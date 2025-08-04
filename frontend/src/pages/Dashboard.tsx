@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Card } from '@/components/ui/Card';
 import { Package, ShoppingCart, Users, TrendingUp, DollarSign, AlertTriangle } from 'lucide-react';
+import { SessionInfo } from '@/components/auth/SessionInfo';
 
 const DashboardContainer = styled.div`
   display: flex;
@@ -357,6 +358,9 @@ export const Dashboard: React.FC = () => {
               </ActionText>
             </ActionButton>
           </Card>
+
+          {/* Session Info */}
+          <SessionInfo />
         </QuickActions>
       </ContentGrid>
     </DashboardContainer>

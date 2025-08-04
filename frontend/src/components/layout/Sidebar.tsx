@@ -10,8 +10,11 @@ import {
   Settings, 
   Image as ImageIcon,
   Home,
-  Heart
+  Heart,
+  LogOut
 } from 'lucide-react';
+import { useLogout } from '@/hooks/useLogout';
+import { LogoutConfirmModal } from '@/components/auth/LogoutConfirmModal';
 
 const SidebarContainer = styled.aside`
   position: fixed;
@@ -127,6 +130,33 @@ const FooterSection = styled.div`
   border-top: 1px solid ${theme.colors.border.light};
 `;
 
+const LogoutButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[3]};
+  width: 100%;
+  padding: ${theme.spacing[3]} ${theme.spacing[4]};
+  background: none;
+  border: 1px solid ${theme.colors.border.light};
+  border-radius: ${theme.borderRadius.md};
+  color: ${theme.colors.error};
+  font-size: ${theme.fontSizes.sm};
+  cursor: pointer;
+  transition: all ${theme.transitions.base};
+  margin-bottom: ${theme.spacing[3]};
+
+  &:hover {
+    background: ${theme.colors.error}10;
+    border-color: ${theme.colors.error};
+    color: ${theme.colors.error};
+  }
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+`;
+
 const FooterText = styled.div`
   font-size: ${theme.fontSizes.xs};
   color: ${theme.colors.text.secondary};
@@ -140,6 +170,14 @@ const BrandText = styled.span`
 `;
 
 export const Sidebar: React.FC = () => {
+  const { 
+    isLogoutModalOpen, 
+    isLoggingOut, 
+    openLogoutModal, 
+    closeLogoutModal, 
+    handleLogout 
+  } = useLogout();
+
   return (
     <SidebarContainer>
       <Logo>
@@ -199,12 +237,25 @@ export const Sidebar: React.FC = () => {
       </Navigation>
 
       <FooterSection>
+        <LogoutButton onClick={openLogoutModal}>
+          <LogOut />
+          Cerrar Sesión
+        </LogoutButton>
+        
         <FooterText>
           © 2025 <BrandText>Happy Baby Style</BrandText>
           <br />
           Hecho con amor para tu bebé
         </FooterText>
       </FooterSection>
+
+      {/* Logout Confirmation Modal */}
+      <LogoutConfirmModal
+        isOpen={isLogoutModalOpen}
+        onClose={closeLogoutModal}
+        onConfirm={handleLogout}
+        isLoading={isLoggingOut}
+      />
     </SidebarContainer>
   );
 };

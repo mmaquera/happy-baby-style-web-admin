@@ -4,6 +4,8 @@ import { theme } from '@/styles/theme';
 import { Search, Bell, User, Settings, LogOut, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
+import { useLogout } from '@/hooks/useLogout';
+import { LogoutConfirmModal } from '@/components/auth/LogoutConfirmModal';
 
 const HeaderContainer = styled.header`
   position: fixed;
@@ -254,16 +256,23 @@ const DropdownArrow = styled(ChevronDown)<{ isOpen: boolean }>`
 `;
 
 export const Header: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
+  const { 
+    isLogoutModalOpen, 
+    isLoggingOut, 
+    openLogoutModal, 
+    closeLogoutModal, 
+    handleLogout 
+  } = useLogout();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleUserClick = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogoutClick = () => {
     setIsDropdownOpen(false);
+    openLogoutModal();
   };
 
   const handleClickOutside = (event: React.MouseEvent) => {
@@ -329,13 +338,21 @@ export const Header: React.FC = () => {
               <Settings size={16} />
               Configuración
             </UserDropdownItem>
-            <UserDropdownItem onClick={handleLogout}>
+            <UserDropdownItem onClick={handleLogoutClick}>
               <LogOut size={16} />
               Cerrar Sesión
             </UserDropdownItem>
           </UserDropdownMenu>
         </UserDropdown>
       </HeaderActions>
+
+      {/* Logout Confirmation Modal */}
+      <LogoutConfirmModal
+        isOpen={isLogoutModalOpen}
+        onClose={closeLogoutModal}
+        onConfirm={handleLogout}
+        isLoading={isLoggingOut}
+      />
     </HeaderContainer>
   );
 };
