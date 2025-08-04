@@ -94,34 +94,7 @@ const FormSubtitle = styled.p`
   margin: 0 0 ${theme.spacing[4]} 0;
 `;
 
-const PasswordInputWrapper = styled.div`
-  position: relative;
-`;
-
-const PasswordToggleButton = styled.button`
-  position: absolute;
-  right: ${theme.spacing[3]};
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: ${theme.colors.warmGray};
-  cursor: pointer;
-  padding: ${theme.spacing[1]};
-  border-radius: ${theme.borderRadius.sm};
-  transition: all ${theme.transitions.fast};
-  z-index: 10;
-
-  &:hover {
-    color: ${theme.colors.primaryPurple};
-    background: ${theme.colors.background.accent};
-  }
-
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px ${theme.colors.primaryPurple}20;
-  }
-`;
+// PasswordInputWrapper and PasswordToggleButton removed - now using integrated Input component
 
 const ForgotPasswordLink = styled.a`
   font-size: ${theme.fontSizes.sm};
@@ -276,30 +249,25 @@ export const Login: React.FC = () => {
             error={errors.email?.message}
           />
 
-          <PasswordInputWrapper>
-            <Input
-              label="Contraseña"
-              type={showPassword ? 'text' : 'password'}
-              placeholder="••••••••"
-              leftIcon={<Lock size={18} />}
-              fullWidth
-              {...register('password', {
-                required: 'La contraseña es requerida',
-                minLength: {
-                  value: 6,
-                  message: 'La contraseña debe tener al menos 6 caracteres',
-                },
-              })}
-              error={errors.password?.message}
-            />
-            <PasswordToggleButton
-              type="button"
-              onClick={togglePasswordVisibility}
-              aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </PasswordToggleButton>
-          </PasswordInputWrapper>
+          <Input
+            label="Contraseña"
+            type={showPassword ? 'text' : 'password'}
+            placeholder="••••••••"
+            leftIcon={<Lock size={18} />}
+            rightIcon={showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            rightIconClickable={true}
+            onRightIconClick={togglePasswordVisibility}
+            rightIconAriaLabel={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+            fullWidth
+            {...register('password', {
+              required: 'La contraseña es requerida',
+              minLength: {
+                value: 6,
+                message: 'La contraseña debe tener al menos 6 caracteres',
+              },
+            })}
+            error={errors.password?.message}
+          />
 
           <ForgotPasswordLink href="#" onClick={(e) => e.preventDefault()}>
             ¿Olvidaste tu contraseña?

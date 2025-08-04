@@ -10,6 +10,9 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   rightIcon?: React.ReactNode;
   icon?: React.ReactNode; // Alias for leftIcon for compatibility
   fullWidth?: boolean;
+  onRightIconClick?: () => void;
+  rightIconClickable?: boolean;
+  rightIconAriaLabel?: string;
 }
 
 const InputContainer = styled.div<{ fullWidth?: boolean }>`
@@ -70,7 +73,7 @@ const StyledInput = styled.input<{ hasLeftIcon?: boolean; hasRightIcon?: boolean
   }
 `;
 
-const IconWrapper = styled.div<{ position: 'left' | 'right' }>`
+const IconWrapper = styled.div<{ position: 'left' | 'right'; clickable?: boolean }>`
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -80,12 +83,26 @@ const IconWrapper = styled.div<{ position: 'left' | 'right' }>`
   width: ${theme.spacing[6]};
   height: ${theme.spacing[6]};
   color: ${theme.colors.warmGray};
-  pointer-events: none;
+  pointer-events: ${({ clickable }) => clickable ? 'auto' : 'none'};
+  cursor: ${({ clickable }) => clickable ? 'pointer' : 'default'};
+  border-radius: ${theme.borderRadius.sm};
+  transition: all ${theme.transitions.fast};
 
   ${({ position }) => position === 'left' ? css`
     left: ${theme.spacing[2]};
   ` : css`
     right: ${theme.spacing[2]};
+  `}
+
+  ${({ clickable }) => clickable && css`
+    &:hover {
+      color: ${theme.colors.primaryPurple};
+      background: ${theme.colors.background.accent};
+    }
+
+    &:active {
+      transform: translateY(-50%) scale(0.95);
+    }
   `}
 `;
 
@@ -104,10 +121,20 @@ export const Input: React.FC<InputProps> = ({
   icon,
   fullWidth = false,
   className,
+  onRightIconClick,
+  rightIconClickable = false,
+  rightIconAriaLabel,
   ...props
 }) => {
   // Use icon as leftIcon if provided
   const finalLeftIcon = leftIcon || icon;
+  
+  const handleRightIconClick = () => {
+    if (rightIconClickable && onRightIconClick) {
+      onRightIconClick();
+    }
+  };
+
   return (
     <InputContainer fullWidth={fullWidth} className={className}>
       {label && <Label>{label}</Label>}
@@ -122,7 +149,18 @@ export const Input: React.FC<InputProps> = ({
           {...props}
         />
         
-        {rightIcon && <IconWrapper position="right">{rightIcon}</IconWrapper>}
+        {rightIcon && (
+          <IconWrapper 
+            position="right" 
+            clickable={rightIconClickable}
+            onClick={handleRightIconClick}
+            role={rightIconClickable ? 'button' : undefined}
+            aria-label={rightIconAriaLabel}
+            tabIndex={rightIconClickable ? 0 : undefined}
+          >
+            {rightIcon}
+          </IconWrapper>
+        )}
       </InputWrapper>
       
       {(error || helperText) && (
