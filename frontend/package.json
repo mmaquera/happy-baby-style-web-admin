@@ -1,0 +1,32 @@
+{
+  "name": "happy-baby-style-admin-frontend",
+  "version": "1.0.0",
+  "description": "Frontend admin panel for Happy Baby Style",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.1",
+    "react-hook-form": "^7.47.0",
+    "react-query": "^3.39.3",
+    "axios": "^1.6.2",
+    "styled-components": "^6.1.1",
+    "lucide-react": "^0.294.0",
+    "react-hot-toast": "^2.4.1",
+    "date-fns": "^2.30.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@types/styled-components": "^5.1.29",
+    "@vitejs/plugin-react": "^4.1.1",
+    "typescript": "^5.2.2",
+    "vite": "^5.0.0"
+  }
+}
