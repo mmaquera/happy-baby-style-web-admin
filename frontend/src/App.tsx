@@ -6,6 +6,9 @@ import { Toaster } from 'react-hot-toast';
 import { GlobalStyles } from '@/styles/GlobalStyles';
 import { theme } from '@/styles/theme';
 import { Layout } from '@/components/layout/Layout';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { Login } from '@/pages/Login';
+import { Unauthorized } from '@/pages/Unauthorized';
 import { Dashboard } from '@/pages/Dashboard';
 import { Products } from '@/pages/Products';
 import { Orders } from '@/pages/Orders';
@@ -27,18 +30,69 @@ function App() {
       <ThemeProvider theme={theme}>
         <GlobalStyles />
         <Router>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/orders" element={<Orders />} />
-              <Route path="/customers" element={<ComingSoon page="Clientes" />} />
-              <Route path="/images" element={<ComingSoon page="Imágenes" />} />
-              <Route path="/analytics" element={<ComingSoon page="Estadísticas" />} />
-              <Route path="/settings" element={<ComingSoon page="Configuración" />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Layout>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
+            
+            {/* Protected routes */}
+            <Route path="/" element={
+              <ProtectedRoute>
+                <Layout>
+                  <Dashboard />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/products" element={
+              <ProtectedRoute>
+                <Layout>
+                  <Products />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/orders" element={
+              <ProtectedRoute>
+                <Layout>
+                  <Orders />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/customers" element={
+              <ProtectedRoute>
+                <Layout>
+                  <ComingSoon page="Clientes" />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/images" element={
+              <ProtectedRoute>
+                <Layout>
+                  <ComingSoon page="Imágenes" />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/analytics" element={
+              <ProtectedRoute>
+                <Layout>
+                  <ComingSoon page="Estadísticas" />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <Layout>
+                  <ComingSoon page="Configuración" />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="*" element={
+              <ProtectedRoute>
+                <Layout>
+                  <NotFound />
+                </Layout>
+              </ProtectedRoute>
+            } />
+          </Routes>
         </Router>
         <Toaster
           position="top-right"

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
-import { Search, Bell, User, Settings } from 'lucide-react';
+import { Search, Bell, User, Settings, LogOut, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { useAuth } from '@/hooks/useAuth';
 
 const HeaderContainer = styled.header`
   position: fixed;
@@ -192,7 +193,101 @@ const MobileMenuButton = styled.button`
   }
 `;
 
+const UserDropdown = styled.div`
+  position: relative;
+`;
+
+const UserDropdownMenu = styled.div<{ isOpen: boolean }>`
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: ${theme.spacing[2]};
+  background: ${theme.colors.white};
+  border: 1px solid ${theme.colors.border.light};
+  border-radius: ${theme.borderRadius.lg};
+  box-shadow: ${theme.shadows.lg};
+  min-width: 200px;
+  opacity: ${({ isOpen }) => isOpen ? 1 : 0};
+  visibility: ${({ isOpen }) => isOpen ? 'visible' : 'hidden'};
+  transform: ${({ isOpen }) => isOpen ? 'translateY(0)' : 'translateY(-10px)'};
+  transition: all ${theme.transitions.base};
+  z-index: ${theme.zIndex.dropdown};
+`;
+
+const UserDropdownItem = styled.button`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[3]};
+  padding: ${theme.spacing[3]} ${theme.spacing[4]};
+  background: none;
+  border: none;
+  color: ${theme.colors.text.primary};
+  font-size: ${theme.fontSizes.sm};
+  cursor: pointer;
+  transition: all ${theme.transitions.fast};
+
+  &:hover {
+    background: ${theme.colors.background.accent};
+    color: ${theme.colors.primaryPurple};
+  }
+
+  &:first-child {
+    border-radius: ${theme.borderRadius.lg} ${theme.borderRadius.lg} 0 0;
+  }
+
+  &:last-child {
+    border-radius: 0 0 ${theme.borderRadius.lg} ${theme.borderRadius.lg};
+    border-top: 1px solid ${theme.colors.border.light};
+    color: ${theme.colors.error};
+  }
+
+  &:last-child:hover {
+    background: ${theme.colors.error}10;
+    color: ${theme.colors.error};
+  }
+`;
+
+const DropdownArrow = styled(ChevronDown)<{ isOpen: boolean }>`
+  transition: transform ${theme.transitions.fast};
+  transform: ${({ isOpen }) => isOpen ? 'rotate(180deg)' : 'rotate(0deg)'};
+`;
+
 export const Header: React.FC = () => {
+  const { user, logout } = useAuth();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const handleUserClick = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleLogout = () => {
+    logout();
+    setIsDropdownOpen(false);
+  };
+
+  const handleClickOutside = (event: React.MouseEvent) => {
+    if (event.target === event.currentTarget) {
+      setIsDropdownOpen(false);
+    }
+  };
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = () => setIsDropdownOpen(false);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
+  const getUserInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
     <HeaderContainer>
       <MobileMenuButton>
@@ -213,15 +308,33 @@ export const Header: React.FC = () => {
           <NotificationBadge />
         </NotificationButton>
 
-        <UserProfile>
-          <Avatar>
-            A
-          </Avatar>
-          <UserInfo>
-            <UserName>Admin</UserName>
-            <UserRole>Administrador</UserRole>
-          </UserInfo>
-        </UserProfile>
+        <UserDropdown>
+          <UserProfile onClick={handleUserClick}>
+            <Avatar>
+              {user ? getUserInitials(user.name) : 'U'}
+            </Avatar>
+            <UserInfo>
+              <UserName>{user?.name || 'Usuario'}</UserName>
+              <UserRole>{user?.role === 'admin' ? 'Administrador' : 'Usuario'}</UserRole>
+            </UserInfo>
+            <DropdownArrow size={16} isOpen={isDropdownOpen} />
+          </UserProfile>
+
+          <UserDropdownMenu isOpen={isDropdownOpen}>
+            <UserDropdownItem>
+              <User size={16} />
+              Mi Perfil
+            </UserDropdownItem>
+            <UserDropdownItem>
+              <Settings size={16} />
+              Configuración
+            </UserDropdownItem>
+            <UserDropdownItem onClick={handleLogout}>
+              <LogOut size={16} />
+              Cerrar Sesión
+            </UserDropdownItem>
+          </UserDropdownMenu>
+        </UserDropdown>
       </HeaderActions>
     </HeaderContainer>
   );
