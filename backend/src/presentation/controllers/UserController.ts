@@ -4,6 +4,7 @@ import { GetUsersUseCase } from '../../application/use-cases/user/GetUsersUseCas
 import { GetUserByIdUseCase } from '../../application/use-cases/user/GetUserByIdUseCase';
 import { UpdateUserUseCase } from '../../application/use-cases/user/UpdateUserUseCase';
 import { GetUserStatsUseCase } from '../../application/use-cases/user/GetUserStatsUseCase';
+import { UserRole } from '../../domain/entities/User';
 
 export class UserController {
   constructor(
@@ -38,7 +39,7 @@ export class UserController {
       const filters = {
         limit: limit ? parseInt(limit as string) : undefined,
         offset: offset ? parseInt(offset as string) : undefined,
-        role: role as string,
+        role: role as UserRole | undefined,
         isActive: isActive === 'true' ? true : isActive === 'false' ? false : undefined,
         search: search as string
       };

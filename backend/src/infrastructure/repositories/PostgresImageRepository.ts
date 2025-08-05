@@ -1,13 +1,9 @@
 import { IImageRepository, ImageFilters } from '@domain/repositories/IImageRepository';
 import { ImageEntity, ImageEntityType } from '@domain/entities/Image';
-import { PostgresConfig } from '@infrastructure/config/postgres';
+import { Pool } from 'pg';
 
 export class PostgresImageRepository implements IImageRepository {
-  private postgres: PostgresConfig;
-
-  constructor() {
-    this.postgres = PostgresConfig.getInstance();
-  }
+  constructor(private pool: Pool) {}
 
   async create(image: ImageEntity): Promise<ImageEntity> {
     const query = `
@@ -30,13 +26,13 @@ export class PostgresImageRepository implements IImageRepository {
       image.entityId
     ];
 
-    const result = await this.postgres.query(query, values);
+    const result = await this.pool.query(query, values);
     return this.mapToImageEntity(result.rows[0]);
   }
 
   async findById(id: string): Promise<ImageEntity | null> {
     const query = 'SELECT * FROM images WHERE id = $1';
-    const result = await this.postgres.query(query, [id]);
+    const result = await this.pool.query(query, [id]);
     
     if (result.rows.length === 0) {
       return null;
@@ -86,25 +82,25 @@ export class PostgresImageRepository implements IImageRepository {
       values.push(filters.offset);
     }
 
-    const result = await this.postgres.query(query, values);
+    const result = await this.pool.query(query, values);
     return result.rows.map((row: any) => this.mapToImageEntity(row));
   }
 
   async findByEntityId(entityId: string, entityType: ImageEntityType): Promise<ImageEntity[]> {
     const query = 'SELECT * FROM images WHERE entity_id = $1 AND entity_type = $2 ORDER BY created_at ASC';
-    const result = await this.postgres.query(query, [entityId, entityType]);
+    const result = await this.pool.query(query, [entityId, entityType]);
     
     return result.rows.map((row: any) => this.mapToImageEntity(row));
   }
 
   async delete(id: string): Promise<void> {
     const query = 'DELETE FROM images WHERE id = $1';
-    await this.postgres.query(query, [id]);
+    await this.pool.query(query, [id]);
   }
 
   async deleteByEntityId(entityId: string, entityType: ImageEntityType): Promise<void> {
     const query = 'DELETE FROM images WHERE entity_id = $1 AND entity_type = $2';
-    await this.postgres.query(query, [entityId, entityType]);
+    await this.pool.query(query, [entityId, entityType]);
   }
 
   private mapToImageEntity(row: any): ImageEntity {

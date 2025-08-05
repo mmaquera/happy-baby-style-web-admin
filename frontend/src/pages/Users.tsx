@@ -2,28 +2,27 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useUsers, useUserStats, useCreateUser, useUpdateUser } from '@/hooks/useUsers';
 import { User, UserRole, CreateUserRequest, UpdateUserRequest } from '@/types';
-import { Card, Button, Input } from '@/components/ui';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { theme } from '@/styles/theme';
 import { 
-  Users, 
-  UserPlus, 
-  Search, 
-  Filter, 
-  Edit, 
-  Eye, 
-  Mail, 
-  Phone, 
+  Users as UsersIcon,
+  UserPlus,
+  Search,
+  Filter,
+  Mail,
+  Phone,
   Calendar,
-  MapPin,
-  Shield,
-  CheckCircle,
-  XCircle,
+  Eye,
+  Edit,
+  Trash2,
   Plus
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 // Styled Components
-const UsersContainer = styled.div`
+const Container = styled.div`
   padding: ${theme.spacing[6]};
   max-width: 1200px;
   margin: 0 auto;
@@ -36,6 +35,18 @@ const Header = styled.div`
   margin-bottom: ${theme.spacing[6]};
 `;
 
+const HeaderContent = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+`;
+
+const HeaderInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
 const Title = styled.h1`
   font-family: ${theme.fonts.heading};
   font-size: ${theme.fontSizes['3xl']};
@@ -46,6 +57,17 @@ const Title = styled.h1`
   gap: ${theme.spacing[3]};
 `;
 
+const Subtitle = styled.p`
+  font-size: ${theme.fontSizes.lg};
+  color: ${theme.colors.text.secondary};
+  margin-top: ${theme.spacing[1]};
+`;
+
+const HeaderActions = styled.div`
+  display: flex;
+  gap: ${theme.spacing[3]};
+`;
+
 const StatsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -53,19 +75,32 @@ const StatsGrid = styled.div`
   margin-bottom: ${theme.spacing[6]};
 `;
 
-const StatCard = styled(Card)`
+const StatsCard = styled(Card)`
   text-align: center;
   padding: ${theme.spacing[4]};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
-const StatNumber = styled.div`
+const StatsIcon = styled.div`
+  color: ${theme.colors.primaryPurple};
+  margin-bottom: ${theme.spacing[3]};
+`;
+
+const StatsContent = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const StatsNumber = styled.div`
   font-size: ${theme.fontSizes['2xl']};
   font-weight: ${theme.fontWeights.bold};
   color: ${theme.colors.primaryPurple};
   margin-bottom: ${theme.spacing[2]};
 `;
 
-const StatLabel = styled.div`
+const StatsLabel = styled.div`
   font-size: ${theme.fontSizes.sm};
   color: ${theme.colors.text.secondary};
   text-transform: uppercase;
@@ -87,6 +122,20 @@ const FiltersRow = styled.div`
   flex-wrap: wrap;
 `;
 
+const SearchInput = styled(Input)`
+  min-width: 250px;
+`;
+
+const FilterSelect = styled.select`
+  padding: 8px 12px;
+  border: 1px solid ${theme.colors.border.light};
+  border-radius: ${theme.borderRadius.md};
+  font-size: ${theme.fontSizes.sm};
+  background-color: ${theme.colors.white};
+  color: ${theme.colors.text.primary};
+  cursor: pointer;
+`;
+
 const UsersGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -97,6 +146,9 @@ const UserCard = styled(Card)`
   padding: ${theme.spacing[4]};
   transition: all ${theme.transitions.base};
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[3]};
 
   &:hover {
     transform: translateY(-2px);
@@ -104,11 +156,17 @@ const UserCard = styled(Card)`
   }
 `;
 
-const UserHeader = styled.div`
+const UserAvatar = styled.div`
+  width: 40px;
+  height: 40px;
+  background-color: ${theme.colors.primaryPurple}10;
+  border-radius: ${theme.borderRadius.full};
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: ${theme.spacing[3]};
+  align-items: center;
+  justify-content: center;
+  font-size: ${theme.fontSizes.lg};
+  font-weight: ${theme.fontWeights.semibold};
+  color: ${theme.colors.primaryPurple};
 `;
 
 const UserInfo = styled.div`
@@ -125,9 +183,13 @@ const UserName = styled.h3`
 const UserEmail = styled.p`
   font-size: ${theme.fontSizes.sm};
   color: ${theme.colors.text.secondary};
+  margin-bottom: ${theme.spacing[2]};
+`;
+
+const UserDetails = styled.div`
   display: flex;
   align-items: center;
-  gap: ${theme.spacing[1]};
+  gap: ${theme.spacing[2]};
   margin-bottom: ${theme.spacing[2]};
 `;
 
@@ -163,24 +225,44 @@ const UserRoleBadge = styled.span<{ role: UserRole }>`
   }}
 `;
 
-const UserStatus = styled.div<{ isActive: boolean }>`
+const UserStatus = styled.span<{ active: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: ${theme.spacing[1]};
+  padding: ${theme.spacing[1]} ${theme.spacing[2]};
+  border-radius: ${theme.borderRadius.full};
+  font-size: ${theme.fontSizes.xs};
+  font-weight: ${theme.fontWeights.medium};
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  ${({ active }) => {
+    if (active) {
+      return `
+        background: ${theme.colors.success}20;
+        color: ${theme.colors.success};
+      `;
+    } else {
+      return `
+        background: ${theme.colors.error}20;
+        color: ${theme.colors.error};
+      `;
+    }
+  }}
+`;
+
+const UserPhone = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[1]};
   font-size: ${theme.fontSizes.sm};
-  color: ${({ isActive }) => isActive ? theme.colors.success : theme.colors.error};
+  color: ${theme.colors.text.secondary};
 `;
 
-const UserDetails = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[2]};
-`;
-
-const UserDetail = styled.div`
+const UserBirthDate = styled.div`
   display: flex;
   align-items: center;
-  gap: ${theme.spacing[2]};
+  gap: ${theme.spacing[1]};
   font-size: ${theme.fontSizes.sm};
   color: ${theme.colors.text.secondary};
 `;
@@ -191,17 +273,16 @@ const UserActions = styled.div`
   margin-top: ${theme.spacing[3]};
 `;
 
-const EmptyState = styled.div`
+const LoadingMessage = styled.div`
   text-align: center;
   padding: ${theme.spacing[8]};
   color: ${theme.colors.text.secondary};
 `;
 
-const EmptyIcon = styled(Users)`
-  width: 64px;
-  height: 64px;
-  margin: 0 auto ${theme.spacing[4]};
-  color: ${theme.colors.border.light};
+const ErrorMessage = styled.div`
+  text-align: center;
+  padding: ${theme.spacing[8]};
+  color: ${theme.colors.error};
 `;
 
 // Modal Components
@@ -257,7 +338,7 @@ const FormActions = styled.div`
 export const UsersPage: React.FC = () => {
   const [filters, setFilters] = useState({
     search: '',
-    role: '' as UserRole | '',
+    role: undefined as UserRole | undefined,
     isActive: undefined as boolean | undefined
   });
   
@@ -355,165 +436,246 @@ export const UsersPage: React.FC = () => {
 
   if (usersError) {
     return (
-      <UsersContainer>
-        <EmptyState>
-          <EmptyIcon />
-          <h3>Error al cargar usuarios</h3>
-          <p>No se pudieron cargar los usuarios. Inténtalo de nuevo.</p>
-        </EmptyState>
-      </UsersContainer>
+      <Container>
+        <Header>
+          <HeaderContent>
+            <HeaderInfo>
+              <Title>Gestión de Usuarios</Title>
+              <Subtitle>Administra usuarios del sistema</Subtitle>
+            </HeaderInfo>
+            <HeaderActions>
+              <Button
+                variant="primary"
+                onClick={() => setShowCreateModal(true)}
+                icon={<UserPlus size={16} />}
+              >
+                Nuevo Usuario
+              </Button>
+            </HeaderActions>
+          </HeaderContent>
+        </Header>
+
+        <StatsGrid>
+          <StatsCard>
+            <StatsIcon>
+              <UsersIcon size={24} />
+            </StatsIcon>
+            <StatsContent>
+              <StatsNumber>{stats?.totalUsers || 0}</StatsNumber>
+              <StatsLabel>Total Usuarios</StatsLabel>
+            </StatsContent>
+          </StatsCard>
+          <StatsCard>
+            <StatsIcon>
+              <UserPlus size={24} />
+            </StatsIcon>
+            <StatsContent>
+              <StatsNumber>{stats?.activeUsers || 0}</StatsNumber>
+              <StatsLabel>Usuarios Activos</StatsLabel>
+            </StatsContent>
+          </StatsCard>
+          <StatsCard>
+            <StatsIcon>
+              <Mail size={24} />
+            </StatsIcon>
+            <StatsContent>
+              <StatsNumber>{stats?.totalUsers || 0}</StatsNumber>
+              <StatsLabel>Usuarios por Rol</StatsLabel>
+            </StatsContent>
+          </StatsCard>
+          <StatsCard>
+            <StatsIcon>
+              <Calendar size={24} />
+            </StatsIcon>
+            <StatsContent>
+              <StatsNumber>{stats?.newUsersThisMonth || 0}</StatsNumber>
+              <StatsLabel>Nuevos este Mes</StatsLabel>
+            </StatsContent>
+          </StatsCard>
+        </StatsGrid>
+
+        <FiltersSection>
+          <FiltersRow>
+            <SearchInput
+              placeholder="Buscar usuarios..."
+              value={filters.search}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+              icon={<Search size={16} />}
+              style={{ minWidth: '250px' }}
+            />
+            <FilterSelect
+              value={filters.role || ''}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilters(prev => ({ 
+                ...prev, 
+                role: e.target.value ? e.target.value as UserRole : undefined 
+              }))}
+            >
+              <option value="">Todos los roles</option>
+              <option value="admin">Administrador</option>
+              <option value="customer">Cliente</option>
+              <option value="staff">Staff</option>
+            </FilterSelect>
+            <FilterSelect
+              value={filters.isActive === undefined ? '' : filters.isActive ? 'true' : 'false'}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilters(prev => ({ 
+                ...prev, 
+                isActive: e.target.value ? e.target.value === 'true' : undefined 
+              }))}
+            >
+              <option value="">Todos los estados</option>
+              <option value="true">Activo</option>
+              <option value="false">Inactivo</option>
+            </FilterSelect>
+          </FiltersRow>
+        </FiltersSection>
+
+        <UsersGrid>
+          <LoadingMessage>Cargando usuarios...</LoadingMessage>
+        </UsersGrid>
+      </Container>
     );
   }
 
   return (
-    <UsersContainer>
+    <Container>
+      {/* Header */}
       <Header>
-        <Title>
-          <Users size={32} />
-          Gestión de Usuarios
-        </Title>
-        <Button
-          variant="primary"
-          size="medium"
-          onClick={() => setShowCreateModal(true)}
-        >
-          <UserPlus size={16} />
-          Nuevo Usuario
-        </Button>
+        <HeaderContent>
+          <HeaderInfo>
+            <Title>Gestión de Usuarios</Title>
+            <Subtitle>Administra usuarios del sistema</Subtitle>
+          </HeaderInfo>
+          <HeaderActions>
+            <Button
+              variant="primary"
+              onClick={() => setShowCreateModal(true)}
+              icon={<UserPlus size={16} />}
+            >
+              Nuevo Usuario
+            </Button>
+          </HeaderActions>
+        </HeaderContent>
       </Header>
 
-      {/* Stats */}
-      {stats && (
-        <StatsGrid>
-          <StatCard>
-            <StatNumber>{stats.totalUsers}</StatNumber>
-            <StatLabel>Total de Usuarios</StatLabel>
-          </StatCard>
-          <StatCard>
-            <StatNumber>{stats.activeUsers}</StatNumber>
-            <StatLabel>Usuarios Activos</StatLabel>
-          </StatCard>
-          <StatCard>
-            <StatNumber>{stats.newUsersThisMonth}</StatNumber>
-            <StatLabel>Nuevos este Mes</StatLabel>
-          </StatCard>
-          <StatCard>
-            <StatNumber>{stats.usersByRole[UserRole.ADMIN] || 0}</StatNumber>
-            <StatLabel>Administradores</StatLabel>
-          </StatCard>
-        </StatsGrid>
-      )}
+      {/* Stats Cards */}
+      <StatsGrid>
+        <StatsCard>
+          <StatsIcon>
+            <UsersIcon size={24} />
+          </StatsIcon>
+          <StatsContent>
+            <StatsNumber>{stats?.totalUsers || 0}</StatsNumber>
+            <StatsLabel>Total Usuarios</StatsLabel>
+          </StatsContent>
+        </StatsCard>
+        <StatsCard>
+          <StatsIcon>
+            <UserPlus size={24} />
+          </StatsIcon>
+          <StatsContent>
+            <StatsNumber>{stats?.activeUsers || 0}</StatsNumber>
+            <StatsLabel>Usuarios Activos</StatsLabel>
+          </StatsContent>
+        </StatsCard>
+        <StatsCard>
+          <StatsIcon>
+            <Mail size={24} />
+          </StatsIcon>
+          <StatsContent>
+                         <StatsNumber>{stats?.activeUsers || 0}</StatsNumber>
+            <StatsLabel>Email Verificado</StatsLabel>
+          </StatsContent>
+        </StatsCard>
+        <StatsCard>
+          <StatsIcon>
+            <Calendar size={24} />
+          </StatsIcon>
+          <StatsContent>
+            <StatsNumber>{stats?.newUsersThisMonth || 0}</StatsNumber>
+            <StatsLabel>Nuevos este Mes</StatsLabel>
+          </StatsContent>
+        </StatsCard>
+      </StatsGrid>
 
       {/* Filters */}
       <FiltersSection>
         <FiltersRow>
-          <Input
+          <SearchInput
             placeholder="Buscar usuarios..."
             value={filters.search}
-            onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-            leftIcon={<Search size={16} />}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+            icon={<Search size={16} />}
             style={{ minWidth: '250px' }}
           />
-          <select
-            value={filters.role}
-            onChange={(e) => setFilters(prev => ({ ...prev, role: e.target.value as UserRole | '' }))}
-            style={{
-              padding: '8px 12px',
-              border: `1px solid ${theme.colors.border.light}`,
-              borderRadius: theme.borderRadius.md,
-              fontSize: theme.fontSizes.sm
-            }}
+          <FilterSelect
+            value={filters.role || ''}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilters(prev => ({ 
+              ...prev, 
+              role: e.target.value ? e.target.value as UserRole : undefined 
+            }))}
           >
             <option value="">Todos los roles</option>
-            <option value={UserRole.ADMIN}>Administrador</option>
-            <option value={UserRole.STAFF}>Personal</option>
-            <option value={UserRole.CUSTOMER}>Cliente</option>
-          </select>
-          <select
-            value={filters.isActive === undefined ? '' : filters.isActive.toString()}
-            onChange={(e) => setFilters(prev => ({ 
+            <option value="admin">Administrador</option>
+            <option value="customer">Cliente</option>
+            <option value="staff">Staff</option>
+          </FilterSelect>
+          <FilterSelect
+            value={filters.isActive === undefined ? '' : filters.isActive ? 'true' : 'false'}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilters(prev => ({ 
               ...prev, 
-              isActive: e.target.value === '' ? undefined : e.target.value === 'true'
+              isActive: e.target.value ? e.target.value === 'true' : undefined 
             }))}
-            style={{
-              padding: '8px 12px',
-              border: `1px solid ${theme.colors.border.light}`,
-              borderRadius: theme.borderRadius.md,
-              fontSize: theme.fontSizes.sm
-            }}
           >
             <option value="">Todos los estados</option>
-            <option value="true">Activos</option>
-            <option value="false">Inactivos</option>
-          </select>
+            <option value="true">Activo</option>
+            <option value="false">Inactivo</option>
+          </FilterSelect>
         </FiltersRow>
       </FiltersSection>
 
-      {/* Users Grid */}
+      {/* Users List */}
       {usersLoading ? (
-        <EmptyState>
-          <EmptyIcon />
-          <h3>Cargando usuarios...</h3>
-        </EmptyState>
-      ) : users.length === 0 ? (
-        <EmptyState>
-          <EmptyIcon />
-          <h3>No se encontraron usuarios</h3>
-          <p>No hay usuarios que coincidan con los filtros aplicados.</p>
-        </EmptyState>
+        <LoadingMessage>Cargando usuarios...</LoadingMessage>
+      ) : usersError ? (
+        <ErrorMessage>Error al cargar usuarios: Error desconocido</ErrorMessage>
       ) : (
         <UsersGrid>
           {users.map((user) => (
             <UserCard key={user.id} onClick={() => openEditModal(user)}>
-              <UserHeader>
-                <UserInfo>
-                  <UserName>
-                    {user.profile?.firstName && user.profile?.lastName
-                      ? `${user.profile.firstName} ${user.profile.lastName}`
-                      : user.email.split('@')[0]
-                    }
-                  </UserName>
-                  <UserEmail>
-                    <Mail size={14} />
-                    {user.email}
-                  </UserEmail>
+              <UserAvatar>
+                {user.profile?.firstName?.[0]}{user.profile?.lastName?.[0]}
+              </UserAvatar>
+              <UserInfo>
+                <UserName>
+                  {user.profile?.firstName} {user.profile?.lastName}
+                </UserName>
+                <UserEmail>{user.email}</UserEmail>
+                <UserDetails>
                   <UserRoleBadge role={user.role}>
-                    <Shield size={12} />
                     {getRoleLabel(user.role)}
                   </UserRoleBadge>
-                </UserInfo>
-                <UserStatus isActive={user.isActive}>
-                  {user.isActive ? <CheckCircle size={16} /> : <XCircle size={16} />}
-                  {user.isActive ? 'Activo' : 'Inactivo'}
-                </UserStatus>
-              </UserHeader>
-
-              <UserDetails>
+                  <UserStatus active={user.isActive}>
+                    {user.isActive ? 'Activo' : 'Inactivo'}
+                  </UserStatus>
+                </UserDetails>
                 {user.profile?.phone && (
-                  <UserDetail>
-                    <Phone size={14} />
+                  <UserPhone>
+                    <Phone size={12} />
                     {user.profile.phone}
-                  </UserDetail>
+                  </UserPhone>
                 )}
                 {user.profile?.birthDate && (
-                  <UserDetail>
-                    <Calendar size={14} />
+                  <UserBirthDate>
+                    <Calendar size={12} />
                     {new Date(user.profile.birthDate).toLocaleDateString()}
-                  </UserDetail>
+                  </UserBirthDate>
                 )}
-                {user.addresses && user.addresses.length > 0 && (
-                  <UserDetail>
-                    <MapPin size={14} />
-                    {user.addresses.length} dirección{user.addresses.length !== 1 ? 'es' : ''}
-                  </UserDetail>
-                )}
-              </UserDetails>
-
+              </UserInfo>
               <UserActions>
                 <Button
                   variant="outline"
                   size="small"
-                  onClick={(e) => {
+                  onClick={(e: React.MouseEvent) => {
                     e.stopPropagation();
                     openEditModal(user);
                   }}
@@ -524,7 +686,7 @@ export const UsersPage: React.FC = () => {
                 <Button
                   variant="outline"
                   size="small"
-                  onClick={(e) => {
+                  onClick={(e: React.MouseEvent) => {
                     e.stopPropagation();
                     // TODO: Implement view user details
                   }}
@@ -541,7 +703,7 @@ export const UsersPage: React.FC = () => {
       {/* Create User Modal */}
       {showCreateModal && (
         <Modal onClick={() => setShowCreateModal(false)}>
-          <ModalContent onClick={(e) => e.stopPropagation()}>
+          <ModalContent onClick={(e: React.MouseEvent) => e.stopPropagation()}>
             <ModalHeader>
               <ModalTitle>Crear Nuevo Usuario</ModalTitle>
               <Button
@@ -558,20 +720,20 @@ export const UsersPage: React.FC = () => {
                 label="Email"
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                 required
               />
               <Input
                 label="Contraseña"
                 type="password"
                 value={formData.password}
-                onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                 required
               />
               <Input
                 label="Nombre"
                 value={formData.profile?.firstName || ''}
-                onChange={(e) => setFormData(prev => ({
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
                   ...prev,
                   profile: { ...prev.profile!, firstName: e.target.value }
                 }))}
@@ -580,7 +742,7 @@ export const UsersPage: React.FC = () => {
               <Input
                 label="Apellido"
                 value={formData.profile?.lastName || ''}
-                onChange={(e) => setFormData(prev => ({
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
                   ...prev,
                   profile: { ...prev.profile!, lastName: e.target.value }
                 }))}
@@ -589,7 +751,7 @@ export const UsersPage: React.FC = () => {
               <Input
                 label="Teléfono"
                 value={formData.profile?.phone || ''}
-                onChange={(e) => setFormData(prev => ({
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
                   ...prev,
                   profile: { ...prev.profile!, phone: e.target.value }
                 }))}
@@ -598,7 +760,7 @@ export const UsersPage: React.FC = () => {
                 label="Fecha de Nacimiento"
                 type="date"
                 value={formData.profile?.birthDate ? new Date(formData.profile.birthDate).toISOString().split('T')[0] : ''}
-                onChange={(e) => setFormData(prev => ({
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
                   ...prev,
                   profile: { ...prev.profile!, birthDate: e.target.value ? new Date(e.target.value) : undefined }
                 }))}
@@ -615,7 +777,7 @@ export const UsersPage: React.FC = () => {
               <Button
                 variant="primary"
                 onClick={handleCreateUser}
-                isLoading={createUserMutation.isPending}
+                isLoading={createUserMutation.isLoading}
               >
                 Crear Usuario
               </Button>
@@ -627,7 +789,7 @@ export const UsersPage: React.FC = () => {
       {/* Edit User Modal */}
       {showEditModal && selectedUser && (
         <Modal onClick={() => setShowEditModal(false)}>
-          <ModalContent onClick={(e) => e.stopPropagation()}>
+          <ModalContent onClick={(e: React.MouseEvent) => e.stopPropagation()}>
             <ModalHeader>
               <ModalTitle>Editar Usuario</ModalTitle>
               <Button
@@ -644,13 +806,13 @@ export const UsersPage: React.FC = () => {
                 label="Email"
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                 required
               />
               <Input
                 label="Nombre"
                 value={formData.profile?.firstName || ''}
-                onChange={(e) => setFormData(prev => ({
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
                   ...prev,
                   profile: { ...prev.profile!, firstName: e.target.value }
                 }))}
@@ -659,7 +821,7 @@ export const UsersPage: React.FC = () => {
               <Input
                 label="Apellido"
                 value={formData.profile?.lastName || ''}
-                onChange={(e) => setFormData(prev => ({
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
                   ...prev,
                   profile: { ...prev.profile!, lastName: e.target.value }
                 }))}
@@ -668,9 +830,18 @@ export const UsersPage: React.FC = () => {
               <Input
                 label="Teléfono"
                 value={formData.profile?.phone || ''}
-                onChange={(e) => setFormData(prev => ({
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
                   ...prev,
                   profile: { ...prev.profile!, phone: e.target.value }
+                }))}
+              />
+              <Input
+                label="Fecha de Nacimiento"
+                type="date"
+                value={formData.profile?.birthDate ? new Date(formData.profile.birthDate).toISOString().split('T')[0] : ''}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
+                  ...prev,
+                  profile: { ...prev.profile!, birthDate: e.target.value ? new Date(e.target.value) : undefined }
                 }))}
               />
             </FormGrid>
@@ -685,7 +856,7 @@ export const UsersPage: React.FC = () => {
               <Button
                 variant="primary"
                 onClick={handleUpdateUser}
-                isLoading={updateUserMutation.isPending}
+                isLoading={updateUserMutation.isLoading}
               >
                 Actualizar Usuario
               </Button>
@@ -693,7 +864,7 @@ export const UsersPage: React.FC = () => {
           </ModalContent>
         </Modal>
       )}
-    </UsersContainer>
+    </Container>
   );
 };
 

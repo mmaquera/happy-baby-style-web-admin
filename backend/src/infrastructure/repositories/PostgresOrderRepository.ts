@@ -1,16 +1,12 @@
 import { IOrderRepository, OrderFilters, OrderStats } from '@domain/repositories/IOrderRepository';
 import { Order, CreateOrderRequest, UpdateOrderRequest, OrderItem, ShippingAddress, OrderEntity, OrderItemEntity, ShippingAddressEntity } from '@domain/entities/Order';
-import { PostgresConfig } from '@infrastructure/config/postgres';
+import { Pool } from 'pg';
 
 export class PostgresOrderRepository implements IOrderRepository {
-  private postgres: PostgresConfig;
-
-  constructor() {
-    this.postgres = PostgresConfig.getInstance();
-  }
+  constructor(private pool: Pool) {}
 
   async create(orderData: CreateOrderRequest): Promise<Order> {
-    const client = await this.postgres.getPool().connect();
+    const client = await this.pool.connect();
     
     try {
       await client.query('BEGIN');
@@ -110,7 +106,7 @@ export class PostgresOrderRepository implements IOrderRepository {
       WHERE o.id = $1
     `;
 
-    const result = await this.postgres.query(query, [id]);
+    const result = await this.pool.query(query, [id]);
     
     if (result.rows.length === 0) {
       return null;
@@ -129,7 +125,7 @@ export class PostgresOrderRepository implements IOrderRepository {
       WHERE oi.order_id = $1
     `;
 
-    const itemsResult = await this.postgres.query(itemsQuery, [id]);
+    const itemsResult = await this.pool.query(itemsQuery, [id]);
     const items = itemsResult.rows.map(this.mapToOrderItem);
 
     return this.mapToOrder(orderData, items);
@@ -186,7 +182,7 @@ export class PostgresOrderRepository implements IOrderRepository {
 
     query += ` ORDER BY o.created_at DESC`;
 
-    const result = await this.postgres.query(query, values);
+    const result = await this.pool.query(query, values);
     
     // Obtener items para cada pedido
     const orders: Order[] = [];
@@ -201,7 +197,7 @@ export class PostgresOrderRepository implements IOrderRepository {
         WHERE oi.order_id = $1
       `;
 
-      const itemsResult = await this.postgres.query(itemsQuery, [orderData.id]);
+      const itemsResult = await this.pool.query(itemsQuery, [orderData.id]);
       const items = itemsResult.rows.map(this.mapToOrderItem);
       
       orders.push(this.mapToOrder(orderData, items));
@@ -232,7 +228,7 @@ export class PostgresOrderRepository implements IOrderRepository {
       id
     ];
 
-    const result = await this.postgres.query(query, values);
+    const result = await this.pool.query(query, values);
     
     if (result.rows.length === 0) {
       throw new Error(`Order with id ${id} not found`);
@@ -242,7 +238,7 @@ export class PostgresOrderRepository implements IOrderRepository {
   }
 
   async delete(id: string): Promise<boolean> {
-    const client = await this.postgres.getPool().connect();
+    const client = await this.pool.connect();
     
     try {
       await client.query('BEGIN');
@@ -294,14 +290,14 @@ export class PostgresOrderRepository implements IOrderRepository {
       item.color
     ];
 
-    const result = await this.postgres.query(query, values);
+    const result = await this.pool.query(query, values);
     return this.mapToOrderItem(result.rows[0]);
   }
 
   async removeOrderItem(orderId: string, itemId: string): Promise<boolean> {
     const query = 'DELETE FROM order_items WHERE order_id = $1 AND id = $2';
-    const result = await this.postgres.query(query, [orderId, itemId]);
-    return result.rowCount > 0;
+    const result = await this.pool.query(query, [orderId, itemId]);
+    return (result.rowCount || 0) > 0;
   }
 
   async getOrderItems(orderId: string): Promise<OrderItem[]> {
@@ -315,7 +311,7 @@ export class PostgresOrderRepository implements IOrderRepository {
       WHERE oi.order_id = $1
     `;
 
-    const result = await this.postgres.query(query, [orderId]);
+    const result = await this.pool.query(query, [orderId]);
     return result.rows.map((row: any) => this.mapToOrderItem(row));
   }
 
@@ -341,7 +337,7 @@ export class PostgresOrderRepository implements IOrderRepository {
       id
     ];
 
-    const result = await this.postgres.query(query, values);
+    const result = await this.pool.query(query, values);
     
     if (result.rows.length === 0) {
       throw new Error(`Shipping address with id ${id} not found`);
@@ -352,7 +348,7 @@ export class PostgresOrderRepository implements IOrderRepository {
 
   async getShippingAddress(id: string): Promise<ShippingAddress | null> {
     const query = 'SELECT * FROM shipping_addresses WHERE id = $1';
-    const result = await this.postgres.query(query, [id]);
+    const result = await this.pool.query(query, [id]);
     
     if (result.rows.length === 0) {
       return null;
@@ -381,7 +377,7 @@ export class PostgresOrderRepository implements IOrderRepository {
       addressData.country
     ];
 
-    const result = await this.postgres.query(query, values);
+    const result = await this.pool.query(query, values);
     return this.mapToShippingAddress(result.rows[0]);
   }
 
@@ -399,7 +395,7 @@ export class PostgresOrderRepository implements IOrderRepository {
       FROM orders
     `;
 
-    const result = await this.postgres.query(statsQuery);
+    const result = await this.pool.query(statsQuery);
     const stats = result.rows[0];
 
     return {

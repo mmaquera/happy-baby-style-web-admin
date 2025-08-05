@@ -13,7 +13,9 @@
     "test:coverage": "jest --coverage",
     "test:unit": "jest --testPathPattern=unit",
     "test:integration": "jest --testPathPattern=integration",
-    "test:postgres": "node scripts/test-postgres-connection.js"
+    "test:postgres": "node scripts/test-postgres-connection.js",
+    "docs": "node docs/serve-docs.js",
+    "docs:open": "open http://localhost:8080"
   },
   "dependencies": {
     "express": "^4.18.2",

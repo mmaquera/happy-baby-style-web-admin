@@ -1,4 +1,5 @@
 import { SupabaseConfig } from '@infrastructure/config/supabase';
+import { PostgresConfig } from '@infrastructure/config/postgres';
 import { PostgresProductRepository } from '@infrastructure/repositories/PostgresProductRepository';
 import { PostgresImageRepository } from '@infrastructure/repositories/PostgresImageRepository';
 import { PostgresOrderRepository } from '@infrastructure/repositories/PostgresOrderRepository';
@@ -44,12 +45,14 @@ export class Container {
   private registerDependencies(): void {
     // Configuración
     const supabase = SupabaseConfig.getInstance();
+    const postgresConfig = PostgresConfig.getInstance();
+    const pool = postgresConfig.getPool();
     
     // Repositorios PostgreSQL
-    const productRepository: IProductRepository = new PostgresProductRepository();
-    const imageRepository: IImageRepository = new PostgresImageRepository();
-    const orderRepository: IOrderRepository = new PostgresOrderRepository();
-    const userRepository: IUserRepository = new PostgresUserRepository();
+    const productRepository: IProductRepository = new PostgresProductRepository(pool);
+    const imageRepository: IImageRepository = new PostgresImageRepository(pool);
+    const orderRepository: IOrderRepository = new PostgresOrderRepository(pool);
+    const userRepository: IUserRepository = new PostgresUserRepository(pool);
     
     // Servicios
     const storageService: IStorageService = new SupabaseStorageService(supabase);

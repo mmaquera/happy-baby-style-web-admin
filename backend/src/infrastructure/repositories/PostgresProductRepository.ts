@@ -1,13 +1,9 @@
 import { IProductRepository, ProductFilters } from '@domain/repositories/IProductRepository';
 import { ProductEntity, ProductVariantEntity } from '@domain/entities/Product';
-import { PostgresConfig } from '@infrastructure/config/postgres';
+import { Pool } from 'pg';
 
 export class PostgresProductRepository implements IProductRepository {
-  private postgres: PostgresConfig;
-
-  constructor() {
-    this.postgres = PostgresConfig.getInstance();
-  }
+  constructor(private pool: Pool) {}
 
   async create(product: ProductEntity): Promise<ProductEntity> {
     const query = `
@@ -35,13 +31,13 @@ export class PostgresProductRepository implements IProductRepository {
       product.reviewCount
     ];
 
-    const result = await this.postgres.query(query, values);
+    const result = await this.pool.query(query, values);
     return this.mapToProductEntity(result.rows[0]);
   }
 
   async findById(id: string): Promise<ProductEntity | null> {
     const query = 'SELECT * FROM products WHERE id = $1';
-    const result = await this.postgres.query(query, [id]);
+    const result = await this.pool.query(query, [id]);
     
     if (result.rows.length === 0) {
       return null;
@@ -107,7 +103,7 @@ export class PostgresProductRepository implements IProductRepository {
       values.push(filters.offset);
     }
 
-    const result = await this.postgres.query(query, values);
+    const result = await this.pool.query(query, values);
     return result.rows.map((row: any) => this.mapToProductEntity(row));
   }
 
@@ -149,7 +145,7 @@ export class PostgresProductRepository implements IProductRepository {
       id
     ];
 
-    const result = await this.postgres.query(query, values);
+    const result = await this.pool.query(query, values);
     
     if (result.rows.length === 0) {
       throw new Error(`Product with id ${id} not found`);
@@ -160,19 +156,19 @@ export class PostgresProductRepository implements IProductRepository {
 
   async delete(id: string): Promise<void> {
     const query = 'DELETE FROM products WHERE id = $1';
-    await this.postgres.query(query, [id]);
+    await this.pool.query(query, [id]);
   }
 
   async findByCategory(categoryId: string): Promise<ProductEntity[]> {
     const query = 'SELECT * FROM products WHERE category_id = $1 AND is_active = true ORDER BY created_at DESC';
-    const result = await this.postgres.query(query, [categoryId]);
+    const result = await this.pool.query(query, [categoryId]);
     
     return result.rows.map((row: any) => this.mapToProductEntity(row));
   }
 
   async findBySku(sku: string): Promise<ProductEntity | null> {
     const query = 'SELECT * FROM products WHERE sku = $1';
-    const result = await this.postgres.query(query, [sku]);
+    const result = await this.pool.query(query, [sku]);
     
     if (result.rows.length === 0) {
       return null;
@@ -183,7 +179,7 @@ export class PostgresProductRepository implements IProductRepository {
 
   async updateStock(id: string, stockQuantity: number): Promise<void> {
     const query = 'UPDATE products SET stock_quantity = $1, updated_at = NOW() WHERE id = $2';
-    await this.postgres.query(query, [stockQuantity, id]);
+    await this.pool.query(query, [stockQuantity, id]);
   }
 
   async search(query: string): Promise<ProductEntity[]> {
@@ -193,7 +189,7 @@ export class PostgresProductRepository implements IProductRepository {
       AND is_active = true 
       ORDER BY created_at DESC
     `;
-    const result = await this.postgres.query(sqlQuery, [`%${query}%`]);
+    const result = await this.pool.query(sqlQuery, [`%${query}%`]);
     return result.rows.map((row: any) => this.mapToProductEntity(row));
   }
 
@@ -215,13 +211,13 @@ export class PostgresProductRepository implements IProductRepository {
       variant.isActive
     ];
 
-    const result = await this.postgres.query(query, values);
+    const result = await this.pool.query(query, values);
     return result.rows[0];
   }
 
   async getProductVariants(productId: string): Promise<any[]> {
     const query = 'SELECT * FROM product_variants WHERE product_id = $1 ORDER BY created_at ASC';
-    const result = await this.postgres.query(query, [productId]);
+    const result = await this.pool.query(query, [productId]);
     return result.rows;
   }
 
@@ -249,7 +245,7 @@ export class PostgresProductRepository implements IProductRepository {
       id
     ];
 
-    const result = await this.postgres.query(query, values);
+    const result = await this.pool.query(query, values);
     
     if (result.rows.length === 0) {
       throw new Error(`Variant with id ${id} not found`);
@@ -260,12 +256,12 @@ export class PostgresProductRepository implements IProductRepository {
 
   async deleteVariant(id: string): Promise<void> {
     const query = 'DELETE FROM product_variants WHERE id = $1';
-    await this.postgres.query(query, [id]);
+    await this.pool.query(query, [id]);
   }
 
   async getCategories(): Promise<any[]> {
     const query = 'SELECT * FROM categories WHERE is_active = true ORDER BY sort_order ASC, name ASC';
-    const result = await this.postgres.query(query);
+    const result = await this.pool.query(query);
     return result.rows;
   }
 

@@ -132,7 +132,16 @@ const CardImage = styled.div`
   }
 `;
 
-export const Card: React.FC<CardProps> = ({
+interface CardComponent extends React.FC<CardProps> {
+  Header: typeof CardHeader;
+  Title: typeof CardTitle;
+  Subtitle: typeof CardSubtitle;
+  Content: typeof CardContent;
+  Actions: typeof CardActions;
+  Image: typeof CardImage;
+}
+
+export const Card: CardComponent = ({
   children,
   padding = 'medium',
   shadow = 'small',
