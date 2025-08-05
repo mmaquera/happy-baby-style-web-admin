@@ -209,9 +209,9 @@ export const Sidebar: React.FC = () => {
             <ShoppingCart />
             Pedidos
           </NavItem>
-          <NavItem to="/customers">
+          <NavItem to="/users">
             <Users />
-            Clientes
+            Usuarios
           </NavItem>
           <NavItem to="/images">
             <ImageIcon />

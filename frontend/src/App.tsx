@@ -12,6 +12,7 @@ import { Unauthorized } from '@/pages/Unauthorized';
 import { Dashboard } from '@/pages/Dashboard';
 import { Products } from '@/pages/Products';
 import { Orders } from '@/pages/Orders';
+import UsersPage from '@/pages/Users';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -57,10 +58,10 @@ function App() {
                 </Layout>
               </ProtectedRoute>
             } />
-            <Route path="/customers" element={
+            <Route path="/users" element={
               <ProtectedRoute>
                 <Layout>
-                  <ComingSoon page="Clientes" />
+                  <UsersPage />
                 </Layout>
               </ProtectedRoute>
             } />

@@ -124,13 +124,80 @@ export enum OrderStatus {
 export interface UserProfile {
   id: string;
   userId: string;
-  firstName?: string;
-  lastName?: string;
+  firstName: string;
+  lastName: string;
   phone?: string;
-  birthDate?: string;
+  birthDate?: Date;
   avatarUrl?: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface UserAddress {
+  id: string;
+  userId: string;
+  title: string;
+  firstName: string;
+  lastName: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  isDefault: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  role: UserRole;
+  isActive: boolean;
+  emailVerified: boolean;
+  profile?: UserProfile;
+  addresses?: UserAddress[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export enum UserRole {
+  ADMIN = 'admin',
+  CUSTOMER = 'customer',
+  STAFF = 'staff'
+}
+
+export interface CreateUserRequest {
+  email: string;
+  password: string;
+  role?: UserRole;
+  profile?: {
+    firstName: string;
+    lastName: string;
+    phone?: string;
+    birthDate?: Date;
+  };
+}
+
+export interface UpdateUserRequest {
+  email?: string;
+  role?: UserRole;
+  isActive?: boolean;
+  profile?: {
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    birthDate?: Date;
+    avatarUrl?: string;
+  };
+}
+
+export interface UserStats {
+  totalUsers: number;
+  activeUsers: number;
+  newUsersThisMonth: number;
+  usersByRole: Record<UserRole, number>;
 }
 
 // Image Types

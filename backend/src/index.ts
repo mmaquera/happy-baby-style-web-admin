@@ -8,9 +8,11 @@ import { Container } from '@shared/container';
 import { createProductRoutes } from '@presentation/routes/productRoutes';
 import { createImageRoutes } from '@presentation/routes/imageRoutes';
 import { createOrderRoutes } from '@presentation/routes/orderRoutes';
+import { createUserRoutes } from '@presentation/routes/userRoutes';
 import { ProductController } from '@presentation/controllers/ProductController';
 import { ImageController } from '@presentation/controllers/ImageController';
 import { OrderController } from '@presentation/controllers/OrderController';
+import { UserController } from '@presentation/controllers/UserController';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -37,14 +39,16 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 const container = Container.getInstance();
 
 // Obtener controladores del container
-const productController = container.get<ProductController>('productController');
-const imageController = container.get<ImageController>('imageController');
-const orderController = container.get<OrderController>('orderController');
+  const productController = container.get<ProductController>('productController');
+  const imageController = container.get<ImageController>('imageController');
+  const orderController = container.get<OrderController>('orderController');
+  const userController = container.get<UserController>('userController');
 
 // Rutas API
 app.use('/api/products', createProductRoutes(productController));
 app.use('/api/images', createImageRoutes(imageController));
 app.use('/api/orders', createOrderRoutes(orderController));
+app.use('/api/users', createUserRoutes(userController));
 
 // Ruta de salud
 app.get('/health', (req, res) => {
