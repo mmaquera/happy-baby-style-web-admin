@@ -12,7 +12,7 @@ export class PostgresConfig {
     let config: PoolConfig;
     
     if (process.env.DATABASE_URL) {
-      // Use DATABASE_URL (recommended for Supabase)
+      // Use DATABASE_URL (AWS RDS PostgreSQL)
       config = {
         connectionString: process.env.DATABASE_URL,
         ssl: {
@@ -25,11 +25,11 @@ export class PostgresConfig {
     } else {
       // Fallback to individual environment variables
       config = {
-        host: process.env.SUPABASE_DB_HOST || 'aws-0-us-east-1.pooler.supabase.com',
-        port: parseInt(process.env.SUPABASE_DB_PORT || '6543'),
-        database: process.env.SUPABASE_DB_NAME || 'postgres',
-        user: process.env.SUPABASE_DB_USER || 'postgres.uumwjhoqkiiyxuperrws',
-        password: process.env.SUPABASE_DB_PASSWORD,
+        host: process.env.DB_HOST || 'localhost',
+        port: parseInt(process.env.DB_PORT || '5432'),
+        database: process.env.DB_NAME || 'postgres',
+        user: process.env.DB_USER || 'postgres',
+        password: process.env.DB_PASSWORD,
         ssl: {
           rejectUnauthorized: false
         },

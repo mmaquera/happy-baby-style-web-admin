@@ -1,10 +1,15 @@
-import { SupabaseConfig } from '@infrastructure/config/supabase';
 import { PostgresConfig } from '@infrastructure/config/postgres';
-import { PostgresProductRepository } from '@infrastructure/repositories/PostgresProductRepository';
+import { PrismaProductRepository } from '@infrastructure/repositories/PrismaProductRepository';
 import { PostgresImageRepository } from '@infrastructure/repositories/PostgresImageRepository';
 import { PostgresOrderRepository } from '@infrastructure/repositories/PostgresOrderRepository';
-import { PostgresUserRepository } from '@infrastructure/repositories/PostgresUserRepository';
-import { SupabaseStorageService } from '@infrastructure/services/SupabaseStorageService';
+import { PrismaUserRepository } from '@infrastructure/repositories/PrismaUserRepository';
+import { InMemoryUserRepository } from '@infrastructure/repositories/InMemoryUserRepository';
+import { PrismaUserProfileRepository } from '@infrastructure/repositories/PrismaUserProfileRepository';
+import { prisma } from '@infrastructure/database/prisma';
+import { LocalStorageService } from '@infrastructure/services/LocalStorageService';
+import { JwtAuthService } from '@infrastructure/auth/JwtAuthService';
+import { PrismaAuthRepository } from '@infrastructure/repositories/PrismaAuthRepository';
+import { GoogleOAuthService } from '@infrastructure/auth/GoogleOAuthService';
 import { CreateProductUseCase } from '@application/use-cases/product/CreateProductUseCase';
 import { GetProductsUseCase } from '@application/use-cases/product/GetProductsUseCase';
 import { GetProductByIdUseCase } from '@application/use-cases/product/GetProductByIdUseCase';
@@ -21,11 +26,16 @@ import { GetUsersUseCase } from '@application/use-cases/user/GetUsersUseCase';
 import { GetUserByIdUseCase } from '@application/use-cases/user/GetUserByIdUseCase';
 import { UpdateUserUseCase } from '@application/use-cases/user/UpdateUserUseCase';
 import { GetUserStatsUseCase } from '@application/use-cases/user/GetUserStatsUseCase';
+import { AuthenticateUserUseCase } from '@application/use-cases/user/AuthenticateUserUseCase';
+import { ManageUserFavoritesUseCase } from '@application/use-cases/user/ManageUserFavoritesUseCase';
+import { GetUserOrderHistoryUseCase } from '@application/use-cases/user/GetUserOrderHistoryUseCase';
+import { UpdateUserPasswordUseCase } from '@application/use-cases/user/UpdateUserPasswordUseCase';
 // Controllers removed - GraphQL only architecture
 import { IProductRepository } from '@domain/repositories/IProductRepository';
 import { IImageRepository, IStorageService } from '@domain/repositories/IImageRepository';
 import { IOrderRepository } from '@domain/repositories/IOrderRepository';
 import { IUserRepository } from '@domain/repositories/IUserRepository';
+import { IAuthRepository } from '@domain/repositories/IAuthRepository';
 // Logging system imports
 import { ILogger } from '@domain/interfaces/ILogger';
 import { LoggerFactory } from '@infrastructure/logging/LoggerFactory';
@@ -51,7 +61,6 @@ export class Container {
     LoggingDecorator.initialize();
     
     // Configuración
-    const supabase = SupabaseConfig.getInstance();
     const postgresConfig = PostgresConfig.getInstance();
     const pool = postgresConfig.getPool();
     
@@ -61,14 +70,19 @@ export class Container {
     const requestLogger = new RequestLogger();
     const performanceLogger = new PerformanceLogger();
     
-    // Repositorios PostgreSQL with logging
-    const productRepository: IProductRepository = new PostgresProductRepository(pool);
+    // Repositorios Prisma with logging  
+    const productRepository: IProductRepository = new PrismaProductRepository(prisma);
     const imageRepository: IImageRepository = new PostgresImageRepository(pool);
     const orderRepository: IOrderRepository = new PostgresOrderRepository(pool);
-    const userRepository: IUserRepository = new PostgresUserRepository(pool);
+    // Usar repositorio PostgreSQL real con AWS RDS
+    const userRepository: IUserRepository = new PrismaUserProfileRepository(prisma);
+    // const userRepository: IUserRepository = new InMemoryUserRepository();
+    const authRepository: IAuthRepository = new PrismaAuthRepository(prisma);
     
     // Servicios
-    const storageService: IStorageService = new SupabaseStorageService(supabase);
+    const storageService: IStorageService = new LocalStorageService();
+    const authService = new JwtAuthService(userRepository);
+    const googleOAuthService = new GoogleOAuthService();
     
     // Casos de uso de Productos with logging
     const createProductUseCase = new CreateProductUseCase(productRepository);
@@ -94,10 +108,35 @@ export class Container {
     const updateUserUseCase = new UpdateUserUseCase(userRepository);
     const getUserStatsUseCase = new GetUserStatsUseCase(userRepository);
     
+    // Nuevos casos de uso de usuarios
+    const authenticateUserUseCase = new AuthenticateUserUseCase(userRepository);
+    const manageUserFavoritesUseCase = new ManageUserFavoritesUseCase({
+      addToFavorites: async () => { throw new Error('Not implemented'); },
+      removeFromFavorites: async () => { throw new Error('Not implemented'); },
+      getUserFavorites: async () => [],
+      isFavorite: async () => false,
+      getFavoriteStats: async () => ({ totalFavorites: 0 })
+    });
+    const getUserOrderHistoryUseCase = new GetUserOrderHistoryUseCase({
+      getUserOrders: async () => ({ orders: [], total: 0 }),
+      getUserOrderStats: async () => ({
+        totalOrders: 0,
+        totalSpent: 0,
+        averageOrderValue: 0
+      })
+    });
+    const updateUserPasswordUseCase = new UpdateUserPasswordUseCase({
+      verifyPassword: async () => false,
+      updatePassword: async () => {},
+      getUserById: async () => null
+    });
+    
     // Controllers removed - GraphQL only architecture
 
     // Registrar dependencias
-    this.dependencies.set('supabase', supabase);
+    this.dependencies.set('authService', authService);
+    this.dependencies.set('authRepository', authRepository);
+    this.dependencies.set('googleOAuthService', googleOAuthService);
     this.dependencies.set('productRepository', productRepository);
     this.dependencies.set('imageRepository', imageRepository);
     this.dependencies.set('orderRepository', orderRepository);
@@ -127,6 +166,10 @@ export class Container {
     this.dependencies.set('getUserByIdUseCase', getUserByIdUseCase);
     this.dependencies.set('updateUserUseCase', updateUserUseCase);
     this.dependencies.set('getUserStatsUseCase', getUserStatsUseCase);
+    this.dependencies.set('authenticateUserUseCase', authenticateUserUseCase);
+    this.dependencies.set('manageUserFavoritesUseCase', manageUserFavoritesUseCase);
+    this.dependencies.set('getUserOrderHistoryUseCase', getUserOrderHistoryUseCase);
+    this.dependencies.set('updateUserPasswordUseCase', updateUserPasswordUseCase);
     
     // Controllers removed - GraphQL only architecture
   }

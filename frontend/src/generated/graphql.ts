@@ -34,10 +34,29 @@ export type AddToFavoritesInput = {
   userId: Scalars['ID']['input'];
 };
 
+export enum AuthProvider {
+  apple = 'apple',
+  email = 'email',
+  facebook = 'facebook',
+  google = 'google'
+}
+
+export type AuthProviderStats = {
+  __typename?: 'AuthProviderStats';
+  activeSessionsCount: Scalars['Int']['output'];
+  recentLogins: Array<RecentLoginActivity>;
+  totalUsers: Scalars['Int']['output'];
+  usersByProvider: Array<ProviderUserCount>;
+};
+
 export type AuthResponse = {
   __typename?: 'AuthResponse';
+  accessToken?: Maybe<Scalars['String']['output']>;
+  message: Scalars['String']['output'];
+  refreshToken?: Maybe<Scalars['String']['output']>;
+  success: Scalars['Boolean']['output'];
   token: Scalars['String']['output'];
-  user: UserProfile;
+  user: User;
 };
 
 export type Category = {
@@ -110,6 +129,14 @@ export type CreateProductVariantInput = {
   stockQuantity: Scalars['Int']['input'];
 };
 
+export type CreateProfileForUserInput = {
+  avatarUrl?: InputMaybe<Scalars['String']['input']>;
+  birthDate?: InputMaybe<Scalars['DateTime']['input']>;
+  firstName?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type CreateUserAddressInput = {
   addressLine1: Scalars['String']['input'];
   addressLine2?: InputMaybe<Scalars['String']['input']>;
@@ -124,6 +151,14 @@ export type CreateUserAddressInput = {
   userId: Scalars['ID']['input'];
 };
 
+export type CreateUserInput = {
+  email: Scalars['String']['input'];
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  password: Scalars['String']['input'];
+  profile?: InputMaybe<CreateProfileForUserInput>;
+  role?: InputMaybe<UserRole>;
+};
+
 export type CreateUserProfileInput = {
   avatarUrl?: InputMaybe<Scalars['String']['input']>;
   birthDate?: InputMaybe<Scalars['DateTime']['input']>;
@@ -133,8 +168,28 @@ export type CreateUserProfileInput = {
   userId: Scalars['ID']['input'];
 };
 
+export type FavoriteCategoryStats = {
+  __typename?: 'FavoriteCategoryStats';
+  categoryId: Scalars['ID']['output'];
+  categoryName: Scalars['String']['output'];
+  count: Scalars['Int']['output'];
+};
+
+export type FavoriteToggleResponse = {
+  __typename?: 'FavoriteToggleResponse';
+  action: Scalars['String']['output'];
+  favorite?: Maybe<UserFavorite>;
+  message: Scalars['String']['output'];
+};
+
+export type LoginUserInput = {
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  activateUser: User;
   addToCart: ShoppingCart;
   addToFavorites: UserFavorite;
   bulkUpdateOrderStatus: Array<Order>;
@@ -147,19 +202,35 @@ export type Mutation = {
   createPaymentMethod: PaymentMethod;
   createProduct: Product;
   createProductVariant: ProductVariant;
+  createUser: User;
   createUserAddress: UserAddress;
   createUserProfile: UserProfile;
+  deactivateUser: User;
   deleteCategory: SuccessResponse;
   deleteOrderItem: SuccessResponse;
   deletePaymentMethod: SuccessResponse;
   deleteProduct: SuccessResponse;
   deleteProductVariant: SuccessResponse;
+  deleteUser: SuccessResponse;
   deleteUserAddress: SuccessResponse;
   deleteUserProfile: SuccessResponse;
   deliverOrder: Order;
+  forcePasswordReset: SuccessResponse;
+  impersonateUser: AuthResponse;
+  loginUser: AuthResponse;
+  logoutUser: SuccessResponse;
+  refreshToken: AuthResponse;
+  registerUser: AuthResponse;
   removeFromCart: SuccessResponse;
   removeFromFavorites: SuccessResponse;
+  requestPasswordReset: SuccessResponse;
+  resetPassword: SuccessResponse;
+  revokeAllUserSessions: SuccessResponse;
+  revokeUserSession: SuccessResponse;
+  setDefaultAddress: SuccessResponse;
   shipOrder: Order;
+  toggleFavorite: FavoriteToggleResponse;
+  unlinkUserAccount: SuccessResponse;
   updateCartItem: ShoppingCart;
   updateCategory: Category;
   updateOrder: Order;
@@ -168,9 +239,16 @@ export type Mutation = {
   updatePaymentMethod: PaymentMethod;
   updateProduct: Product;
   updateProductVariant: ProductVariant;
+  updateUser: User;
   updateUserAddress: UserAddress;
+  updateUserPassword: SuccessResponse;
   updateUserProfile: UserProfile;
   uploadImage: UploadResponse;
+};
+
+
+export type MutationActivateUserArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -239,6 +317,11 @@ export type MutationCreateProductVariantArgs = {
 };
 
 
+export type MutationCreateUserArgs = {
+  input: CreateUserInput;
+};
+
+
 export type MutationCreateUserAddressArgs = {
   input: CreateUserAddressInput;
 };
@@ -246,6 +329,11 @@ export type MutationCreateUserAddressArgs = {
 
 export type MutationCreateUserProfileArgs = {
   input: CreateUserProfileInput;
+};
+
+
+export type MutationDeactivateUserArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -274,6 +362,11 @@ export type MutationDeleteProductVariantArgs = {
 };
 
 
+export type MutationDeleteUserArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteUserAddressArgs = {
   id: Scalars['ID']['input'];
 };
@@ -289,6 +382,31 @@ export type MutationDeliverOrderArgs = {
 };
 
 
+export type MutationForcePasswordResetArgs = {
+  userId: Scalars['ID']['input'];
+};
+
+
+export type MutationImpersonateUserArgs = {
+  userId: Scalars['ID']['input'];
+};
+
+
+export type MutationLoginUserArgs = {
+  input: LoginUserInput;
+};
+
+
+export type MutationRefreshTokenArgs = {
+  refreshToken: Scalars['String']['input'];
+};
+
+
+export type MutationRegisterUserArgs = {
+  input: RegisterUserInput;
+};
+
+
 export type MutationRemoveFromCartArgs = {
   id: Scalars['ID']['input'];
 };
@@ -300,9 +418,47 @@ export type MutationRemoveFromFavoritesArgs = {
 };
 
 
+export type MutationRequestPasswordResetArgs = {
+  email: Scalars['String']['input'];
+};
+
+
+export type MutationResetPasswordArgs = {
+  newPassword: Scalars['String']['input'];
+  token: Scalars['String']['input'];
+};
+
+
+export type MutationRevokeAllUserSessionsArgs = {
+  userId: Scalars['ID']['input'];
+};
+
+
+export type MutationRevokeUserSessionArgs = {
+  sessionId: Scalars['ID']['input'];
+};
+
+
+export type MutationSetDefaultAddressArgs = {
+  addressId: Scalars['ID']['input'];
+  userId: Scalars['ID']['input'];
+};
+
+
 export type MutationShipOrderArgs = {
   id: Scalars['ID']['input'];
   trackingNumber?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationToggleFavoriteArgs = {
+  productId: Scalars['ID']['input'];
+  userId: Scalars['ID']['input'];
+};
+
+
+export type MutationUnlinkUserAccountArgs = {
+  accountId: Scalars['ID']['input'];
 };
 
 
@@ -356,9 +512,20 @@ export type MutationUpdateProductVariantArgs = {
 };
 
 
+export type MutationUpdateUserArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateUserInput;
+};
+
+
 export type MutationUpdateUserAddressArgs = {
   id: Scalars['ID']['input'];
   input: UpdateUserAddressInput;
+};
+
+
+export type MutationUpdateUserPasswordArgs = {
+  input: UpdateUserPasswordInput;
 };
 
 
@@ -448,7 +615,7 @@ export type PaginatedUsers = {
   __typename?: 'PaginatedUsers';
   hasMore: Scalars['Boolean']['output'];
   total: Scalars['Int']['output'];
-  users: Array<UserProfile>;
+  users: Array<User>;
 };
 
 export type PaginationInput = {
@@ -537,12 +704,23 @@ export type ProductVariant = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type ProviderUserCount = {
+  __typename?: 'ProviderUserCount';
+  count: Scalars['Int']['output'];
+  percentage: Scalars['Float']['output'];
+  provider: AuthProvider;
+};
+
 export type Query = {
   __typename?: 'Query';
+  activeSessions: Array<UserSession>;
+  activeUsers: Array<User>;
+  authProviderStats: AuthProviderStats;
   cartItem?: Maybe<ShoppingCart>;
   categories: Array<Category>;
   category?: Maybe<Category>;
   categoryBySlug?: Maybe<Category>;
+  currentUser?: Maybe<User>;
   health: Scalars['String']['output'];
   isProductFavorited: Scalars['Boolean']['output'];
   order?: Maybe<Order>;
@@ -558,15 +736,29 @@ export type Query = {
   productVariants: Array<ProductVariant>;
   products: PaginatedProducts;
   productsByCategory: PaginatedProducts;
+  searchUsers: Array<User>;
+  user?: Maybe<User>;
+  userAccounts: Array<UserAccount>;
+  userActivitySummary: UserActivitySummaryResponse;
   userAddress?: Maybe<UserAddress>;
   userAddresses: Array<UserAddress>;
   userCart: Array<ShoppingCart>;
+  userFavoriteStats: UserFavoriteStatsResponse;
   userFavorites: Array<UserFavorite>;
+  userOrderHistory: UserOrderHistoryResponse;
   userOrders: PaginatedOrders;
   userPaymentMethods: Array<PaymentMethod>;
   userProfile?: Maybe<UserProfile>;
+  userSessions: Array<UserSession>;
   userStats: Scalars['JSON']['output'];
   users: PaginatedUsers;
+  usersByProvider: Array<User>;
+  usersByRole: Array<User>;
+};
+
+
+export type QueryActiveSessionsArgs = {
+  userId: Scalars['ID']['input'];
 };
 
 
@@ -649,6 +841,26 @@ export type QueryProductsByCategoryArgs = {
 };
 
 
+export type QuerySearchUsersArgs = {
+  query: Scalars['String']['input'];
+};
+
+
+export type QueryUserArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryUserAccountsArgs = {
+  userId: Scalars['ID']['input'];
+};
+
+
+export type QueryUserActivitySummaryArgs = {
+  userId: Scalars['ID']['input'];
+};
+
+
 export type QueryUserAddressArgs = {
   id: Scalars['ID']['input'];
 };
@@ -664,7 +876,19 @@ export type QueryUserCartArgs = {
 };
 
 
+export type QueryUserFavoriteStatsArgs = {
+  userId: Scalars['ID']['input'];
+};
+
+
 export type QueryUserFavoritesArgs = {
+  userId: Scalars['ID']['input'];
+};
+
+
+export type QueryUserOrderHistoryArgs = {
+  filter?: InputMaybe<UserOrderHistoryFilter>;
+  pagination?: InputMaybe<PaginationInput>;
   userId: Scalars['ID']['input'];
 };
 
@@ -685,9 +909,43 @@ export type QueryUserProfileArgs = {
 };
 
 
+export type QueryUserSessionsArgs = {
+  userId: Scalars['ID']['input'];
+};
+
+
 export type QueryUsersArgs = {
   filter?: InputMaybe<UserFilterInput>;
   pagination?: InputMaybe<PaginationInput>;
+};
+
+
+export type QueryUsersByProviderArgs = {
+  provider: AuthProvider;
+};
+
+
+export type QueryUsersByRoleArgs = {
+  role: UserRole;
+};
+
+export type RecentLoginActivity = {
+  __typename?: 'RecentLoginActivity';
+  email: Scalars['String']['output'];
+  ipAddress?: Maybe<Scalars['String']['output']>;
+  loginAt: Scalars['DateTime']['output'];
+  provider: AuthProvider;
+  userAgent?: Maybe<Scalars['String']['output']>;
+  userId: Scalars['ID']['output'];
+};
+
+export type RegisterUserInput = {
+  birthDate?: InputMaybe<Scalars['String']['input']>;
+  email: Scalars['String']['input'];
+  firstName: Scalars['String']['input'];
+  lastName: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  phone?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ShoppingCart = {
@@ -767,6 +1025,19 @@ export type UpdateUserAddressInput = {
   title?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UpdateUserInput = {
+  email?: InputMaybe<Scalars['String']['input']>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  profile?: InputMaybe<UpdateUserProfileInput>;
+  role?: InputMaybe<UserRole>;
+};
+
+export type UpdateUserPasswordInput = {
+  confirmPassword: Scalars['String']['input'];
+  currentPassword: Scalars['String']['input'];
+  newPassword: Scalars['String']['input'];
+};
+
 export type UpdateUserProfileInput = {
   avatarUrl?: InputMaybe<Scalars['String']['input']>;
   birthDate?: InputMaybe<Scalars['DateTime']['input']>;
@@ -781,6 +1052,48 @@ export type UploadResponse = {
   message: Scalars['String']['output'];
   success: Scalars['Boolean']['output'];
   url?: Maybe<Scalars['String']['output']>;
+};
+
+export type User = {
+  __typename?: 'User';
+  accounts: Array<UserAccount>;
+  addresses: Array<UserAddress>;
+  createdAt: Scalars['DateTime']['output'];
+  email: Scalars['String']['output'];
+  emailVerified: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  isActive: Scalars['Boolean']['output'];
+  lastLoginAt?: Maybe<Scalars['DateTime']['output']>;
+  profile?: Maybe<UserProfile>;
+  role: UserRole;
+  sessions: Array<UserSession>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type UserAccount = {
+  __typename?: 'UserAccount';
+  accessToken?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  expiresAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  idToken?: Maybe<Scalars['String']['output']>;
+  provider: AuthProvider;
+  providerAccountId: Scalars['String']['output'];
+  refreshToken?: Maybe<Scalars['String']['output']>;
+  scope?: Maybe<Scalars['String']['output']>;
+  tokenType?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+  userId: Scalars['ID']['output'];
+};
+
+export type UserActivitySummaryResponse = {
+  __typename?: 'UserActivitySummaryResponse';
+  cartItemsCount: Scalars['Int']['output'];
+  favoriteProducts: Array<Product>;
+  joinDate: Scalars['DateTime']['output'];
+  lastActivity?: Maybe<Scalars['DateTime']['output']>;
+  recentOrders: Array<Order>;
+  totalSpent: Scalars['Decimal']['output'];
 };
 
 export type UserAddress = {
@@ -814,10 +1127,42 @@ export type UserFavorite = {
   userId?: Maybe<Scalars['ID']['output']>;
 };
 
+export type UserFavoriteStatsResponse = {
+  __typename?: 'UserFavoriteStatsResponse';
+  favoriteCategories: Array<FavoriteCategoryStats>;
+  recentFavorites: Array<UserFavorite>;
+  totalFavorites: Scalars['Int']['output'];
+};
+
 export type UserFilterInput = {
   isActive?: InputMaybe<Scalars['Boolean']['input']>;
   role?: InputMaybe<UserRole>;
   search?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserOrderHistoryFilter = {
+  endDate?: InputMaybe<Scalars['String']['input']>;
+  maxAmount?: InputMaybe<Scalars['Decimal']['input']>;
+  minAmount?: InputMaybe<Scalars['Decimal']['input']>;
+  startDate?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserOrderHistoryResponse = {
+  __typename?: 'UserOrderHistoryResponse';
+  hasMore: Scalars['Boolean']['output'];
+  orders: Array<Order>;
+  stats: UserOrderStats;
+  total: Scalars['Int']['output'];
+};
+
+export type UserOrderStats = {
+  __typename?: 'UserOrderStats';
+  averageOrderValue: Scalars['Decimal']['output'];
+  lastOrderDate?: Maybe<Scalars['DateTime']['output']>;
+  ordersByStatus: Scalars['JSON']['output'];
+  totalOrders: Scalars['Int']['output'];
+  totalSpent: Scalars['Decimal']['output'];
 };
 
 export type UserProfile = {
@@ -844,6 +1189,40 @@ export enum UserRole {
   customer = 'customer',
   staff = 'staff'
 }
+
+export type UserSession = {
+  __typename?: 'UserSession';
+  accessToken: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  expiresAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  ipAddress?: Maybe<Scalars['String']['output']>;
+  isActive: Scalars['Boolean']['output'];
+  refreshToken?: Maybe<Scalars['String']['output']>;
+  sessionToken: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  userAgent?: Maybe<Scalars['String']['output']>;
+  userId: Scalars['ID']['output'];
+};
+
+export type LoginUserMutationVariables = Exact<{
+  input: LoginUserInput;
+}>;
+
+
+export type LoginUserMutation = { __typename?: 'Mutation', loginUser: { __typename?: 'AuthResponse', success: boolean, accessToken?: string | null, refreshToken?: string | null, message: string, user: { __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, profile?: { __typename?: 'UserProfile', id: string, firstName?: string | null, lastName?: string | null, phone?: string | null, birthDate?: string | null, avatarUrl?: string | null } | null } } };
+
+export type RefreshTokenMutationVariables = Exact<{
+  refreshToken: Scalars['String']['input'];
+}>;
+
+
+export type RefreshTokenMutation = { __typename?: 'Mutation', refreshToken: { __typename?: 'AuthResponse', success: boolean, accessToken?: string | null, refreshToken?: string | null, message: string, user: { __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, profile?: { __typename?: 'UserProfile', id: string, firstName?: string | null, lastName?: string | null, phone?: string | null, birthDate?: string | null, avatarUrl?: string | null } | null } } };
+
+export type LogoutUserMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutUserMutation = { __typename?: 'Mutation', logoutUser: { __typename?: 'SuccessResponse', success: boolean, message: string } };
 
 export type OrderBasicFragment = { __typename?: 'Order', id: string, userId?: string | null, orderNumber: string, status: OrderStatus, subtotal: number, taxAmount: number, shippingCost: number, discountAmount: number, totalAmount: number, notes?: string | null, trackingNumber?: string | null, shippedAt?: string | null, deliveredAt?: string | null, createdAt: string, updatedAt: string };
 
@@ -956,39 +1335,30 @@ export type UploadImageMutationVariables = Exact<{
 
 export type UploadImageMutation = { __typename?: 'Mutation', uploadImage: { __typename?: 'UploadResponse', success: boolean, url?: string | null, filename?: string | null, message: string } };
 
+export type UserAccountFragment = { __typename?: 'UserAccount', id: string, userId: string, provider: AuthProvider, providerAccountId: string, expiresAt?: string | null, createdAt: string, updatedAt: string };
+
+export type UserSessionFragment = { __typename?: 'UserSession', id: string, userId: string, sessionToken: string, expiresAt: string, userAgent?: string | null, ipAddress?: string | null, isActive: boolean, createdAt: string, updatedAt: string };
+
+export type UserBasicFragment = { __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, createdAt: string, updatedAt: string };
+
+export type UserProfileBasicFragment = { __typename?: 'UserProfile', id: string, userId: string, firstName?: string | null, lastName?: string | null, fullName?: string | null, phone?: string | null, birthDate?: string | null, avatarUrl?: string | null, createdAt: string, updatedAt: string };
+
+export type UserProfileFullFragment = { __typename?: 'UserProfile', id: string, userId: string, firstName?: string | null, lastName?: string | null, fullName?: string | null, phone?: string | null, birthDate?: string | null, avatarUrl?: string | null, createdAt: string, updatedAt: string, addresses: Array<{ __typename?: 'UserAddress', id: string, title: string, firstName: string, lastName: string, fullName: string, fullAddress: string, isDefault: boolean }>, orders: Array<{ __typename?: 'Order', id: string, orderNumber: string, status: OrderStatus, totalAmount: number, createdAt: string }>, cartItems: Array<{ __typename?: 'ShoppingCart', id: string, quantity: number, product?: { __typename?: 'Product', id: string, name: string, currentPrice: number, images: Array<string> } | null, variant?: { __typename?: 'ProductVariant', id: string, size?: string | null, color?: string | null } | null }>, favorites: Array<{ __typename?: 'UserFavorite', id: string, product?: { __typename?: 'Product', id: string, name: string, currentPrice: number, images: Array<string> } | null }> };
+
 export type GetUsersQueryVariables = Exact<{
   filter?: InputMaybe<UserFilterInput>;
   pagination?: InputMaybe<PaginationInput>;
 }>;
 
 
-export type GetUsersQuery = { __typename?: 'Query', users: { __typename?: 'PaginatedUsers', total: number, hasMore: boolean, users: Array<{ __typename?: 'UserProfile', id: string, userId: string, firstName?: string | null, lastName?: string | null, phone?: string | null, birthDate?: string | null, avatarUrl?: string | null, createdAt: string, updatedAt: string }> } };
+export type GetUsersQuery = { __typename?: 'Query', users: { __typename?: 'PaginatedUsers', total: number, hasMore: boolean, users: Array<{ __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, createdAt: string, updatedAt: string, profile?: { __typename?: 'UserProfile', id: string, userId: string, firstName?: string | null, lastName?: string | null, fullName?: string | null, phone?: string | null, birthDate?: string | null, avatarUrl?: string | null, createdAt: string, updatedAt: string } | null }> } };
 
 export type GetUserQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type GetUserQuery = { __typename?: 'Query', userProfile?: { __typename?: 'UserProfile', id: string, userId: string, firstName?: string | null, lastName?: string | null, phone?: string | null, birthDate?: string | null, avatarUrl?: string | null, createdAt: string, updatedAt: string } | null };
-
-export type CreateUserMutationVariables = Exact<{
-  input: CreateUserProfileInput;
-}>;
-
-
-export type CreateUserMutation = { __typename?: 'Mutation', createUserProfile: { __typename?: 'UserProfile', id: string, userId: string, firstName?: string | null, lastName?: string | null, phone?: string | null, birthDate?: string | null, avatarUrl?: string | null, createdAt: string, updatedAt: string } };
-
-export type UpdateUserMutationVariables = Exact<{
-  userId: Scalars['ID']['input'];
-  input: UpdateUserProfileInput;
-}>;
-
-
-export type UpdateUserMutation = { __typename?: 'Mutation', updateUserProfile: { __typename?: 'UserProfile', id: string, userId: string, firstName?: string | null, lastName?: string | null, phone?: string | null, birthDate?: string | null, avatarUrl?: string | null, createdAt: string, updatedAt: string } };
-
-export type UserProfileBasicFragment = { __typename?: 'UserProfile', id: string, userId: string, firstName?: string | null, lastName?: string | null, fullName?: string | null, phone?: string | null, birthDate?: string | null, avatarUrl?: string | null, createdAt: string, updatedAt: string };
-
-export type UserProfileFullFragment = { __typename?: 'UserProfile', id: string, userId: string, firstName?: string | null, lastName?: string | null, fullName?: string | null, phone?: string | null, birthDate?: string | null, avatarUrl?: string | null, createdAt: string, updatedAt: string, addresses: Array<{ __typename?: 'UserAddress', id: string, title: string, firstName: string, lastName: string, fullName: string, fullAddress: string, isDefault: boolean }>, orders: Array<{ __typename?: 'Order', id: string, orderNumber: string, status: OrderStatus, totalAmount: number, createdAt: string }>, cartItems: Array<{ __typename?: 'ShoppingCart', id: string, quantity: number, product?: { __typename?: 'Product', id: string, name: string, currentPrice: number, images: Array<string> } | null, variant?: { __typename?: 'ProductVariant', id: string, size?: string | null, color?: string | null } | null }>, favorites: Array<{ __typename?: 'UserFavorite', id: string, product?: { __typename?: 'Product', id: string, name: string, currentPrice: number, images: Array<string> } | null }> };
+export type GetUserQuery = { __typename?: 'Query', user?: { __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, createdAt: string, updatedAt: string, profile?: { __typename?: 'UserProfile', id: string, userId: string, firstName?: string | null, lastName?: string | null, fullName?: string | null, phone?: string | null, birthDate?: string | null, avatarUrl?: string | null, createdAt: string, updatedAt: string, addresses: Array<{ __typename?: 'UserAddress', id: string, title: string, firstName: string, lastName: string, fullName: string, fullAddress: string, isDefault: boolean }>, orders: Array<{ __typename?: 'Order', id: string, orderNumber: string, status: OrderStatus, totalAmount: number, createdAt: string }>, cartItems: Array<{ __typename?: 'ShoppingCart', id: string, quantity: number, product?: { __typename?: 'Product', id: string, name: string, currentPrice: number, images: Array<string> } | null, variant?: { __typename?: 'ProductVariant', id: string, size?: string | null, color?: string | null } | null }>, favorites: Array<{ __typename?: 'UserFavorite', id: string, product?: { __typename?: 'Product', id: string, name: string, currentPrice: number, images: Array<string> } | null }> } | null, accounts: Array<{ __typename?: 'UserAccount', id: string, userId: string, provider: AuthProvider, providerAccountId: string, expiresAt?: string | null, createdAt: string, updatedAt: string }>, sessions: Array<{ __typename?: 'UserSession', id: string, userId: string, sessionToken: string, expiresAt: string, userAgent?: string | null, ipAddress?: string | null, isActive: boolean, createdAt: string, updatedAt: string }> } | null };
 
 export type GetUserProfileQueryVariables = Exact<{
   userId: Scalars['ID']['input'];
@@ -1001,6 +1371,48 @@ export type GetUserStatsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetUserStatsQuery = { __typename?: 'Query', userStats: any };
+
+export type GetUsersByProviderQueryVariables = Exact<{
+  provider: AuthProvider;
+  pagination?: InputMaybe<PaginationInput>;
+}>;
+
+
+export type GetUsersByProviderQuery = { __typename?: 'Query', usersByProvider: Array<{ __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, createdAt: string, updatedAt: string, profile?: { __typename?: 'UserProfile', id: string, userId: string, firstName?: string | null, lastName?: string | null, fullName?: string | null, phone?: string | null, birthDate?: string | null, avatarUrl?: string | null, createdAt: string, updatedAt: string } | null, accounts: Array<{ __typename?: 'UserAccount', id: string, userId: string, provider: AuthProvider, providerAccountId: string, expiresAt?: string | null, createdAt: string, updatedAt: string }> }> };
+
+export type GetAuthProviderStatsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetAuthProviderStatsQuery = { __typename?: 'Query', authProviderStats: { __typename?: 'AuthProviderStats', totalUsers: number, activeSessionsCount: number, usersByProvider: Array<{ __typename?: 'ProviderUserCount', provider: AuthProvider, count: number, percentage: number }>, recentLogins: Array<{ __typename?: 'RecentLoginActivity', userId: string, email: string, provider: AuthProvider, loginAt: string, ipAddress?: string | null, userAgent?: string | null }> } };
+
+export type GetUserSessionsQueryVariables = Exact<{
+  userId: Scalars['ID']['input'];
+}>;
+
+
+export type GetUserSessionsQuery = { __typename?: 'Query', userSessions: Array<{ __typename?: 'UserSession', id: string, userId: string, sessionToken: string, expiresAt: string, userAgent?: string | null, ipAddress?: string | null, isActive: boolean, createdAt: string, updatedAt: string }> };
+
+export type GetActiveSessionsQueryVariables = Exact<{
+  userId: Scalars['ID']['input'];
+}>;
+
+
+export type GetActiveSessionsQuery = { __typename?: 'Query', activeSessions: Array<{ __typename?: 'UserSession', id: string, userId: string, sessionToken: string, expiresAt: string, userAgent?: string | null, ipAddress?: string | null, isActive: boolean, createdAt: string, updatedAt: string }> };
+
+export type CreateUserMutationVariables = Exact<{
+  input: CreateUserInput;
+}>;
+
+
+export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, createdAt: string, updatedAt: string, profile?: { __typename?: 'UserProfile', id: string, userId: string, firstName?: string | null, lastName?: string | null, fullName?: string | null, phone?: string | null, birthDate?: string | null, avatarUrl?: string | null, createdAt: string, updatedAt: string } | null } };
+
+export type UpdateUserMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: UpdateUserInput;
+}>;
+
+
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, createdAt: string, updatedAt: string, profile?: { __typename?: 'UserProfile', id: string, userId: string, firstName?: string | null, lastName?: string | null, fullName?: string | null, phone?: string | null, birthDate?: string | null, avatarUrl?: string | null, createdAt: string, updatedAt: string } | null } };
 
 export type CreateUserProfileMutationVariables = Exact<{
   input: CreateUserProfileInput;
@@ -1016,6 +1428,41 @@ export type UpdateUserProfileMutationVariables = Exact<{
 
 
 export type UpdateUserProfileMutation = { __typename?: 'Mutation', updateUserProfile: { __typename?: 'UserProfile', id: string, userId: string, firstName?: string | null, lastName?: string | null, fullName?: string | null, phone?: string | null, birthDate?: string | null, avatarUrl?: string | null, createdAt: string, updatedAt: string } };
+
+export type RevokeUserSessionMutationVariables = Exact<{
+  sessionId: Scalars['ID']['input'];
+}>;
+
+
+export type RevokeUserSessionMutation = { __typename?: 'Mutation', revokeUserSession: { __typename?: 'SuccessResponse', success: boolean, message: string } };
+
+export type RevokeAllUserSessionsMutationVariables = Exact<{
+  userId: Scalars['ID']['input'];
+}>;
+
+
+export type RevokeAllUserSessionsMutation = { __typename?: 'Mutation', revokeAllUserSessions: { __typename?: 'SuccessResponse', success: boolean, message: string } };
+
+export type UnlinkUserAccountMutationVariables = Exact<{
+  accountId: Scalars['ID']['input'];
+}>;
+
+
+export type UnlinkUserAccountMutation = { __typename?: 'Mutation', unlinkUserAccount: { __typename?: 'SuccessResponse', success: boolean, message: string } };
+
+export type ForcePasswordResetMutationVariables = Exact<{
+  userId: Scalars['ID']['input'];
+}>;
+
+
+export type ForcePasswordResetMutation = { __typename?: 'Mutation', forcePasswordReset: { __typename?: 'SuccessResponse', success: boolean, message: string } };
+
+export type ImpersonateUserMutationVariables = Exact<{
+  userId: Scalars['ID']['input'];
+}>;
+
+
+export type ImpersonateUserMutation = { __typename?: 'Mutation', impersonateUser: { __typename?: 'AuthResponse', success: boolean, accessToken?: string | null, message: string, user: { __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, createdAt: string, updatedAt: string } } };
 
 export const OrderBasicFragmentDoc = gql`
     fragment OrderBasic on Order {
@@ -1112,6 +1559,42 @@ export const ProductFullFragmentDoc = gql`
   }
 }
     ${ProductBasicFragmentDoc}`;
+export const UserAccountFragmentDoc = gql`
+    fragment UserAccount on UserAccount {
+  id
+  userId
+  provider
+  providerAccountId
+  expiresAt
+  createdAt
+  updatedAt
+}
+    `;
+export const UserSessionFragmentDoc = gql`
+    fragment UserSession on UserSession {
+  id
+  userId
+  sessionToken
+  expiresAt
+  userAgent
+  ipAddress
+  isActive
+  createdAt
+  updatedAt
+}
+    `;
+export const UserBasicFragmentDoc = gql`
+    fragment UserBasic on User {
+  id
+  email
+  role
+  isActive
+  emailVerified
+  lastLoginAt
+  createdAt
+  updatedAt
+}
+    `;
 export const UserProfileBasicFragmentDoc = gql`
     fragment UserProfileBasic on UserProfile {
   id
@@ -1171,6 +1654,143 @@ export const UserProfileFullFragmentDoc = gql`
   }
 }
     ${UserProfileBasicFragmentDoc}`;
+export const LoginUserDocument = gql`
+    mutation LoginUser($input: LoginUserInput!) {
+  loginUser(input: $input) {
+    success
+    user {
+      id
+      email
+      role
+      isActive
+      emailVerified
+      lastLoginAt
+      profile {
+        id
+        firstName
+        lastName
+        phone
+        birthDate
+        avatarUrl
+      }
+    }
+    accessToken
+    refreshToken
+    message
+  }
+}
+    `;
+export type LoginUserMutationFn = Apollo.MutationFunction<LoginUserMutation, LoginUserMutationVariables>;
+
+/**
+ * __useLoginUserMutation__
+ *
+ * To run a mutation, you first call `useLoginUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLoginUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [loginUserMutation, { data, loading, error }] = useLoginUserMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useLoginUserMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<LoginUserMutation, LoginUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<LoginUserMutation, LoginUserMutationVariables>(LoginUserDocument, options);
+      }
+export type LoginUserMutationHookResult = ReturnType<typeof useLoginUserMutation>;
+export type LoginUserMutationResult = Apollo.MutationResult<LoginUserMutation>;
+export type LoginUserMutationOptions = Apollo.BaseMutationOptions<LoginUserMutation, LoginUserMutationVariables>;
+export const RefreshTokenDocument = gql`
+    mutation RefreshToken($refreshToken: String!) {
+  refreshToken(refreshToken: $refreshToken) {
+    success
+    user {
+      id
+      email
+      role
+      isActive
+      emailVerified
+      lastLoginAt
+      profile {
+        id
+        firstName
+        lastName
+        phone
+        birthDate
+        avatarUrl
+      }
+    }
+    accessToken
+    refreshToken
+    message
+  }
+}
+    `;
+export type RefreshTokenMutationFn = Apollo.MutationFunction<RefreshTokenMutation, RefreshTokenMutationVariables>;
+
+/**
+ * __useRefreshTokenMutation__
+ *
+ * To run a mutation, you first call `useRefreshTokenMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRefreshTokenMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [refreshTokenMutation, { data, loading, error }] = useRefreshTokenMutation({
+ *   variables: {
+ *      refreshToken: // value for 'refreshToken'
+ *   },
+ * });
+ */
+export function useRefreshTokenMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RefreshTokenMutation, RefreshTokenMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<RefreshTokenMutation, RefreshTokenMutationVariables>(RefreshTokenDocument, options);
+      }
+export type RefreshTokenMutationHookResult = ReturnType<typeof useRefreshTokenMutation>;
+export type RefreshTokenMutationResult = Apollo.MutationResult<RefreshTokenMutation>;
+export type RefreshTokenMutationOptions = Apollo.BaseMutationOptions<RefreshTokenMutation, RefreshTokenMutationVariables>;
+export const LogoutUserDocument = gql`
+    mutation LogoutUser {
+  logoutUser {
+    success
+    message
+  }
+}
+    `;
+export type LogoutUserMutationFn = Apollo.MutationFunction<LogoutUserMutation, LogoutUserMutationVariables>;
+
+/**
+ * __useLogoutUserMutation__
+ *
+ * To run a mutation, you first call `useLogoutUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLogoutUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [logoutUserMutation, { data, loading, error }] = useLogoutUserMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useLogoutUserMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<LogoutUserMutation, LogoutUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<LogoutUserMutation, LogoutUserMutationVariables>(LogoutUserDocument, options);
+      }
+export type LogoutUserMutationHookResult = ReturnType<typeof useLogoutUserMutation>;
+export type LogoutUserMutationResult = Apollo.MutationResult<LogoutUserMutation>;
+export type LogoutUserMutationOptions = Apollo.BaseMutationOptions<LogoutUserMutation, LogoutUserMutationVariables>;
 export const GetOrdersDocument = gql`
     query GetOrders($filter: OrderFilterInput, $pagination: PaginationInput) {
   orders(filter: $filter, pagination: $pagination) {
@@ -1722,22 +2342,18 @@ export type UploadImageMutationOptions = Apollo.BaseMutationOptions<UploadImageM
 export const GetUsersDocument = gql`
     query GetUsers($filter: UserFilterInput, $pagination: PaginationInput) {
   users(filter: $filter, pagination: $pagination) {
-    users {
-      id
-      userId
-      firstName
-      lastName
-      phone
-      birthDate
-      avatarUrl
-      createdAt
-      updatedAt
-    }
     total
     hasMore
+    users {
+      ...UserBasic
+      profile {
+        ...UserProfileBasic
+      }
+    }
   }
 }
-    `;
+    ${UserBasicFragmentDoc}
+${UserProfileBasicFragmentDoc}`;
 
 /**
  * __useGetUsersQuery__
@@ -1777,19 +2393,23 @@ export function refetchGetUsersQuery(variables?: GetUsersQueryVariables) {
     }
 export const GetUserDocument = gql`
     query GetUser($id: ID!) {
-  userProfile(userId: $id) {
-    id
-    userId
-    firstName
-    lastName
-    phone
-    birthDate
-    avatarUrl
-    createdAt
-    updatedAt
+  user(id: $id) {
+    ...UserBasic
+    profile {
+      ...UserProfileFull
+    }
+    accounts {
+      ...UserAccount
+    }
+    sessions {
+      ...UserSession
+    }
   }
 }
-    `;
+    ${UserBasicFragmentDoc}
+${UserProfileFullFragmentDoc}
+${UserAccountFragmentDoc}
+${UserSessionFragmentDoc}`;
 
 /**
  * __useGetUserQuery__
@@ -1826,89 +2446,6 @@ export type GetUserQueryResult = Apollo.QueryResult<GetUserQuery, GetUserQueryVa
 export function refetchGetUserQuery(variables: GetUserQueryVariables) {
       return { query: GetUserDocument, variables: variables }
     }
-export const CreateUserDocument = gql`
-    mutation CreateUser($input: CreateUserProfileInput!) {
-  createUserProfile(input: $input) {
-    id
-    userId
-    firstName
-    lastName
-    phone
-    birthDate
-    avatarUrl
-    createdAt
-    updatedAt
-  }
-}
-    `;
-export type CreateUserMutationFn = Apollo.MutationFunction<CreateUserMutation, CreateUserMutationVariables>;
-
-/**
- * __useCreateUserMutation__
- *
- * To run a mutation, you first call `useCreateUserMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateUserMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createUserMutation, { data, loading, error }] = useCreateUserMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useCreateUserMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateUserMutation, CreateUserMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useMutation<CreateUserMutation, CreateUserMutationVariables>(CreateUserDocument, options);
-      }
-export type CreateUserMutationHookResult = ReturnType<typeof useCreateUserMutation>;
-export type CreateUserMutationResult = Apollo.MutationResult<CreateUserMutation>;
-export type CreateUserMutationOptions = Apollo.BaseMutationOptions<CreateUserMutation, CreateUserMutationVariables>;
-export const UpdateUserDocument = gql`
-    mutation UpdateUser($userId: ID!, $input: UpdateUserProfileInput!) {
-  updateUserProfile(userId: $userId, input: $input) {
-    id
-    userId
-    firstName
-    lastName
-    phone
-    birthDate
-    avatarUrl
-    createdAt
-    updatedAt
-  }
-}
-    `;
-export type UpdateUserMutationFn = Apollo.MutationFunction<UpdateUserMutation, UpdateUserMutationVariables>;
-
-/**
- * __useUpdateUserMutation__
- *
- * To run a mutation, you first call `useUpdateUserMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateUserMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [updateUserMutation, { data, loading, error }] = useUpdateUserMutation({
- *   variables: {
- *      userId: // value for 'userId'
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useUpdateUserMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateUserMutation, UpdateUserMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useMutation<UpdateUserMutation, UpdateUserMutationVariables>(UpdateUserDocument, options);
-      }
-export type UpdateUserMutationHookResult = ReturnType<typeof useUpdateUserMutation>;
-export type UpdateUserMutationResult = Apollo.MutationResult<UpdateUserMutation>;
-export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<UpdateUserMutation, UpdateUserMutationVariables>;
 export const GetUserProfileDocument = gql`
     query GetUserProfile($userId: ID!) {
   userProfile(userId: $userId) {
@@ -1992,6 +2529,275 @@ export type GetUserStatsQueryResult = Apollo.QueryResult<GetUserStatsQuery, GetU
 export function refetchGetUserStatsQuery(variables?: GetUserStatsQueryVariables) {
       return { query: GetUserStatsDocument, variables: variables }
     }
+export const GetUsersByProviderDocument = gql`
+    query GetUsersByProvider($provider: AuthProvider!, $pagination: PaginationInput) {
+  usersByProvider(provider: $provider) {
+    ...UserBasic
+    profile {
+      ...UserProfileBasic
+    }
+    accounts {
+      ...UserAccount
+    }
+  }
+}
+    ${UserBasicFragmentDoc}
+${UserProfileBasicFragmentDoc}
+${UserAccountFragmentDoc}`;
+
+/**
+ * __useGetUsersByProviderQuery__
+ *
+ * To run a query within a React component, call `useGetUsersByProviderQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUsersByProviderQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUsersByProviderQuery({
+ *   variables: {
+ *      provider: // value for 'provider'
+ *      pagination: // value for 'pagination'
+ *   },
+ * });
+ */
+export function useGetUsersByProviderQuery(baseOptions: ApolloReactHooks.QueryHookOptions<GetUsersByProviderQuery, GetUsersByProviderQueryVariables> & ({ variables: GetUsersByProviderQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetUsersByProviderQuery, GetUsersByProviderQueryVariables>(GetUsersByProviderDocument, options);
+      }
+export function useGetUsersByProviderLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetUsersByProviderQuery, GetUsersByProviderQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetUsersByProviderQuery, GetUsersByProviderQueryVariables>(GetUsersByProviderDocument, options);
+        }
+export function useGetUsersByProviderSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetUsersByProviderQuery, GetUsersByProviderQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetUsersByProviderQuery, GetUsersByProviderQueryVariables>(GetUsersByProviderDocument, options);
+        }
+export type GetUsersByProviderQueryHookResult = ReturnType<typeof useGetUsersByProviderQuery>;
+export type GetUsersByProviderLazyQueryHookResult = ReturnType<typeof useGetUsersByProviderLazyQuery>;
+export type GetUsersByProviderSuspenseQueryHookResult = ReturnType<typeof useGetUsersByProviderSuspenseQuery>;
+export type GetUsersByProviderQueryResult = Apollo.QueryResult<GetUsersByProviderQuery, GetUsersByProviderQueryVariables>;
+export function refetchGetUsersByProviderQuery(variables: GetUsersByProviderQueryVariables) {
+      return { query: GetUsersByProviderDocument, variables: variables }
+    }
+export const GetAuthProviderStatsDocument = gql`
+    query GetAuthProviderStats {
+  authProviderStats {
+    totalUsers
+    activeSessionsCount
+    usersByProvider {
+      provider
+      count
+      percentage
+    }
+    recentLogins {
+      userId
+      email
+      provider
+      loginAt
+      ipAddress
+      userAgent
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetAuthProviderStatsQuery__
+ *
+ * To run a query within a React component, call `useGetAuthProviderStatsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAuthProviderStatsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAuthProviderStatsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetAuthProviderStatsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetAuthProviderStatsQuery, GetAuthProviderStatsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetAuthProviderStatsQuery, GetAuthProviderStatsQueryVariables>(GetAuthProviderStatsDocument, options);
+      }
+export function useGetAuthProviderStatsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetAuthProviderStatsQuery, GetAuthProviderStatsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetAuthProviderStatsQuery, GetAuthProviderStatsQueryVariables>(GetAuthProviderStatsDocument, options);
+        }
+export function useGetAuthProviderStatsSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetAuthProviderStatsQuery, GetAuthProviderStatsQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetAuthProviderStatsQuery, GetAuthProviderStatsQueryVariables>(GetAuthProviderStatsDocument, options);
+        }
+export type GetAuthProviderStatsQueryHookResult = ReturnType<typeof useGetAuthProviderStatsQuery>;
+export type GetAuthProviderStatsLazyQueryHookResult = ReturnType<typeof useGetAuthProviderStatsLazyQuery>;
+export type GetAuthProviderStatsSuspenseQueryHookResult = ReturnType<typeof useGetAuthProviderStatsSuspenseQuery>;
+export type GetAuthProviderStatsQueryResult = Apollo.QueryResult<GetAuthProviderStatsQuery, GetAuthProviderStatsQueryVariables>;
+export function refetchGetAuthProviderStatsQuery(variables?: GetAuthProviderStatsQueryVariables) {
+      return { query: GetAuthProviderStatsDocument, variables: variables }
+    }
+export const GetUserSessionsDocument = gql`
+    query GetUserSessions($userId: ID!) {
+  userSessions(userId: $userId) {
+    ...UserSession
+  }
+}
+    ${UserSessionFragmentDoc}`;
+
+/**
+ * __useGetUserSessionsQuery__
+ *
+ * To run a query within a React component, call `useGetUserSessionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserSessionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserSessionsQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetUserSessionsQuery(baseOptions: ApolloReactHooks.QueryHookOptions<GetUserSessionsQuery, GetUserSessionsQueryVariables> & ({ variables: GetUserSessionsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetUserSessionsQuery, GetUserSessionsQueryVariables>(GetUserSessionsDocument, options);
+      }
+export function useGetUserSessionsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetUserSessionsQuery, GetUserSessionsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetUserSessionsQuery, GetUserSessionsQueryVariables>(GetUserSessionsDocument, options);
+        }
+export function useGetUserSessionsSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetUserSessionsQuery, GetUserSessionsQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetUserSessionsQuery, GetUserSessionsQueryVariables>(GetUserSessionsDocument, options);
+        }
+export type GetUserSessionsQueryHookResult = ReturnType<typeof useGetUserSessionsQuery>;
+export type GetUserSessionsLazyQueryHookResult = ReturnType<typeof useGetUserSessionsLazyQuery>;
+export type GetUserSessionsSuspenseQueryHookResult = ReturnType<typeof useGetUserSessionsSuspenseQuery>;
+export type GetUserSessionsQueryResult = Apollo.QueryResult<GetUserSessionsQuery, GetUserSessionsQueryVariables>;
+export function refetchGetUserSessionsQuery(variables: GetUserSessionsQueryVariables) {
+      return { query: GetUserSessionsDocument, variables: variables }
+    }
+export const GetActiveSessionsDocument = gql`
+    query GetActiveSessions($userId: ID!) {
+  activeSessions(userId: $userId) {
+    ...UserSession
+  }
+}
+    ${UserSessionFragmentDoc}`;
+
+/**
+ * __useGetActiveSessionsQuery__
+ *
+ * To run a query within a React component, call `useGetActiveSessionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetActiveSessionsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetActiveSessionsQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetActiveSessionsQuery(baseOptions: ApolloReactHooks.QueryHookOptions<GetActiveSessionsQuery, GetActiveSessionsQueryVariables> & ({ variables: GetActiveSessionsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetActiveSessionsQuery, GetActiveSessionsQueryVariables>(GetActiveSessionsDocument, options);
+      }
+export function useGetActiveSessionsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetActiveSessionsQuery, GetActiveSessionsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetActiveSessionsQuery, GetActiveSessionsQueryVariables>(GetActiveSessionsDocument, options);
+        }
+export function useGetActiveSessionsSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetActiveSessionsQuery, GetActiveSessionsQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetActiveSessionsQuery, GetActiveSessionsQueryVariables>(GetActiveSessionsDocument, options);
+        }
+export type GetActiveSessionsQueryHookResult = ReturnType<typeof useGetActiveSessionsQuery>;
+export type GetActiveSessionsLazyQueryHookResult = ReturnType<typeof useGetActiveSessionsLazyQuery>;
+export type GetActiveSessionsSuspenseQueryHookResult = ReturnType<typeof useGetActiveSessionsSuspenseQuery>;
+export type GetActiveSessionsQueryResult = Apollo.QueryResult<GetActiveSessionsQuery, GetActiveSessionsQueryVariables>;
+export function refetchGetActiveSessionsQuery(variables: GetActiveSessionsQueryVariables) {
+      return { query: GetActiveSessionsDocument, variables: variables }
+    }
+export const CreateUserDocument = gql`
+    mutation CreateUser($input: CreateUserInput!) {
+  createUser(input: $input) {
+    ...UserBasic
+    profile {
+      ...UserProfileBasic
+    }
+  }
+}
+    ${UserBasicFragmentDoc}
+${UserProfileBasicFragmentDoc}`;
+export type CreateUserMutationFn = Apollo.MutationFunction<CreateUserMutation, CreateUserMutationVariables>;
+
+/**
+ * __useCreateUserMutation__
+ *
+ * To run a mutation, you first call `useCreateUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createUserMutation, { data, loading, error }] = useCreateUserMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateUserMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateUserMutation, CreateUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<CreateUserMutation, CreateUserMutationVariables>(CreateUserDocument, options);
+      }
+export type CreateUserMutationHookResult = ReturnType<typeof useCreateUserMutation>;
+export type CreateUserMutationResult = Apollo.MutationResult<CreateUserMutation>;
+export type CreateUserMutationOptions = Apollo.BaseMutationOptions<CreateUserMutation, CreateUserMutationVariables>;
+export const UpdateUserDocument = gql`
+    mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {
+  updateUser(id: $id, input: $input) {
+    ...UserBasic
+    profile {
+      ...UserProfileBasic
+    }
+  }
+}
+    ${UserBasicFragmentDoc}
+${UserProfileBasicFragmentDoc}`;
+export type UpdateUserMutationFn = Apollo.MutationFunction<UpdateUserMutation, UpdateUserMutationVariables>;
+
+/**
+ * __useUpdateUserMutation__
+ *
+ * To run a mutation, you first call `useUpdateUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateUserMutation, { data, loading, error }] = useUpdateUserMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateUserMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateUserMutation, UpdateUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<UpdateUserMutation, UpdateUserMutationVariables>(UpdateUserDocument, options);
+      }
+export type UpdateUserMutationHookResult = ReturnType<typeof useUpdateUserMutation>;
+export type UpdateUserMutationResult = Apollo.MutationResult<UpdateUserMutation>;
+export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<UpdateUserMutation, UpdateUserMutationVariables>;
 export const CreateUserProfileDocument = gql`
     mutation CreateUserProfile($input: CreateUserProfileInput!) {
   createUserProfile(input: $input) {
@@ -2059,3 +2865,177 @@ export function useUpdateUserProfileMutation(baseOptions?: ApolloReactHooks.Muta
 export type UpdateUserProfileMutationHookResult = ReturnType<typeof useUpdateUserProfileMutation>;
 export type UpdateUserProfileMutationResult = Apollo.MutationResult<UpdateUserProfileMutation>;
 export type UpdateUserProfileMutationOptions = Apollo.BaseMutationOptions<UpdateUserProfileMutation, UpdateUserProfileMutationVariables>;
+export const RevokeUserSessionDocument = gql`
+    mutation RevokeUserSession($sessionId: ID!) {
+  revokeUserSession(sessionId: $sessionId) {
+    success
+    message
+  }
+}
+    `;
+export type RevokeUserSessionMutationFn = Apollo.MutationFunction<RevokeUserSessionMutation, RevokeUserSessionMutationVariables>;
+
+/**
+ * __useRevokeUserSessionMutation__
+ *
+ * To run a mutation, you first call `useRevokeUserSessionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRevokeUserSessionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [revokeUserSessionMutation, { data, loading, error }] = useRevokeUserSessionMutation({
+ *   variables: {
+ *      sessionId: // value for 'sessionId'
+ *   },
+ * });
+ */
+export function useRevokeUserSessionMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RevokeUserSessionMutation, RevokeUserSessionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<RevokeUserSessionMutation, RevokeUserSessionMutationVariables>(RevokeUserSessionDocument, options);
+      }
+export type RevokeUserSessionMutationHookResult = ReturnType<typeof useRevokeUserSessionMutation>;
+export type RevokeUserSessionMutationResult = Apollo.MutationResult<RevokeUserSessionMutation>;
+export type RevokeUserSessionMutationOptions = Apollo.BaseMutationOptions<RevokeUserSessionMutation, RevokeUserSessionMutationVariables>;
+export const RevokeAllUserSessionsDocument = gql`
+    mutation RevokeAllUserSessions($userId: ID!) {
+  revokeAllUserSessions(userId: $userId) {
+    success
+    message
+  }
+}
+    `;
+export type RevokeAllUserSessionsMutationFn = Apollo.MutationFunction<RevokeAllUserSessionsMutation, RevokeAllUserSessionsMutationVariables>;
+
+/**
+ * __useRevokeAllUserSessionsMutation__
+ *
+ * To run a mutation, you first call `useRevokeAllUserSessionsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRevokeAllUserSessionsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [revokeAllUserSessionsMutation, { data, loading, error }] = useRevokeAllUserSessionsMutation({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useRevokeAllUserSessionsMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RevokeAllUserSessionsMutation, RevokeAllUserSessionsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<RevokeAllUserSessionsMutation, RevokeAllUserSessionsMutationVariables>(RevokeAllUserSessionsDocument, options);
+      }
+export type RevokeAllUserSessionsMutationHookResult = ReturnType<typeof useRevokeAllUserSessionsMutation>;
+export type RevokeAllUserSessionsMutationResult = Apollo.MutationResult<RevokeAllUserSessionsMutation>;
+export type RevokeAllUserSessionsMutationOptions = Apollo.BaseMutationOptions<RevokeAllUserSessionsMutation, RevokeAllUserSessionsMutationVariables>;
+export const UnlinkUserAccountDocument = gql`
+    mutation UnlinkUserAccount($accountId: ID!) {
+  unlinkUserAccount(accountId: $accountId) {
+    success
+    message
+  }
+}
+    `;
+export type UnlinkUserAccountMutationFn = Apollo.MutationFunction<UnlinkUserAccountMutation, UnlinkUserAccountMutationVariables>;
+
+/**
+ * __useUnlinkUserAccountMutation__
+ *
+ * To run a mutation, you first call `useUnlinkUserAccountMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUnlinkUserAccountMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [unlinkUserAccountMutation, { data, loading, error }] = useUnlinkUserAccountMutation({
+ *   variables: {
+ *      accountId: // value for 'accountId'
+ *   },
+ * });
+ */
+export function useUnlinkUserAccountMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UnlinkUserAccountMutation, UnlinkUserAccountMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<UnlinkUserAccountMutation, UnlinkUserAccountMutationVariables>(UnlinkUserAccountDocument, options);
+      }
+export type UnlinkUserAccountMutationHookResult = ReturnType<typeof useUnlinkUserAccountMutation>;
+export type UnlinkUserAccountMutationResult = Apollo.MutationResult<UnlinkUserAccountMutation>;
+export type UnlinkUserAccountMutationOptions = Apollo.BaseMutationOptions<UnlinkUserAccountMutation, UnlinkUserAccountMutationVariables>;
+export const ForcePasswordResetDocument = gql`
+    mutation ForcePasswordReset($userId: ID!) {
+  forcePasswordReset(userId: $userId) {
+    success
+    message
+  }
+}
+    `;
+export type ForcePasswordResetMutationFn = Apollo.MutationFunction<ForcePasswordResetMutation, ForcePasswordResetMutationVariables>;
+
+/**
+ * __useForcePasswordResetMutation__
+ *
+ * To run a mutation, you first call `useForcePasswordResetMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useForcePasswordResetMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [forcePasswordResetMutation, { data, loading, error }] = useForcePasswordResetMutation({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useForcePasswordResetMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ForcePasswordResetMutation, ForcePasswordResetMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<ForcePasswordResetMutation, ForcePasswordResetMutationVariables>(ForcePasswordResetDocument, options);
+      }
+export type ForcePasswordResetMutationHookResult = ReturnType<typeof useForcePasswordResetMutation>;
+export type ForcePasswordResetMutationResult = Apollo.MutationResult<ForcePasswordResetMutation>;
+export type ForcePasswordResetMutationOptions = Apollo.BaseMutationOptions<ForcePasswordResetMutation, ForcePasswordResetMutationVariables>;
+export const ImpersonateUserDocument = gql`
+    mutation ImpersonateUser($userId: ID!) {
+  impersonateUser(userId: $userId) {
+    success
+    user {
+      ...UserBasic
+    }
+    accessToken
+    message
+  }
+}
+    ${UserBasicFragmentDoc}`;
+export type ImpersonateUserMutationFn = Apollo.MutationFunction<ImpersonateUserMutation, ImpersonateUserMutationVariables>;
+
+/**
+ * __useImpersonateUserMutation__
+ *
+ * To run a mutation, you first call `useImpersonateUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useImpersonateUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [impersonateUserMutation, { data, loading, error }] = useImpersonateUserMutation({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useImpersonateUserMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ImpersonateUserMutation, ImpersonateUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<ImpersonateUserMutation, ImpersonateUserMutationVariables>(ImpersonateUserDocument, options);
+      }
+export type ImpersonateUserMutationHookResult = ReturnType<typeof useImpersonateUserMutation>;
+export type ImpersonateUserMutationResult = Apollo.MutationResult<ImpersonateUserMutation>;
+export type ImpersonateUserMutationOptions = Apollo.BaseMutationOptions<ImpersonateUserMutation, ImpersonateUserMutationVariables>;

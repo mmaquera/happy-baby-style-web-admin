@@ -25,6 +25,14 @@ export class LoggerFactory {
   }
 
   /**
+   * Static method to create a logger with specific module name
+   * This is the method being called in the use cases
+   */
+  static create(moduleName: string): ILogger {
+    return this.getInstance().createModuleLogger(moduleName);
+  }
+
+  /**
    * Create a new logger instance
    */
   createLogger(): ILogger {

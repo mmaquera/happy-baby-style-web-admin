@@ -1,10 +1,12 @@
 import { 
   useGetUsersQuery, 
   useGetUserStatsQuery,
+  useCreateUserMutation,
+  useUpdateUserMutation,
   GetUsersDocument,
   UserFilterInput,
-  CreateUserProfileInput,
-  UpdateUserProfileInput
+  CreateUserInput,
+  UpdateUserInput
 } from '../generated/graphql';
 import toast from 'react-hot-toast';
 
@@ -52,21 +54,45 @@ export const useUsers = (options: UseUsersOptions = {}) => {
 };
 
 export const useCreateUser = () => {
-  // Placeholder - implement when mutations are available
-  const create = (input: CreateUserProfileInput) => {
-    return Promise.resolve();
+  const [createUserMutation, { loading, error }] = useCreateUserMutation({
+    refetchQueries: [GetUsersDocument],
+  });
+
+  const create = async (input: CreateUserInput) => {
+    try {
+      const result = await createUserMutation({
+        variables: { input }
+      });
+      toast.success('Usuario creado exitosamente');
+      return result.data?.createUser;
+    } catch (error) {
+      toast.error('Error al crear usuario');
+      throw error;
+    }
   };
 
-  return { create, loading: false, error: null };
+  return { create, loading, error };
 };
 
 export const useUpdateUser = () => {
-  // Placeholder - implement when mutations are available
-  const update = (id: string, input: UpdateUserProfileInput) => {
-    return Promise.resolve();
+  const [updateUserMutation, { loading, error }] = useUpdateUserMutation({
+    refetchQueries: [GetUsersDocument],
+  });
+
+  const update = async (id: string, input: UpdateUserInput) => {
+    try {
+      const result = await updateUserMutation({
+        variables: { id, input }
+      });
+      toast.success('Usuario actualizado exitosamente');
+      return result.data?.updateUser;
+    } catch (error) {
+      toast.error('Error al actualizar usuario');
+      throw error;
+    }
   };
 
-  return { update, loading: false, error: null };
+  return { update, loading, error };
 };
 
 export const useUserStats = () => {

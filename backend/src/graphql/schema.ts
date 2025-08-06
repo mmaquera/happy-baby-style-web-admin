@@ -33,6 +33,63 @@ export const typeDefs = gql`
   scalar Upload
 
   # Types
+  enum UserRole {
+    admin
+    customer
+    staff
+  }
+
+  enum AuthProvider {
+    email
+    google
+    facebook
+    apple
+  }
+
+  type UserAccount {
+    id: ID!
+    userId: ID!
+    provider: AuthProvider!
+    providerAccountId: String!
+    accessToken: String
+    refreshToken: String
+    tokenType: String
+    scope: String
+    idToken: String
+    expiresAt: DateTime
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  type UserSession {
+    id: ID!
+    userId: ID!
+    sessionToken: String!
+    accessToken: String!
+    refreshToken: String
+    expiresAt: DateTime!
+    userAgent: String
+    ipAddress: String
+    isActive: Boolean!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  type User {
+    id: ID!
+    email: String!
+    role: UserRole!
+    isActive: Boolean!
+    emailVerified: Boolean!
+    lastLoginAt: DateTime
+    profile: UserProfile
+    addresses: [UserAddress!]!
+    accounts: [UserAccount!]!
+    sessions: [UserSession!]!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
   type UserProfile {
     id: ID!
     userId: ID!
@@ -241,6 +298,14 @@ export const typeDefs = gql`
     avatarUrl: String
   }
 
+  input CreateProfileForUserInput {
+    firstName: String
+    lastName: String
+    phone: String
+    birthDate: DateTime
+    avatarUrl: String
+  }
+
   input UpdateUserProfileInput {
     firstName: String
     lastName: String
@@ -431,14 +496,14 @@ export const typeDefs = gql`
   }
 
   type PaginatedUsers {
-    users: [UserProfile!]!
+    users: [User!]!
     total: Int!
     hasMore: Boolean!
   }
 
   type AuthResponse {
     token: String!
-    user: UserProfile!
+    user: User!
   }
 
   type SuccessResponse {
@@ -453,6 +518,128 @@ export const typeDefs = gql`
     message: String!
   }
 
+  # Auth types
+  type AuthResponse {
+    success: Boolean!
+    user: User
+    accessToken: String
+    refreshToken: String
+    message: String!
+  }
+
+  # User order history types
+  type UserOrderHistoryResponse {
+    orders: [Order!]!
+    total: Int!
+    hasMore: Boolean!
+    stats: UserOrderStats!
+  }
+
+  type UserOrderStats {
+    totalOrders: Int!
+    totalSpent: Decimal!
+    averageOrderValue: Decimal!
+    lastOrderDate: DateTime
+    ordersByStatus: JSON!
+  }
+
+  # User favorite stats types
+  type UserFavoriteStatsResponse {
+    totalFavorites: Int!
+    recentFavorites: [UserFavorite!]!
+    favoriteCategories: [FavoriteCategoryStats!]!
+  }
+
+  type FavoriteCategoryStats {
+    categoryId: ID!
+    categoryName: String!
+    count: Int!
+  }
+
+  # User activity summary types
+  type UserActivitySummaryResponse {
+    recentOrders: [Order!]!
+    favoriteProducts: [Product!]!
+    cartItemsCount: Int!
+    totalSpent: Decimal!
+    joinDate: DateTime!
+    lastActivity: DateTime
+  }
+
+  # Favorite toggle response
+  type FavoriteToggleResponse {
+    action: String! # "added" | "removed"
+    favorite: UserFavorite
+    message: String!
+  }
+
+  # Auth Statistics
+  type AuthProviderStats {
+    totalUsers: Int!
+    usersByProvider: [ProviderUserCount!]!
+    activeSessionsCount: Int!
+    recentLogins: [RecentLoginActivity!]!
+  }
+
+  type ProviderUserCount {
+    provider: AuthProvider!
+    count: Int!
+    percentage: Float!
+  }
+
+  type RecentLoginActivity {
+    userId: ID!
+    email: String!
+    provider: AuthProvider!
+    loginAt: DateTime!
+    ipAddress: String
+    userAgent: String
+  }
+
+  # Extended input types
+  input CreateUserInput {
+    email: String!
+    password: String!
+    role: UserRole
+    isActive: Boolean
+    profile: CreateProfileForUserInput
+  }
+
+  input UpdateUserInput {
+    email: String
+    role: UserRole
+    isActive: Boolean
+    profile: UpdateUserProfileInput
+  }
+
+  input RegisterUserInput {
+    email: String!
+    password: String!
+    firstName: String!
+    lastName: String!
+    phone: String
+    birthDate: String
+  }
+
+  input LoginUserInput {
+    email: String!
+    password: String!
+  }
+
+  input UpdateUserPasswordInput {
+    currentPassword: String!
+    newPassword: String!
+    confirmPassword: String!
+  }
+
+  input UserOrderHistoryFilter {
+    status: String
+    startDate: String
+    endDate: String
+    minAmount: Decimal
+    maxAmount: Decimal
+  }
+
   # Queries
   type Query {
     # Health check
@@ -460,9 +647,24 @@ export const typeDefs = gql`
     
     # User queries
     users(filter: UserFilterInput, pagination: PaginationInput): PaginatedUsers!
+    user(id: ID!): User
     userProfile(userId: ID!): UserProfile
     userAddresses(userId: ID!): [UserAddress!]!
     userAddress(id: ID!): UserAddress
+    currentUser: User
+    searchUsers(query: String!): [User!]!
+    activeUsers: [User!]!
+    usersByRole(role: UserRole!): [User!]!
+    usersByProvider(provider: AuthProvider!): [User!]!
+    userOrderHistory(userId: ID!, filter: UserOrderHistoryFilter, pagination: PaginationInput): UserOrderHistoryResponse!
+    userFavoriteStats(userId: ID!): UserFavoriteStatsResponse!
+    userActivitySummary(userId: ID!): UserActivitySummaryResponse!
+    
+    # Authentication queries
+    userAccounts(userId: ID!): [UserAccount!]!
+    userSessions(userId: ID!): [UserSession!]!
+    activeSessions(userId: ID!): [UserSession!]!
+    authProviderStats: AuthProviderStats!
     
     # Category queries
     categories: [Category!]!
@@ -508,15 +710,37 @@ export const typeDefs = gql`
 
   # Mutations
   type Mutation {
+    # Auth mutations
+    registerUser(input: RegisterUserInput!): AuthResponse!
+    loginUser(input: LoginUserInput!): AuthResponse!
+    logoutUser: SuccessResponse!
+    refreshToken(refreshToken: String!): AuthResponse!
+    
     # User mutations
+    createUser(input: CreateUserInput!): User!
+    updateUser(id: ID!, input: UpdateUserInput!): User!
+    deleteUser(id: ID!): SuccessResponse!
+    activateUser(id: ID!): User!
+    deactivateUser(id: ID!): User!
     createUserProfile(input: CreateUserProfileInput!): UserProfile!
     updateUserProfile(userId: ID!, input: UpdateUserProfileInput!): UserProfile!
     deleteUserProfile(userId: ID!): SuccessResponse!
+    updateUserPassword(input: UpdateUserPasswordInput!): SuccessResponse!
+    requestPasswordReset(email: String!): SuccessResponse!
+    resetPassword(token: String!, newPassword: String!): SuccessResponse!
+    
+    # Authentication management mutations
+    revokeUserSession(sessionId: ID!): SuccessResponse!
+    revokeAllUserSessions(userId: ID!): SuccessResponse!
+    unlinkUserAccount(accountId: ID!): SuccessResponse!
+    forcePasswordReset(userId: ID!): SuccessResponse!
+    impersonateUser(userId: ID!): AuthResponse!
     
     # User address mutations
     createUserAddress(input: CreateUserAddressInput!): UserAddress!
     updateUserAddress(id: ID!, input: UpdateUserAddressInput!): UserAddress!
     deleteUserAddress(id: ID!): SuccessResponse!
+    setDefaultAddress(userId: ID!, addressId: ID!): SuccessResponse!
     
     # Category mutations
     createCategory(input: CreateCategoryInput!): Category!
@@ -542,6 +766,7 @@ export const typeDefs = gql`
     # User favorites mutations
     addToFavorites(input: AddToFavoritesInput!): UserFavorite!
     removeFromFavorites(userId: ID!, productId: ID!): SuccessResponse!
+    toggleFavorite(userId: ID!, productId: ID!): FavoriteToggleResponse!
     
     # Order mutations
     createOrder(input: CreateOrderInput!): Order!

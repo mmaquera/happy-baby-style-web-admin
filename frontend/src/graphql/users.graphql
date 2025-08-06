@@ -1,4 +1,37 @@
 # User Fragments
+fragment UserAccount on UserAccount {
+  id
+  userId
+  provider
+  providerAccountId
+  expiresAt
+  createdAt
+  updatedAt
+}
+
+fragment UserSession on UserSession {
+  id
+  userId
+  sessionToken
+  expiresAt
+  userAgent
+  ipAddress
+  isActive
+  createdAt
+  updatedAt
+}
+
+fragment UserBasic on User {
+  id
+  email
+  role
+  isActive
+  emailVerified
+  lastLoginAt
+  createdAt
+  updatedAt
+}
+
 fragment UserProfileBasic on UserProfile {
   id
   userId
@@ -57,6 +90,34 @@ fragment UserProfileFull on UserProfile {
 }
 
 # Queries
+query GetUsers($filter: UserFilterInput, $pagination: PaginationInput) {
+  users(filter: $filter, pagination: $pagination) {
+    total
+    hasMore
+    users {
+      ...UserBasic
+      profile {
+        ...UserProfileBasic
+      }
+    }
+  }
+}
+
+query GetUser($id: ID!) {
+  user(id: $id) {
+    ...UserBasic
+    profile {
+      ...UserProfileFull
+    }
+    accounts {
+      ...UserAccount
+    }
+    sessions {
+      ...UserSession
+    }
+  }
+}
+
 query GetUserProfile($userId: ID!) {
   userProfile(userId: $userId) {
     ...UserProfileFull
@@ -67,7 +128,69 @@ query GetUserStats {
   userStats
 }
 
+query GetUsersByProvider($provider: AuthProvider!, $pagination: PaginationInput) {
+  usersByProvider(provider: $provider) {
+    ...UserBasic
+    profile {
+      ...UserProfileBasic
+    }
+    accounts {
+      ...UserAccount
+    }
+  }
+}
+
+query GetAuthProviderStats {
+  authProviderStats {
+    totalUsers
+    activeSessionsCount
+    usersByProvider {
+      provider
+      count
+      percentage
+    }
+    recentLogins {
+      userId
+      email
+      provider
+      loginAt
+      ipAddress
+      userAgent
+    }
+  }
+}
+
+query GetUserSessions($userId: ID!) {
+  userSessions(userId: $userId) {
+    ...UserSession
+  }
+}
+
+query GetActiveSessions($userId: ID!) {
+  activeSessions(userId: $userId) {
+    ...UserSession
+  }
+}
+
 # Mutations
+mutation CreateUser($input: CreateUserInput!) {
+  createUser(input: $input) {
+    ...UserBasic
+    profile {
+      ...UserProfileBasic
+    }
+  }
+}
+
+mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {
+  updateUser(id: $id, input: $input) {
+    ...UserBasic
+    profile {
+      ...UserProfileBasic
+    }
+  }
+}
+
 mutation CreateUserProfile($input: CreateUserProfileInput!) {
   createUserProfile(input: $input) {
     ...UserProfileBasic
@@ -77,5 +200,45 @@ mutation CreateUserProfile($input: CreateUserProfileInput!) {
 mutation UpdateUserProfile($userId: ID!, $input: UpdateUserProfileInput!) {
   updateUserProfile(userId: $userId, input: $input) {
     ...UserProfileBasic
+  }
+}
+
+# Authentication Management Mutations
+mutation RevokeUserSession($sessionId: ID!) {
+  revokeUserSession(sessionId: $sessionId) {
+    success
+    message
+  }
+}
+
+mutation RevokeAllUserSessions($userId: ID!) {
+  revokeAllUserSessions(userId: $userId) {
+    success
+    message
+  }
+}
+
+mutation UnlinkUserAccount($accountId: ID!) {
+  unlinkUserAccount(accountId: $accountId) {
+    success
+    message
+  }
+}
+
+mutation ForcePasswordReset($userId: ID!) {
+  forcePasswordReset(userId: $userId) {
+    success
+    message
+  }
+}
+
+mutation ImpersonateUser($userId: ID!) {
+  impersonateUser(userId: $userId) {
+    success
+    user {
+      ...UserBasic
+    }
+    accessToken
+    message
   }
 }

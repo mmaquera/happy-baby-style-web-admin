@@ -14,7 +14,7 @@ class PrismaService {
           log: ['error', 'warn'],
         });
       } else {
-        // In development, use a global instance to prevent multiple connections
+        // En desarrollo, usar global para evitar múltiples conexiones con hot reload
         if (!global.__prisma) {
           global.__prisma = new PrismaClient({
             log: ['query', 'info', 'warn', 'error'],
@@ -23,7 +23,7 @@ class PrismaService {
         PrismaService.instance = global.__prisma;
       }
 
-      // Handle graceful shutdown
+      // Manejo de errores de desconexión
       process.on('beforeExit', async () => {
         await PrismaService.instance.$disconnect();
       });
@@ -35,7 +35,6 @@ class PrismaService {
 
       process.on('SIGTERM', async () => {
         await PrismaService.instance.$disconnect();
-        process.exit(0);
       });
     }
 
@@ -45,13 +44,11 @@ class PrismaService {
   public static async connect(): Promise<void> {
     const client = PrismaService.getInstance();
     await client.$connect();
-    console.log('✅ Database connected successfully');
   }
 
   public static async disconnect(): Promise<void> {
     const client = PrismaService.getInstance();
     await client.$disconnect();
-    console.log('✅ Database disconnected successfully');
   }
 
   public static async healthCheck(): Promise<boolean> {
@@ -60,11 +57,12 @@ class PrismaService {
       await client.$queryRaw`SELECT 1`;
       return true;
     } catch (error) {
-      console.error('❌ Database health check failed:', error);
+      console.error('Prisma health check failed:', error);
       return false;
     }
   }
 }
 
+// Singleton export
 export const prisma = PrismaService.getInstance();
-export default PrismaService; 
+export default PrismaService;

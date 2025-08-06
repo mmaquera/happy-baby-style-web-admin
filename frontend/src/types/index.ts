@@ -150,14 +150,53 @@ export interface UserAddress {
   updatedAt: Date;
 }
 
+export enum AuthProvider {
+  EMAIL = 'email',
+  GOOGLE = 'google',
+  FACEBOOK = 'facebook',
+  APPLE = 'apple'
+}
+
+export interface UserAccount {
+  id: string;
+  userId: string;
+  provider: AuthProvider;
+  providerAccountId: string;
+  accessToken?: string;
+  refreshToken?: string;
+  tokenType?: string;
+  scope?: string;
+  idToken?: string;
+  expiresAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface UserSession {
+  id: string;
+  userId: string;
+  sessionToken: string;
+  accessToken: string;
+  refreshToken?: string;
+  expiresAt: Date;
+  userAgent?: string;
+  ipAddress?: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface User {
   id: string;
   email: string;
   role: UserRole;
   isActive: boolean;
   emailVerified: boolean;
+  lastLoginAt?: Date;
   profile?: UserProfile;
   addresses?: UserAddress[];
+  accounts?: UserAccount[];
+  sessions?: UserSession[];
   createdAt: Date;
   updatedAt: Date;
 }

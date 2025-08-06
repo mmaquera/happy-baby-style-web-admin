@@ -1,11 +1,21 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useUsers, useUserStats, useCreateUser, useUpdateUser } from '@/hooks/useUsersGraphQL';
+// import { useMockUsers, useMockUserStats } from '@/hooks/useMockUsers';
 import { User, UserRole, CreateUserRequest, UpdateUserRequest } from '@/types';
+import { CreateUserInput, UpdateUserInput } from '@/generated/graphql';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { UserDetailModal } from '@/components/users/UserDetailModal';
+import { AuthProviderDashboard } from '@/components/users/AuthProviderDashboard';
+import { ImprovedCreateUserModal } from '@/components/users/ImprovedCreateUserModal';
+import { UserActionsMenu } from '@/components/users/UserActionsMenu';
+import { PasswordManagementModal } from '@/components/users/PasswordManagementModal';
+import { useProviderUtils, useAccountManagement } from '@/hooks/useAuthManagement';
+import { useUserActions } from '@/hooks/useUserActions';
 import { theme } from '@/styles/theme';
+import { AuthProvider } from '@/types';
 import { 
   Users as UsersIcon,
   UserPlus,
@@ -17,7 +27,10 @@ import {
   Eye,
   Edit,
   Trash2,
-  Plus
+  Plus,
+  Shield,
+  MoreVertical,
+  Key
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -136,6 +149,41 @@ const FilterSelect = styled.select`
   cursor: pointer;
 `;
 
+const FormSelect = styled.select`
+  padding: 12px;
+  border: 1px solid ${theme.colors.border.light};
+  border-radius: ${theme.borderRadius.md};
+  font-size: ${theme.fontSizes.sm};
+  background-color: ${theme.colors.white};
+  color: ${theme.colors.text.primary};
+  width: 100%;
+  
+  &:focus {
+    outline: none;
+    border-color: ${theme.colors.primaryPurple};
+    box-shadow: 0 0 0 2px ${theme.colors.primaryPurple}20;
+  }
+`;
+
+const CheckboxContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[2]};
+  margin-bottom: ${theme.spacing[4]};
+`;
+
+const Checkbox = styled.input`
+  width: 18px;
+  height: 18px;
+  accent-color: ${theme.colors.primaryPurple};
+`;
+
+const CheckboxLabel = styled.label`
+  font-size: ${theme.fontSizes.sm};
+  color: ${theme.colors.text.primary};
+  cursor: pointer;
+`;
+
 const UsersGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -149,6 +197,7 @@ const UserCard = styled(Card)`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[3]};
+  position: relative;
 
   &:hover {
     transform: translateY(-2px);
@@ -267,6 +316,37 @@ const UserBirthDate = styled.div`
   color: ${theme.colors.text.secondary};
 `;
 
+const AuthProviderIndicator = styled.div<{ provider: AuthProvider }>`
+  position: absolute;
+  top: ${theme.spacing[2]};
+  right: ${theme.spacing[2]};
+  width: 24px;
+  height: 24px;
+  border-radius: ${theme.borderRadius.full};
+  background-color: ${props => getProviderColor(props.provider)}20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: ${theme.fontSizes.xs};
+  color: ${props => getProviderColor(props.provider)};
+  border: 1px solid ${props => getProviderColor(props.provider)}40;
+`;
+
+const getProviderColor = (provider: AuthProvider) => {
+  switch (provider) {
+    case AuthProvider.GOOGLE:
+      return '#4285f4';
+    case AuthProvider.FACEBOOK:
+      return '#1877f2';
+    case AuthProvider.APPLE:
+      return '#000000';
+    case AuthProvider.EMAIL:
+      return theme.colors.primaryPurple;
+    default:
+      return theme.colors.text.secondary;
+  }
+};
+
 const UserActions = styled.div`
   display: flex;
   gap: ${theme.spacing[2]};
@@ -334,6 +414,40 @@ const FormActions = styled.div`
   justify-content: flex-end;
 `;
 
+const TabsContainer = styled.div`
+  display: flex;
+  border-bottom: 1px solid ${theme.colors.border.light};
+  margin-bottom: ${theme.spacing[6]};
+`;
+
+const Tab = styled.button<{ active: boolean }>`
+  padding: ${theme.spacing[3]} ${theme.spacing[4]};
+  border: none;
+  background: none;
+  font-size: ${theme.fontSizes.sm};
+  font-weight: ${theme.fontWeights.medium};
+  cursor: pointer;
+  transition: all ${theme.transitions.base};
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[2]};
+  
+  ${({ active }) => active ? `
+    color: ${theme.colors.primaryPurple};
+    border-bottom: 2px solid ${theme.colors.primaryPurple};
+  ` : `
+    color: ${theme.colors.text.secondary};
+    
+    &:hover {
+      color: ${theme.colors.text.primary};
+    }
+  `}
+`;
+
+const TabContent = styled.div`
+  min-height: 400px;
+`;
+
 // Component
 export const UsersPage: React.FC = () => {
   const [filters, setFilters] = useState({
@@ -342,21 +456,31 @@ export const UsersPage: React.FC = () => {
     isActive: undefined as boolean | undefined
   });
   
+  const [activeTab, setActiveTab] = useState<'users' | 'auth-dashboard'>('users');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [openMenuUserId, setOpenMenuUserId] = useState<string | null>(null);
 
-  // Queries and mutations
+  // Queries and mutations (conexiones reales al backend)
   const { users = [], loading: usersLoading, error: usersError } = useUsers({ filter: filters });
   const { stats } = useUserStats();
   const createUserMutation = useCreateUser();
   const updateUserMutation = useUpdateUser();
+  const { getProviderIcon } = useProviderUtils();
+  
+  // Password management hooks
+  const { forcePasswordReset } = useAccountManagement();
+  const userActions = useUserActions();
 
   // Form state
-  const [formData, setFormData] = useState<CreateUserRequest>({
+  const [formData, setFormData] = useState<CreateUserInput>({
     email: '',
     password: '',
     role: UserRole.CUSTOMER,
+    isActive: true,
     profile: {
       firstName: '',
       lastName: '',
@@ -365,21 +489,10 @@ export const UsersPage: React.FC = () => {
     }
   });
 
-  const handleCreateUser = async () => {
+  const handleCreateUser = async (userData: CreateUserInput) => {
     try {
-      await createUserMutation.create(formData);
+      await createUserMutation.create(userData);
       setShowCreateModal(false);
-      setFormData({
-        email: '',
-        password: '',
-        role: UserRole.CUSTOMER,
-        profile: {
-          firstName: '',
-          lastName: '',
-          phone: '',
-          birthDate: undefined
-        }
-      });
       toast.success('Usuario creado exitosamente');
     } catch (error) {
       toast.error('Error al crear usuario');
@@ -390,16 +503,14 @@ export const UsersPage: React.FC = () => {
     if (!selectedUser) return;
     
     try {
-      const updateData: UpdateUserRequest = {
+      const updateData: UpdateUserInput = {
         email: formData.email,
         role: formData.role,
+        isActive: formData.isActive,
         profile: formData.profile
       };
       
-      await updateUserMutation.update(editingUser.id, {
-        id: selectedUser.id,
-        data: updateData
-      });
+      await updateUserMutation.update(selectedUser.id, updateData);
       
       setShowEditModal(false);
       setSelectedUser(null);
@@ -415,6 +526,7 @@ export const UsersPage: React.FC = () => {
       email: user.email,
       password: '',
       role: user.role,
+      isActive: user.isActive,
       profile: {
         firstName: user.profile?.firstName || '',
         lastName: user.profile?.lastName || '',
@@ -423,6 +535,41 @@ export const UsersPage: React.FC = () => {
       }
     });
     setShowEditModal(true);
+  };
+
+  // User action handlers
+  const handleResetPassword = (user: User) => {
+    setSelectedUser(user);
+    setShowPasswordModal(true);
+  };
+
+  const handleActivateUser = async (user: User) => {
+    await userActions.activateUser(user);
+  };
+
+  const handleDeactivateUser = async (user: User) => {
+    await userActions.deactivateUser(user);
+  };
+
+  const handleDeleteUser = async (user: User) => {
+    await userActions.deleteUser(user);
+  };
+
+  const handlePromoteToAdmin = async (user: User) => {
+    await userActions.promoteToAdmin(user);
+  };
+
+  const handleDemoteFromAdmin = async (user: User) => {
+    await userActions.demoteFromAdmin(user);
+  };
+
+  // Menu management handlers
+  const handleMenuToggle = (userId: string) => {
+    setOpenMenuUserId(openMenuUserId === userId ? null : userId);
+  };
+
+  const handleMenuClose = () => {
+    setOpenMenuUserId(null);
   };
 
   const getRoleLabel = (role: UserRole) => {
@@ -543,22 +690,46 @@ export const UsersPage: React.FC = () => {
         <HeaderContent>
           <HeaderInfo>
             <Title>Gestión de Usuarios</Title>
-            <Subtitle>Administra usuarios del sistema</Subtitle>
+            <Subtitle>Administra usuarios del sistema y autenticación</Subtitle>
           </HeaderInfo>
           <HeaderActions>
-            <Button
-              variant="primary"
-              onClick={() => setShowCreateModal(true)}
-              icon={<UserPlus size={16} />}
-            >
-              Nuevo Usuario
-            </Button>
+            {activeTab === 'users' && (
+              <Button
+                variant="primary"
+                onClick={() => setShowCreateModal(true)}
+                icon={<UserPlus size={16} />}
+              >
+                Nuevo Usuario
+              </Button>
+            )}
           </HeaderActions>
         </HeaderContent>
       </Header>
 
-      {/* Stats Cards */}
-      <StatsGrid>
+      {/* Tabs Navigation */}
+      <TabsContainer>
+        <Tab 
+          active={activeTab === 'users'} 
+          onClick={() => setActiveTab('users')}
+        >
+          <UsersIcon size={16} />
+          Gestión de Usuarios
+        </Tab>
+        <Tab 
+          active={activeTab === 'auth-dashboard'} 
+          onClick={() => setActiveTab('auth-dashboard')}
+        >
+          <Shield size={16} />
+          Dashboard de Autenticación
+        </Tab>
+      </TabsContainer>
+
+      {/* Tab Content */}
+      <TabContent>
+        {activeTab === 'users' && (
+          <>
+            {/* Stats Cards */}
+            <StatsGrid>
         <StatsCard>
           <StatsIcon>
             <UsersIcon size={24} />
@@ -640,12 +811,23 @@ export const UsersPage: React.FC = () => {
         <ErrorMessage>Error al cargar usuarios: Error desconocido</ErrorMessage>
       ) : (
         <UsersGrid>
-          {users.map((user) => (
-            <UserCard key={user.id} onClick={() => openEditModal(user)}>
-              <UserAvatar>
-                {user.profile?.firstName?.[0]}{user.profile?.lastName?.[0]}
-              </UserAvatar>
-              <UserInfo>
+          {users.map((user) => {
+            // Determinar el proveedor principal del usuario
+            const primaryProvider = user.accounts?.length > 0 
+              ? user.accounts[0].provider 
+              : AuthProvider.EMAIL;
+              
+            return (
+              <UserCard key={user.id} onClick={() => openEditModal(user)}>
+                {/* Indicador del proveedor de autenticación */}
+                <AuthProviderIndicator provider={primaryProvider}>
+                  {getProviderIcon(primaryProvider)}
+                </AuthProviderIndicator>
+                
+                <UserAvatar>
+                  {user.profile?.firstName?.[0]}{user.profile?.lastName?.[0]}
+                </UserAvatar>
+                <UserInfo>
                 <UserName>
                   {user.profile?.firstName} {user.profile?.lastName}
                 </UserName>
@@ -672,119 +854,46 @@ export const UsersPage: React.FC = () => {
                 )}
               </UserInfo>
               <UserActions>
-                <Button
-                  variant="outline"
-                  size="small"
-                  onClick={(e: React.MouseEvent) => {
-                    e.stopPropagation();
-                    openEditModal(user);
-                  }}
-                >
-                  <Edit size={14} />
-                  Editar
-                </Button>
-                <Button
-                  variant="outline"
-                  size="small"
-                  onClick={(e: React.MouseEvent) => {
-                    e.stopPropagation();
-                    // TODO: Implement view user details
-                  }}
-                >
-                  <Eye size={14} />
-                  Ver
-                </Button>
+                <div onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                  <UserActionsMenu
+                    user={user}
+                    isOpen={openMenuUserId === user.id}
+                    onToggle={() => handleMenuToggle(user.id)}
+                    onClose={handleMenuClose}
+                    onEdit={openEditModal}
+                    onView={(user) => {
+                      setSelectedUser(user);
+                      setShowDetailModal(true);
+                    }}
+                    onActivate={user.isActive ? undefined : handleActivateUser}
+                    onDeactivate={user.isActive ? handleDeactivateUser : undefined}
+                    onDelete={handleDeleteUser}
+                    onResetPassword={handleResetPassword}
+                    onPromoteToAdmin={user.role !== UserRole.admin ? handlePromoteToAdmin : undefined}
+                    onDemoteFromAdmin={user.role === UserRole.admin ? handleDemoteFromAdmin : undefined}
+                  />
+                </div>
               </UserActions>
             </UserCard>
-          ))}
+            );
+          })}
         </UsersGrid>
       )}
+          </>
+        )}
+
+        {activeTab === 'auth-dashboard' && (
+          <AuthProviderDashboard />
+        )}
+      </TabContent>
 
       {/* Create User Modal */}
-      {showCreateModal && (
-        <Modal onClick={() => setShowCreateModal(false)}>
-          <ModalContent onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-            <ModalHeader>
-              <ModalTitle>Crear Nuevo Usuario</ModalTitle>
-              <Button
-                variant="ghost"
-                size="small"
-                onClick={() => setShowCreateModal(false)}
-              >
-                ✕
-              </Button>
-            </ModalHeader>
-
-            <FormGrid>
-              <Input
-                label="Email"
-                type="email"
-                value={formData.email}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                required
-              />
-              <Input
-                label="Contraseña"
-                type="password"
-                value={formData.password}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                required
-              />
-              <Input
-                label="Nombre"
-                value={formData.profile?.firstName || ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
-                  ...prev,
-                  profile: { ...prev.profile!, firstName: e.target.value }
-                }))}
-                required
-              />
-              <Input
-                label="Apellido"
-                value={formData.profile?.lastName || ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
-                  ...prev,
-                  profile: { ...prev.profile!, lastName: e.target.value }
-                }))}
-                required
-              />
-              <Input
-                label="Teléfono"
-                value={formData.profile?.phone || ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
-                  ...prev,
-                  profile: { ...prev.profile!, phone: e.target.value }
-                }))}
-              />
-              <Input
-                label="Fecha de Nacimiento"
-                type="date"
-                value={formData.profile?.birthDate ? new Date(formData.profile.birthDate).toISOString().split('T')[0] : ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
-                  ...prev,
-                  profile: { ...prev.profile!, birthDate: e.target.value ? new Date(e.target.value) : undefined }
-                }))}
-              />
-            </FormGrid>
-
-            <FormActions>
-              <Button
-                variant="outline"
-                onClick={() => setShowCreateModal(false)}
-              >
-                Cancelar
-              </Button>
-              <Button
-                variant="primary"
-                onClick={handleCreateUser}
-                isLoading={createUserMutation.loading}
-              >
-                Crear Usuario
-              </Button>
-            </FormActions>
-          </ModalContent>
-        </Modal>
-      )}
+      <ImprovedCreateUserModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSubmit={handleCreateUser}
+        isLoading={createUserMutation.loading}
+      />
 
       {/* Edit User Modal */}
       {showEditModal && selectedUser && (
@@ -846,6 +955,42 @@ export const UsersPage: React.FC = () => {
               />
             </FormGrid>
 
+            <div style={{ marginBottom: theme.spacing[4] }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: theme.spacing[2], 
+                fontSize: theme.fontSizes.sm,
+                fontWeight: theme.fontWeights.medium,
+                color: theme.colors.text.primary 
+              }}>
+                Rol
+              </label>
+              <FormSelect
+                value={formData.role}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData(prev => ({ 
+                  ...prev, 
+                  role: e.target.value as UserRole 
+                }))}
+              >
+                <option value={UserRole.CUSTOMER}>Cliente</option>
+                <option value={UserRole.STAFF}>Staff</option>
+                <option value={UserRole.ADMIN}>Administrador</option>
+              </FormSelect>
+            </div>
+
+            <CheckboxContainer>
+              <Checkbox
+                type="checkbox"
+                id="isActiveEdit"
+                checked={formData.isActive}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ 
+                  ...prev, 
+                  isActive: e.target.checked 
+                }))}
+              />
+              <CheckboxLabel htmlFor="isActiveEdit">Usuario activo</CheckboxLabel>
+            </CheckboxContainer>
+
             <FormActions>
               <Button
                 variant="outline"
@@ -863,6 +1008,30 @@ export const UsersPage: React.FC = () => {
             </FormActions>
           </ModalContent>
         </Modal>
+      )}
+
+      {/* User Detail Modal */}
+      {selectedUser && (
+        <UserDetailModal
+          user={selectedUser}
+          isOpen={showDetailModal}
+          onClose={() => {
+            setShowDetailModal(false);
+            setSelectedUser(null);
+          }}
+        />
+      )}
+
+      {/* Password Management Modal */}
+      {selectedUser && (
+        <PasswordManagementModal
+          user={selectedUser}
+          isOpen={showPasswordModal}
+          onClose={() => {
+            setShowPasswordModal(false);
+            setSelectedUser(null);
+          }}
+        />
       )}
     </Container>
   );

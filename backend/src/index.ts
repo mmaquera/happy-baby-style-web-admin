@@ -9,6 +9,7 @@ import { Container } from '@shared/container';
 import { LoggerFactory } from '@infrastructure/logging/LoggerFactory';
 import { RequestLogger } from '@infrastructure/logging/RequestLogger';
 import { GraphQLPlayground } from '@infrastructure/web/GraphQLPlayground';
+import { StaticFileMiddleware } from '@infrastructure/web/StaticFileMiddleware';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -73,6 +74,9 @@ async function startServer() {
       environment: process.env.NODE_ENV || 'development'
     });
 
+    // Setup static file middleware for uploads
+    StaticFileMiddleware.setup(app);
+    
     // Configurar Apollo GraphQL Server
     const apolloServer = await createApolloServer(app);
     
@@ -82,7 +86,7 @@ async function startServer() {
         const playgroundHtml = GraphQLPlayground.generateInterface({
           title: 'GraphQL Playground - Happy Baby Style',
           endpoint: '/graphql',
-          port: PORT
+          port: Number(PORT)
         });
         res.send(playgroundHtml);
       });

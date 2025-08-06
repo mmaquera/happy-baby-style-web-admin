@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "postgres-rds": {
+      "command": "uvx",
+      "args": [
+        "awslabs.postgres-mcp-server@latest",
+        "--host", "happy-baby-style-db.cr0ug6u2oje3.us-east-2.rds.amazonaws.com",
+        "--port", "5432", 
+        "--database", "happy_baby_style_db",
+        "--username", "postgres",
+        "--password", "HappyBaby2024!",
+        "--readonly", "true"
+      ],
+      "env": {
+        "AWS_REGION": "us-east-2"
+      }
+    },
+    "aws-s3": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-aws@latest"
+      ],
+      "env": {
+        "AWS_REGION": "us-east-2"
+      }
+    }
+  }
+}
