@@ -25,6 +25,7 @@
     "test:graphql": "node scripts/test-graphql.js",
     "test:graphql:complete": "node scripts/test-graphql-complete.js",
     "test:logging": "ts-node -r tsconfig-paths/register scripts/test-logging.js",
+    "explore:graphql": "node scripts/start-graphql-explorer.js",
 
     "graphql:playground": "echo 'GraphQL Playground: http://localhost:3001/graphql' && open http://localhost:3001/graphql"
   },
