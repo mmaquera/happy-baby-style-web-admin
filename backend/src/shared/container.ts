@@ -21,10 +21,7 @@ import { GetUsersUseCase } from '@application/use-cases/user/GetUsersUseCase';
 import { GetUserByIdUseCase } from '@application/use-cases/user/GetUserByIdUseCase';
 import { UpdateUserUseCase } from '@application/use-cases/user/UpdateUserUseCase';
 import { GetUserStatsUseCase } from '@application/use-cases/user/GetUserStatsUseCase';
-import { ProductController } from '@presentation/controllers/ProductController';
-import { ImageController } from '@presentation/controllers/ImageController';
-import { OrderController } from '@presentation/controllers/OrderController';
-import { UserController } from '@presentation/controllers/UserController';
+// Controllers removed - GraphQL only architecture
 import { IProductRepository } from '@domain/repositories/IProductRepository';
 import { IImageRepository, IStorageService } from '@domain/repositories/IImageRepository';
 import { IOrderRepository } from '@domain/repositories/IOrderRepository';
@@ -81,29 +78,7 @@ export class Container {
     const updateUserUseCase = new UpdateUserUseCase(userRepository);
     const getUserStatsUseCase = new GetUserStatsUseCase(userRepository);
     
-    // Controladores
-    const productController = new ProductController(
-      createProductUseCase, 
-      getProductsUseCase,
-      getProductByIdUseCase,
-      updateProductUseCase,
-      deleteProductUseCase
-    );
-    const imageController = new ImageController(uploadImageUseCase);
-    const orderController = new OrderController(
-      createOrderUseCase,
-      getOrdersUseCase,
-      getOrderByIdUseCase,
-      updateOrderUseCase,
-      getOrderStatsUseCase
-    );
-    const userController = new UserController(
-      createUserUseCase,
-      getUsersUseCase,
-      getUserByIdUseCase,
-      updateUserUseCase,
-      getUserStatsUseCase
-    );
+    // Controllers removed - GraphQL only architecture
 
     // Registrar dependencias
     this.dependencies.set('supabase', supabase);
@@ -131,11 +106,7 @@ export class Container {
     this.dependencies.set('updateUserUseCase', updateUserUseCase);
     this.dependencies.set('getUserStatsUseCase', getUserStatsUseCase);
     
-    // Controladores
-    this.dependencies.set('productController', productController);
-    this.dependencies.set('imageController', imageController);
-    this.dependencies.set('orderController', orderController);
-    this.dependencies.set('userController', userController);
+    // Controllers removed - GraphQL only architecture
   }
 
   get<T>(key: string): T {

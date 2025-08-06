@@ -4,7 +4,7 @@ import { theme } from '@/styles/theme';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { useProducts } from '@/hooks/useProducts';
+import { useProducts } from '@/hooks/useProductsGraphQL';
 import { ProductFilters, PRODUCT_CATEGORIES, ORDER_STATUS_LABELS, ORDER_STATUS_COLORS } from '@/types';
 import { Plus, Search, Filter, Grid, List, Edit, Trash2, Eye, Tag, Star } from 'lucide-react';
 
@@ -330,12 +330,12 @@ export const Products: React.FC = () => {
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
 
-  const { data: productsResponse, isLoading, error } = useProducts({
-    ...filters,
-    search: searchTerm
+  // Simplified call to test if the hook works
+  const { products, loading: isLoading, error } = useProducts({
+    filter: {
+      isActive: true
+    }
   });
-
-  const products = productsResponse?.data || [];
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);

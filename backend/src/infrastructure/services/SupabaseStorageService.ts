@@ -1,5 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { IStorageService } from '@domain/repositories/IImageRepository';
+import { Multer } from 'multer';
 
 export class SupabaseStorageService implements IStorageService {
   private readonly bucketName = 'images';

@@ -1,5 +1,14 @@
 import { ProductEntity } from '@domain/entities/Product';
 import { IProductRepository } from '@domain/repositories/IProductRepository';
+import { 
+  RequiredFieldError, 
+  InvalidRangeError, 
+  DuplicateError, 
+  BusinessLogicError,
+  DatabaseError,
+  ValidationError 
+} from '@domain/errors/DomainError';
+import { ValidationService, createProductValidationRules } from '@application/validation/ValidationService';
 
 export interface CreateProductRequest {
   categoryId: string;
@@ -10,7 +19,7 @@ export interface CreateProductRequest {
   sku: string;
   images?: string[];
   attributes?: Record<string, any>;
-  stockQuantity: number;
+  stockQuantity?: number;
   tags?: string[];
   isActive?: boolean;
 }
@@ -21,42 +30,48 @@ export class CreateProductUseCase {
   ) {}
 
   async execute(request: CreateProductRequest): Promise<ProductEntity> {
-    // Validar que el SKU sea único
-    const existingProduct = await this.productRepository.findBySku(request.sku);
-    if (existingProduct) {
-      throw new Error('Product with this SKU already exists');
+    try {
+      // Validación de input usando el servicio de validación
+      ValidationService.validateBatch(request, createProductValidationRules);
+
+      // Validar que el SKU sea único
+      const existingProduct = await this.productRepository.findBySku(request.sku);
+      if (existingProduct) {
+        throw new DuplicateError('Product', 'SKU', request.sku);
+      }
+
+      // Crear producto
+      const product = ProductEntity.create({
+        categoryId: request.categoryId,
+        name: request.name.trim(),
+        description: request.description.trim(),
+        price: request.price,
+        salePrice: request.salePrice,
+        sku: request.sku.trim().toUpperCase(),
+        images: request.images || [],
+        attributes: request.attributes || {},
+        isActive: request.isActive ?? true,
+        stockQuantity: request.stockQuantity || 0,
+        tags: request.tags
+      });
+
+      return await this.productRepository.create(product);
+    } catch (error) {
+      // Re-throw validation and domain errors as-is
+      if (error instanceof ValidationError || 
+          error instanceof DuplicateError || 
+          error instanceof BusinessLogicError) {
+        throw error;
+      }
+      
+      // Wrap infrastructure errors
+      if (error instanceof Error) {
+        throw new DatabaseError('create product', error);
+      }
+      
+      throw new DatabaseError('create product');
     }
-
-    // Validar precio
-    if (request.price <= 0) {
-      throw new Error('Price must be greater than 0');
-    }
-
-    // Validar precio de oferta
-    if (request.salePrice !== undefined && request.salePrice >= request.price) {
-      throw new Error('Sale price must be less than regular price');
-    }
-
-    // Validar stock
-    if (request.stockQuantity < 0) {
-      throw new Error('Stock quantity cannot be negative');
-    }
-
-    // Crear producto
-    const product = ProductEntity.create({
-      categoryId: request.categoryId,
-      name: request.name.trim(),
-      description: request.description.trim(),
-      price: request.price,
-      salePrice: request.salePrice,
-      sku: request.sku.trim().toUpperCase(),
-      images: request.images || [],
-      attributes: request.attributes || {},
-      isActive: request.isActive ?? true,
-      stockQuantity: request.stockQuantity,
-      tags: request.tags
-    });
-
-    return await this.productRepository.create(product);
   }
+
+
 }

@@ -1,0 +1,81 @@
+# User Fragments
+fragment UserProfileBasic on UserProfile {
+  id
+  userId
+  firstName
+  lastName
+  fullName
+  phone
+  birthDate
+  avatarUrl
+  createdAt
+  updatedAt
+}
+
+fragment UserProfileFull on UserProfile {
+  ...UserProfileBasic
+  addresses {
+    id
+    title
+    firstName
+    lastName
+    fullName
+    fullAddress
+    isDefault
+  }
+  orders {
+    id
+    orderNumber
+    status
+    totalAmount
+    createdAt
+  }
+  cartItems {
+    id
+    quantity
+    product {
+      id
+      name
+      currentPrice
+      images
+    }
+    variant {
+      id
+      size
+      color
+    }
+  }
+  favorites {
+    id
+    product {
+      id
+      name
+      currentPrice
+      images
+    }
+  }
+}
+
+# Queries
+query GetUserProfile($userId: ID!) {
+  userProfile(userId: $userId) {
+    ...UserProfileFull
+  }
+}
+
+query GetUserStats {
+  userStats
+}
+
+# Mutations
+mutation CreateUserProfile($input: CreateUserProfileInput!) {
+  createUserProfile(input: $input) {
+    ...UserProfileBasic
+  }
+}
+
+mutation UpdateUserProfile($userId: ID!, $input: UpdateUserProfileInput!) {
+  updateUserProfile(userId: $userId, input: $input) {
+    ...UserProfileBasic
+  }
+}

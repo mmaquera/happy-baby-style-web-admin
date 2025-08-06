@@ -8,20 +8,36 @@ export class PostgresConfig {
   private pool: Pool;
 
   private constructor() {
-    const config: PoolConfig = {
-      // Transaction Pooler Configuration (IPv4 compatible)
-      host: process.env.SUPABASE_DB_HOST || 'aws-0-us-east-1.pooler.supabase.com',
-      port: parseInt(process.env.SUPABASE_DB_PORT || '6543'),
-      database: process.env.SUPABASE_DB_NAME || 'postgres',
-      user: process.env.SUPABASE_DB_USER || 'postgres.uumwjhoqkiiyxuperrws',
-      password: process.env.SUPABASE_DB_PASSWORD,
-      ssl: {
-        rejectUnauthorized: false
-      },
-      max: 20, // máximo número de conexiones en el pool
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000,
-    };
+    // Parse DATABASE_URL if available, otherwise use individual env vars
+    let config: PoolConfig;
+    
+    if (process.env.DATABASE_URL) {
+      // Use DATABASE_URL (recommended for Supabase)
+      config = {
+        connectionString: process.env.DATABASE_URL,
+        ssl: {
+          rejectUnauthorized: false
+        },
+        max: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000,
+      };
+    } else {
+      // Fallback to individual environment variables
+      config = {
+        host: process.env.SUPABASE_DB_HOST || 'aws-0-us-east-1.pooler.supabase.com',
+        port: parseInt(process.env.SUPABASE_DB_PORT || '6543'),
+        database: process.env.SUPABASE_DB_NAME || 'postgres',
+        user: process.env.SUPABASE_DB_USER || 'postgres.uumwjhoqkiiyxuperrws',
+        password: process.env.SUPABASE_DB_PASSWORD,
+        ssl: {
+          rejectUnauthorized: false
+        },
+        max: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000,
+      };
+    }
 
     this.pool = new Pool(config);
 

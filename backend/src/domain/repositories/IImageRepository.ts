@@ -1,4 +1,5 @@
 import { ImageEntity, ImageEntityType } from '../entities/Image';
+import { Multer } from 'multer';
 
 export interface IImageRepository {
   create(image: ImageEntity): Promise<ImageEntity>;

@@ -2,14 +2,25 @@ import { ProductEntity } from '@domain/entities/Product';
 import { IProductRepository, ProductFilters } from '@domain/repositories/IProductRepository';
 
 export interface GetProductsRequest {
-  category?: string;
-  isActive?: boolean;
-  minPrice?: number;
-  maxPrice?: number;
-  inStock?: boolean;
-  search?: string;
-  limit?: number;
-  offset?: number;
+  filters?: {
+    category?: string;
+    isActive?: boolean;
+    minPrice?: number;
+    maxPrice?: number;
+    inStock?: boolean;
+    search?: string;
+    sku?: string;
+  };
+  pagination?: {
+    limit?: number;
+    offset?: number;
+  };
+}
+
+export interface GetProductsResponse {
+  products: ProductEntity[];
+  total: number;
+  hasMore: boolean;
 }
 
 export class GetProductsUseCase {
@@ -17,18 +28,38 @@ export class GetProductsUseCase {
     private readonly productRepository: IProductRepository
   ) {}
 
-  async execute(request: GetProductsRequest = {}): Promise<ProductEntity[]> {
-    const filters: ProductFilters = {
-      categoryId: request.category,
-      isActive: request.isActive,
-      minPrice: request.minPrice,
-      maxPrice: request.maxPrice,
-      inStock: request.inStock,
-      search: request.search?.trim(),
-      limit: request.limit || 50,
-      offset: request.offset || 0
-    };
+  async execute(request: GetProductsRequest = {}): Promise<GetProductsResponse> {
+    try {
+      const pagination = request.pagination || {};
+      const limit = pagination.limit || 50;
+      const offset = pagination.offset || 0;
+      
+      const filters: ProductFilters = {
+        categoryId: request.filters?.category,
+        isActive: request.filters?.isActive,
+        minPrice: request.filters?.minPrice,
+        maxPrice: request.filters?.maxPrice,
+        inStock: request.filters?.inStock,
+        search: request.filters?.search?.trim(),
+        sku: request.filters?.sku,
+        limit,
+        offset
+      };
 
-    return await this.productRepository.findAll(filters);
+      const products = await this.productRepository.findAll(filters);
+      
+      // Note: This is a simplified implementation. 
+      // For production, you'd want to get the actual total count from the database
+      const hasMore = products.length === limit;
+      const total = offset + products.length + (hasMore ? 1 : 0);
+
+      return {
+        products,
+        total,
+        hasMore
+      };
+    } catch (error: any) {
+      throw error;
+    }
   }
 }

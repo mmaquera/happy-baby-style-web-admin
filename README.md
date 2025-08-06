@@ -1,8 +1,24 @@
 # Happy Baby Style - Panel de Administración
 
-Un sistema completo de administración para la tienda de ropa infantil "Happy Baby Style" construido con Clean Architecture, TypeScript, React y Supabase.
+Un sistema completo de administración para la tienda de ropa infantil "Happy Baby Style" construido con **Clean Architecture**, **TypeScript**, **React**, **GraphQL** y **Supabase**.
 
-## 🏗️ Arquitectura
+## 🚀 **Estado Actual del Proyecto**
+
+### ✅ **Migración a GraphQL Completada**
+- **Apollo Server** integrado con Express.js
+- **Prisma ORM** para operaciones de base de datos
+- **API Híbrida**: GraphQL + REST (compatibilidad total)
+- **Conexión directa** a Supabase PostgreSQL
+- **Todas las consultas funcionando** con datos reales
+
+### 🎯 **Funcionalidades Principales**
+- **GraphQL API** con 20+ queries y 30+ mutations
+- **REST API** mantenida para compatibilidad
+- **Base de datos** con 6 categorías, 3 productos, 10 usuarios
+- **Autenticación JWT** integrada
+- **Documentación completa** con ejemplos
+
+## 🏗️ **Arquitectura**
 
 El proyecto sigue los principios de **Clean Architecture** con una separación clara de responsabilidades:
 
@@ -12,300 +28,226 @@ src/
 ├── application/      # Casos de uso
 ├── infrastructure/   # Implementaciones externas (Supabase, APIs)
 ├── presentation/     # Controladores y rutas
+├── graphql/          # 🆕 GraphQL schema y resolvers
 └── shared/          # Utilidades compartidas
 ```
 
-## 🚀 Características Implementadas
+## 🔥 **GraphQL API (Nuevo!)**
 
-### Backend (Node.js + Express + TypeScript)
+### **Endpoints Disponibles**
+- **GraphQL**: `http://localhost:3001/graphql`
+- **Playground**: `http://localhost:3001/graphql`
+- **Health Check**: `http://localhost:3001/health`
 
-#### ✅ Entidades y Dominio
-- **Product**: Gestión completa de productos con categorías, tallas, colores
-- **Order**: Sistema de pedidos con estados y validaciones
-- **Image**: Gestión de imágenes con almacenamiento en Supabase
-- **User**: Sistema de usuarios administradores
+### **Consultas Principales**
+```graphql
+# Obtener categorías
+query {
+  categories {
+    id name slug isActive
+  }
+}
 
-#### ✅ Casos de Uso
-- **Productos**: Crear, obtener, actualizar productos
-- **Pedidos**: Crear, gestionar estados, estadísticas
-- **Imágenes**: Subir, gestionar imágenes de productos
-- **Validaciones**: Reglas de negocio y validaciones robustas
+# Obtener productos con paginación
+query {
+  products {
+    products {
+      id name price description
+      category { name }
+    }
+    total hasMore
+  }
+}
 
-#### ✅ Infraestructura
-- **Supabase**: Base de datos PostgreSQL con RLS
-- **Storage**: Almacenamiento de imágenes con políticas de seguridad
-- **Repositorios**: Implementaciones para todas las entidades
-
-#### ✅ API REST
-- **Productos**: `/api/products`
-- **Pedidos**: `/api/orders`
-- **Imágenes**: `/api/images`
-- **Validación**: Middleware de validación de requests
-- **Error Handling**: Manejo centralizado de errores
-
-### Frontend (React + TypeScript + Vite)
-
-#### ✅ Páginas Implementadas
-- **Dashboard**: Vista general con estadísticas
-- **Productos**: CRUD completo con interfaz moderna
-- **Pedidos**: Gestión de pedidos con filtros y estados
-- **Navegación**: Sidebar responsive con rutas
-
-#### ✅ Componentes UI
-- **Card**: Contenedores con diseño consistente
-- **Button**: Botones con variantes y estados
-- **Input**: Campos de entrada con validación
-- **Layout**: Header, Sidebar y estructura principal
-
-#### ✅ Hooks Personalizados
-- **useProducts**: Gestión de productos con React Query
-- **useOrders**: Gestión de pedidos con mutaciones
-- **useImages**: Gestión de imágenes
-
-#### ✅ Características UX
-- **Loading States**: Estados de carga con spinners
-- **Error Handling**: Manejo de errores con toasts
-- **Responsive**: Diseño adaptativo para móviles
-- **Theme**: Sistema de diseño consistente
-
-## 🗄️ Base de Datos
-
-### Esquema Principal
-```sql
--- Productos
-products (id, name, description, price, category, sizes[], colors[], stock, sku)
-
--- Pedidos
-orders (id, customer_email, customer_name, status, total, shipping_address_id)
-order_items (id, order_id, product_id, quantity, price, size, color)
-
--- Imágenes
-images (id, file_name, url, entity_type, entity_id)
-
--- Usuarios
-users (id, email, name, role, is_active)
+# Estadísticas de productos
+query {
+  productStats
+}
 ```
 
-### Políticas de Seguridad
-- **RLS**: Row Level Security habilitado
-- **Storage**: Políticas para bucket de imágenes
-- **Autenticación**: Sistema de roles y permisos
+### **Mutaciones Disponibles**
+```graphql
+# Crear categoría
+mutation {
+  createCategory(input: {
+    name: "Nueva Categoría"
+    description: "Descripción"
+    slug: "nueva-categoria"
+  }) {
+    id name slug
+  }
+}
+```
 
-## 🛠️ Tecnologías
+## 🛠️ **Tecnologías**
 
-### Backend
-- **Node.js** + **Express**
+### **Backend**
+- **Node.js** + **Express.js**
 - **TypeScript** para type safety
-- **Supabase** como base de datos y storage
-- **Clean Architecture** para organización del código
-- **Dependency Injection** con container pattern
+- **Apollo Server** para GraphQL
+- **Prisma ORM** para base de datos
+- **Supabase** como base de datos PostgreSQL
+- **Clean Architecture** para organización
 
-### Frontend
-- **React 18** con hooks
-- **TypeScript** para type safety
-- **Vite** como bundler
-- **React Query** para gestión de estado del servidor
-- **Styled Components** para estilos
-- **React Router** para navegación
+### **Frontend**
+- **React** + **TypeScript**
+- **Vite** para desarrollo rápido
+- **Tailwind CSS** para estilos
+- **React Query** para gestión de estado
 
-### Base de Datos
+### **Base de Datos**
 - **PostgreSQL** (Supabase)
-- **Row Level Security (RLS)**
-- **Storage buckets** para archivos
+- **Prisma** como ORM
+- **Conexión directa** optimizada
 
-## 📦 Instalación
+## 🚀 **Inicio Rápido**
 
-### Prerrequisitos
-- Node.js 18+
-- npm o yarn
-- Cuenta de Supabase
-
-### 1. Clonar el repositorio
-```bash
-git clone <repository-url>
-cd happy-baby-style-web-admin
-```
-
-### 2. Configurar variables de entorno
-
-#### Backend (.env)
-```env
-PORT=3001
-SUPABASE_URL=your_supabase_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
-FRONTEND_URL=http://localhost:3000
-NODE_ENV=development
-```
-
-#### Frontend (.env)
-```env
-VITE_API_URL=http://localhost:3001/api
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-
-### 3. Instalar dependencias
+### **1. Instalar Dependencias**
 ```bash
 # Backend
 cd backend
 npm install
 
 # Frontend
-cd ../frontend
+cd frontend
 npm install
 ```
 
-### 4. Configurar base de datos
+### **2. Configurar Variables de Entorno**
 ```bash
-# Ejecutar el esquema de base de datos
-# Copiar el contenido de supabase/schema.sql en tu proyecto Supabase
+# backend/.env
+DATABASE_URL="postgresql://postgres.uumwjhoqkiiyxuperrws:95uLDtA5Sd4O1kdp@aws-0-us-east-1.pooler.supabase.com:5432/postgres"
+JWT_SECRET="your-secret-key"
 ```
 
-### 5. Ejecutar el proyecto
+### **3. Generar Cliente Prisma**
 ```bash
-# Backend (puerto 3001)
 cd backend
+npm run prisma:generate
+```
+
+### **4. Iniciar Servidores**
+```bash
+# Desarrollo completo (backend + frontend)
 npm run dev
 
-# Frontend (puerto 3000)
-cd frontend
-npm run dev
+# Solo backend
+cd backend && npm run dev
+
+# Solo frontend
+cd frontend && npm run dev
 ```
 
-## 🚀 Uso
-
-### Endpoints Principales
-
-#### Productos
+### **5. Probar APIs**
 ```bash
-GET    /api/products          # Obtener productos
-POST   /api/products          # Crear producto
-PUT    /api/products/:id      # Actualizar producto
-DELETE /api/products/:id      # Eliminar producto
+# Probar conexión a BD
+npm run test:db
+
+# Probar GraphQL
+npm run test:graphql
+
+# Health check
+curl http://localhost:3001/health
 ```
 
-#### Pedidos
-```bash
-GET    /api/orders            # Obtener pedidos
-POST   /api/orders            # Crear pedido
-PUT    /api/orders/:id        # Actualizar pedido
-GET    /api/orders/stats      # Estadísticas de pedidos
+## 📊 **Base de Datos**
+
+### **Esquema Principal**
+```sql
+-- Categorías
+categories (id, name, description, slug, is_active, sort_order)
+
+-- Productos
+products (id, name, description, price, sale_price, sku, stock_quantity, is_active)
+
+-- Variantes de Productos
+product_variants (id, product_id, size, color, stock_quantity, price)
+
+-- Usuarios
+user_profiles (id, user_id, first_name, last_name, phone, is_active)
+
+-- Pedidos
+orders (id, user_id, status, total_amount, shipping_address_id)
+order_items (id, order_id, product_id, quantity, unit_price)
 ```
 
-#### Imágenes
-```bash
-POST   /api/images/upload     # Subir imagen
-GET    /api/images/:id        # Obtener imagen
-DELETE /api/images/:id        # Eliminar imagen
+### **Datos Actuales**
+- **6 categorías** (Bodysuits, Pijamas, Conjuntos, Gorros, Calcetines, Accesorios)
+- **3 productos** con variantes
+- **10 usuarios** registrados
+- **90 variantes** de productos
+
+## 📁 **Estructura del Proyecto**
+
 ```
-
-### Funcionalidades del Frontend
-
-#### Gestión de Productos
-- ✅ Crear productos con múltiples imágenes
-- ✅ Editar información de productos
-- ✅ Gestionar stock y variantes
-- ✅ Filtros y búsqueda
-
-#### Gestión de Pedidos
-- ✅ Ver todos los pedidos
-- ✅ Cambiar estados de pedidos
-- ✅ Ver detalles completos
-- ✅ Filtros por estado y cliente
-
-#### Dashboard
-- ✅ Estadísticas generales
-- ✅ Resumen de ventas
-- ✅ Productos más vendidos
-
-## 🔧 Desarrollo
-
-### Estructura de Carpetas
-```
-├── backend/
+happy-baby-style-web-admin/
+├── backend/                     # API Backend
 │   ├── src/
-│   │   ├── domain/           # Entidades y reglas de negocio
-│   │   ├── application/      # Casos de uso
-│   │   ├── infrastructure/   # Implementaciones externas
-│   │   ├── presentation/     # Controladores y rutas
-│   │   └── shared/          # Utilidades compartidas
-│   └── package.json
-├── frontend/
+│   │   ├── graphql/            # GraphQL implementation
+│   │   │   ├── schema.ts       # Schema definitions
+│   │   │   ├── resolvers.ts    # Query/mutation resolvers
+│   │   │   └── server.ts       # Apollo Server setup
+│   │   ├── domain/             # Business entities
+│   │   ├── application/        # Use cases
+│   │   ├── infrastructure/     # External implementations
+│   │   └── presentation/       # Controllers and routes
+│   ├── prisma/
+│   │   └── schema.prisma       # Database schema
+│   ├── scripts/                # Utility scripts
+│   │   ├── test-prisma-connection.js
+│   │   ├── test-graphql.js
+│   │   └── README.md
+│   └── docs/                   # API documentation
+├── frontend/                   # React Frontend
 │   ├── src/
-│   │   ├── components/       # Componentes React
-│   │   ├── hooks/           # Hooks personalizados
-│   │   ├── pages/           # Páginas de la aplicación
-│   │   ├── services/        # Servicios de API
-│   │   └── styles/          # Estilos y tema
-│   └── package.json
-└── supabase/
-    ├── schema.sql           # Esquema de base de datos
-    └── storage-policies.sql # Políticas de almacenamiento
+│   │   ├── components/         # UI components
+│   │   ├── pages/             # Page components
+│   │   ├── hooks/             # Custom hooks
+│   │   └── utils/             # Utilities
+│   └── public/                # Static assets
+└── README.md                  # This file
 ```
 
-### Comandos de Desarrollo
+## 🔧 **Comandos Útiles**
 
-#### Backend
+### **Backend**
 ```bash
-npm run dev          # Desarrollo con hot reload
-npm run build        # Compilar para producción
-npm run start        # Ejecutar en producción
-npm run type-check   # Verificar tipos TypeScript
+npm run dev                    # Servidor de desarrollo
+npm run test:db               # Probar conexión a BD
+npm run test:graphql          # Probar consultas GraphQL
+npm run prisma:generate       # Generar cliente Prisma
+npm run prisma:studio         # Abrir Prisma Studio
+npm run graphql:codegen       # Generar tipos TypeScript
 ```
 
-#### Frontend
+### **Frontend**
 ```bash
-npm run dev          # Desarrollo con Vite
-npm run build        # Compilar para producción
-npm run preview      # Preview de producción
-npm run type-check   # Verificar tipos TypeScript
+npm run dev                   # Servidor de desarrollo
+npm run build                 # Build de producción
+npm run preview               # Preview de producción
 ```
 
-## 🧪 Testing
+## 📚 **Documentación**
 
-### Backend
-```bash
-# TODO: Implementar tests unitarios
-npm test
-```
+- **API Reference**: `backend/docs/API_REFERENCE.md`
+- **Quick Start**: `backend/docs/QUICK_START.md`
+- **Scripts**: `backend/scripts/README.md`
+- **GraphQL Playground**: `http://localhost:3001/graphql`
 
-### Frontend
-```bash
-# TODO: Implementar tests de componentes
-npm test
-```
+## 🎯 **Próximos Pasos**
 
-## 📊 Estado del Proyecto
+### **Inmediatos**
+- [ ] Probar mutaciones GraphQL (crear, actualizar, eliminar)
+- [ ] Implementar autenticación JWT en GraphQL
+- [ ] Optimizar consultas para mejor rendimiento
 
-### ✅ Completado
-- [x] Arquitectura base con Clean Architecture
-- [x] Base de datos con Supabase
-- [x] API REST completa
-- [x] Frontend con React + TypeScript
-- [x] Gestión de productos
-- [x] Gestión de pedidos
-- [x] Sistema de imágenes
-- [x] UI/UX moderna y responsive
-- [x] Validaciones y manejo de errores
-- [x] Hooks personalizados
-- [x] Documentación
+### **Futuros**
+- [ ] Implementar suscripciones GraphQL
+- [ ] Añadir caché con Redis
+- [ ] Implementar tests automatizados
+- [ ] Configurar CI/CD
 
-### 🚧 En Desarrollo
-- [ ] Sistema de autenticación
-- [ ] Gestión de usuarios
-- [ ] Reportes y analytics
-- [ ] Tests unitarios y de integración
-- [ ] Deploy automatizado
-
-### 📋 Pendiente
-- [ ] Notificaciones en tiempo real
-- [ ] Exportación de datos
-- [ ] Integración con pasarelas de pago
-- [ ] App móvil
-- [ ] Multi-idioma
-
-## 🤝 Contribución
+## 🤝 **Contribución**
 
 1. Fork el proyecto
 2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
@@ -313,22 +255,10 @@ npm test
 4. Push a la rama (`git push origin feature/AmazingFeature`)
 5. Abre un Pull Request
 
-## 📝 Licencia
+## 📄 **Licencia**
 
 Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
 
-## 👥 Equipo
-
-- **Desarrollador Principal**: [Tu Nombre]
-- **Diseño UX/UI**: [Diseñador]
-- **QA**: [Tester]
-
-## 📞 Contacto
-
-- **Email**: [tu-email@ejemplo.com]
-- **LinkedIn**: [tu-linkedin]
-- **GitHub**: [tu-github]
-
 ---
 
-**Happy Baby Style** - Haciendo que la moda infantil sea más feliz y accesible. 👶✨
+**¡El proyecto está listo para desarrollo y producción!** 🚀

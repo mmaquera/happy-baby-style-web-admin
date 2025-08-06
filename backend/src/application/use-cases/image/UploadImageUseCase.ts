@@ -1,5 +1,6 @@
 import { ImageEntity, ImageEntityType } from '@domain/entities/Image';
 import { IImageRepository, IStorageService } from '@domain/repositories/IImageRepository';
+import { Multer } from 'multer';
 
 export interface UploadImageRequest {
   file: Express.Multer.File;

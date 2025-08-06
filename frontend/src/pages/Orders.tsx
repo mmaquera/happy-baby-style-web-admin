@@ -15,7 +15,8 @@ import {
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { useOrders, Order } from '@/hooks/useOrders';
+import { useOrders } from '@/hooks/useOrdersGraphQL';
+import { Order } from '@/types';
 import { theme } from '@/styles/theme';
 
 // These interfaces are already defined in the hook, so we don't need them here
@@ -67,16 +68,16 @@ export const Orders: React.FC = () => {
   // Use custom hook for orders
   const { 
     orders, 
-    isLoading, 
+    loading: isLoading, 
     error, 
-    refetch, 
-    updateOrderStatus 
-  } = useOrders({ status: statusFilter });
+    refetch
+  } = useOrders({ filter: { status: statusFilter } });
 
   // Filter orders based on search term
   const filteredOrders = orders.filter(order =>
-    order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    order.customerEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (order.user?.firstName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (order.user?.lastName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (order.user?.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     order.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -278,22 +279,22 @@ export const Orders: React.FC = () => {
                       marginBottom: '0.5rem',
                       color: theme.colors.text.primary
                     }}>
-                      {order.customerName}
+                      {order.user?.firstName} {order.user?.lastName}
                     </h3>
                     
                     <p style={{ 
                       color: theme.colors.text.secondary,
                       marginBottom: '0.5rem'
                     }}>
-                      {order.customerEmail}
+                      {order.user?.email}
                     </p>
                     
-                    {order.customerPhone && (
+                    {order.user?.phone && (
                       <p style={{ 
                         color: theme.colors.text.secondary,
                         marginBottom: '0.5rem'
                       }}>
-                        📞 {order.customerPhone}
+                        📞 {order.user.phone}
                       </p>
                     )}
                     
@@ -319,13 +320,13 @@ export const Orders: React.FC = () => {
                         color: theme.colors.text.primary,
                         marginBottom: '0.25rem'
                       }}>
-                        {formatCurrency(order.total)}
+                        {formatCurrency(order.totalAmount)}
                       </p>
                       <p style={{ 
                         color: theme.colors.text.secondary,
                         fontSize: theme.fontSizes.sm
                       }}>
-                        {order.items?.length || 0} producto{order.items?.length !== 1 ? 's' : ''}
+                        {order.orderItems?.length || 0} producto{order.orderItems?.length !== 1 ? 's' : ''}
                       </p>
                     </div>
                     
@@ -422,10 +423,10 @@ export const Orders: React.FC = () => {
               }}>
                 Información del Cliente
               </h3>
-              <p><strong>Nombre:</strong> {selectedOrder.customerName}</p>
-              <p><strong>Email:</strong> {selectedOrder.customerEmail}</p>
-              {selectedOrder.customerPhone && (
-                <p><strong>Teléfono:</strong> {selectedOrder.customerPhone}</p>
+              <p><strong>Nombre:</strong> {selectedOrder.user?.firstName} {selectedOrder.user?.lastName}</p>
+              <p><strong>Email:</strong> {selectedOrder.user?.email}</p>
+              {selectedOrder.user?.phone && (
+                <p><strong>Teléfono:</strong> {selectedOrder.user.phone}</p>
               )}
             </div>
             
@@ -438,9 +439,9 @@ export const Orders: React.FC = () => {
                 }}>
                   Dirección de Envío
                 </h3>
-                <p>{selectedOrder.shippingAddress.street}</p>
-                <p>{selectedOrder.shippingAddress.city}, {selectedOrder.shippingAddress.state}</p>
-                <p>{selectedOrder.shippingAddress.zipCode}, {selectedOrder.shippingAddress.country}</p>
+                <p>{selectedOrder.shippingAddress?.street}</p>
+                <p>{selectedOrder.shippingAddress?.city}, {selectedOrder.shippingAddress?.state}</p>
+                <p>{selectedOrder.shippingAddress?.zipCode}, {selectedOrder.shippingAddress?.country}</p>
               </div>
             )}
             
@@ -470,7 +471,7 @@ export const Orders: React.FC = () => {
                           color: theme.colors.text.secondary,
                           fontSize: theme.fontSizes.sm
                         }}>
-                          Cantidad: {item.quantity} | Talla: {item.size} | Color: {item.color}
+                          Cantidad: {item.quantity} | Precio: {formatCurrency(item.unitPrice)}
                         </p>
                       </div>
                       <p style={{ fontWeight: theme.fontWeights.medium }}>

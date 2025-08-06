@@ -58,7 +58,9 @@ describe('GetProductsUseCase', () => {
       const result = await useCase.execute({});
 
       // Assert
-      expect(result).toEqual(mockProducts);
+      expect(result.products).toEqual(mockProducts);
+      expect(result.total).toBeGreaterThan(0);
+      expect(typeof result.hasMore).toBe('boolean');
       expect(mockProductRepository.findAll).toHaveBeenCalledWith({
         categoryId: undefined,
         isActive: undefined,
@@ -74,14 +76,18 @@ describe('GetProductsUseCase', () => {
     it('should apply filters correctly', async () => {
       // Arrange
       const request: GetProductsRequest = {
-        category: 'category-1',
-        isActive: true,
-        minPrice: 10,
-        maxPrice: 50,
-        inStock: true,
-        search: 'test',
-        limit: 10,
-        offset: 5
+        filters: {
+          category: 'category-1',
+          isActive: true,
+          minPrice: 10,
+          maxPrice: 50,
+          inStock: true,
+          search: 'test'
+        },
+        pagination: {
+          limit: 10,
+          offset: 5
+        }
       };
 
       const mockProducts: ProductEntity[] = [];
@@ -91,7 +97,9 @@ describe('GetProductsUseCase', () => {
       const result = await useCase.execute(request);
 
       // Assert
-      expect(result).toEqual(mockProducts);
+      expect(result.products).toEqual(mockProducts);
+      expect(result.total).toBeGreaterThan(0);
+      expect(typeof result.hasMore).toBe('boolean');
       expect(mockProductRepository.findAll).toHaveBeenCalledWith({
         categoryId: 'category-1',
         isActive: true,
@@ -107,7 +115,9 @@ describe('GetProductsUseCase', () => {
     it('should handle empty search string', async () => {
       // Arrange
       const request: GetProductsRequest = {
-        search: '   '
+        filters: {
+          search: '   '
+        }
       };
 
       const mockProducts: ProductEntity[] = [];
@@ -141,7 +151,9 @@ describe('GetProductsUseCase', () => {
       const result = await useCase.execute(request);
 
       // Assert
-      expect(result).toEqual(mockProducts);
+      expect(result.products).toEqual(mockProducts);
+      expect(result.total).toBeGreaterThan(0);
+      expect(typeof result.hasMore).toBe('boolean');
       expect(mockProductRepository.findAll).toHaveBeenCalledWith({
         categoryId: undefined,
         isActive: undefined,

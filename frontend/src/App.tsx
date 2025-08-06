@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from 'react-query';
 import { ThemeProvider } from 'styled-components';
 import { Toaster } from 'react-hot-toast';
 import { GlobalStyles } from '@/styles/GlobalStyles';
@@ -14,20 +13,8 @@ import { Products } from '@/pages/Products';
 import { Orders } from '@/pages/Orders';
 import UsersPage from '@/pages/Users';
 
-// Create a client
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-      refetchOnWindowFocus: false,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-    },
-  },
-});
-
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
         <GlobalStyles />
         <Router>
@@ -121,7 +108,6 @@ function App() {
           }}
         />
       </ThemeProvider>
-    </QueryClientProvider>
   );
 }
 

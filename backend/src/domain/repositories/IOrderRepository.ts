@@ -31,6 +31,8 @@ export interface IOrderRepository {
 export interface OrderFilters {
   status?: string;
   customerEmail?: string;
+  userId?: string;
+  orderNumber?: string;
   startDate?: Date;
   endDate?: Date;
   limit?: number;

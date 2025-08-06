@@ -1,4 +1,5 @@
 // Configuración global de Jest
+/// <reference types="jest" />
 
 // Configurar variables de entorno para tests
 process.env.NODE_ENV = 'test';
@@ -10,6 +11,4 @@ process.env.SUPABASE_DB_USER = 'test-user';
 process.env.SUPABASE_DB_PASSWORD = 'test-password';
 
 // Configurar timeouts
-if (typeof jest !== 'undefined') {
-  jest.setTimeout(10000);
-} 
+jest.setTimeout(10000); 

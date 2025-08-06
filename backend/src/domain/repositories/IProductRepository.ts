@@ -28,6 +28,7 @@ export interface ProductFilters {
   maxPrice?: number;
   inStock?: boolean;
   search?: string;
+  sku?: string;
   limit?: number;
   offset?: number;
 }

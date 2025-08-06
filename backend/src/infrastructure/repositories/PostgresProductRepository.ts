@@ -47,10 +47,11 @@ export class PostgresProductRepository implements IProductRepository {
   }
 
   async findAll(filters?: ProductFilters): Promise<ProductEntity[]> {
-    let query = 'SELECT * FROM products';
-    const values: any[] = [];
-    let whereConditions: string[] = [];
-    let paramIndex = 1;
+    try {
+      let query = 'SELECT * FROM products';
+      const values: any[] = [];
+      let whereConditions: string[] = [];
+      let paramIndex = 1;
 
     if (filters?.categoryId) {
       whereConditions.push(`category_id = $${paramIndex}`);
@@ -102,9 +103,13 @@ export class PostgresProductRepository implements IProductRepository {
       query += ` OFFSET $${paramIndex}`;
       values.push(filters.offset);
     }
-
-    const result = await this.pool.query(query, values);
-    return result.rows.map((row: any) => this.mapToProductEntity(row));
+      
+      const result = await this.pool.query(query, values);
+      
+      return result.rows.map((row: any) => this.mapToProductEntity(row));
+    } catch (error: any) {
+      throw error;
+    }
   }
 
   async update(id: string, product: Partial<ProductEntity>): Promise<ProductEntity> {
@@ -304,21 +309,21 @@ export class PostgresProductRepository implements IProductRepository {
 
     return new ProductEntity(
       row.id,
-      row.category_id,
-      row.name,
-      row.description,
-      parseFloat(row.price),
+      row.category_id || '',
+      row.name || '',
+      row.description || '',
+      parseFloat(row.price) || 0,
       row.sale_price ? parseFloat(row.sale_price) : undefined,
-      row.sku,
+      row.sku || '',
       parseImages(row.images),
       parseAttributes(row.attributes),
-      row.is_active,
-      row.stock_quantity,
-      row.tags || undefined, // tags ya es un array en PostgreSQL
-      row.rating || 0,
-      row.review_count || 0,
-      row.created_at,
-      row.updated_at
+      Boolean(row.is_active), // Ensure boolean value
+      parseInt(row.stock_quantity) || 0,
+      row.tags || [], // Ensure array
+      parseFloat(row.rating) || 0,
+      parseInt(row.review_count) || 0,
+      row.created_at || new Date(),
+      row.updated_at || new Date()
     );
   }
 } 

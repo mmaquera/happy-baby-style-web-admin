@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useUsers, useUserStats, useCreateUser, useUpdateUser } from '@/hooks/useUsers';
+import { useUsers, useUserStats, useCreateUser, useUpdateUser } from '@/hooks/useUsersGraphQL';
 import { User, UserRole, CreateUserRequest, UpdateUserRequest } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -347,8 +347,8 @@ export const UsersPage: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   // Queries and mutations
-  const { data: users = [], isLoading: usersLoading, error: usersError } = useUsers(filters);
-  const { data: stats } = useUserStats();
+  const { users = [], loading: usersLoading, error: usersError } = useUsers({ filter: filters });
+  const { stats } = useUserStats();
   const createUserMutation = useCreateUser();
   const updateUserMutation = useUpdateUser();
 
@@ -367,7 +367,7 @@ export const UsersPage: React.FC = () => {
 
   const handleCreateUser = async () => {
     try {
-      await createUserMutation.mutateAsync(formData);
+      await createUserMutation.create(formData);
       setShowCreateModal(false);
       setFormData({
         email: '',
@@ -396,7 +396,7 @@ export const UsersPage: React.FC = () => {
         profile: formData.profile
       };
       
-      await updateUserMutation.mutateAsync({
+      await updateUserMutation.update(editingUser.id, {
         id: selectedUser.id,
         data: updateData
       });
@@ -777,7 +777,7 @@ export const UsersPage: React.FC = () => {
               <Button
                 variant="primary"
                 onClick={handleCreateUser}
-                isLoading={createUserMutation.isLoading}
+                isLoading={createUserMutation.loading}
               >
                 Crear Usuario
               </Button>
@@ -856,7 +856,7 @@ export const UsersPage: React.FC = () => {
               <Button
                 variant="primary"
                 onClick={handleUpdateUser}
-                isLoading={updateUserMutation.isLoading}
+                isLoading={updateUserMutation.loading}
               >
                 Actualizar Usuario
               </Button>

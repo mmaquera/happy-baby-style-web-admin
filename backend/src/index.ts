@@ -4,15 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
 import dotenv from 'dotenv';
-import { Container } from '@shared/container';
-import { createProductRoutes } from '@presentation/routes/productRoutes';
-import { createImageRoutes } from '@presentation/routes/imageRoutes';
-import { createOrderRoutes } from '@presentation/routes/orderRoutes';
-import { createUserRoutes } from '@presentation/routes/userRoutes';
-import { ProductController } from '@presentation/controllers/ProductController';
-import { ImageController } from '@presentation/controllers/ImageController';
-import { OrderController } from '@presentation/controllers/OrderController';
-import { UserController } from '@presentation/controllers/UserController';
+import { createApolloServer } from '@graphql/server';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -31,57 +23,74 @@ app.use(cors({
   credentials: true
 }));
 
-// Parseo de JSON
+// Parseo de JSON (necesario para GraphQL)
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Inicializar container de dependencias
-const container = Container.getInstance();
-
-// Obtener controladores del container
-  const productController = container.get<ProductController>('productController');
-  const imageController = container.get<ImageController>('imageController');
-  const orderController = container.get<OrderController>('orderController');
-  const userController = container.get<UserController>('userController');
-
-// Rutas API
-app.use('/api/products', createProductRoutes(productController));
-app.use('/api/images', createImageRoutes(imageController));
-app.use('/api/orders', createOrderRoutes(orderController));
-app.use('/api/users', createUserRoutes(userController));
-
-// Ruta de salud
+// Ruta de salud (solo información GraphQL)
 app.get('/health', (req, res) => {
   res.json({
     status: 'OK',
     timestamp: new Date().toISOString(),
-    service: 'Happy Baby Style Admin API'
+    service: 'Happy Baby Style - GraphQL API',
+    api: 'GraphQL Only',
+    endpoint: '/graphql',
+    playground: process.env.NODE_ENV !== 'production' ? 'Available at /graphql' : 'Disabled in production',
+    message: 'GraphQL API is the primary endpoint.'
   });
 });
 
-// Middleware de manejo de errores
-app.use((error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('Error:', error);
-  res.status(500).json({
-    success: false,
-    message: 'Internal server error',
-    error: process.env.NODE_ENV === 'development' ? error.message : undefined
-  });
-});
+// Inicializar servidor
+async function startServer() {
+  try {
+    // Configurar Apollo GraphQL Server
+    const apolloServer = await createApolloServer(app);
+    
+    // Middleware de manejo de errores
+    app.use((error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+      console.error('Error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    });
 
-// Middleware para rutas no encontradas
-app.use('*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found'
-  });
-});
+    // Middleware para rutas no encontradas
+    app.use('*', (req, res) => {
+      res.status(404).json({
+        success: false,
+        message: 'Endpoint not found. This API only supports GraphQL.',
+        availableEndpoints: {
+          graphql: '/graphql',
+          health: '/health',
+          playground: process.env.NODE_ENV !== 'production' ? '/graphql' : null
+        },
+        notice: 'Please use GraphQL endpoint at /graphql'
+      });
+    });
+    
+    // Iniciar servidor Express
+    app.listen(PORT, () => {
+      console.log(`🚀 Happy Baby Style GraphQL Server running on port ${PORT}`);
+      console.log(`📱 Health check: http://localhost:${PORT}/health`);
+      console.log(`🎮 GraphQL Endpoint: http://localhost:${PORT}/graphql`);
+      
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`🔍 GraphQL Playground: http://localhost:${PORT}/graphql`);
+        console.log(`📊 Schema Explorer available in Playground`);
+      }
+      
+      console.log(`✨ GraphQL API Ready`);
+    });
 
-// Iniciar servidor
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📱 Health check: http://localhost:${PORT}/health`);
-  console.log(`🔗 API Base URL: http://localhost:${PORT}/api`);
-});
+    console.log('✅ Apollo GraphQL Server initialized successfully');
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+startServer();
 
 export default app;
