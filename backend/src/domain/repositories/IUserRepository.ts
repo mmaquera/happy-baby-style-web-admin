@@ -12,6 +12,8 @@ export interface IUserRepository {
   getUsersByRole(role: UserRole): Promise<User[]>;
   getActiveUsers(): Promise<User[]>;
   searchUsers(query: string): Promise<User[]>;
+  getUserPasswordHash(userId: string): Promise<string | null>;
+  updateUserLastLogin(userId: string): Promise<void>;
   
   // User profile operations
   createUserProfile(userId: string, profile: Omit<UserProfile, 'id' | 'userId' | 'createdAt' | 'updatedAt'>): Promise<UserProfile>;
