@@ -24,6 +24,7 @@
     "test:db": "node scripts/test-prisma-connection.js",
     "test:graphql": "node scripts/test-graphql.js",
     "test:graphql:complete": "node scripts/test-graphql-complete.js",
+    "test:logging": "ts-node -r tsconfig-paths/register scripts/test-logging.js",
 
     "graphql:playground": "echo 'GraphQL Playground: http://localhost:3001/graphql' && open http://localhost:3001/graphql"
   },
@@ -47,7 +48,10 @@
     "multer": "^1.4.5-lts.1",
     "pg": "^8.11.3",
     "prisma": "^5.7.1",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "winston": "^3.11.0",
+    "winston-daily-rotate-file": "^4.7.1",
+    "winston-transport": "^2.0.0"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.0",
@@ -67,6 +71,7 @@
     "@types/pg": "^8.10.9",
     "@types/supertest": "^2.0.16",
     "@types/uuid": "^9.0.7",
+    "@types/winston": "^2.4.4",
     "jest": "^29.7.0",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1",

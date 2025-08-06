@@ -1,5 +1,8 @@
 import { ProductEntity } from '@domain/entities/Product';
 import { IProductRepository, ProductFilters } from '@domain/repositories/IProductRepository';
+import { LoggingDecorator } from '@infrastructure/logging/LoggingDecorator';
+import { LoggerFactory } from '@infrastructure/logging/LoggerFactory';
+import { ILogger } from '@domain/interfaces/ILogger';
 
 export interface GetProductsRequest {
   filters?: {
@@ -24,12 +27,27 @@ export interface GetProductsResponse {
 }
 
 export class GetProductsUseCase {
+  private readonly logger: ILogger;
+
   constructor(
     private readonly productRepository: IProductRepository
-  ) {}
+  ) {
+    this.logger = LoggerFactory.getInstance().createUseCaseLogger('GetProductsUseCase');
+  }
 
+  @LoggingDecorator.logUseCase({
+    includeArgs: true,
+    includeResult: true,
+    includeDuration: true,
+    context: { useCase: 'GetProducts' }
+  })
   async execute(request: GetProductsRequest = {}): Promise<GetProductsResponse> {
     try {
+      this.logger.info('Starting GetProducts use case execution', {
+        filters: request.filters,
+        pagination: request.pagination
+      });
+
       const pagination = request.pagination || {};
       const limit = pagination.limit || 50;
       const offset = pagination.offset || 0;
@@ -46,6 +64,8 @@ export class GetProductsUseCase {
         offset
       };
 
+      this.logger.debug('Applying filters to product query', { filters });
+
       const products = await this.productRepository.findAll(filters);
       
       // Note: This is a simplified implementation. 
@@ -53,12 +73,25 @@ export class GetProductsUseCase {
       const hasMore = products.length === limit;
       const total = offset + products.length + (hasMore ? 1 : 0);
 
-      return {
+      const result = {
         products,
         total,
         hasMore
       };
+
+      this.logger.info('GetProducts use case completed successfully', {
+        productsCount: products.length,
+        total,
+        hasMore,
+        filters: request.filters
+      });
+
+      return result;
     } catch (error: any) {
+      this.logger.error('GetProducts use case failed', error, {
+        filters: request.filters,
+        pagination: request.pagination
+      });
       throw error;
     }
   }

@@ -5,6 +5,9 @@ import morgan from 'morgan';
 import compression from 'compression';
 import dotenv from 'dotenv';
 import { createApolloServer } from '@graphql/server';
+import { Container } from '@shared/container';
+import { LoggerFactory } from '@infrastructure/logging/LoggerFactory';
+import { RequestLogger } from '@infrastructure/logging/RequestLogger';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -12,10 +15,18 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Initialize container and logging
+const container = Container.getInstance();
+const logger = LoggerFactory.getInstance().getDefaultLogger();
+const requestLogger = new RequestLogger();
+
 // Middleware de seguridad y utilidades
 app.use(helmet());
 app.use(compression());
 app.use(morgan('combined'));
+
+// Request logging middleware
+app.use(requestLogger.middleware());
 
 // CORS configurado para desarrollo
 app.use(cors({
@@ -29,6 +40,12 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Ruta de salud (solo información GraphQL)
 app.get('/health', (req, res) => {
+  logger.info('Health check requested', {
+    endpoint: '/health',
+    userAgent: req.get('User-Agent'),
+    ip: req.ip
+  }, (req as any).traceId);
+
   res.json({
     status: 'OK',
     timestamp: new Date().toISOString(),
@@ -43,12 +60,23 @@ app.get('/health', (req, res) => {
 // Inicializar servidor
 async function startServer() {
   try {
+    logger.info('Starting Happy Baby Style GraphQL Server', {
+      port: PORT,
+      environment: process.env.NODE_ENV || 'development'
+    });
+
     // Configurar Apollo GraphQL Server
     const apolloServer = await createApolloServer(app);
     
     // Middleware de manejo de errores
     app.use((error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-      console.error('Error:', error);
+      logger.error('Unhandled error in request', error, {
+        url: req.url,
+        method: req.method,
+        userAgent: req.get('User-Agent'),
+        ip: req.ip
+      }, (req as any).traceId);
+
       res.status(500).json({
         success: false,
         message: 'Internal server error',
@@ -58,6 +86,13 @@ async function startServer() {
 
     // Middleware para rutas no encontradas
     app.use('*', (req, res) => {
+      logger.warn('404 - Endpoint not found', {
+        url: req.url,
+        method: req.method,
+        userAgent: req.get('User-Agent'),
+        ip: req.ip
+      }, (req as any).traceId);
+
       res.status(404).json({
         success: false,
         message: 'Endpoint not found. This API only supports GraphQL.',
@@ -72,6 +107,14 @@ async function startServer() {
     
     // Iniciar servidor Express
     app.listen(PORT, () => {
+      logger.info('🚀 Happy Baby Style GraphQL Server started successfully', {
+        port: PORT,
+        healthCheck: `http://localhost:${PORT}/health`,
+        graphqlEndpoint: `http://localhost:${PORT}/graphql`,
+        playground: process.env.NODE_ENV !== 'production' ? `http://localhost:${PORT}/graphql` : 'disabled',
+        environment: process.env.NODE_ENV || 'development'
+      });
+
       console.log(`🚀 Happy Baby Style GraphQL Server running on port ${PORT}`);
       console.log(`📱 Health check: http://localhost:${PORT}/health`);
       console.log(`🎮 GraphQL Endpoint: http://localhost:${PORT}/graphql`);
@@ -84,8 +127,13 @@ async function startServer() {
       console.log(`✨ GraphQL API Ready`);
     });
 
-    console.log('✅ Apollo GraphQL Server initialized successfully');
+    logger.info('✅ Apollo GraphQL Server initialized successfully');
   } catch (error) {
+    logger.fatal('❌ Failed to start server', error as Error, {
+      port: PORT,
+      environment: process.env.NODE_ENV || 'development'
+    });
+    
     console.error('❌ Failed to start server:', error);
     process.exit(1);
   }

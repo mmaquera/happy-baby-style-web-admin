@@ -26,6 +26,13 @@ import { IProductRepository } from '@domain/repositories/IProductRepository';
 import { IImageRepository, IStorageService } from '@domain/repositories/IImageRepository';
 import { IOrderRepository } from '@domain/repositories/IOrderRepository';
 import { IUserRepository } from '@domain/repositories/IUserRepository';
+// Logging system imports
+import { ILogger } from '@domain/interfaces/ILogger';
+import { LoggerFactory } from '@infrastructure/logging/LoggerFactory';
+import { WinstonLogger } from '@infrastructure/logging/WinstonLogger';
+import { RequestLogger } from '@infrastructure/logging/RequestLogger';
+import { PerformanceLogger } from '@infrastructure/logging/PerformanceLogger';
+import { LoggingDecorator } from '@infrastructure/logging/LoggingDecorator';
 
 export class Container {
   private static instance: Container;
@@ -40,12 +47,21 @@ export class Container {
   }
 
   private registerDependencies(): void {
+    // Initialize logging system
+    LoggingDecorator.initialize();
+    
     // Configuración
     const supabase = SupabaseConfig.getInstance();
     const postgresConfig = PostgresConfig.getInstance();
     const pool = postgresConfig.getPool();
     
-    // Repositorios PostgreSQL
+    // Logging system
+    const loggerFactory = LoggerFactory.getInstance();
+    const defaultLogger: ILogger = loggerFactory.getDefaultLogger();
+    const requestLogger = new RequestLogger();
+    const performanceLogger = new PerformanceLogger();
+    
+    // Repositorios PostgreSQL with logging
     const productRepository: IProductRepository = new PostgresProductRepository(pool);
     const imageRepository: IImageRepository = new PostgresImageRepository(pool);
     const orderRepository: IOrderRepository = new PostgresOrderRepository(pool);
@@ -54,7 +70,7 @@ export class Container {
     // Servicios
     const storageService: IStorageService = new SupabaseStorageService(supabase);
     
-    // Casos de uso de Productos
+    // Casos de uso de Productos with logging
     const createProductUseCase = new CreateProductUseCase(productRepository);
     const getProductsUseCase = new GetProductsUseCase(productRepository);
     const getProductByIdUseCase = new GetProductByIdUseCase(productRepository);
@@ -87,6 +103,12 @@ export class Container {
     this.dependencies.set('orderRepository', orderRepository);
     this.dependencies.set('userRepository', userRepository);
     this.dependencies.set('storageService', storageService);
+    
+    // Logging dependencies
+    this.dependencies.set('loggerFactory', loggerFactory);
+    this.dependencies.set('defaultLogger', defaultLogger);
+    this.dependencies.set('requestLogger', requestLogger);
+    this.dependencies.set('performanceLogger', performanceLogger);
     
     // Casos de uso
     this.dependencies.set('createProductUseCase', createProductUseCase);
