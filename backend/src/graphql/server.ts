@@ -54,7 +54,20 @@ export async function createApolloServer(app: Express): Promise<ApolloServer> {
       
       return error;
     },
+    introspection: process.env.NODE_ENV !== 'production',
+    debug: process.env.NODE_ENV !== 'production',
+    csrfPrevention: false, // Permite requests desde el navegador
     plugins: [
+      // Plugin para Apollo Studio Sandbox
+      process.env.NODE_ENV !== 'production' && {
+        requestDidStart() {
+          return {
+            didResolveOperation() {
+              return;
+            },
+          };
+        },
+      },
       {
         requestDidStart: async () => ({
           willSendResponse: async ({ response }) => {
@@ -65,9 +78,7 @@ export async function createApolloServer(app: Express): Promise<ApolloServer> {
           },
         }),
       },
-    ],
-    introspection: process.env.NODE_ENV !== 'production',
-    debug: process.env.NODE_ENV !== 'production',
+    ].filter(Boolean),
   });
 
   await server.start();

@@ -8,6 +8,7 @@ import { createApolloServer } from '@graphql/server';
 import { Container } from '@shared/container';
 import { LoggerFactory } from '@infrastructure/logging/LoggerFactory';
 import { RequestLogger } from '@infrastructure/logging/RequestLogger';
+import { GraphQLPlayground } from '@infrastructure/web/GraphQLPlayground';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -20,8 +21,10 @@ const container = Container.getInstance();
 const logger = LoggerFactory.getInstance().getDefaultLogger();
 const requestLogger = new RequestLogger();
 
-// Middleware de seguridad y utilidades
-app.use(helmet());
+// Middleware de seguridad y utilidades (CSP deshabilitado para el playground)
+app.use(helmet({
+  contentSecurityPolicy: false, // Deshabilitar CSP completamente para desarrollo
+}));
 app.use(compression());
 app.use(morgan('combined'));
 
@@ -37,6 +40,11 @@ app.use(cors({
 // Parseo de JSON (necesario para GraphQL)
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Favicon para evitar errores 404
+app.get('/favicon.ico', (req, res) => {
+  res.status(204).end();
+});
 
 // Ruta de salud (solo información GraphQL)
 app.get('/health', (req, res) => {
@@ -67,6 +75,23 @@ async function startServer() {
 
     // Configurar Apollo GraphQL Server
     const apolloServer = await createApolloServer(app);
+    
+    // GraphQL Playground - Clean Architecture Implementation
+    if (process.env.NODE_ENV !== 'production') {
+      app.get('/playground', (req, res) => {
+        const playgroundHtml = GraphQLPlayground.generateInterface({
+          title: 'GraphQL Playground - Happy Baby Style',
+          endpoint: '/graphql',
+          port: PORT
+        });
+        res.send(playgroundHtml);
+      });
+      
+      logger.info('GraphQL Playground available at /playground', {
+        playgroundUrl: `http://localhost:${PORT}/playground`,
+        graphqlUrl: `http://localhost:${PORT}/graphql`
+      });
+    }
     
     // Middleware de manejo de errores
     app.use((error: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -115,14 +140,15 @@ async function startServer() {
         environment: process.env.NODE_ENV || 'development'
       });
 
-      console.log(`🚀 Happy Baby Style GraphQL Server running on port ${PORT}`);
-      console.log(`📱 Health check: http://localhost:${PORT}/health`);
-      console.log(`🎮 GraphQL Endpoint: http://localhost:${PORT}/graphql`);
-      
-      if (process.env.NODE_ENV !== 'production') {
-        console.log(`🔍 GraphQL Playground: http://localhost:${PORT}/graphql`);
-        console.log(`📊 Schema Explorer available in Playground`);
-      }
+                    console.log(`🚀 Happy Baby Style GraphQL Server running on port ${PORT}`);
+              console.log(`📱 Health check: http://localhost:${PORT}/health`);
+              console.log(`🎮 GraphQL Endpoint: http://localhost:${PORT}/graphql`);
+              
+              if (process.env.NODE_ENV !== 'production') {
+                console.log(`🔍 GraphQL Playground: http://localhost:${PORT}/playground`);
+                console.log(`🎯 Apollo Studio: http://localhost:${PORT}/graphql`);
+                console.log(`📊 Schema Explorer available in both interfaces`);
+              }
       
       console.log(`✨ GraphQL API Ready`);
     });
