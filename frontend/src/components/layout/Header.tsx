@@ -289,6 +289,15 @@ export const Header: React.FC = () => {
   }, []);
 
   const getUserInitials = (name: string) => {
+    if (!name) return 'U';
+    
+    // If it's an email, use the part before @
+    if (name.includes('@')) {
+      const emailUser = name.split('@')[0];
+      return emailUser.charAt(0).toUpperCase();
+    }
+    
+    // If it's a regular name, use first letters of words
     return name
       .split(' ')
       .map(word => word.charAt(0))
@@ -320,10 +329,19 @@ export const Header: React.FC = () => {
         <UserDropdown>
           <UserProfile onClick={handleUserClick}>
             <Avatar>
-              {user ? getUserInitials(user.name) : 'U'}
+              {user ? getUserInitials(
+                user.profile?.firstName && user.profile?.lastName 
+                  ? `${user.profile.firstName} ${user.profile.lastName}`
+                  : user.email
+              ) : 'U'}
             </Avatar>
             <UserInfo>
-              <UserName>{user?.name || 'Usuario'}</UserName>
+              <UserName>
+                {user?.profile?.firstName && user?.profile?.lastName 
+                  ? `${user.profile.firstName} ${user.profile.lastName}`
+                  : user?.email || 'Usuario'
+                }
+              </UserName>
               <UserRole>{user?.role === 'admin' ? 'Administrador' : 'Usuario'}</UserRole>
             </UserInfo>
             <DropdownArrow size={16} isOpen={isDropdownOpen} />
