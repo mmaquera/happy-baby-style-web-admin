@@ -11,7 +11,9 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   iconPosition?: 'left' | 'right';
 }
 
-const StyledButton = styled.button<ButtonProps>`
+const StyledButton = styled.button.withConfig({
+  shouldForwardProp: (prop) => !['variant', 'size', 'isLoading', 'fullWidth', 'icon', 'iconPosition'].includes(prop),
+})<ButtonProps>`
   display: inline-flex;
   align-items: center;
   justify-content: center;

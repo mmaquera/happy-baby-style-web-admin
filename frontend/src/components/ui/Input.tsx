@@ -13,9 +13,12 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   onRightIconClick?: () => void;
   rightIconClickable?: boolean;
   rightIconAriaLabel?: string;
+  isError?: boolean; // Add support for isError prop
 }
 
-const InputContainer = styled.div<{ fullWidth?: boolean }>`
+const InputContainer = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'fullWidth',
+})<{ fullWidth?: boolean }>`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing[2]};
@@ -37,7 +40,9 @@ const InputWrapper = styled.div`
   align-items: center;
 `;
 
-const StyledInput = styled.input<{ hasLeftIcon?: boolean; hasRightIcon?: boolean; hasError?: boolean }>`
+const StyledInput = styled.input.withConfig({
+  shouldForwardProp: (prop) => !['hasLeftIcon', 'hasRightIcon', 'hasError'].includes(prop),
+})<{ hasLeftIcon?: boolean; hasRightIcon?: boolean; hasError?: boolean }>`
   width: 100%;
   padding: ${theme.spacing[3]} ${theme.spacing[4]};
   font-size: ${theme.fontSizes.base};
@@ -73,7 +78,9 @@ const StyledInput = styled.input<{ hasLeftIcon?: boolean; hasRightIcon?: boolean
   }
 `;
 
-const IconWrapper = styled.div<{ position: 'left' | 'right'; clickable?: boolean }>`
+const IconWrapper = styled.div.withConfig({
+  shouldForwardProp: (prop) => !['position', 'clickable'].includes(prop),
+})<{ position: 'left' | 'right'; clickable?: boolean }>`
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -106,13 +113,15 @@ const IconWrapper = styled.div<{ position: 'left' | 'right'; clickable?: boolean
   `}
 `;
 
-const HelperText = styled.span<{ isError?: boolean }>`
+const HelperText = styled.span.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isError',
+})<{ isError?: boolean }>`
   font-size: ${theme.fontSizes.sm};
   color: ${({ isError }) => isError ? theme.colors.error : theme.colors.warmGray};
   line-height: 1.4;
 `;
 
-export const Input: React.FC<InputProps> = ({
+export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   label,
   error,
   helperText,
@@ -124,10 +133,17 @@ export const Input: React.FC<InputProps> = ({
   onRightIconClick,
   rightIconClickable = false,
   rightIconAriaLabel,
+  isError,
   ...props
-}) => {
+}, ref) => {
   // Use icon as leftIcon if provided
   const finalLeftIcon = leftIcon || icon;
+  
+  // Determine if there's an error (support both error and isError props)
+  const hasError = !!(error || isError);
+  
+  // Filter out custom props that shouldn't be passed to DOM
+  const { isError: _, ...domProps } = props;
   
   const handleRightIconClick = () => {
     if (rightIconClickable && onRightIconClick) {
@@ -143,10 +159,11 @@ export const Input: React.FC<InputProps> = ({
         {finalLeftIcon && <IconWrapper position="left">{finalLeftIcon}</IconWrapper>}
         
         <StyledInput
+          ref={ref}
           hasLeftIcon={!!finalLeftIcon}
           hasRightIcon={!!rightIcon}
-          hasError={!!error}
-          {...props}
+          hasError={hasError}
+          {...domProps}
         />
         
         {rightIcon && (
@@ -164,10 +181,12 @@ export const Input: React.FC<InputProps> = ({
       </InputWrapper>
       
       {(error || helperText) && (
-        <HelperText isError={!!error}>
+        <HelperText isError={hasError}>
           {error || helperText}
         </HelperText>
       )}
     </InputContainer>
   );
-};
+});
+
+Input.displayName = 'Input';

@@ -10,7 +10,9 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   clickable?: boolean;
 }
 
-const StyledCard = styled.div<CardProps>`
+const StyledCard = styled.div.withConfig({
+  shouldForwardProp: (prop) => !['padding', 'shadow', 'hover', 'clickable'].includes(prop),
+})<Pick<CardProps, 'padding' | 'shadow' | 'hover' | 'clickable'>>`
   background: ${theme.colors.white};
   border-radius: ${theme.borderRadius.xl};
   border: 1px solid ${theme.colors.border.light};
