@@ -1,13 +1,24 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useAuthGraphQL } from './useAuthGraphQL';
 
 // Types
 export interface User {
   id: string;
   email: string;
-  name: string;
   role: string;
+  isActive: boolean;
+  emailVerified: boolean;
+  lastLoginAt?: string;
+  profile?: {
+    id: string;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    birthDate?: string;
+    avatarUrl?: string;
+  };
 }
 
 export interface AuthState {
@@ -22,47 +33,10 @@ export interface LoginCredentials {
   password: string;
 }
 
-export interface LoginResponse {
-  success: boolean;
-  data?: {
-    token: string;
-    user: User;
-  };
-  message: string;
-}
-
 // Storage keys
 const AUTH_TOKEN_KEY = 'authToken';
+const REFRESH_TOKEN_KEY = 'refreshToken';
 const USER_DATA_KEY = 'user';
-
-// Mock API function (reemplazar con la implementación real)
-const mockLoginAPI = async (credentials: LoginCredentials): Promise<LoginResponse> => {
-  // Simular delay de red
-  await new Promise(resolve => setTimeout(resolve, 1000));
-
-  // Validar credenciales de demo
-  if (credentials.email === 'admin@happybabystyle.com' && credentials.password === 'admin123') {
-    return {
-      success: true,
-      data: {
-        token: 'mock-jwt-token-12345',
-        user: {
-          id: '1',
-          email: 'admin@happybabystyle.com',
-          name: 'Administrador',
-          role: 'admin',
-        },
-      },
-      message: 'Login exitoso',
-    };
-  }
-
-  // Credenciales incorrectas
-  return {
-    success: false,
-    message: 'Credenciales incorrectas. Por favor, verifica tu email y contraseña.',
-  };
-};
 
 // Storage utilities
 const getStoredToken = (): string | null => {
@@ -84,9 +58,19 @@ const getStoredUser = (): User | null => {
   }
 };
 
-const setStoredAuth = (token: string, user: User): void => {
+const getStoredRefreshToken = (): string | null => {
   try {
-    localStorage.setItem(AUTH_TOKEN_KEY, token);
+    return localStorage.getItem(REFRESH_TOKEN_KEY);
+  } catch (error) {
+    console.error('Error getting stored refresh token:', error);
+    return null;
+  }
+};
+
+const setStoredAuth = (accessToken: string, refreshToken: string, user: User): void => {
+  try {
+    localStorage.setItem(AUTH_TOKEN_KEY, accessToken);
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
     localStorage.setItem(USER_DATA_KEY, JSON.stringify(user));
   } catch (error) {
     console.error('Error setting stored auth:', error);
@@ -96,6 +80,7 @@ const setStoredAuth = (token: string, user: User): void => {
 const clearStoredAuth = (): void => {
   try {
     localStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem(USER_DATA_KEY);
   } catch (error) {
     console.error('Error clearing stored auth:', error);
@@ -105,6 +90,7 @@ const clearStoredAuth = (): void => {
 // Hook
 export const useAuth = () => {
   const navigate = useNavigate();
+  const { loginUser: graphQLLogin, logoutUser: graphQLLogout } = useAuthGraphQL();
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
     token: null,
@@ -118,13 +104,38 @@ export const useAuth = () => {
       const token = getStoredToken();
       const user = getStoredUser();
 
+      // Validate token format (basic check)
       if (token && user) {
-        setAuthState({
-          user,
-          token,
-          isAuthenticated: true,
-          isLoading: false,
-        });
+        try {
+          // Check if token is a valid JWT format (has 3 parts separated by dots)
+          const tokenParts = token.split('.');
+          if (tokenParts.length === 3) {
+            setAuthState({
+              user,
+              token,
+              isAuthenticated: true,
+              isLoading: false,
+            });
+          } else {
+            // Invalid token format, clear storage
+            clearStoredAuth();
+            setAuthState({
+              user: null,
+              token: null,
+              isAuthenticated: false,
+              isLoading: false,
+            });
+          }
+        } catch (error) {
+          // Token validation failed, clear storage
+          clearStoredAuth();
+          setAuthState({
+            user: null,
+            token: null,
+            isAuthenticated: false,
+            isLoading: false,
+          });
+        }
       } else {
         setAuthState({
           user: null,
@@ -141,15 +152,15 @@ export const useAuth = () => {
   // Login function
   const login = useCallback(async (credentials: LoginCredentials): Promise<boolean> => {
     try {
-      const response = await mockLoginAPI(credentials);
+      const response = await graphQLLogin(credentials);
 
-      if (response.success && response.data) {
-        const { token, user } = response.data;
+      if (response.success && response.user && response.accessToken && response.refreshToken) {
+        const { accessToken, refreshToken, user } = response;
         
-        setStoredAuth(token, user);
+        setStoredAuth(accessToken, refreshToken, user);
         setAuthState({
           user,
-          token,
+          token: accessToken,
           isAuthenticated: true,
           isLoading: false,
         });
@@ -165,21 +176,27 @@ export const useAuth = () => {
       toast.error('Error al conectar con el servidor');
       return false;
     }
-  }, []);
+  }, [graphQLLogin]);
 
   // Logout function
-  const logout = useCallback(() => {
-    clearStoredAuth();
-    setAuthState({
-      user: null,
-      token: null,
-      isAuthenticated: false,
-      isLoading: false,
-    });
+  const logout = useCallback(async () => {
+    try {
+      await graphQLLogout();
+    } catch (error) {
+      console.warn('Error during logout call:', error);
+    } finally {
+      clearStoredAuth();
+      setAuthState({
+        user: null,
+        token: null,
+        isAuthenticated: false,
+        isLoading: false,
+      });
 
-    toast.success('Sesión cerrada exitosamente');
-    navigate('/login');
-  }, [navigate]);
+      toast.success('Sesión cerrada exitosamente');
+      navigate('/login');
+    }
+  }, [navigate, graphQLLogout]);
 
   // Check if user has specific role
   const hasRole = useCallback((role: string): boolean => {

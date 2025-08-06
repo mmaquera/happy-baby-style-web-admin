@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useAuth } from '@/hooks/useAuth';
+import '@/utils/debugAuth'; // Import debug utilities
 
 // Types
 interface LoginFormData {
@@ -180,6 +181,30 @@ export const Login: React.FC = () => {
     },
   });
 
+  // Clean invalid tokens on login page load
+  React.useEffect(() => {
+    // Clear any invalid tokens when landing on login page
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      try {
+        const tokenParts = token.split('.');
+        if (tokenParts.length !== 3) {
+          // Invalid JWT format, clear all auth data
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('user');
+          console.log('Cleared invalid tokens');
+        }
+      } catch (error) {
+        // Error parsing token, clear all auth data
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        console.log('Cleared malformed tokens');
+      }
+    }
+  }, []);
+
   // Redirect if already authenticated
   React.useEffect(() => {
     if (isAuthenticated) {
@@ -205,10 +230,7 @@ export const Login: React.FC = () => {
     }
   };
 
-  const handleDemoLogin = () => {
-    setValue('email', 'admin@happybabystyle.com');
-    setValue('password', 'admin123');
-  };
+
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -284,26 +306,7 @@ export const Login: React.FC = () => {
           </Button>
         </FormContainer>
 
-        <Divider>
-          <span>o</span>
-        </Divider>
 
-        <Button
-          variant="outline"
-          size="medium"
-          fullWidth
-          onClick={handleDemoLogin}
-        >
-          Usar Credenciales de Demo
-        </Button>
-
-        <DemoCredentials>
-          <DemoTitle>Credenciales de Demo</DemoTitle>
-          <DemoText>
-            Email: admin@happybabystyle.com<br />
-            Contraseña: admin123
-          </DemoText>
-        </DemoCredentials>
 
         <FooterText>
           © 2024 Happy Baby Style. Todos los derechos reservados.

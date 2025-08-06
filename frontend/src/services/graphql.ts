@@ -8,8 +8,29 @@ const httpLink = createHttpLink({
 });
 
 // Auth link to add JWT token to requests
-const authLink = setContext((_, { headers }) => {
+const authLink = setContext((operation, { headers }) => {
+  // Debug logging
+  console.log('🔗 AuthLink - Operation:', operation.operationName);
+  
+  // Don't send token for public operations like login
+  const publicOperations = ['LoginUser', 'RefreshToken', 'RegisterUser'];
+  const isPublicOperation = publicOperations.includes(operation.operationName || '');
+  
+  console.log('🔗 AuthLink - Is public operation:', isPublicOperation);
+  
+  if (isPublicOperation) {
+    console.log('🔗 AuthLink - Public operation, not sending token');
+    return {
+      headers: {
+        ...headers,
+        // Explicitly do not include authorization
+      }
+    };
+  }
+  
   const token = localStorage.getItem('authToken');
+  console.log('🔗 AuthLink - Sending token:', !!token);
+  
   return {
     headers: {
       ...headers,
@@ -36,9 +57,15 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
       
       // Handle authentication errors
       if (extensions?.code === 'UNAUTHENTICATED' || extensions?.statusCode === 401) {
-        console.warn('Authentication error detected, redirecting to login...');
+        console.warn('Authentication error detected, clearing tokens...');
         localStorage.removeItem('authToken');
-        window.location.href = '/login';
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        
+        // Only redirect if not already on login page
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
         return;
       }
       
