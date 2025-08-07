@@ -4,7 +4,10 @@ import { onError } from '@apollo/client/link/error';
 
 // Create HTTP link for GraphQL queries
 const httpLink = createHttpLink({
-  uri: 'http://localhost:3001/graphql',
+  uri: process.env.VITE_GRAPHQL_URL || 
+       (process.env.NODE_ENV === 'production' 
+         ? 'http://3.144.1.119/graphql'
+         : 'http://localhost:3001/graphql'),
 });
 
 // Auth link to add JWT token to requests

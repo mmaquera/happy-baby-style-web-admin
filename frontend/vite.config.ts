@@ -18,4 +18,13 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: false,
+  },
+  preview: {
+    port: 3000,
+    host: true,
+  },
 })
