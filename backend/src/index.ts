@@ -3,40 +3,50 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
-import dotenv from 'dotenv';
 import { createApolloServer } from '@graphql/server';
 import { Container } from '@shared/container';
 import { LoggerFactory } from '@infrastructure/logging/LoggerFactory';
 import { RequestLogger } from '@infrastructure/logging/RequestLogger';
 import { GraphQLPlayground } from '@infrastructure/web/GraphQLPlayground';
 import { StaticFileMiddleware } from '@infrastructure/web/StaticFileMiddleware';
-
-// Cargar variables de entorno
-dotenv.config();
+import { environment } from './config/environment';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const config = environment.getConfig();
+const PORT = config.port;
 
 // Initialize container and logging
 const container = Container.getInstance();
 const logger = LoggerFactory.getInstance().getDefaultLogger();
 const requestLogger = new RequestLogger();
 
-// Middleware de seguridad y utilidades (CSP deshabilitado para el playground)
-app.use(helmet({
-  contentSecurityPolicy: false, // Deshabilitar CSP completamente para desarrollo
-}));
-app.use(compression());
+// Log environment information
+console.log('🚀 Starting Happy Baby Style Backend');
+console.log('📊 Environment Info:', environment.getEnvironmentInfo());
+
+// Middleware de seguridad y utilidades
+if (config.enableHelmet) {
+  app.use(helmet({
+    contentSecurityPolicy: false, // Deshabilitar CSP para el playground
+  }));
+}
+
+if (config.enableCompression) {
+  app.use(compression());
+}
+
 app.use(morgan('combined'));
 
 // Request logging middleware
 app.use(requestLogger.middleware());
 
-// CORS configurado para desarrollo
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true
-}));
+// CORS configurado según el entorno
+if (config.enableCors) {
+  app.use(cors({
+    origin: config.frontendUrl,
+    credentials: true
+  }));
+}
 
 // Parseo de JSON (necesario para GraphQL)
 app.use(express.json({ limit: '10mb' }));
@@ -47,7 +57,7 @@ app.get('/favicon.ico', (req, res) => {
   res.status(204).end();
 });
 
-// Ruta de salud (solo información GraphQL)
+// Ruta de salud con información del entorno
 app.get('/health', (req, res) => {
   logger.info('Health check requested', {
     endpoint: '/health',
@@ -59,9 +69,16 @@ app.get('/health', (req, res) => {
     status: 'OK',
     timestamp: new Date().toISOString(),
     service: 'Happy Baby Style - GraphQL API',
+    environment: config.nodeEnv,
     api: 'GraphQL Only',
     endpoint: '/graphql',
-    playground: process.env.NODE_ENV !== 'production' ? 'Available at /graphql' : 'Disabled in production',
+    playground: config.enableGraphQLPlayground ? 'Available at /playground' : 'Disabled in production',
+    database: {
+      host: environment.getDatabaseConfig().host,
+      port: environment.getDatabaseConfig().port,
+      name: environment.getDatabaseConfig().database,
+      ssl: !!environment.getDatabaseConfig().ssl,
+    },
     message: 'GraphQL API is the primary endpoint.'
   });
 });
@@ -71,7 +88,8 @@ async function startServer() {
   try {
     logger.info('Starting Happy Baby Style GraphQL Server', {
       port: PORT,
-      environment: process.env.NODE_ENV || 'development'
+      environment: config.nodeEnv,
+      database: environment.getDatabaseConfig().host,
     });
 
     // Setup static file middleware for uploads
@@ -81,7 +99,7 @@ async function startServer() {
     const apolloServer = await createApolloServer(app);
     
     // GraphQL Playground - Clean Architecture Implementation
-    if (process.env.NODE_ENV !== 'production') {
+    if (config.enableGraphQLPlayground) {
       app.get('/playground', (req, res) => {
         const playgroundHtml = GraphQLPlayground.generateInterface({
           title: 'GraphQL Playground - Happy Baby Style',
@@ -128,7 +146,7 @@ async function startServer() {
         availableEndpoints: {
           graphql: '/graphql',
           health: '/health',
-          playground: process.env.NODE_ENV !== 'production' ? '/graphql' : null
+          playground: config.enableGraphQLPlayground ? '/graphql' : null
         },
         notice: 'Please use GraphQL endpoint at /graphql'
       });
@@ -140,15 +158,16 @@ async function startServer() {
         port: PORT,
         healthCheck: `http://localhost:${PORT}/health`,
         graphqlEndpoint: `http://localhost:${PORT}/graphql`,
-        playground: process.env.NODE_ENV !== 'production' ? `http://localhost:${PORT}/graphql` : 'disabled',
-        environment: process.env.NODE_ENV || 'development'
+        playground: config.enableGraphQLPlayground ? `http://localhost:${PORT}/graphql` : 'disabled',
+        environment: config.nodeEnv,
+        database: environment.getDatabaseConfig().host,
       });
 
                     console.log(`🚀 Happy Baby Style GraphQL Server running on port ${PORT}`);
               console.log(`📱 Health check: http://localhost:${PORT}/health`);
               console.log(`🎮 GraphQL Endpoint: http://localhost:${PORT}/graphql`);
               
-              if (process.env.NODE_ENV !== 'production') {
+              if (config.enableGraphQLPlayground) {
                 console.log(`🔍 GraphQL Playground: http://localhost:${PORT}/playground`);
                 console.log(`🎯 Apollo Studio: http://localhost:${PORT}/graphql`);
                 console.log(`📊 Schema Explorer available in both interfaces`);
@@ -161,7 +180,8 @@ async function startServer() {
   } catch (error) {
     logger.fatal('❌ Failed to start server', error as Error, {
       port: PORT,
-      environment: process.env.NODE_ENV || 'development'
+      environment: config.nodeEnv,
+      database: environment.getDatabaseConfig().host,
     });
     
     console.error('❌ Failed to start server:', error);
