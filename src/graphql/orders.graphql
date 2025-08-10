@@ -1,0 +1,486 @@
+# =====================================================
+# ORDERS GRAPHQL OPERATIONS
+# =====================================================
+# Following Clean Architecture principles:
+# - Single Responsibility: Order operations only
+# - Interface Segregation: Specific operations for orders
+# - Dependency Inversion: Depends on backend schema
+
+# =====================================================
+# QUERIES
+# =====================================================
+
+# Get paginated orders with filtering
+query GetOrders($filter: OrderFilterInput, $pagination: PaginationInput) {
+  orders(filter: $filter, pagination: $pagination) {
+    orders {
+      id
+      orderNumber
+      status
+      subtotal
+      taxAmount
+      shippingAmount
+      totalAmount
+      notes
+      createdAt
+      updatedAt
+      # Relations
+      user {
+        id
+        email
+        firstName
+        lastName
+        phone
+      }
+      items {
+        id
+        quantity
+        unitPrice
+        totalPrice
+        product {
+          id
+          name
+          sku
+          images
+        }
+      }
+      shippingAddress {
+        id
+        type
+        firstName
+        lastName
+        company
+        address1
+        address2
+        city
+        state
+        postalCode
+        country
+        phone
+        isDefault
+        # Computed fields
+        fullName
+        fullAddress
+      }
+    }
+    total
+    hasMore
+  }
+}
+
+# Get single order by ID
+query GetOrder($id: ID!) {
+  order(id: $id) {
+    id
+    orderNumber
+    status
+    subtotal
+    taxAmount
+    shippingAmount
+    totalAmount
+    notes
+    createdAt
+    updatedAt
+    # Relations
+    user {
+      id
+      email
+      firstName
+      lastName
+      phone
+    }
+    items {
+      id
+      quantity
+      unitPrice
+      totalPrice
+      product {
+        id
+        name
+        sku
+        images
+        price
+        salePrice
+      }
+    }
+    shippingAddress {
+      id
+      type
+      firstName
+      lastName
+      company
+      address1
+      address2
+      city
+      state
+      postalCode
+      country
+      phone
+      isDefault
+      # Computed fields
+      fullName
+      fullAddress
+    }
+  }
+}
+
+# Get order by order number
+query GetOrderByNumber($orderNumber: String!) {
+  orderByNumber(orderNumber: $orderNumber) {
+    id
+    orderNumber
+    status
+    subtotal
+    taxAmount
+    shippingAmount
+    totalAmount
+    notes
+    createdAt
+    updatedAt
+    # Relations
+    user {
+      id
+      email
+      firstName
+      lastName
+      phone
+    }
+    items {
+      id
+      quantity
+      unitPrice
+      totalPrice
+      product {
+        id
+        name
+        sku
+        images
+        price
+        salePrice
+      }
+    }
+    shippingAddress {
+      id
+      type
+      firstName
+      lastName
+      company
+      address1
+      address2
+      city
+      state
+      postalCode
+      country
+      phone
+      isDefault
+      # Computed fields
+      fullName
+      fullAddress
+    }
+  }
+}
+
+# Get order items
+query GetOrderItems($orderId: ID!) {
+  orderItems(orderId: $orderId) {
+    id
+    quantity
+    unitPrice
+    totalPrice
+    order {
+      id
+      orderNumber
+      status
+      totalAmount
+      createdAt
+    }
+    product {
+      id
+      name
+      sku
+      images
+      price
+      salePrice
+    }
+  }
+}
+
+# Get order stats
+query GetOrderStats {
+  orderStats {
+    totalOrders
+    pendingOrders
+    processingOrders
+    shippedOrders
+    deliveredOrders
+    cancelledOrders
+    totalRevenue
+    averageOrderValue
+  }
+}
+
+# =====================================================
+# MUTATIONS
+# =====================================================
+
+# Create new order
+mutation CreateOrder($input: CreateOrderInput!) {
+  createOrder(input: $input) {
+    id
+    orderNumber
+    status
+    subtotal
+    taxAmount
+    shippingAmount
+    totalAmount
+    notes
+    createdAt
+    updatedAt
+    # Relations
+    user {
+      id
+      email
+      firstName
+      lastName
+      phone
+    }
+    items {
+      id
+      quantity
+      unitPrice
+      totalPrice
+      product {
+        id
+        name
+        sku
+        images
+      }
+    }
+    shippingAddress {
+      id
+      type
+      firstName
+      lastName
+      company
+      address1
+      address2
+      city
+      state
+      postalCode
+      country
+      phone
+      isDefault
+      # Computed fields
+      fullName
+      fullAddress
+    }
+  }
+}
+
+# Update existing order
+mutation UpdateOrder($id: ID!, $input: UpdateOrderInput!) {
+  updateOrder(id: $id, input: $input) {
+    id
+    orderNumber
+    status
+    subtotal
+    taxAmount
+    shippingAmount
+    totalAmount
+    notes
+    createdAt
+    updatedAt
+    # Relations
+    user {
+      id
+      email
+      firstName
+      lastName
+      phone
+    }
+    items {
+      id
+      quantity
+      unitPrice
+      totalPrice
+      product {
+        id
+        name
+        sku
+        images
+      }
+    }
+    shippingAddress {
+      id
+      type
+      firstName
+      lastName
+      company
+      address1
+      address2
+      city
+      state
+      postalCode
+      country
+      phone
+      isDefault
+      # Computed fields
+      fullName
+      fullAddress
+    }
+  }
+}
+
+# Update order status
+mutation UpdateOrderStatus($id: ID!, $status: OrderStatus!) {
+  updateOrderStatus(id: $id, status: $status) {
+    id
+    orderNumber
+    status
+    subtotal
+    taxAmount
+    shippingAmount
+    totalAmount
+    notes
+    createdAt
+    updatedAt
+    # Relations
+    user {
+      id
+      email
+      firstName
+      lastName
+      phone
+    }
+  }
+}
+
+# Cancel order
+mutation CancelOrder($id: ID!) {
+  cancelOrder(id: $id) {
+    id
+    orderNumber
+    status
+    subtotal
+    taxAmount
+    shippingAmount
+    totalAmount
+    notes
+    createdAt
+    updatedAt
+    # Relations
+    user {
+      id
+      email
+      firstName
+      lastName
+      phone
+    }
+  }
+}
+
+# Ship order
+mutation ShipOrder($id: ID!, $trackingNumber: String) {
+  shipOrder(id: $id, trackingNumber: $trackingNumber) {
+    id
+    orderNumber
+    status
+    subtotal
+    taxAmount
+    shippingAmount
+    totalAmount
+    notes
+    createdAt
+    updatedAt
+    # Relations
+    user {
+      id
+      email
+      firstName
+      lastName
+      phone
+    }
+  }
+}
+
+# Deliver order
+mutation DeliverOrder($id: ID!) {
+  deliverOrder(id: $id) {
+    id
+    orderNumber
+    status
+    subtotal
+    taxAmount
+    shippingAmount
+    totalAmount
+    notes
+    createdAt
+    updatedAt
+    # Relations
+    user {
+      id
+      email
+      firstName
+      lastName
+      phone
+    }
+  }
+}
+
+# Create order item
+mutation CreateOrderItem($input: CreateOrderItemInput!) {
+  createOrderItem(input: $input) {
+    id
+    quantity
+    unitPrice
+    totalPrice
+    order {
+      id
+      orderNumber
+      status
+      totalAmount
+      createdAt
+    }
+    product {
+      id
+      name
+      sku
+      images
+      price
+      salePrice
+    }
+  }
+}
+
+# Update order item
+mutation UpdateOrderItem($id: ID!, $quantity: Int!, $unitPrice: Decimal!) {
+  updateOrderItem(id: $id, quantity: $quantity, unitPrice: $unitPrice) {
+    id
+    quantity
+    unitPrice
+    totalPrice
+    order {
+      id
+      orderNumber
+      status
+      totalAmount
+      createdAt
+    }
+    product {
+      id
+      name
+      sku
+      images
+      price
+      salePrice
+    }
+  }
+}
+
+# Delete order item
+mutation DeleteOrderItem($id: ID!) {
+  deleteOrderItem(id: $id) {
+    success
+    message
+  }
+}

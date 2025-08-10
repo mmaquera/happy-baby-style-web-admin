@@ -1,0 +1,177 @@
+# GraphQL Authentication Query for Backend Playground
+# URL: http://localhost:3001/playground
+
+# =====================================================
+# EMAIL AND PASSWORD AUTHENTICACIÓN - SIN VARIABLES
+# =====================================================
+
+# IMPORTANTE: Tu playground NO tiene soporte para variables
+# Usa esta query con los valores hardcodeados:
+
+mutation {
+  loginUser(email: "marco.arka@gmail.com", password: "123Admin$") {
+    success
+    message
+    accessToken
+    refreshToken
+    user {
+      id
+      email
+      role
+      isActive
+      emailVerified
+      lastLoginAt
+      profile {
+        id
+        firstName
+        lastName
+        phone
+        birthDate
+        avatarUrl
+      }
+    }
+  }
+}
+
+# =====================================================
+# ALTERNATIVA: APOLLO STUDIO SANDBOX (CON VARIABLES)
+# =====================================================
+
+# Si quieres usar variables, abre Apollo Studio Sandbox:
+# http://localhost:3001/graphql
+
+# Mutation con variables (solo en Apollo Studio):
+# mutation LoginUser($email: String!, $password: String!) {
+#   loginUser(email: $email, password: $password) {
+#     success
+#     message
+#     accessToken
+#     refreshToken
+#     user {
+#       id
+#       email
+#       role
+#       isActive
+#       emailVerified
+#       lastLoginAt
+#       profile {
+#         id
+#         firstName
+#         lastName
+#         phone
+#         birthDate
+#         avatarUrl
+#       }
+#     }
+#   }
+# }
+
+# Variables para Apollo Studio:
+# {
+#   "email": "marco.arka@gmail.com",
+#   "password": "123Admin$"
+# }
+
+# =====================================================
+# QUERIES ADICIONALES PARA TESTING
+# =====================================================
+
+# Query para verificar usuario actual (requiere autenticación)
+query {
+  currentUser {
+    id
+    email
+    role
+    isActive
+    emailVerified
+    lastLoginAt
+    profile {
+      id
+      firstName
+      lastName
+      phone
+      birthDate
+      avatarUrl
+    }
+  }
+}
+
+# Query para obtener usuario por ID (requiere autenticación)
+query {
+  user(id: "1") {
+    id
+    email
+    role
+    isActive
+    emailVerified
+    lastLoginAt
+    profile {
+      id
+      firstName
+      lastName
+      phone
+      birthDate
+      avatarUrl
+    }
+  }
+}
+
+# =====================================================
+# INSTRUCCIONES DE USO
+# =====================================================
+
+# OPCIÓN 1: Playground Personalizado (SIN VARIABLES)
+# 1. Abre http://localhost:3001/playground
+# 2. Copia la mutation con valores hardcodeados de arriba
+# 3. Pégalo en el Query Editor
+# 4. Haz clic en "Execute Query"
+
+# OPCIÓN 2: Apollo Studio Sandbox (CON VARIABLES)
+# 1. Abre http://localhost:3001/graphql
+# 2. Usa la mutation con variables
+# 3. Agrega las variables en la sección correspondiente
+
+# =====================================================
+# RESPUESTA ESPERADA
+# =====================================================
+
+# Respuesta Exitosa:
+# {
+#   "data": {
+#     "loginUser": {
+#       "success": true,
+#       "message": "Login successful",
+#       "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+#       "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+#       "user": {
+#         "id": "1",
+#         "email": "marco.arka@gmail.com",
+#         "role": "admin",
+#         "isActive": true,
+#         "emailVerified": true,
+#         "lastLoginAt": "2024-01-15T10:30:00Z",
+#         "profile": {
+#           "id": "1",
+#           "firstName": "Marco",
+#           "lastName": "Arka",
+#           "phone": "+1234567890",
+#           "birthDate": "1990-01-01",
+#           "avatarUrl": "https://example.com/avatar.jpg"
+#         }
+#       }
+#     }
+#   }
+# }
+
+# Respuesta de Error:
+# {
+#   "data": {
+#     "loginUser": {
+#       "success": false,
+#       "message": "Invalid email or password",
+#       "accessToken": null,
+#       "refreshToken": null,
+#       "user": null
+#     }
+#   }
+# }

@@ -1,95 +1,96 @@
-# ========================================
-# DEPENDENCIAS
-# ========================================
+# Dependencies
 node_modules/
-*/node_modules/
-**/node_modules/
-
-# Logs de npm/yarn
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-# ========================================
-# VARIABLES DE ENTORNO
-# ========================================
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.env.staging.local
-
-# Archivos de entorno específicos del proyecto
-backend/.env
-frontend/.env.local
-frontend/.env.development.local
-frontend/.env.test.local
-frontend/.env.production.local
-
-# ========================================
-# ARCHIVOS DE CONSTRUCCIÓN
-# ========================================
+# Build outputs
 dist/
 build/
-.next/
-out/
 *.tsbuildinfo
 
-# Construcciones específicas
-backend/dist/
-frontend/dist/
-frontend/build/
+# Environment files (keep examples, ignore local overrides)
+.env
+.env.local
+.env.*.local
 
-# ========================================
-# CACHE Y ARCHIVOS TEMPORALES
-# ========================================
-.cache/
-.parcel-cache/
-*.cache
-.tmp/
-tmp/
-temp/
-*.tmp
-*.temp
+# Keep environment templates
+!.env.example
+!env.development
+!env.production
+!env.staging
+!env.template
 
-# ========================================
-# LOGS Y DATOS DE RUNTIME
-# ========================================
+# Logs
 logs/
 *.log
+
+# Runtime data
 pids/
 *.pid
 *.seed
 *.pid.lock
 
-# ========================================
-# COBERTURA DE TESTS
-# ========================================
+# Coverage directory used by tools like istanbul
 coverage/
-.nyc_output/
-test-results/
-junit.xml
 *.lcov
 
-# ========================================
-# EDITORES E IDEs
-# ========================================
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env.test
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+
+# Nuxt.js build / generate output
+.nuxt
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Temporary folders
+tmp/
+temp/
+
+# Editor directories and files
 .vscode/
 .idea/
 *.swp
 *.swo
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+*~
 
-# ========================================
-# ARCHIVOS DEL SISTEMA OPERATIVO
-# ========================================
+# OS generated files
 .DS_Store
 .DS_Store?
 ._*
@@ -97,118 +98,3 @@ junit.xml
 .Trashes
 ehthumbs.db
 Thumbs.db
-
-# ========================================
-# SUPABASE
-# ========================================
-.supabase/
-
-# ========================================
-# BASES DE DATOS
-# ========================================
-*.sqlite
-*.db
-*.sqlite3
-
-# ========================================
-# ARCHIVOS COMPRIMIDOS
-# ========================================
-*.tgz
-*.tar.gz
-*.zip
-*.rar
-
-# ========================================
-# CACHE DE NPM
-# ========================================
-.npm
-.yarn-integrity
-
-# ========================================
-# CACHE DE ESLINT
-# ========================================
-.eslintcache
-
-# ========================================
-# HISTORIAL DE REPL
-# ========================================
-.node_repl_history
-
-# ========================================
-# ARCHIVOS ESPECÍFICOS DE FRAMEWORKS
-# ========================================
-# Next.js
-.next
-out/
-
-# Nuxt.js
-.nuxt
-dist
-
-# Gatsby
-.cache/
-public
-
-# Storybook
-.out
-.storybook-out
-
-# ========================================
-# ARCHIVOS DE DOCUMENTACIÓN TEMPORAL
-# ========================================
-# Archivos de análisis y debugging (opcional - descomenta si quieres ignorarlos)
-# *_ANALYSIS.md
-# *_SOLUTION.md
-# *_FIXED.md
-# *_REPORT.md
-# *_GUIDE.md
-# *_SUCCESS.md
-# *_COMPLETE.md
-# *_CONNECTION.md
-# *_FLOW_*.md
-
-# ========================================
-# ARCHIVOS DE TESTING ESPECÍFICOS
-# ========================================
-# Jest
-coverage/
-.nyc_output/
-
-# Playwright
-test-results/
-playwright-report/
-playwright/.cache/
-
-# Cypress
-cypress/videos/
-cypress/screenshots/
-
-# ========================================
-# ARCHIVOS DE DEPLOYMENT
-# ========================================
-# Vercel
-.vercel
-
-# Netlify
-.netlify
-
-# ========================================
-# ARCHIVOS DE MONITOREO Y LOGS
-# ========================================
-# PM2
-.pm2/
-
-# ========================================
-# ARCHIVOS DE BACKUP
-# ========================================
-*.bak
-*.backup
-*.old
-*.orig
-
-# ========================================
-# ARCHIVOS DE CONFIGURACIÓN LOCAL
-# ========================================
-# Configuraciones locales que no deben ser compartidas
-.local/
-local/

@@ -1,0 +1,121 @@
+# =====================================================
+# AUTHENTICATION GRAPHQL OPERATIONS
+# =====================================================
+# Following Clean Architecture principles:
+# - Single Responsibility: Authentication operations only
+# - Interface Segregation: Specific operations for auth
+# - Dependency Inversion: Depends on backend schema
+
+# =====================================================
+# MUTATIONS
+# =====================================================
+
+# User registration with email and password
+mutation RegisterUser($input: CreateUserProfileInput!) {
+  registerUser(input: $input) {
+    success
+    message
+    accessToken
+    refreshToken
+    user {
+      id
+      email
+      role
+      isActive
+      emailVerified
+      lastLoginAt
+      profile {
+        id
+        firstName
+        lastName
+        phone
+        dateOfBirth
+        avatar
+      }
+    }
+  }
+}
+
+# User login with email and password
+mutation LoginUser($email: String!, $password: String!) {
+  loginUser(email: $email, password: $password) {
+    success
+    message
+    accessToken
+    refreshToken
+    user {
+      id
+      email
+      role
+      isActive
+      emailVerified
+      lastLoginAt
+      profile {
+        id
+        firstName
+        lastName
+        phone
+        dateOfBirth
+        avatar
+      }
+    }
+  }
+}
+
+# User logout
+mutation LogoutUser {
+  logoutUser {
+    success
+    message
+  }
+}
+
+# Refresh access token
+mutation RefreshToken($refreshToken: String!) {
+  refreshToken(refreshToken: $refreshToken) {
+    success
+    message
+    accessToken
+    refreshToken
+    user {
+      id
+      email
+      role
+      isActive
+      emailVerified
+      lastLoginAt
+      profile {
+        id
+        firstName
+        lastName
+        phone
+        dateOfBirth
+        avatar
+      }
+    }
+  }
+}
+
+# =====================================================
+# QUERIES
+# =====================================================
+
+# Get current authenticated user
+query GetCurrentUser {
+  currentUser {
+    id
+    email
+    role
+    isActive
+    emailVerified
+    lastLoginAt
+    profile {
+      id
+      firstName
+      lastName
+      phone
+      dateOfBirth
+      avatar
+    }
+  }
+}
