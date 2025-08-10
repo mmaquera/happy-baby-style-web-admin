@@ -1,0 +1,809 @@
+# =====================================================
+# USERS GRAPHQL OPERATIONS
+# =====================================================
+# Following Clean Architecture principles:
+# - Single Responsibility: User operations only
+# - Interface Segregation: Specific operations for users
+# - Dependency Inversion: Depends on backend schema
+
+# =====================================================
+# QUERIES
+# =====================================================
+
+# Get paginated users with filtering
+query GetUsers($filter: UserFilterInput, $pagination: PaginationInput) {
+  users(filter: $filter, pagination: $pagination) {
+    users {
+      id
+      email
+      role
+      isActive
+      emailVerified
+      lastLoginAt
+      createdAt
+      updatedAt
+      profile {
+        id
+        firstName
+        lastName
+        phone
+        dateOfBirth
+        avatar
+        role
+        emailVerified
+        isActive
+        lastLoginAt
+        createdAt
+        updatedAt
+        # Computed fields
+        fullName
+      }
+      addresses {
+        id
+        type
+        firstName
+        lastName
+        company
+        address1
+        address2
+        city
+        state
+        postalCode
+        country
+        phone
+        isDefault
+        createdAt
+        updatedAt
+        # Computed fields
+        fullName
+        fullAddress
+      }
+    }
+    total
+    hasMore
+  }
+}
+
+# Get single user by ID
+query GetUser($id: ID!) {
+  user(id: $id) {
+    id
+    email
+    role
+    isActive
+    emailVerified
+    lastLoginAt
+    createdAt
+    updatedAt
+    profile {
+      id
+      firstName
+      lastName
+      phone
+      dateOfBirth
+      avatar
+      role
+      emailVerified
+      isActive
+      lastLoginAt
+      createdAt
+      updatedAt
+      # Computed fields
+      fullName
+    }
+    addresses {
+      id
+      type
+      firstName
+      lastName
+      company
+      address1
+      address2
+      city
+      state
+      postalCode
+      country
+      phone
+      isDefault
+      createdAt
+      updatedAt
+      # Computed fields
+      fullName
+      fullAddress
+    }
+    accounts {
+      id
+      provider
+      providerAccountId
+      accessToken
+      refreshToken
+      tokenType
+      scope
+      idToken
+      expiresAt
+      createdAt
+      updatedAt
+    }
+    sessions {
+      id
+      sessionToken
+      accessToken
+      refreshToken
+      expiresAt
+      userAgent
+      ipAddress
+      isActive
+      createdAt
+      updatedAt
+    }
+  }
+}
+
+# Get user profile by user ID
+query GetUserProfile($userId: ID!) {
+  userProfile(userId: $userId) {
+    id
+    firstName
+    lastName
+    phone
+    dateOfBirth
+    avatar
+    role
+    emailVerified
+    isActive
+    lastLoginAt
+    createdAt
+    updatedAt
+    # Computed fields
+    fullName
+    # Relations
+    addresses {
+      id
+      type
+      firstName
+      lastName
+      company
+      address1
+      address2
+      city
+      state
+      postalCode
+      country
+      phone
+      isDefault
+      createdAt
+      updatedAt
+      # Computed fields
+      fullName
+      fullAddress
+    }
+    orders {
+      id
+      orderNumber
+      status
+      totalAmount
+      createdAt
+      updatedAt
+    }
+  }
+}
+
+# Get user stats
+query GetUserStats {
+  userStats {
+    totalUsers
+    activeUsers
+    newUsersThisMonth
+    usersByRole
+  }
+}
+
+# Get user addresses
+query GetUserAddresses($userId: ID!) {
+  userAddresses(userId: $userId) {
+    id
+    type
+    firstName
+    lastName
+    company
+    address1
+    address2
+    city
+    state
+    postalCode
+    country
+    phone
+    isDefault
+    createdAt
+    updatedAt
+    # Computed fields
+    fullName
+    fullAddress
+  }
+}
+
+# Get user address by ID
+query GetUserAddress($id: ID!) {
+  userAddress(id: $id) {
+    id
+    type
+    firstName
+    lastName
+    company
+    address1
+    address2
+    city
+    state
+    postalCode
+    country
+    phone
+    isDefault
+    createdAt
+    updatedAt
+    # Computed fields
+    fullName
+    fullAddress
+    # Relations
+    user {
+      id
+      email
+      firstName
+      lastName
+    }
+  }
+}
+
+# Search users
+query SearchUsers($query: String!) {
+  searchUsers(query: $query) {
+    id
+    email
+    role
+    isActive
+    emailVerified
+    lastLoginAt
+    createdAt
+    updatedAt
+    profile {
+      id
+      firstName
+      lastName
+      phone
+      dateOfBirth
+      avatar
+      role
+      emailVerified
+      isActive
+      lastLoginAt
+      createdAt
+      updatedAt
+      # Computed fields
+      fullName
+    }
+  }
+}
+
+# Get active users
+query GetActiveUsers {
+  activeUsers {
+    id
+    email
+    role
+    isActive
+    emailVerified
+    lastLoginAt
+    createdAt
+    updatedAt
+    profile {
+      id
+      firstName
+      lastName
+      phone
+      dateOfBirth
+      avatar
+      role
+      emailVerified
+      isActive
+      lastLoginAt
+      createdAt
+      updatedAt
+      # Computed fields
+      fullName
+    }
+  }
+}
+
+# Get users by role
+query GetUsersByRole($role: UserRole!) {
+  usersByRole(role: $role) {
+    id
+    email
+    role
+    isActive
+    emailVerified
+    lastLoginAt
+    createdAt
+    updatedAt
+    profile {
+      id
+      firstName
+      lastName
+      phone
+      dateOfBirth
+      avatar
+      role
+      emailVerified
+      isActive
+      lastLoginAt
+      createdAt
+      updatedAt
+      # Computed fields
+      fullName
+    }
+  }
+}
+
+# Get users by provider
+query GetUsersByProvider($provider: AuthProvider!) {
+  usersByProvider(provider: $provider) {
+    id
+    email
+    role
+    isActive
+    emailVerified
+    lastLoginAt
+    createdAt
+    updatedAt
+    profile {
+      id
+      firstName
+      lastName
+      phone
+      dateOfBirth
+      avatar
+      role
+      emailVerified
+      isActive
+      lastLoginAt
+      createdAt
+      updatedAt
+      # Computed fields
+      fullName
+    }
+  }
+}
+
+# Get user order history
+query GetUserOrderHistory($userId: ID!, $filter: UserOrderHistoryFilter, $pagination: PaginationInput) {
+  userOrderHistory(userId: $userId, filter: $filter, pagination: $pagination) {
+    orders {
+      id
+      orderNumber
+      status
+      subtotal
+      taxAmount
+      shippingAmount
+      totalAmount
+      createdAt
+      updatedAt
+    }
+    stats {
+      totalOrders
+      totalSpent
+      averageOrderValue
+      lastOrderDate
+      ordersByStatus
+    }
+    total
+    hasMore
+  }
+}
+
+# Get user favorite stats
+query GetUserFavoriteStats($userId: ID!) {
+  userFavoriteStats(userId: $userId) {
+    totalFavorites
+    favoriteCategories
+    recentFavorites {
+      id
+      createdAt
+      product {
+        id
+        name
+        price
+        images
+      }
+    }
+  }
+}
+
+# Get user activity summary
+query GetUserActivitySummary($userId: ID!) {
+  userActivitySummary(userId: $userId) {
+    joinDate
+    lastActivity
+    totalSpent
+    cartItemsCount
+    favoriteProducts {
+      id
+      name
+      price
+      images
+    }
+    recentOrders {
+      id
+      orderNumber
+      status
+      totalAmount
+      createdAt
+    }
+  }
+}
+
+# Get user accounts
+query GetUserAccounts($userId: ID!) {
+  userAccounts(userId: $userId) {
+    id
+    provider
+    providerAccountId
+    accessToken
+    refreshToken
+    tokenType
+    scope
+    idToken
+    expiresAt
+    createdAt
+    updatedAt
+  }
+}
+
+# Get user sessions
+query GetUserSessions($userId: ID!) {
+  userSessions(userId: $userId) {
+    id
+    sessionToken
+    accessToken
+    refreshToken
+    expiresAt
+    userAgent
+    ipAddress
+    isActive
+    createdAt
+    updatedAt
+  }
+}
+
+# Get active sessions
+query GetActiveSessions($userId: ID!) {
+  activeSessions(userId: $userId) {
+    id
+    sessionToken
+    accessToken
+    refreshToken
+    expiresAt
+    userAgent
+    ipAddress
+    isActive
+    createdAt
+    updatedAt
+  }
+}
+
+# =====================================================
+# MUTATIONS
+# =====================================================
+
+# Create new user
+mutation CreateUser($input: CreateUserProfileInput!) {
+  createUser(input: $input) {
+    id
+    email
+    role
+    isActive
+    emailVerified
+    lastLoginAt
+    createdAt
+    updatedAt
+    profile {
+      id
+      firstName
+      lastName
+      phone
+      dateOfBirth
+      avatar
+      role
+      emailVerified
+      isActive
+      lastLoginAt
+      createdAt
+      updatedAt
+      # Computed fields
+      fullName
+    }
+  }
+}
+
+# Optimized update user mutation - only returns essential fields
+mutation UpdateUserOptimized($id: ID!, $input: UpdateUserInput!) {
+  updateUser(id: $id, input: $input) {
+    id
+    email
+    role
+    isActive
+    profile {
+      id
+      firstName
+      lastName
+      phone
+      dateOfBirth
+    }
+  }
+}
+
+# Original update user mutation (kept for backward compatibility)
+mutation UpdateUser($id: ID!, $input: UpdateUserInput!) {
+  updateUser(id: $id, input: $input) {
+    id
+    email
+    role
+    isActive
+    emailVerified
+    lastLoginAt
+    createdAt
+    updatedAt
+    profile {
+      id
+      firstName
+      lastName
+      phone
+      dateOfBirth
+      avatar
+      role
+      emailVerified
+      isActive
+      lastLoginAt
+      createdAt
+      updatedAt
+      # Computed fields
+      fullName
+    }
+  }
+}
+
+# Delete user
+mutation DeleteUser($id: ID!) {
+  deleteUser(id: $id) {
+    success
+    message
+  }
+}
+
+# Activate user
+mutation ActivateUser($id: ID!) {
+  activateUser(id: $id) {
+    id
+    email
+    role
+    isActive
+    emailVerified
+    lastLoginAt
+    createdAt
+    updatedAt
+    profile {
+      id
+      firstName
+      lastName
+      phone
+      dateOfBirth
+      avatar
+      role
+      emailVerified
+      isActive
+      lastLoginAt
+      createdAt
+      updatedAt
+      # Computed fields
+      fullName
+    }
+  }
+}
+
+# Deactivate user
+mutation DeactivateUser($id: ID!) {
+  deactivateUser(id: $id) {
+    id
+    email
+    role
+    isActive
+    emailVerified
+    lastLoginAt
+    createdAt
+    updatedAt
+    profile {
+      id
+      firstName
+      lastName
+      phone
+      dateOfBirth
+      avatar
+      role
+      emailVerified
+      isActive
+      lastLoginAt
+      createdAt
+      updatedAt
+      # Computed fields
+      fullName
+    }
+  }
+}
+
+# Create user profile
+mutation CreateUserProfile($input: CreateUserProfileInput!) {
+  createUserProfile(input: $input) {
+    id
+    firstName
+    lastName
+    phone
+    dateOfBirth
+    avatar
+    role
+    emailVerified
+    isActive
+    lastLoginAt
+    createdAt
+    updatedAt
+    # Computed fields
+    fullName
+  }
+}
+
+# Update user profile
+mutation UpdateUserProfile($userId: ID!, $input: UpdateUserProfileInput!) {
+  updateUserProfile(userId: $userId, input: $input) {
+    id
+    firstName
+    lastName
+    phone
+    dateOfBirth
+    avatar
+    role
+    emailVerified
+    isActive
+    lastLoginAt
+    createdAt
+    updatedAt
+    # Computed fields
+    fullName
+  }
+}
+
+# Delete user profile
+mutation DeleteUserProfile($userId: ID!) {
+  deleteUserProfile(userId: $userId) {
+    success
+    message
+  }
+}
+
+# Create user address
+mutation CreateUserAddress($input: CreateUserAddressInput!) {
+  createUserAddress(input: $input) {
+    id
+    type
+    firstName
+    lastName
+    company
+    address1
+    address2
+    city
+    state
+    postalCode
+    country
+    phone
+    isDefault
+    createdAt
+    updatedAt
+    # Computed fields
+    fullName
+    fullAddress
+  }
+}
+
+# Update user address
+mutation UpdateUserAddress($id: ID!, $input: UpdateUserAddressInput!) {
+  updateUserAddress(id: $id, input: $input) {
+    id
+    type
+    firstName
+    lastName
+    company
+    address1
+    address2
+    city
+    state
+    postalCode
+    country
+    phone
+    isDefault
+    createdAt
+    updatedAt
+    # Computed fields
+    fullName
+    fullAddress
+  }
+}
+
+# Delete user address
+mutation DeleteUserAddress($id: ID!) {
+  deleteUserAddress(id: $id) {
+    success
+    message
+  }
+}
+
+# Set default address
+mutation SetDefaultAddress($userId: ID!, $addressId: ID!) {
+  setDefaultAddress(userId: $userId, addressId: $addressId) {
+    success
+    message
+  }
+}
+
+# Revoke user session
+mutation RevokeUserSession($sessionId: ID!) {
+  revokeUserSession(sessionId: $sessionId) {
+    success
+    message
+  }
+}
+
+# Revoke all user sessions
+mutation RevokeAllUserSessions($userId: ID!) {
+  revokeAllUserSessions(userId: $userId) {
+    success
+    message
+  }
+}
+
+# Unlink user account
+mutation UnlinkUserAccount($accountId: ID!) {
+  unlinkUserAccount(accountId: $accountId) {
+    success
+    message
+  }
+}
+
+# Force password reset
+mutation ForcePasswordReset($userId: ID!) {
+  forcePasswordReset(userId: $userId) {
+    success
+    message
+  }
+}
+
+# Impersonate user
+mutation ImpersonateUser($userId: ID!) {
+  impersonateUser(userId: $userId) {
+    success
+    message
+    accessToken
+    refreshToken
+    user {
+      id
+      email
+      role
+      isActive
+      emailVerified
+      lastLoginAt
+      profile {
+        id
+        firstName
+        lastName
+        phone
+        dateOfBirth
+        avatar
+      }
+    }
+  }
+}
