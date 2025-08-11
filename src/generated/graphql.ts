@@ -16,8 +16,11 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  /** DateTime custom scalar type */
   DateTime: { input: string; output: string; }
+  /** Decimal custom scalar type */
   Decimal: { input: number; output: number; }
+  /** JSON custom scalar type */
   JSON: { input: any; output: any; }
   Upload: { input: File; output: File; }
 };

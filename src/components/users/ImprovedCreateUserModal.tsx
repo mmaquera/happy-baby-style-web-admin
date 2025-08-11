@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { CreateUserInput, UserRole } from '@/generated/graphql';
+import { UserRole } from '@/generated/graphql';
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { useCreateUser } from '@/hooks/useUsersGraphQL';
+
 import { 
   UserPlus, 
   X, 
