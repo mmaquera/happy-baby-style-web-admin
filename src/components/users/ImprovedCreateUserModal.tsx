@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { UserRole } from '@/generated/graphql';
+import { CreateUserProfileInput, UserRole } from '@/generated/graphql';
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { useCreateUser } from '@/hooks/useUsersGraphQL';
 
 import { 
   UserPlus, 
@@ -23,8 +22,9 @@ import {
 interface CreateUserModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (userData: CreateUserInput) => void;
+  onSubmit: (userData: CreateUserProfileInput) => Promise<any>;
   isLoading: boolean;
+  serverError?: string | undefined;
 }
 
 // Styled Components
@@ -192,6 +192,20 @@ const StepLine = styled.div`
 const ModalContent = styled.div`
   padding: ${theme.spacing[6]};
   padding-top: ${theme.spacing[4]};
+`;
+
+const ServerErrorBanner = styled.div`
+  background: ${theme.colors.error}15;
+  border: 1px solid ${theme.colors.error};
+  border-radius: ${theme.borderRadius.md};
+  padding: ${theme.spacing[3]};
+  margin-bottom: ${theme.spacing[4]};
+  color: ${theme.colors.error};
+  font-size: ${theme.fontSizes.sm};
+  font-weight: ${theme.fontWeights.medium};
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[2]};
 `;
 
 const Section = styled.div`
@@ -441,54 +455,147 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
-  isLoading
+  isLoading,
+  serverError
 }) => {
-  const [formData, setFormData] = useState<CreateUserInput>({
+  const [formData, setFormData] = useState<CreateUserProfileInput>({
     email: '',
     password: '',
+    firstName: '',
+    lastName: '',
+    phone: '',
+    dateOfBirth: null,
     role: UserRole.customer,
-    isActive: true,
-    profile: {
-      firstName: '',
-      lastName: '',
-      phone: '',
-      birthDate: undefined
-    }
+    isActive: true
   });
 
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
+
+  // Limpiar formulario cuando se abra el modal
+  useEffect(() => {
+    if (isOpen) {
+      setFormData({
+        email: '',
+        password: '',
+        firstName: '',
+        lastName: '',
+        phone: '',
+        dateOfBirth: null,
+        role: UserRole.customer,
+        isActive: true
+      });
+      setErrors({});
+      setServerErrors({});
+      setShowPassword(false);
+    }
+  }, [isOpen]);
+
+  // Procesar errores del servidor cuando cambien
+  useEffect(() => {
+    if (serverError) {
+      processServerError(serverError);
+    } else {
+      setServerErrors({});
+    }
+  }, [serverError]);
+
+  // Función para validar y formatear fecha
+  const formatDateForAPI = (dateString: string): string | null => {
+    if (!dateString) return null;
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return null;
+      
+      // Asegurar formato ISO para el backend
+      return date.toISOString();
+    } catch {
+      return null;
+    }
+  };
+
+  // Función para procesar errores del servidor y mapearlos a campos específicos
+  const processServerError = (errorMessage: string): void => {
+    const newServerErrors: Record<string, string> = {};
+    
+    // Mapear errores específicos del servidor a campos del formulario
+    if (errorMessage.toLowerCase().includes('birth date') || errorMessage.toLowerCase().includes('fecha de nacimiento')) {
+      newServerErrors['dateOfBirth'] = 'Fecha de nacimiento inválida';
+    } else if (errorMessage.toLowerCase().includes('email')) {
+      newServerErrors['email'] = 'Email inválido o ya existe';
+    } else if (errorMessage.toLowerCase().includes('password')) {
+      newServerErrors['password'] = 'Contraseña inválida';
+    } else if (errorMessage.toLowerCase().includes('first name') || errorMessage.toLowerCase().includes('nombre')) {
+      newServerErrors['firstName'] = 'Nombre inválido';
+    } else if (errorMessage.toLowerCase().includes('last name') || errorMessage.toLowerCase().includes('apellido')) {
+      newServerErrors['lastName'] = 'Apellido inválido';
+    } else if (errorMessage.toLowerCase().includes('phone') || errorMessage.toLowerCase().includes('teléfono')) {
+      newServerErrors['phone'] = 'Teléfono inválido';
+    }
+    
+    setServerErrors(newServerErrors);
+  };
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.email) {
-      newErrors.email = 'Email es requerido';
+      newErrors['email'] = 'Email es requerido';
     } else if (!isValidEmail(formData.email)) {
-      newErrors.email = 'Email no válido';
+      newErrors['email'] = 'Email no válido';
     }
 
     if (!formData.password) {
-      newErrors.password = 'Contraseña es requerida';
+      newErrors['password'] = 'Contraseña es requerida';
     } else if (calculatePasswordStrength(formData.password) < 50) {
-      newErrors.password = 'Contraseña muy débil';
+      newErrors['password'] = 'Contraseña muy débil';
     }
 
-    if (!formData.profile?.firstName) {
-      newErrors.firstName = 'Nombre es requerido';
+    if (!formData.firstName) {
+      newErrors['firstName'] = 'Nombre es requerido';
     }
 
-    if (!formData.profile?.lastName) {
-      newErrors.lastName = 'Apellido es requerido';
+    if (!formData.lastName) {
+      newErrors['lastName'] = 'Apellido es requerido';
+    }
+
+    // Validar fecha de nacimiento
+    if (formData.dateOfBirth) {
+      const birthDate = new Date(formData.dateOfBirth);
+      const today = new Date();
+      
+      if (isNaN(birthDate.getTime())) {
+        newErrors['dateOfBirth'] = 'Fecha de nacimiento no válida';
+      } else if (birthDate > today) {
+        newErrors['dateOfBirth'] = 'La fecha de nacimiento no puede ser futura';
+      } else if (birthDate < new Date('1900-01-01')) {
+        newErrors['dateOfBirth'] = 'Fecha de nacimiento demasiado antigua';
+      }
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validateForm()) {
-      onSubmit(formData);
+      try {
+        // Limpiar errores del servidor antes de enviar
+        setServerErrors({});
+        
+        // Formatear la fecha antes de enviar
+        const formattedData = {
+          ...formData,
+          dateOfBirth: formData.dateOfBirth ? formatDateForAPI(formData.dateOfBirth as string) : null
+        };
+        
+        await onSubmit(formattedData);
+      } catch (error) {
+        // Los errores se manejan en el hook, pero podemos mostrar errores específicos aquí si es necesario
+        console.error('Error en el modal:', error);
+      }
     }
   };
 
@@ -496,33 +603,36 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
     setFormData({
       email: '',
       password: '',
+      firstName: '',
+      lastName: '',
+      phone: '',
+      dateOfBirth: null,
       role: UserRole.customer,
-      isActive: true,
-      profile: {
-        firstName: '',
-        lastName: '',
-        phone: '',
-        birthDate: undefined
-      }
+      isActive: true
     });
     setErrors({});
+    setServerErrors({});
     onClose();
   };
 
   const isFormValid = (): boolean => {
-    return !!(
+    const hasRequiredFields = !!(
       formData.email &&
       formData.password &&
-      formData.profile?.firstName &&
-      formData.profile?.lastName &&
+      formData.firstName &&
+      formData.lastName &&
       isValidEmail(formData.email) &&
       calculatePasswordStrength(formData.password) >= 50
     );
+    
+    // Solo validar que no haya errores de validación locales
+    // Los errores del servidor no deberían impedir que el usuario pueda enviar el formulario
+    const hasNoValidationErrors = Object.keys(errors).length === 0;
+    
+    return hasRequiredFields && hasNoValidationErrors;
   };
 
-  const passwordStrength = calculatePasswordStrength(formData.password);
-
-
+  const passwordStrength = calculatePasswordStrength(formData.password || '');
 
   if (!isOpen) return null;
 
@@ -557,6 +667,14 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
         </StepsIndicator>
 
         <ModalContent>
+          {/* Server Error Banner */}
+          {serverError && (
+            <ServerErrorBanner>
+              <Shield size={16} />
+              {serverError}
+            </ServerErrorBanner>
+          )}
+          
           {/* Account Information Section */}
           <Section>
             <SectionHeader>
@@ -570,10 +688,17 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
                   label="Email"
                   type="email"
                   value={formData.email}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    setFormData(prev => ({ ...prev, email: e.target.value }));
+                    // Limpiar errores cuando el usuario empiece a corregir
+                    if (errors['email'] || serverErrors['email']) {
+                      setErrors(prev => ({ ...prev, email: '' }));
+                      setServerErrors(prev => ({ ...prev, email: '' }));
+                    }
+                  }}
                   required
                   placeholder="ejemplo@correo.com"
-                  error={errors.email}
+                  error={errors['email'] || serverErrors['email'] || ''}
                 />
                 <FieldHint>
                   <Mail size={12} />
@@ -585,11 +710,18 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
                 <Input
                   label="Contraseña"
                   type={showPassword ? 'text' : 'password'}
-                  value={formData.password}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                  value={formData.password || ''}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    setFormData(prev => ({ ...prev, password: e.target.value }));
+                    // Limpiar errores cuando el usuario empiece a corregir
+                    if (errors['password'] || serverErrors['password']) {
+                      setErrors(prev => ({ ...prev, password: '' }));
+                      setServerErrors(prev => ({ ...prev, password: '' }));
+                    }
+                  }}
                   required
                   placeholder="Mínimo 8 caracteres"
-                  error={errors.password}
+                  error={errors['password'] || serverErrors['password'] || ''}
                   rightIcon={showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   onRightIconClick={() => setShowPassword(!showPassword)}
                   rightIconClickable={true}
@@ -623,37 +755,59 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
             <FormGrid>
               <Input
                 label="Nombre"
-                value={formData.profile?.firstName || ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
-                  ...prev,
-                  profile: { ...prev.profile!, firstName: e.target.value }
-                }))}
+                value={formData.firstName || ''}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    firstName: e.target.value
+                  }));
+                  // Limpiar errores cuando el usuario empiece a corregir
+                  if (errors['firstName'] || serverErrors['firstName']) {
+                    setErrors(prev => ({ ...prev, firstName: '' }));
+                    setServerErrors(prev => ({ ...prev, firstName: '' }));
+                  }
+                }}
                 required
                 placeholder="Nombre del usuario"
-                error={errors.firstName}
+                error={errors['firstName'] || serverErrors['firstName'] || ''}
               />
               
               <Input
                 label="Apellido"
-                value={formData.profile?.lastName || ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
-                  ...prev,
-                  profile: { ...prev.profile!, lastName: e.target.value }
-                }))}
+                value={formData.lastName || ''}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    lastName: e.target.value
+                  }));
+                  // Limpiar errores cuando el usuario empiece a corregir
+                  if (errors['lastName'] || serverErrors['lastName']) {
+                    setErrors(prev => ({ ...prev, lastName: '' }));
+                    setServerErrors(prev => ({ ...prev, lastName: '' }));
+                  }
+                }}
                 required
                 placeholder="Apellido del usuario"
-                error={errors.lastName}
+                error={errors['lastName'] || serverErrors['lastName'] || ''}
               />
 
               <FormField>
                 <Input
                   label="Teléfono"
-                  value={formData.profile?.phone || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
-                    ...prev,
-                    profile: { ...prev.profile!, phone: e.target.value }
-                  }))}
+                  value={formData.phone || ''}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    setFormData(prev => ({
+                      ...prev,
+                      phone: e.target.value
+                    }));
+                    // Limpiar errores cuando el usuario empiece a corregir
+                    if (errors['phone'] || serverErrors['phone']) {
+                      setErrors(prev => ({ ...prev, phone: '' }));
+                      setServerErrors(prev => ({ ...prev, phone: '' }));
+                    }
+                  }}
                   placeholder="+34 600 000 000"
+                  error={errors['phone'] || serverErrors['phone'] || ''}
                 />
                 <FieldHint>
                   <Phone size={12} />
@@ -664,11 +818,20 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
               <Input
                 label="Fecha de Nacimiento"
                 type="date"
-                value={formData.profile?.birthDate ? new Date(formData.profile.birthDate).toISOString().split('T')[0] : ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
-                  ...prev,
-                  profile: { ...prev.profile!, birthDate: e.target.value ? e.target.value : undefined }
-                }))}
+                value={formData.dateOfBirth ? new Date(formData.dateOfBirth as string).toISOString().split('T')[0] : ''}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const formattedDate = formatDateForAPI(e.target.value);
+                  setFormData(prev => ({
+                    ...prev,
+                    dateOfBirth: formattedDate
+                  }));
+                  // Limpiar tanto errores de validación como errores del servidor
+                  if (errors['dateOfBirth'] || serverErrors['dateOfBirth']) {
+                    setErrors(prev => ({ ...prev, dateOfBirth: '' }));
+                    setServerErrors(prev => ({ ...prev, dateOfBirth: '' }));
+                  }
+                }}
+                error={errors['dateOfBirth'] || serverErrors['dateOfBirth'] || ''}
               />
             </FormGrid>
           </Section>
