@@ -1,6 +1,7 @@
 // Hooks Index - Following Clean Architecture
-// Single entry point for all authentication-related hooks
+// Single entry point for all hooks
 
+// Authentication hooks
 export { 
   useUnifiedAuth,
   useRoleAccess,
@@ -11,6 +12,10 @@ export {
 export { useLoginForm } from './useLoginForm';
 export { useLogout } from './useLogout';
 export { useAuthManagement } from './useAuthManagement';
-export { useUsersGraphQL } from './useUsersGraphQL';
-export { useProductsGraphQL } from './useProductsGraphQL';
-export { useOrdersGraphQL } from './useOrdersGraphQL';
+
+// Category hooks
+export { useCategories } from './useCategories';
+export { useCategoriesGraphQL } from './useCategoriesGraphQL';
+export { useCategoryActions } from './useCategoryActions';
+export { useCategoryFilters } from './useCategoryFilters';
+export { useCreateCategory } from './useCreateCategory';

@@ -11,7 +11,8 @@ import {
   Image as ImageIcon,
   Home,
   Baby,
-  LogOut
+  LogOut,
+  Folder
 } from 'lucide-react';
 import { useLogout } from '@/hooks/useLogout';
 import { LogoutConfirmModal } from '@/components/auth/LogoutConfirmModal';
@@ -204,6 +205,10 @@ export const Sidebar: React.FC = () => {
           <NavItem to="/products">
             <Package />
             Productos
+          </NavItem>
+          <NavItem to="/categories">
+            <Folder />
+            Categorías
           </NavItem>
           <NavItem to="/orders">
             <ShoppingCart />

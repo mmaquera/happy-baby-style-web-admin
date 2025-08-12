@@ -1,208 +1,311 @@
-# Users Module - Frontend Implementation
+# 👥 Componentes de Usuarios - Happy Baby Style Web Admin
 
-Este módulo contiene la implementación completa del sistema de gestión de usuarios para el panel de administración de Happy Baby Style.
+## 📋 Descripción General
 
-## Arquitectura
+Esta carpeta contiene todos los componentes relacionados con la gestión de usuarios en el sistema de administración. Los componentes siguen los estándares establecidos para manejo de errores, validaciones y arquitectura del sistema.
 
-### Componentes
+## 🏗️ Arquitectura de Componentes
 
-#### 1. `UserDetailModal.tsx`
-Modal completo para visualizar información detallada del usuario:
-- **Información Personal**: Nombre, email, teléfono, fecha de nacimiento
-- **Estado de Cuenta**: Rol, estado activo, verificación de email
-- **Direcciones**: Lista de direcciones del usuario con marcación de predeterminada
-- **UI Responsiva**: Diseño adaptable para diferentes tamaños de pantalla
+### Estructura de Archivos
+```
+users/
+├── README.md                           # Este archivo
+├── ERROR_HANDLING_STANDARDS.md         # Estándares de manejo de errores
+├── index.ts                            # Exportaciones principales
+├── ImprovedCreateUserModal.tsx         # Modal de creación de usuarios
+├── UserCard.tsx                        # Tarjeta de usuario individual
+├── UserDetailModal.tsx                 # Modal de detalles de usuario
+├── UserActionsMenu.tsx                 # Menú de acciones de usuario
+├── PasswordManagementModal.tsx         # Modal de gestión de contraseñas
+├── CreateUserModal.tsx                 # Modal de creación (legacy)
+├── AuthProviderDashboard.tsx           # Dashboard de proveedores de auth
+├── GoogleUserFeatures.tsx              # Funcionalidades específicas de Google
+├── PasswordHistoryCard.tsx             # Historial de contraseñas
+├── UserAuthAccounts.tsx                # Cuentas de autenticación
+├── UserSessionsManager.tsx             # Gestor de sesiones
+└── OAUTH_IMPLEMENTATION.md             # Documentación de OAuth
+```
 
-#### 2. `UserActionsMenu.tsx`
-Menú desplegable con acciones contextuales para cada usuario:
-- **Acciones Básicas**: Ver detalles, editar usuario
-- **Estado**: Activar/desactivar usuario
-- **Seguridad**: Restablecer contraseña, promover/degradar admin
-- **Zona Peligrosa**: Eliminar usuario
+## 🎯 Componentes Principales
 
-### Hooks
+### 1. **ImprovedCreateUserModal.tsx** ⭐
+**Descripción**: Modal mejorado para creación de usuarios con manejo robusto de errores
+**Características**:
+- ✅ Validación local completa de formularios
+- ✅ Manejo de errores del servidor
+- ✅ Formateo automático de datos para API
+- ✅ Estados visuales claros del formulario
+- ✅ Limpieza automática de errores
 
-#### 1. `useUsersGraphQL.ts`
-Hook principal para operaciones GraphQL de usuarios:
-- `useUsers()`: Obtener lista paginada de usuarios con filtros
-- `useUserStats()`: Estadísticas generales de usuarios
-- `useCreateUser()`: Crear nuevo usuario completo
-- `useUpdateUser()`: Actualizar información de usuario
-- Utiliza Apollo Client para caché automático y refetch
-
-#### 2. `useUserActions.ts`
-Hook utilitario para acciones específicas de usuarios:
-- Activar/desactivar usuarios
-- Eliminar usuarios
-- Restablecer contraseñas
-- Promoción de roles
-- Manejo de estados de carga y notificaciones
-
-## Características Implementadas
-
-### ✅ Gestión Completa de Usuarios
-- **CRUD Completo**: Crear, leer, actualizar usuarios
-- **Filtros Avanzados**: Por rol, estado, búsqueda por texto
-- **Paginación**: Manejo eficiente de grandes listas
-- **Validación**: Formularios con validación en tiempo real
-
-### ✅ Interfaz de Usuario Moderna
-- **Diseño Consistente**: Siguiendo el theme system del proyecto
-- **Componentes Reutilizables**: Modal, Card, Button, Input
-- **Iconografía**: Iconos de Lucide React
-- **Responsive**: Adaptable a diferentes dispositivos
-
-### ✅ Estados y Feedback
-- **Loading States**: Indicadores de carga en operaciones
-- **Error Handling**: Manejo de errores con notificaciones
-- **Success Feedback**: Confirmaciones de acciones exitosas
-- **Empty States**: Manejo de listas vacías
-
-### ✅ Seguridad y Roles
-- **Control de Acceso**: Validación de roles y permisos
-- **Estados de Usuario**: Activo/inactivo, verificado/no verificado
-- **Roles Múltiples**: Admin, Staff, Customer
-- **Auditoría**: Fechas de creación y actualización
-
-## Integración con Backend
-
-### GraphQL Schema
-```graphql
-type User {
-  id: ID!
-  email: String!
-  role: UserRole!
-  isActive: Boolean!
-  emailVerified: Boolean!
-  profile: UserProfile
-  addresses: [UserAddress!]!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-type UserProfile {
-  id: ID!
-  userId: ID!
-  firstName: String
-  lastName: String
-  fullName: String
-  phone: String
-  birthDate: DateTime
-  avatarUrl: String
-  createdAt: DateTime!
-  updatedAt: DateTime!
+**Props Requeridas**:
+```typescript
+interface CreateUserModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (userData: CreateUserProfileInput) => Promise<any>;
+  isLoading: boolean;
+  serverError?: string | undefined; // OBLIGATORIO para errores del servidor
 }
 ```
 
-### Mutations Implementadas
-- `createUser`: Crear usuario completo con perfil
-- `updateUser`: Actualizar datos de usuario y perfil
-- `activateUser`: Activar usuario
-- `deactivateUser`: Desactivar usuario
-
-### Queries Implementadas
-- `users`: Lista paginada con filtros
-- `user`: Usuario específico por ID
-- `userStats`: Estadísticas de usuarios
-
-## Uso
-
-### Importación
+**Uso**:
 ```typescript
-import { UsersPage } from '@/pages/Users';
-import { UserDetailModal, UserActionsMenu } from '@/components/users';
-import { useUsersGraphQL, useUserActions } from '@/hooks';
+<ImprovedCreateUserModal
+  isOpen={showCreateModal}
+  onClose={() => setShowCreateModal(false)}
+  onSubmit={handleCreateUser}
+  isLoading={createUserMutation.loading}
+  serverError={createUserMutation.error?.message}
+/>
 ```
 
-### Ejemplo de Uso
+### 2. **UserCard.tsx**
+**Descripción**: Tarjeta individual de usuario con información básica
+**Características**:
+- ✅ Información resumida del usuario
+- ✅ Acciones rápidas
+- ✅ Estados visuales (activo/inactivo)
+- ✅ Responsive design
+
+### 3. **UserDetailModal.tsx**
+**Descripción**: Modal para ver y editar detalles completos del usuario
+**Características**:
+- ✅ Vista completa de información del usuario
+- ✅ Edición inline de campos
+- ✅ Historial de cambios
+- ✅ Gestión de permisos
+
+### 4. **UserActionsMenu.tsx**
+**Descripción**: Menú contextual con acciones disponibles para el usuario
+**Características**:
+- ✅ Acciones contextuales
+- ✅ Confirmaciones para acciones destructivas
+- ✅ Estados de permisos
+- ✅ Accesibilidad completa
+
+## 🔧 Estándares Implementados
+
+### 1. **Manejo de Errores**
+- **Estados Separados**: Errores locales vs. errores del servidor
+- **Mapeo Inteligente**: Errores del servidor se mapean a campos específicos
+- **Limpieza Automática**: Errores se limpian cuando el usuario corrige
+- **Feedback Visual**: Banner de errores del servidor y errores en campos
+
+### 2. **Validaciones**
+- **Validación Local**: Campos requeridos, formatos, rangos
+- **Validación del Servidor**: Respuestas de API con códigos de error
+- **Validación de Fechas**: Formato ISO, rangos válidos, prevención de fechas futuras
+- **Validación de Contraseñas**: Fortaleza, requisitos mínimos
+
+### 3. **Estados del Formulario**
+- **Indicadores Visuales**: Pasos del formulario, botones deshabilitados
+- **Estados de Carga**: Loading states, disabled states
+- **Validación en Tiempo Real**: Feedback inmediato al usuario
+
+## 📊 Patrones de Implementación
+
+### 1. **Hook Pattern**
 ```typescript
-const { users, loading, error } = useUsers({
-  filter: {
-    role: UserRole.CUSTOMER,
-    isActive: true,
-    search: 'john@example.com'
-  },
-  limit: 20
+// ✅ Patrón obligatorio para hooks de usuarios
+export const useUserAction = () => {
+  const [action, { loading, error }] = useUserActionMutation();
+  
+  const execute = async (input: UserActionInput) => {
+    try {
+      const result = await action({ variables: { input } });
+      
+      // ✅ Validar respuesta del servidor
+      if (!result.data?.userAction?.success) {
+        throw new Error(result.data?.userAction?.message || 'Error en acción');
+      }
+      
+      return result.data.userAction;
+    } catch (error) {
+      // ✅ Propagar error para manejo en UI
+      throw error;
+    }
+  };
+  
+  return { execute, loading, error };
+};
+```
+
+### 2. **Modal Pattern**
+```typescript
+// ✅ Patrón obligatorio para modales de usuario
+export const UserModal: React.FC<UserModalProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  isLoading,
+  serverError
+}) => {
+  // ✅ Estados separados para errores
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
+  
+  // ✅ Procesar errores del servidor
+  useEffect(() => {
+    if (serverError) {
+      processServerError(serverError);
+    } else {
+      setServerErrors({});
+    }
+  }, [serverError]);
+  
+  // ✅ Validación local
+  const validateForm = (): boolean => {
+    // implementación de validación
+  };
+  
+  // ✅ Envío con formateo de datos
+  const handleSubmit = async () => {
+    if (validateForm()) {
+      try {
+        setServerErrors({});
+        const formattedData = formatDataForAPI(formData);
+        await onSubmit(formattedData);
+      } catch (error) {
+        console.error('Error en modal:', error);
+      }
+    }
+  };
+  
+  return (
+    // JSX del modal
+  );
+};
+```
+
+### 3. **Error Processing Pattern**
+```typescript
+// ✅ Patrón obligatorio para procesar errores del servidor
+const processServerError = (errorMessage: string): void => {
+  const newServerErrors: Record<string, string> = {};
+  
+  // ✅ Mapeo inteligente de errores
+  if (errorMessage.toLowerCase().includes('birth date')) {
+    newServerErrors['dateOfBirth'] = 'Fecha de nacimiento inválida';
+  } else if (errorMessage.toLowerCase().includes('email')) {
+    newServerErrors['email'] = 'Email inválido o ya existe';
+  }
+  // ... más mapeos
+  
+  setServerErrors(newServerErrors);
+};
+```
+
+## 🎨 Componentes de UI Requeridos
+
+### 1. **ServerErrorBanner**
+```typescript
+const ServerErrorBanner = styled.div`
+  background: ${theme.colors.error}15;
+  border: 1px solid ${theme.colors.error};
+  border-radius: ${theme.borderRadius.md};
+  padding: ${theme.spacing[3]};
+  margin-bottom: ${theme.spacing[4]};
+  color: ${theme.colors.error};
+  font-size: ${theme.fontSizes.sm};
+  font-weight: ${theme.fontWeights.medium};
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[2]};
+`;
+```
+
+### 2. **Indicadores de Estado**
+```typescript
+// ✅ Indicador de pasos con errores del servidor
+<Step active={true} completed={isFormValid() && Object.keys(serverErrors).length === 0}>
+  <StepNumber active={true} completed={isFormValid() && Object.keys(serverErrors).length === 0}>1</StepNumber>
+  <StepLabel>Datos Básicos</StepLabel>
+</Step>
+
+// ✅ Botón deshabilitado con errores
+<Button
+  variant="primary"
+  onClick={handleSubmit}
+  isLoading={isLoading}
+  disabled={!isFormValid() || Object.keys(serverErrors).length > 0}
+>
+  {isLoading ? 'Procesando...' : 'Guardar'}
+</Button>
+```
+
+## 🧪 Testing
+
+### Casos de Prueba Obligatorios
+- ✅ Validación local de campos requeridos
+- ✅ Validación de formatos (email, fecha, contraseña)
+- ✅ Manejo de errores del servidor
+- ✅ Mapeo de errores a campos específicos
+- ✅ Estados del formulario con errores
+- ✅ Limpieza automática de errores
+- ✅ Formateo de datos para API
+
+### Ejemplo de Test
+```typescript
+describe('ImprovedCreateUserModal', () => {
+  test('should handle server validation error', async () => {
+    const mockServerError = 'Validation failed: Birth date is invalid';
+    
+    render(
+      <ImprovedCreateUserModal
+        isOpen={true}
+        onClose={jest.fn()}
+        onSubmit={jest.fn()}
+        isLoading={false}
+        serverError={mockServerError}
+      />
+    );
+    
+    // Verificar que el error se mapea al campo correcto
+    expect(screen.getByText('Fecha de nacimiento inválida')).toBeInTheDocument();
+    
+    // Verificar que el botón está deshabilitado
+    expect(screen.getByRole('button', { name: /crear usuario/i })).toBeDisabled();
+  });
 });
 ```
 
-## Clean Architecture
+## 📝 Checklist de Implementación
 
-### Separation of Concerns
-- **Presentation Layer**: Componentes React para UI
-- **Business Logic**: Hooks para lógica de negocio
-- **Data Layer**: GraphQL queries y mutations
-- **Domain Layer**: Types y interfaces TypeScript
+### Para Nuevos Componentes de Usuario
+- [ ] Seguir patrones establecidos en `ERROR_HANDLING_STANDARDS.md`
+- [ ] Implementar estados separados para errores locales y del servidor
+- [ ] Agregar validación local completa
+- [ ] Implementar procesamiento de errores del servidor
+- [ ] Agregar indicadores visuales de estado
+- [ ] Implementar limpieza automática de errores
+- [ ] Agregar tests unitarios
+- [ ] Documentar props y comportamiento
 
-### Principios SOLID
-- **Single Responsibility**: Cada componente tiene una responsabilidad específica
-- **Open/Closed**: Extensible sin modificar código existente
-- **Dependency Inversion**: Dependencias inyectadas a través de props/hooks
+### Para Modificaciones de Componentes Existentes
+- [ ] Mantener compatibilidad con patrones establecidos
+- [ ] Actualizar manejo de errores si es necesario
+- [ ] Agregar tests para nuevas funcionalidades
+- [ ] Actualizar documentación
+- [ ] Verificar consistencia con otros componentes
 
-## Tecnologías Utilizadas
+## 🚀 Próximos Pasos
 
-- **React 18**: Functional components con hooks
-- **TypeScript**: Tipado estático fuerte
-- **Styled Components**: CSS-in-JS con theming
-- **Apollo Client**: Cliente GraphQL con caché
-- **React Hook Form**: Manejo de formularios
-- **React Hot Toast**: Notificaciones de usuario
-- **Lucide React**: Iconografía moderna
+1. **Implementar** estándares en componentes legacy (`CreateUserModal.tsx`)
+2. **Extender** sistema de errores para otros tipos de validación
+3. **Crear** componentes reutilizables para manejo de errores
+4. **Implementar** tests automatizados para todos los casos de uso
+5. **Documentar** patrones específicos para otros tipos de entidades
 
-## Testing (Pendiente)
+## 📚 Referencias
 
-### Unit Tests
-- Componentes individuales con React Testing Library
-- Hooks con @testing-library/react-hooks
-- Mocking de GraphQL con Apollo MockedProvider
+- [Estándares de Manejo de Errores](./ERROR_HANDLING_STANDARDS.md)
+- [Estándares de Desarrollo del Proyecto](../../../DEVELOPMENT_STANDARDS.md)
+- [Principios SOLID](https://en.wikipedia.org/wiki/SOLID)
+- [Clean Code Principles](https://blog.cleancoder.com/uncle-bob/2014/12/17/TheCyclesOfTDD.html)
 
-### Integration Tests
-- Flujos completos de usuario
-- Interacción entre componentes
-- Estados de carga y error
+---
 
-### E2E Tests
-- Cypress para flujos de extremo a extremo
-- Pruebas de accesibilidad
-- Performance testing
-
-## Mejoras Futuras
-
-### Funcionalidades
-- [ ] Importación masiva de usuarios (CSV/Excel)
-- [ ] Exportación de datos de usuarios
-- [ ] Historial de cambios y auditoría
-- [ ] Filtros avanzados con rango de fechas
-- [ ] Búsqueda fuzzy y autocompletado
-- [ ] Gestión de permisos granulares
-
-### Performance
-- [ ] Virtualización para listas grandes
-- [ ] Optimistic updates
-- [ ] Lazy loading de componentes
-- [ ] Image optimization para avatares
-
-### UX/UI
-- [ ] Drag & drop para reordenar
-- [ ] Temas oscuro/claro
-- [ ] Atajos de teclado
-- [ ] Accesibilidad mejorada (ARIA)
-- [ ] Animaciones y transiciones suaves
-
-## Contribución
-
-### Code Style
-- Seguir las convenciones de TypeScript/React
-- Usar Prettier para formateo automático
-- Seguir el sistema de nomenclatura establecido
-- Documentar componentes complejos
-
-### Git Workflow
-- Feature branches para nuevas funcionalidades
-- Pull requests con revisión de código
-- Tests antes de merge
-- Commits semánticos
-
-## Support
-
-Para dudas o problemas con este módulo, contactar al equipo de desarrollo o crear un issue en el repositorio del proyecto.
+**Última actualización**: [Fecha actual]
+**Versión**: 1.0.0
+**Mantenido por**: Equipo de Desarrollo
+**Estándares**: Basado en `ERROR_HANDLING_STANDARDS.md`

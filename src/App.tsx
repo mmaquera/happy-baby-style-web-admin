@@ -13,6 +13,7 @@ import { Login } from '@/pages/Login';
 import { Unauthorized } from '@/pages/Unauthorized';
 import { Dashboard } from '@/pages/Dashboard';
 import { Products } from '@/pages/Products';
+import { Categories } from '@/pages/Categories';
 import { Orders } from '@/pages/Orders';
 import UsersPage from '@/pages/Users';
 
@@ -40,6 +41,13 @@ function App() {
                 <ProtectedRoute>
                   <Layout>
                     <Products />
+                  </Layout>
+                </ProtectedRoute>
+              } />
+              <Route path="/categories" element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Categories />
                   </Layout>
                 </ProtectedRoute>
               } />

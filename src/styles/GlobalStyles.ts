@@ -20,7 +20,7 @@ export const GlobalStyles = createGlobalStyle`
     font-weight: ${theme.fontWeights.light};
     line-height: 1.6;
     color: ${theme.colors.text.primary};
-    background: ${theme.colors.background.primary};
+    background: ${theme.colors.background.light};
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }

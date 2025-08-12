@@ -639,6 +639,147 @@ type PaginatedReviews {
   total: Int!
   hasMore: Boolean!
 }
+type BaseResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  metadata: ResponseMetadata
+}
+type ResponseMetadata {
+  requestId: String
+  traceId: String
+  duration: Int
+  timestamp: String!
+}
+type CreateUserResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: CreateUserData
+  metadata: ResponseMetadata
+}
+type CreateUserData {
+  entity: User!
+  id: ID!
+  createdAt: String!
+}
+type CreateProductResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: CreateProductData
+  metadata: ResponseMetadata
+}
+type CreateProductData {
+  entity: Product!
+  id: ID!
+  createdAt: String!
+}
+type GetProductsResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: GetProductsData
+  metadata: ResponseMetadata
+}
+type GetProductsData {
+  items: [Product!]!
+  pagination: ProductPaginationInfo!
+}
+type ProductPaginationInfo {
+  total: Int!
+  limit: Int!
+  offset: Int!
+  hasMore: Boolean!
+  currentPage: Int!
+  totalPages: Int!
+}
+type GetProductResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: GetProductData
+  metadata: ResponseMetadata
+}
+type GetProductData {
+  entity: Product!
+}
+type GetCategoriesResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: GetCategoriesData
+  metadata: ResponseMetadata
+}
+type GetCategoriesData {
+  items: [Category!]!
+  pagination: CategoryPaginationInfo!
+}
+type CategoryPaginationInfo {
+  total: Int!
+  limit: Int!
+  offset: Int!
+  hasMore: Boolean!
+  currentPage: Int!
+  totalPages: Int!
+}
+type GetCategoryResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: GetCategoryData
+  metadata: ResponseMetadata
+}
+type GetCategoryData {
+  entity: Category!
+}
+type CreateCategoryResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: CreateCategoryData
+  metadata: ResponseMetadata
+}
+type CreateCategoryData {
+  entity: Category!
+  id: ID!
+  createdAt: String!
+}
+type UpdateCategoryResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: UpdateCategoryData
+  metadata: ResponseMetadata
+}
+type UpdateCategoryData {
+  entity: Category!
+  id: ID!
+  updatedAt: String!
+  changes: [String!]!
+}
+type DeleteCategoryResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: DeleteCategoryData
+  metadata: ResponseMetadata
+}
+type DeleteCategoryData {
+  id: ID!
+  deletedAt: String!
+  softDelete: Boolean!
+}
 type AuthResponse {
   success: Boolean!
   user: User
@@ -719,12 +860,12 @@ type Query {
   userSessions(userId: ID!): [UserSession!]!
   activeSessions(userId: ID!): [UserSession!]!
   userSessionAnalytics(userId: ID!): [UserSessionAnalytics!]!
-  categories: [Category!]!
-  category(id: ID!): Category
-  categoryBySlug(slug: String!): Category
-  products(filter: ProductFilterInput, pagination: PaginationInput): PaginatedProducts!
-  product(id: ID!): Product
-  productBySku(sku: String!): Product
+  categories(filters: CategoryFilterInput, pagination: PaginationInput): GetCategoriesResponse!
+  category(id: ID!): GetCategoryResponse!
+  categoryBySlug(slug: String!): GetCategoryResponse!
+  products(filter: ProductFilterInput, pagination: PaginationInput): GetProductsResponse!
+  product(id: ID!): GetProductResponse!
+  productBySku(sku: String!): GetProductResponse!
   productsByCategory(categoryId: ID!, pagination: PaginationInput): PaginatedProducts!
   searchProducts(query: String!, filter: ProductFilterInput, pagination: PaginationInput): PaginatedProducts!
   productVariants(productId: ID!): [ProductVariant!]!
@@ -789,7 +930,7 @@ type Mutation {
   loginUser(email: String!, password: String!): AuthResponse!
   logoutUser: SuccessResponse!
   refreshToken(refreshToken: String!): AuthResponse!
-  createUser(input: CreateUserProfileInput!): User!
+  createUser(input: CreateUserProfileInput!): CreateUserResponse!
   updateUser(id: ID!, input: UpdateUserInput!): User!
   deleteUser(id: ID!): SuccessResponse!
   activateUser(id: ID!): User!
@@ -809,10 +950,10 @@ type Mutation {
   updateUserAddress(id: ID!, input: UpdateUserAddressInput!): UserAddress!
   deleteUserAddress(id: ID!): SuccessResponse!
   setDefaultAddress(userId: ID!, addressId: ID!): SuccessResponse!
-  createCategory(input: CreateCategoryInput!): Category!
-  updateCategory(id: ID!, input: UpdateCategoryInput!): Category!
-  deleteCategory(id: ID!): SuccessResponse!
-  createProduct(input: CreateProductInput!): Product!
+  createCategory(input: CreateCategoryInput!): CreateCategoryResponse!
+  updateCategory(id: ID!, input: UpdateCategoryInput!): UpdateCategoryResponse!
+  deleteCategory(id: ID!): DeleteCategoryResponse!
+  createProduct(input: CreateProductInput!): CreateProductResponse!
   updateProduct(id: ID!, input: UpdateProductInput!): Product!
   deleteProduct(id: ID!): SuccessResponse!
   createProductVariant(input: CreateProductVariantInput!): ProductVariant!
@@ -1230,6 +1371,10 @@ input UserFilterInput {
   isActive: Boolean
   search: String
   emailVerified: Boolean
+}
+input CategoryFilterInput {
+  isActive: Boolean
+  search: String
 }
 input UserOrderHistoryFilter {
   status: OrderStatus

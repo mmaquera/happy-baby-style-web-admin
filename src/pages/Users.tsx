@@ -538,11 +538,18 @@ export const UsersPage: React.FC = () => {
 
   const handleCreateUser = async (userData: any) => {
     try {
-      await createUserMutation.create(userData);
-      setShowCreateModal(false);
-      toast.success('Usuario creado exitosamente');
+      const result = await createUserMutation.create(userData);
+      
+      if (result?.success) {
+        setShowCreateModal(false);
+        // El toast ya se maneja en el hook
+      } else {
+        // Manejar caso donde success es false pero no hay excepción
+        toast.error(result?.message || 'Error al crear usuario');
+      }
     } catch (error) {
-      toast.error('Error al crear usuario');
+      // El error ya se maneja en el hook, solo cerrar el modal si es necesario
+      console.error('Error en handleCreateUser:', error);
     }
   };
 
@@ -950,6 +957,7 @@ export const UsersPage: React.FC = () => {
         onClose={() => setShowCreateModal(false)}
         onSubmit={handleCreateUser}
         isLoading={createUserMutation.loading}
+        serverError={createUserMutation.error?.message}
       />
 
       {/* Edit User Modal */}

@@ -212,7 +212,148 @@ query SearchProducts($query: String!, $filter: ProductFilterInput, $pagination: 
   }
 }
 
+# Get categories
+query GetCategories($filters: CategoryFilterInput, $pagination: PaginationInput) {
+  categories(filters: $filters, pagination: $pagination) {
+    success
+    message
+    code
+    timestamp
+    data {
+      items {
+        id
+        name
+        description
+        slug
+        image
+        isActive
+        sortOrder
+        createdAt
+        updatedAt
+        products {
+          id
+          name
+          price
+          images
+          isActive
+        }
+      }
+      pagination {
+        total
+        limit
+        offset
+        hasMore
+        currentPage
+        totalPages
+      }
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
+  }
+}
 
+# Get category by ID
+query GetCategory($id: ID!) {
+  category(id: $id) {
+    success
+    message
+    code
+    timestamp
+    data {
+      entity {
+        id
+        name
+        description
+        slug
+        image
+        isActive
+        sortOrder
+        createdAt
+        updatedAt
+        products {
+          id
+          name
+          description
+          price
+          salePrice
+          sku
+          images
+          attributes
+          isActive
+          stockQuantity
+          tags
+          rating
+          reviewCount
+          currentPrice
+          hasDiscount
+          discountPercentage
+          totalStock
+          isInStock
+        }
+      }
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
+  }
+}
+
+# Get category by slug
+query GetCategoryBySlug($slug: String!) {
+  categoryBySlug(slug: $slug) {
+    success
+    message
+    code
+    timestamp
+    data {
+      entity {
+        id
+        name
+        description
+        slug
+        image
+        isActive
+        sortOrder
+        createdAt
+        updatedAt
+          products {
+            id
+            name
+            description
+            price
+            salePrice
+            sku
+            images
+            attributes
+            isActive
+            stockQuantity
+            tags
+            rating
+            reviewCount
+            currentPrice
+            hasDiscount
+            discountPercentage
+            totalStock
+            isInStock
+          }
+        }
+      }
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
+  }
+}
 
 # =====================================================
 # MUTATIONS

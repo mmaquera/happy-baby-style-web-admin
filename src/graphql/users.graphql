@@ -496,29 +496,39 @@ query GetActiveSessions($userId: ID!) {
 # Create new user
 mutation CreateUser($input: CreateUserProfileInput!) {
   createUser(input: $input) {
-    id
-    email
-    role
-    isActive
-    emailVerified
-    lastLoginAt
-    createdAt
-    updatedAt
-    profile {
+    success
+    message
+    code
+    timestamp
+    data {
+      entity {
+        id
+        email
+        role
+        isActive
+        emailVerified
+        lastLoginAt
+        createdAt
+        updatedAt
+        profile {
+          id
+          firstName
+          lastName
+          phone
+          dateOfBirth
+          avatar
+          role
+          emailVerified
+          isActive
+          lastLoginAt
+          createdAt
+          updatedAt
+          # Computed fields
+          fullName
+        }
+      }
       id
-      firstName
-      lastName
-      phone
-      dateOfBirth
-      avatar
-      role
-      emailVerified
-      isActive
-      lastLoginAt
       createdAt
-      updatedAt
-      # Computed fields
-      fullName
     }
   }
 }

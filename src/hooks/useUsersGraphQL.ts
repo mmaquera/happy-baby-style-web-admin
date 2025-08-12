@@ -85,10 +85,26 @@ export const useCreateUser = () => {
       const result = await createUserMutation({
         variables: { input }
       });
+      
+      const response = result.data?.createUser;
+      
+      if (!response) {
+        throw new Error('No se recibió respuesta del servidor');
+      }
+      
+      if (!response.success) {
+        // Manejar errores de validación del servidor
+        const errorMessage = response.message || 'Error al crear usuario';
+        const errorCode = response.code || 'UNKNOWN_ERROR';
+        
+        throw new Error(`${errorMessage} (${errorCode})`);
+      }
+      
       toast.success('Usuario creado exitosamente');
-      return result.data?.createUser;
+      return response;
     } catch (error) {
-      toast.error('Error al crear usuario');
+      const errorMessage = error instanceof Error ? error.message : 'Error al crear usuario';
+      toast.error(errorMessage);
       throw error;
     }
   };

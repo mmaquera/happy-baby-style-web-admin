@@ -19,7 +19,9 @@
     "test:coverage": "jest --coverage",
     "test:unit": "jest --testPathPattern=src/services/auth/__tests__",
     "test:integration": "jest --testPathPattern=src/__tests__/integration",
-    "codegen": "graphql-codegen --config codegen.yml"
+    "codegen": "graphql-codegen --config codegen.yml",
+    "graphql:download-schema": "rover graph introspect http://localhost:3001/graphql --output src/graphql/schema.graphql",
+    "graphql:generate": "npm run graphql:download-schema && npm run codegen"
   },
   "dependencies": {
     "@types/node": "^20.10.0",
@@ -37,6 +39,7 @@
   },
   "devDependencies": {
     "@apollo/client": "^3.13.9",
+    "@apollo/rover": "^0.35.0",
     "@graphql-codegen/cli": "^5.0.7",
     "@graphql-codegen/typescript": "^4.1.6",
     "@graphql-codegen/typescript-operations": "^4.6.1",

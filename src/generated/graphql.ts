@@ -74,6 +74,15 @@ export type AuthResponse = {
   user?: Maybe<User>;
 };
 
+export type BaseResponse = {
+  __typename?: 'BaseResponse';
+  code: Scalars['String']['output'];
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
 export type Carrier = {
   __typename?: 'Carrier';
   code: Scalars['String']['output'];
@@ -98,6 +107,21 @@ export type Category = {
   slug: Scalars['String']['output'];
   sortOrder: Scalars['Int']['output'];
   updatedAt: Scalars['DateTime']['output'];
+};
+
+export type CategoryFilterInput = {
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CategoryPaginationInfo = {
+  __typename?: 'CategoryPaginationInfo';
+  currentPage: Scalars['Int']['output'];
+  hasMore: Scalars['Boolean']['output'];
+  limit: Scalars['Int']['output'];
+  offset: Scalars['Int']['output'];
+  total: Scalars['Int']['output'];
+  totalPages: Scalars['Int']['output'];
 };
 
 export type Coupon = {
@@ -143,6 +167,13 @@ export type CreateCarrierInput = {
   trackingUrlTemplate?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type CreateCategoryData = {
+  __typename?: 'CreateCategoryData';
+  createdAt: Scalars['String']['output'];
+  entity: Category;
+  id: Scalars['ID']['output'];
+};
+
 export type CreateCategoryInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   image?: InputMaybe<Scalars['String']['input']>;
@@ -150,6 +181,16 @@ export type CreateCategoryInput = {
   name: Scalars['String']['input'];
   slug: Scalars['String']['input'];
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type CreateCategoryResponse = {
+  __typename?: 'CreateCategoryResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<CreateCategoryData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
 };
 
 export type CreateCouponInput = {
@@ -216,6 +257,13 @@ export type CreatePaymentMethodInput = {
   type: PaymentMethodType;
 };
 
+export type CreateProductData = {
+  __typename?: 'CreateProductData';
+  createdAt: Scalars['String']['output'];
+  entity: Product;
+  id: Scalars['ID']['output'];
+};
+
 export type CreateProductInput = {
   attributes?: InputMaybe<Scalars['JSON']['input']>;
   categoryId?: InputMaybe<Scalars['ID']['input']>;
@@ -228,6 +276,16 @@ export type CreateProductInput = {
   sku: Scalars['String']['input'];
   stockQuantity?: InputMaybe<Scalars['Int']['input']>;
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+export type CreateProductResponse = {
+  __typename?: 'CreateProductResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<CreateProductData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
 };
 
 export type CreateProductReviewInput = {
@@ -316,6 +374,13 @@ export type CreateUserAddressInput = {
   userId: Scalars['ID']['input'];
 };
 
+export type CreateUserData = {
+  __typename?: 'CreateUserData';
+  createdAt: Scalars['String']['output'];
+  entity: User;
+  id: Scalars['ID']['output'];
+};
+
 export type CreateUserProfileInput = {
   avatar?: InputMaybe<Scalars['String']['input']>;
   dateOfBirth?: InputMaybe<Scalars['DateTime']['input']>;
@@ -326,6 +391,16 @@ export type CreateUserProfileInput = {
   password?: InputMaybe<Scalars['String']['input']>;
   phone?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<UserRole>;
+};
+
+export type CreateUserResponse = {
+  __typename?: 'CreateUserResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<CreateUserData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
 };
 
 export type DashboardMetrics = {
@@ -339,6 +414,23 @@ export type DashboardMetrics = {
   totalProducts: Scalars['Int']['output'];
   totalRevenue: Scalars['Decimal']['output'];
   totalUsers: Scalars['Int']['output'];
+};
+
+export type DeleteCategoryData = {
+  __typename?: 'DeleteCategoryData';
+  deletedAt: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  softDelete: Scalars['Boolean']['output'];
+};
+
+export type DeleteCategoryResponse = {
+  __typename?: 'DeleteCategoryResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<DeleteCategoryData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
 };
 
 export type DeliverySlot = {
@@ -369,6 +461,68 @@ export type EmailTemplate = {
   subject: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
   variables: Array<Scalars['String']['output']>;
+};
+
+export type GetCategoriesData = {
+  __typename?: 'GetCategoriesData';
+  items: Array<Category>;
+  pagination: CategoryPaginationInfo;
+};
+
+export type GetCategoriesResponse = {
+  __typename?: 'GetCategoriesResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<GetCategoriesData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
+export type GetCategoryData = {
+  __typename?: 'GetCategoryData';
+  entity: Category;
+};
+
+export type GetCategoryResponse = {
+  __typename?: 'GetCategoryResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<GetCategoryData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
+export type GetProductData = {
+  __typename?: 'GetProductData';
+  entity: Product;
+};
+
+export type GetProductResponse = {
+  __typename?: 'GetProductResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<GetProductData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
+export type GetProductsData = {
+  __typename?: 'GetProductsData';
+  items: Array<Product>;
+  pagination: ProductPaginationInfo;
+};
+
+export type GetProductsResponse = {
+  __typename?: 'GetProductsResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<GetProductsData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
 };
 
 export type Image = {
@@ -431,14 +585,14 @@ export type Mutation = {
   cancelOrder: Order;
   clearUserCart: SuccessResponse;
   createCarrier: Carrier;
-  createCategory: Category;
+  createCategory: CreateCategoryResponse;
   createCoupon: Coupon;
   createInventoryTransaction: InventoryTransaction;
   createNotificationTemplate: NotificationTemplate;
   createOrder: Order;
   createOrderItem: OrderItem;
   createPaymentMethod: PaymentMethod;
-  createProduct: Product;
+  createProduct: CreateProductResponse;
   createProductReview: ProductReview;
   createProductVariant: ProductVariant;
   createPushNotification: PushNotification;
@@ -447,12 +601,12 @@ export type Mutation = {
   createShippingRate: ShippingRate;
   createShippingZone: ShippingZone;
   createStockAlert: StockAlert;
-  createUser: User;
+  createUser: CreateUserResponse;
   createUserAddress: UserAddress;
   createUserProfile: UserProfile;
   deactivateUser: User;
   deleteCarrier: SuccessResponse;
-  deleteCategory: SuccessResponse;
+  deleteCategory: DeleteCategoryResponse;
   deleteCoupon: SuccessResponse;
   deleteOrderItem: SuccessResponse;
   deletePaymentMethod: SuccessResponse;
@@ -489,7 +643,7 @@ export type Mutation = {
   unsubscribeFromNewsletter: SuccessResponse;
   updateCarrier: Carrier;
   updateCartItem: ShoppingCartItem;
-  updateCategory: Category;
+  updateCategory: UpdateCategoryResponse;
   updateCoupon: Coupon;
   updateOrder: Order;
   updateOrderItem: OrderItem;
@@ -1199,6 +1353,16 @@ export type ProductFilterInput = {
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
+export type ProductPaginationInfo = {
+  __typename?: 'ProductPaginationInfo';
+  currentPage: Scalars['Int']['output'];
+  hasMore: Scalars['Boolean']['output'];
+  limit: Scalars['Int']['output'];
+  offset: Scalars['Int']['output'];
+  total: Scalars['Int']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
 export type ProductReview = {
   __typename?: 'ProductReview';
   comment?: Maybe<Scalars['String']['output']>;
@@ -1268,9 +1432,9 @@ export type Query = {
   carrier?: Maybe<Carrier>;
   carriers: Array<Carrier>;
   cartItem?: Maybe<ShoppingCart>;
-  categories: Array<Category>;
-  category?: Maybe<Category>;
-  categoryBySlug?: Maybe<Category>;
+  categories: GetCategoriesResponse;
+  category: GetCategoryResponse;
+  categoryBySlug: GetCategoryResponse;
   coupon?: Maybe<Coupon>;
   couponByCode?: Maybe<Coupon>;
   coupons: Array<Coupon>;
@@ -1298,15 +1462,15 @@ export type Query = {
   orders: PaginatedOrders;
   outOfStockProducts: Array<Product>;
   paymentMethod?: Maybe<PaymentMethod>;
-  product?: Maybe<Product>;
+  product: GetProductResponse;
   productAnalytics: ProductAnalytics;
   productAppEvents: Array<AppEvent>;
-  productBySku?: Maybe<Product>;
+  productBySku: GetProductResponse;
   productReviews: PaginatedReviews;
   productStats: ProductStats;
   productVariant?: Maybe<ProductVariant>;
   productVariants: Array<ProductVariant>;
-  products: PaginatedProducts;
+  products: GetProductsResponse;
   productsByCategory: PaginatedProducts;
   review?: Maybe<ProductReview>;
   reviewVotes: Array<ReviewVote>;
@@ -1366,6 +1530,12 @@ export type QueryCarrierArgs = {
 
 export type QueryCartItemArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryCategoriesArgs = {
+  filters?: InputMaybe<CategoryFilterInput>;
+  pagination?: InputMaybe<PaginationInput>;
 };
 
 
@@ -1685,6 +1855,14 @@ export type QueryUsersByRoleArgs = {
   role: UserRole;
 };
 
+export type ResponseMetadata = {
+  __typename?: 'ResponseMetadata';
+  duration?: Maybe<Scalars['Int']['output']>;
+  requestId?: Maybe<Scalars['String']['output']>;
+  timestamp: Scalars['String']['output'];
+  traceId?: Maybe<Scalars['String']['output']>;
+};
+
 export type ReviewPhoto = {
   __typename?: 'ReviewPhoto';
   caption?: Maybe<Scalars['String']['output']>;
@@ -1890,6 +2068,14 @@ export enum TransactionType {
   refund = 'refund'
 }
 
+export type UpdateCategoryData = {
+  __typename?: 'UpdateCategoryData';
+  changes: Array<Scalars['String']['output']>;
+  entity: Category;
+  id: Scalars['ID']['output'];
+  updatedAt: Scalars['String']['output'];
+};
+
 export type UpdateCategoryInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   image?: InputMaybe<Scalars['String']['input']>;
@@ -1897,6 +2083,16 @@ export type UpdateCategoryInput = {
   name?: InputMaybe<Scalars['String']['input']>;
   slug?: InputMaybe<Scalars['String']['input']>;
   sortOrder?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type UpdateCategoryResponse = {
+  __typename?: 'UpdateCategoryResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<UpdateCategoryData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
 };
 
 export type UpdateCouponInput = {
@@ -2242,6 +2438,50 @@ export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetCurrentUserQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, profile?: { __typename?: 'UserProfile', id: string, firstName: string, lastName: string, phone?: string | null, dateOfBirth?: string | null, avatar?: string | null } | null } | null };
 
+export type GetCategoriesQueryVariables = Exact<{
+  filters?: InputMaybe<CategoryFilterInput>;
+  pagination?: InputMaybe<PaginationInput>;
+}>;
+
+
+export type GetCategoriesQuery = { __typename?: 'Query', categories: { __typename?: 'GetCategoriesResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'GetCategoriesData', items: Array<{ __typename?: 'Category', id: string, name: string, description?: string | null, slug: string, image?: string | null, isActive: boolean, sortOrder: number, createdAt: string, updatedAt: string, products: Array<{ __typename?: 'Product', id: string, name: string, sku: string, isActive: boolean }> }>, pagination: { __typename?: 'CategoryPaginationInfo', total: number, limit: number, offset: number, hasMore: boolean, currentPage: number, totalPages: number } } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
+
+export type GetCategoryQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetCategoryQuery = { __typename?: 'Query', category: { __typename?: 'GetCategoryResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'GetCategoryData', entity: { __typename?: 'Category', id: string, name: string, description?: string | null, slug: string, image?: string | null, isActive: boolean, sortOrder: number, createdAt: string, updatedAt: string, products: Array<{ __typename?: 'Product', id: string, name: string, description?: string | null, price: number, salePrice?: number | null, sku: string, images: Array<string>, attributes: any, isActive: boolean, stockQuantity: number, tags: Array<string>, rating?: number | null, reviewCount: number, currentPrice: number, hasDiscount: boolean, discountPercentage: number, totalStock: number, isInStock: boolean }> } } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
+
+export type GetCategoryBySlugQueryVariables = Exact<{
+  slug: Scalars['String']['input'];
+}>;
+
+
+export type GetCategoryBySlugQuery = { __typename?: 'Query', categoryBySlug: { __typename?: 'GetCategoryResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'GetCategoryData', entity: { __typename?: 'Category', id: string, name: string, description?: string | null, slug: string, image?: string | null, isActive: boolean, sortOrder: number, createdAt: string, updatedAt: string, products: Array<{ __typename?: 'Product', id: string, name: string, description?: string | null, price: number, salePrice?: number | null, sku: string, images: Array<string>, attributes: any, isActive: boolean, stockQuantity: number, tags: Array<string>, rating?: number | null, reviewCount: number, currentPrice: number, hasDiscount: boolean, discountPercentage: number, totalStock: number, isInStock: boolean }> } } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
+
+export type CreateCategoryMutationVariables = Exact<{
+  input: CreateCategoryInput;
+}>;
+
+
+export type CreateCategoryMutation = { __typename?: 'Mutation', createCategory: { __typename?: 'CreateCategoryResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'CreateCategoryData', entity: { __typename?: 'Category', id: string, name: string, description?: string | null, slug: string, image?: string | null, isActive: boolean, sortOrder: number, createdAt: string, updatedAt: string } } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
+
+export type UpdateCategoryMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: UpdateCategoryInput;
+}>;
+
+
+export type UpdateCategoryMutation = { __typename?: 'Mutation', updateCategory: { __typename?: 'UpdateCategoryResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'UpdateCategoryData', id: string, updatedAt: string, changes: Array<string>, entity: { __typename?: 'Category', id: string, name: string, description?: string | null, slug: string, image?: string | null, isActive: boolean, sortOrder: number, createdAt: string, updatedAt: string } } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
+
+export type DeleteCategoryMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteCategoryMutation = { __typename?: 'Mutation', deleteCategory: { __typename?: 'DeleteCategoryResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'DeleteCategoryData', id: string, deletedAt: string, softDelete: boolean } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
+
 export type GetOrdersQueryVariables = Exact<{
   filter?: InputMaybe<OrderFilterInput>;
   pagination?: InputMaybe<PaginationInput>;
@@ -2350,21 +2590,21 @@ export type GetProductsQueryVariables = Exact<{
 }>;
 
 
-export type GetProductsQuery = { __typename?: 'Query', products: { __typename?: 'PaginatedProducts', total: number, hasMore: boolean, products: Array<{ __typename?: 'Product', id: string, name: string, description?: string | null, price: number, salePrice?: number | null, sku: string, images: Array<string>, attributes: any, isActive: boolean, stockQuantity: number, tags: Array<string>, rating?: number | null, reviewCount: number, createdAt: string, updatedAt: string, currentPrice: number, hasDiscount: boolean, discountPercentage: number, totalStock: number, isInStock: boolean, category?: { __typename?: 'Category', id: string, name: string, slug: string, image?: string | null } | null, variants: Array<{ __typename?: 'ProductVariant', id: string, name: string, price: number, sku: string, stockQuantity: number, attributes: any, isActive: boolean, isInStock: boolean }> }> } };
+export type GetProductsQuery = { __typename?: 'Query', products: { __typename?: 'GetProductsResponse', data?: { __typename?: 'GetProductsData', items: Array<{ __typename?: 'Product', id: string, name: string, description?: string | null, price: number, salePrice?: number | null, sku: string, images: Array<string>, attributes: any, isActive: boolean, stockQuantity: number, tags: Array<string>, rating?: number | null, reviewCount: number, createdAt: string, updatedAt: string, currentPrice: number, hasDiscount: boolean, discountPercentage: number, totalStock: number, isInStock: boolean, category?: { __typename?: 'Category', id: string, name: string, slug: string, image?: string | null } | null, variants: Array<{ __typename?: 'ProductVariant', id: string, name: string, price: number, sku: string, stockQuantity: number, attributes: any, isActive: boolean, isInStock: boolean }> }>, pagination: { __typename?: 'ProductPaginationInfo', total: number, limit: number, offset: number, hasMore: boolean, currentPage: number, totalPages: number } } | null } };
 
 export type GetProductQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type GetProductQuery = { __typename?: 'Query', product?: { __typename?: 'Product', id: string, name: string, description?: string | null, price: number, salePrice?: number | null, sku: string, images: Array<string>, attributes: any, isActive: boolean, stockQuantity: number, tags: Array<string>, rating?: number | null, reviewCount: number, createdAt: string, updatedAt: string, currentPrice: number, hasDiscount: boolean, discountPercentage: number, totalStock: number, isInStock: boolean, category?: { __typename?: 'Category', id: string, name: string, slug: string, image?: string | null } | null, variants: Array<{ __typename?: 'ProductVariant', id: string, name: string, price: number, sku: string, stockQuantity: number, attributes: any, isActive: boolean, isInStock: boolean }>, reviews: Array<{ __typename?: 'ProductReview', id: string, rating: number, title?: string | null, comment?: string | null, createdAt: string, user: { __typename?: 'UserProfile', id: string, firstName: string, lastName: string } }> } | null };
+export type GetProductQuery = { __typename?: 'Query', product: { __typename?: 'GetProductResponse', data?: { __typename?: 'GetProductData', entity: { __typename?: 'Product', id: string, name: string, description?: string | null, price: number, salePrice?: number | null, sku: string, images: Array<string>, attributes: any, isActive: boolean, stockQuantity: number, tags: Array<string>, rating?: number | null, reviewCount: number, createdAt: string, updatedAt: string, currentPrice: number, hasDiscount: boolean, discountPercentage: number, totalStock: number, isInStock: boolean, category?: { __typename?: 'Category', id: string, name: string, slug: string, image?: string | null } | null, variants: Array<{ __typename?: 'ProductVariant', id: string, name: string, price: number, sku: string, stockQuantity: number, attributes: any, isActive: boolean, isInStock: boolean }>, reviews: Array<{ __typename?: 'ProductReview', id: string, rating: number, title?: string | null, comment?: string | null, createdAt: string, user: { __typename?: 'UserProfile', id: string, firstName: string, lastName: string } }> } } | null } };
 
 export type GetProductBySkuQueryVariables = Exact<{
   sku: Scalars['String']['input'];
 }>;
 
 
-export type GetProductBySkuQuery = { __typename?: 'Query', productBySku?: { __typename?: 'Product', id: string, name: string, description?: string | null, price: number, salePrice?: number | null, sku: string, images: Array<string>, attributes: any, isActive: boolean, stockQuantity: number, tags: Array<string>, rating?: number | null, reviewCount: number, createdAt: string, updatedAt: string, currentPrice: number, hasDiscount: boolean, discountPercentage: number, totalStock: number, isInStock: boolean, category?: { __typename?: 'Category', id: string, name: string, slug: string, image?: string | null } | null, variants: Array<{ __typename?: 'ProductVariant', id: string, name: string, price: number, sku: string, stockQuantity: number, attributes: any, isActive: boolean, isInStock: boolean }> } | null };
+export type GetProductBySkuQuery = { __typename?: 'Query', productBySku: { __typename?: 'GetProductResponse', data?: { __typename?: 'GetProductData', entity: { __typename?: 'Product', id: string, name: string, description?: string | null, price: number, salePrice?: number | null, sku: string, images: Array<string>, attributes: any, isActive: boolean, stockQuantity: number, tags: Array<string>, rating?: number | null, reviewCount: number, createdAt: string, updatedAt: string, currentPrice: number, hasDiscount: boolean, discountPercentage: number, totalStock: number, isInStock: boolean, category?: { __typename?: 'Category', id: string, name: string, slug: string, image?: string | null } | null, variants: Array<{ __typename?: 'ProductVariant', id: string, name: string, price: number, sku: string, stockQuantity: number, attributes: any, isActive: boolean, isInStock: boolean }> } } | null } };
 
 export type SearchProductsQueryVariables = Exact<{
   query: Scalars['String']['input'];
@@ -2375,31 +2615,12 @@ export type SearchProductsQueryVariables = Exact<{
 
 export type SearchProductsQuery = { __typename?: 'Query', searchProducts: { __typename?: 'PaginatedProducts', total: number, hasMore: boolean, products: Array<{ __typename?: 'Product', id: string, name: string, description?: string | null, price: number, salePrice?: number | null, sku: string, images: Array<string>, attributes: any, isActive: boolean, stockQuantity: number, tags: Array<string>, rating?: number | null, reviewCount: number, createdAt: string, updatedAt: string, currentPrice: number, hasDiscount: boolean, discountPercentage: number, totalStock: number, isInStock: boolean, category?: { __typename?: 'Category', id: string, name: string, slug: string, image?: string | null } | null }> } };
 
-export type GetCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetCategoriesQuery = { __typename?: 'Query', categories: Array<{ __typename?: 'Category', id: string, name: string, description?: string | null, slug: string, image?: string | null, isActive: boolean, sortOrder: number, createdAt: string, updatedAt: string, products: Array<{ __typename?: 'Product', id: string, name: string, price: number, images: Array<string>, isActive: boolean }> }> };
-
-export type GetCategoryQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type GetCategoryQuery = { __typename?: 'Query', category?: { __typename?: 'Category', id: string, name: string, description?: string | null, slug: string, image?: string | null, isActive: boolean, sortOrder: number, createdAt: string, updatedAt: string, products: Array<{ __typename?: 'Product', id: string, name: string, description?: string | null, price: number, salePrice?: number | null, sku: string, images: Array<string>, attributes: any, isActive: boolean, stockQuantity: number, tags: Array<string>, rating?: number | null, reviewCount: number, currentPrice: number, hasDiscount: boolean, discountPercentage: number, totalStock: number, isInStock: boolean }> } | null };
-
-export type GetCategoryBySlugQueryVariables = Exact<{
-  slug: Scalars['String']['input'];
-}>;
-
-
-export type GetCategoryBySlugQuery = { __typename?: 'Query', categoryBySlug?: { __typename?: 'Category', id: string, name: string, description?: string | null, slug: string, image?: string | null, isActive: boolean, sortOrder: number, createdAt: string, updatedAt: string, products: Array<{ __typename?: 'Product', id: string, name: string, description?: string | null, price: number, salePrice?: number | null, sku: string, images: Array<string>, attributes: any, isActive: boolean, stockQuantity: number, tags: Array<string>, rating?: number | null, reviewCount: number, currentPrice: number, hasDiscount: boolean, discountPercentage: number, totalStock: number, isInStock: boolean }> } | null };
-
 export type CreateProductMutationVariables = Exact<{
   input: CreateProductInput;
 }>;
 
 
-export type CreateProductMutation = { __typename?: 'Mutation', createProduct: { __typename?: 'Product', id: string, name: string, description?: string | null, price: number, salePrice?: number | null, sku: string, images: Array<string>, attributes: any, isActive: boolean, stockQuantity: number, tags: Array<string>, rating?: number | null, reviewCount: number, createdAt: string, updatedAt: string, currentPrice: number, hasDiscount: boolean, discountPercentage: number, totalStock: number, isInStock: boolean, category?: { __typename?: 'Category', id: string, name: string, slug: string, image?: string | null } | null } };
+export type CreateProductMutation = { __typename?: 'Mutation', createProduct: { __typename?: 'CreateProductResponse', data?: { __typename?: 'CreateProductData', entity: { __typename?: 'Product', id: string, name: string, description?: string | null, price: number, salePrice?: number | null, sku: string, images: Array<string>, attributes: any, isActive: boolean, stockQuantity: number, tags: Array<string>, rating?: number | null, reviewCount: number, createdAt: string, updatedAt: string, currentPrice: number, hasDiscount: boolean, discountPercentage: number, totalStock: number, isInStock: boolean, category?: { __typename?: 'Category', id: string, name: string, slug: string, image?: string | null } | null } } | null } };
 
 export type UpdateProductMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -2563,7 +2784,7 @@ export type CreateUserMutationVariables = Exact<{
 }>;
 
 
-export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, createdAt: string, updatedAt: string, profile?: { __typename?: 'UserProfile', id: string, firstName: string, lastName: string, phone?: string | null, dateOfBirth?: string | null, avatar?: string | null, role: UserRole, emailVerified: boolean, isActive: boolean, lastLoginAt?: string | null, createdAt: string, updatedAt: string, fullName?: string | null } | null } };
+export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'CreateUserResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'CreateUserData', id: string, createdAt: string, entity: { __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, createdAt: string, updatedAt: string, profile?: { __typename?: 'UserProfile', id: string, firstName: string, lastName: string, phone?: string | null, dateOfBirth?: string | null, avatar?: string | null, role: UserRole, emailVerified: boolean, isActive: boolean, lastLoginAt?: string | null, createdAt: string, updatedAt: string, fullName?: string | null } | null } } | null } };
 
 export type UpdateUserOptimizedMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -2935,6 +3156,417 @@ export type GetCurrentUserQueryResult = Apollo.QueryResult<GetCurrentUserQuery, 
 export function refetchGetCurrentUserQuery(variables?: GetCurrentUserQueryVariables) {
       return { query: GetCurrentUserDocument, variables: variables }
     }
+export const GetCategoriesDocument = gql`
+    query GetCategories($filters: CategoryFilterInput, $pagination: PaginationInput) {
+  categories(filters: $filters, pagination: $pagination) {
+    success
+    message
+    code
+    timestamp
+    data {
+      items {
+        id
+        name
+        description
+        slug
+        image
+        isActive
+        sortOrder
+        createdAt
+        updatedAt
+        products {
+          id
+          name
+          sku
+          isActive
+        }
+      }
+      pagination {
+        total
+        limit
+        offset
+        hasMore
+        currentPage
+        totalPages
+      }
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetCategoriesQuery__
+ *
+ * To run a query within a React component, call `useGetCategoriesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCategoriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCategoriesQuery({
+ *   variables: {
+ *      filters: // value for 'filters'
+ *      pagination: // value for 'pagination'
+ *   },
+ * });
+ */
+export function useGetCategoriesQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetCategoriesQuery, GetCategoriesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument, options);
+      }
+export function useGetCategoriesLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetCategoriesQuery, GetCategoriesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument, options);
+        }
+export function useGetCategoriesSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetCategoriesQuery, GetCategoriesQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument, options);
+        }
+export type GetCategoriesQueryHookResult = ReturnType<typeof useGetCategoriesQuery>;
+export type GetCategoriesLazyQueryHookResult = ReturnType<typeof useGetCategoriesLazyQuery>;
+export type GetCategoriesSuspenseQueryHookResult = ReturnType<typeof useGetCategoriesSuspenseQuery>;
+export type GetCategoriesQueryResult = Apollo.QueryResult<GetCategoriesQuery, GetCategoriesQueryVariables>;
+export function refetchGetCategoriesQuery(variables?: GetCategoriesQueryVariables) {
+      return { query: GetCategoriesDocument, variables: variables }
+    }
+export const GetCategoryDocument = gql`
+    query GetCategory($id: ID!) {
+  category(id: $id) {
+    success
+    message
+    code
+    timestamp
+    data {
+      entity {
+        id
+        name
+        description
+        slug
+        image
+        isActive
+        sortOrder
+        createdAt
+        updatedAt
+        products {
+          id
+          name
+          description
+          price
+          salePrice
+          sku
+          images
+          attributes
+          isActive
+          stockQuantity
+          tags
+          rating
+          reviewCount
+          currentPrice
+          hasDiscount
+          discountPercentage
+          totalStock
+          isInStock
+        }
+      }
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetCategoryQuery__
+ *
+ * To run a query within a React component, call `useGetCategoryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCategoryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCategoryQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetCategoryQuery(baseOptions: ApolloReactHooks.QueryHookOptions<GetCategoryQuery, GetCategoryQueryVariables> & ({ variables: GetCategoryQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetCategoryQuery, GetCategoryQueryVariables>(GetCategoryDocument, options);
+      }
+export function useGetCategoryLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetCategoryQuery, GetCategoryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetCategoryQuery, GetCategoryQueryVariables>(GetCategoryDocument, options);
+        }
+export function useGetCategorySuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetCategoryQuery, GetCategoryQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetCategoryQuery, GetCategoryQueryVariables>(GetCategoryDocument, options);
+        }
+export type GetCategoryQueryHookResult = ReturnType<typeof useGetCategoryQuery>;
+export type GetCategoryLazyQueryHookResult = ReturnType<typeof useGetCategoryLazyQuery>;
+export type GetCategorySuspenseQueryHookResult = ReturnType<typeof useGetCategorySuspenseQuery>;
+export type GetCategoryQueryResult = Apollo.QueryResult<GetCategoryQuery, GetCategoryQueryVariables>;
+export function refetchGetCategoryQuery(variables: GetCategoryQueryVariables) {
+      return { query: GetCategoryDocument, variables: variables }
+    }
+export const GetCategoryBySlugDocument = gql`
+    query GetCategoryBySlug($slug: String!) {
+  categoryBySlug(slug: $slug) {
+    success
+    message
+    code
+    timestamp
+    data {
+      entity {
+        id
+        name
+        description
+        slug
+        image
+        isActive
+        sortOrder
+        createdAt
+        updatedAt
+        products {
+          id
+          name
+          description
+          price
+          salePrice
+          sku
+          images
+          attributes
+          isActive
+          stockQuantity
+          tags
+          rating
+          reviewCount
+          currentPrice
+          hasDiscount
+          discountPercentage
+          totalStock
+          isInStock
+        }
+      }
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetCategoryBySlugQuery__
+ *
+ * To run a query within a React component, call `useGetCategoryBySlugQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCategoryBySlugQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetCategoryBySlugQuery({
+ *   variables: {
+ *      slug: // value for 'slug'
+ *   },
+ * });
+ */
+export function useGetCategoryBySlugQuery(baseOptions: ApolloReactHooks.QueryHookOptions<GetCategoryBySlugQuery, GetCategoryBySlugQueryVariables> & ({ variables: GetCategoryBySlugQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetCategoryBySlugQuery, GetCategoryBySlugQueryVariables>(GetCategoryBySlugDocument, options);
+      }
+export function useGetCategoryBySlugLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetCategoryBySlugQuery, GetCategoryBySlugQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetCategoryBySlugQuery, GetCategoryBySlugQueryVariables>(GetCategoryBySlugDocument, options);
+        }
+export function useGetCategoryBySlugSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetCategoryBySlugQuery, GetCategoryBySlugQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetCategoryBySlugQuery, GetCategoryBySlugQueryVariables>(GetCategoryBySlugDocument, options);
+        }
+export type GetCategoryBySlugQueryHookResult = ReturnType<typeof useGetCategoryBySlugQuery>;
+export type GetCategoryBySlugLazyQueryHookResult = ReturnType<typeof useGetCategoryBySlugLazyQuery>;
+export type GetCategoryBySlugSuspenseQueryHookResult = ReturnType<typeof useGetCategoryBySlugSuspenseQuery>;
+export type GetCategoryBySlugQueryResult = Apollo.QueryResult<GetCategoryBySlugQuery, GetCategoryBySlugQueryVariables>;
+export function refetchGetCategoryBySlugQuery(variables: GetCategoryBySlugQueryVariables) {
+      return { query: GetCategoryBySlugDocument, variables: variables }
+    }
+export const CreateCategoryDocument = gql`
+    mutation CreateCategory($input: CreateCategoryInput!) {
+  createCategory(input: $input) {
+    success
+    message
+    code
+    timestamp
+    data {
+      entity {
+        id
+        name
+        description
+        slug
+        image
+        isActive
+        sortOrder
+        createdAt
+        updatedAt
+      }
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
+  }
+}
+    `;
+export type CreateCategoryMutationFn = Apollo.MutationFunction<CreateCategoryMutation, CreateCategoryMutationVariables>;
+
+/**
+ * __useCreateCategoryMutation__
+ *
+ * To run a mutation, you first call `useCreateCategoryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateCategoryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createCategoryMutation, { data, loading, error }] = useCreateCategoryMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateCategoryMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateCategoryMutation, CreateCategoryMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<CreateCategoryMutation, CreateCategoryMutationVariables>(CreateCategoryDocument, options);
+      }
+export type CreateCategoryMutationHookResult = ReturnType<typeof useCreateCategoryMutation>;
+export type CreateCategoryMutationResult = Apollo.MutationResult<CreateCategoryMutation>;
+export type CreateCategoryMutationOptions = Apollo.BaseMutationOptions<CreateCategoryMutation, CreateCategoryMutationVariables>;
+export const UpdateCategoryDocument = gql`
+    mutation UpdateCategory($id: ID!, $input: UpdateCategoryInput!) {
+  updateCategory(id: $id, input: $input) {
+    success
+    message
+    code
+    timestamp
+    data {
+      entity {
+        id
+        name
+        description
+        slug
+        image
+        isActive
+        sortOrder
+        createdAt
+        updatedAt
+      }
+      id
+      updatedAt
+      changes
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
+  }
+}
+    `;
+export type UpdateCategoryMutationFn = Apollo.MutationFunction<UpdateCategoryMutation, UpdateCategoryMutationVariables>;
+
+/**
+ * __useUpdateCategoryMutation__
+ *
+ * To run a mutation, you first call `useUpdateCategoryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateCategoryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateCategoryMutation, { data, loading, error }] = useUpdateCategoryMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateCategoryMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateCategoryMutation, UpdateCategoryMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<UpdateCategoryMutation, UpdateCategoryMutationVariables>(UpdateCategoryDocument, options);
+      }
+export type UpdateCategoryMutationHookResult = ReturnType<typeof useUpdateCategoryMutation>;
+export type UpdateCategoryMutationResult = Apollo.MutationResult<UpdateCategoryMutation>;
+export type UpdateCategoryMutationOptions = Apollo.BaseMutationOptions<UpdateCategoryMutation, UpdateCategoryMutationVariables>;
+export const DeleteCategoryDocument = gql`
+    mutation DeleteCategory($id: ID!) {
+  deleteCategory(id: $id) {
+    success
+    message
+    code
+    timestamp
+    data {
+      id
+      deletedAt
+      softDelete
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
+  }
+}
+    `;
+export type DeleteCategoryMutationFn = Apollo.MutationFunction<DeleteCategoryMutation, DeleteCategoryMutationVariables>;
+
+/**
+ * __useDeleteCategoryMutation__
+ *
+ * To run a mutation, you first call `useDeleteCategoryMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteCategoryMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteCategoryMutation, { data, loading, error }] = useDeleteCategoryMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteCategoryMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DeleteCategoryMutation, DeleteCategoryMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<DeleteCategoryMutation, DeleteCategoryMutationVariables>(DeleteCategoryDocument, options);
+      }
+export type DeleteCategoryMutationHookResult = ReturnType<typeof useDeleteCategoryMutation>;
+export type DeleteCategoryMutationResult = Apollo.MutationResult<DeleteCategoryMutation>;
+export type DeleteCategoryMutationOptions = Apollo.BaseMutationOptions<DeleteCategoryMutation, DeleteCategoryMutationVariables>;
 export const GetOrdersDocument = gql`
     query GetOrders($filter: OrderFilterInput, $pagination: PaginationInput) {
   orders(filter: $filter, pagination: $pagination) {
@@ -3814,46 +4446,54 @@ export type DeleteOrderItemMutationOptions = Apollo.BaseMutationOptions<DeleteOr
 export const GetProductsDocument = gql`
     query GetProducts($filter: ProductFilterInput, $pagination: PaginationInput) {
   products(filter: $filter, pagination: $pagination) {
-    products {
-      id
-      name
-      description
-      price
-      salePrice
-      sku
-      images
-      attributes
-      isActive
-      stockQuantity
-      tags
-      rating
-      reviewCount
-      createdAt
-      updatedAt
-      currentPrice
-      hasDiscount
-      discountPercentage
-      totalStock
-      isInStock
-      category {
+    data {
+      items {
         id
         name
-        slug
-        image
-      }
-      variants {
-        id
-        name
+        description
         price
+        salePrice
         sku
-        stockQuantity
+        images
         attributes
         isActive
+        stockQuantity
+        tags
+        rating
+        reviewCount
+        createdAt
+        updatedAt
+        currentPrice
+        hasDiscount
+        discountPercentage
+        totalStock
         isInStock
+        category {
+          id
+          name
+          slug
+          image
+        }
+        variants {
+          id
+          name
+          price
+          sku
+          stockQuantity
+          attributes
+          isActive
+          isInStock
+        }
+      }
+      pagination {
+        total
+        limit
+        offset
+        hasMore
+        currentPage
+        totalPages
       }
     }
-    total
-    hasMore
   }
 }
     `;
@@ -3897,52 +4537,56 @@ export function refetchGetProductsQuery(variables?: GetProductsQueryVariables) {
 export const GetProductDocument = gql`
     query GetProduct($id: ID!) {
   product(id: $id) {
-    id
-    name
-    description
-    price
-    salePrice
-    sku
-    images
-    attributes
-    isActive
-    stockQuantity
-    tags
-    rating
-    reviewCount
-    createdAt
-    updatedAt
-    currentPrice
-    hasDiscount
-    discountPercentage
-    totalStock
-    isInStock
-    category {
-      id
-      name
-      slug
-      image
-    }
-    variants {
-      id
-      name
-      price
-      sku
-      stockQuantity
-      attributes
-      isActive
-      isInStock
-    }
-    reviews {
-      id
-      rating
-      title
-      comment
-      createdAt
-      user {
+    data {
+      entity {
         id
-        firstName
-        lastName
+        name
+        description
+        price
+        salePrice
+        sku
+        images
+        attributes
+        isActive
+        stockQuantity
+        tags
+        rating
+        reviewCount
+        createdAt
+        updatedAt
+        currentPrice
+        hasDiscount
+        discountPercentage
+        totalStock
+        isInStock
+        category {
+          id
+          name
+          slug
+          image
+        }
+        variants {
+          id
+          name
+          price
+          sku
+          stockQuantity
+          attributes
+          isActive
+          isInStock
+        }
+        reviews {
+          id
+          rating
+          title
+          comment
+          createdAt
+          user {
+            id
+            firstName
+            lastName
+          }
+        }
       }
     }
   }
@@ -3987,41 +4631,45 @@ export function refetchGetProductQuery(variables: GetProductQueryVariables) {
 export const GetProductBySkuDocument = gql`
     query GetProductBySku($sku: String!) {
   productBySku(sku: $sku) {
-    id
-    name
-    description
-    price
-    salePrice
-    sku
-    images
-    attributes
-    isActive
-    stockQuantity
-    tags
-    rating
-    reviewCount
-    createdAt
-    updatedAt
-    currentPrice
-    hasDiscount
-    discountPercentage
-    totalStock
-    isInStock
-    category {
-      id
-      name
-      slug
-      image
-    }
-    variants {
-      id
-      name
-      price
-      sku
-      stockQuantity
-      attributes
-      isActive
-      isInStock
+    data {
+      entity {
+        id
+        name
+        description
+        price
+        salePrice
+        sku
+        images
+        attributes
+        isActive
+        stockQuantity
+        tags
+        rating
+        reviewCount
+        createdAt
+        updatedAt
+        currentPrice
+        hasDiscount
+        discountPercentage
+        totalStock
+        isInStock
+        category {
+          id
+          name
+          slug
+          image
+        }
+        variants {
+          id
+          name
+          price
+          sku
+          stockQuantity
+          attributes
+          isActive
+          isInStock
+        }
+      }
     }
   }
 }
@@ -4136,233 +4784,38 @@ export type SearchProductsQueryResult = Apollo.QueryResult<SearchProductsQuery, 
 export function refetchSearchProductsQuery(variables: SearchProductsQueryVariables) {
       return { query: SearchProductsDocument, variables: variables }
     }
-export const GetCategoriesDocument = gql`
-    query GetCategories {
-  categories {
-    id
-    name
-    description
-    slug
-    image
-    isActive
-    sortOrder
-    createdAt
-    updatedAt
-    products {
-      id
-      name
-      price
-      images
-      isActive
-    }
-  }
-}
-    `;
-
-/**
- * __useGetCategoriesQuery__
- *
- * To run a query within a React component, call `useGetCategoriesQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetCategoriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetCategoriesQuery({
- *   variables: {
- *   },
- * });
- */
-export function useGetCategoriesQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetCategoriesQuery, GetCategoriesQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument, options);
-      }
-export function useGetCategoriesLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetCategoriesQuery, GetCategoriesQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useLazyQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument, options);
-        }
-export function useGetCategoriesSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetCategoriesQuery, GetCategoriesQueryVariables>) {
-          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useSuspenseQuery<GetCategoriesQuery, GetCategoriesQueryVariables>(GetCategoriesDocument, options);
-        }
-export type GetCategoriesQueryHookResult = ReturnType<typeof useGetCategoriesQuery>;
-export type GetCategoriesLazyQueryHookResult = ReturnType<typeof useGetCategoriesLazyQuery>;
-export type GetCategoriesSuspenseQueryHookResult = ReturnType<typeof useGetCategoriesSuspenseQuery>;
-export type GetCategoriesQueryResult = Apollo.QueryResult<GetCategoriesQuery, GetCategoriesQueryVariables>;
-export function refetchGetCategoriesQuery(variables?: GetCategoriesQueryVariables) {
-      return { query: GetCategoriesDocument, variables: variables }
-    }
-export const GetCategoryDocument = gql`
-    query GetCategory($id: ID!) {
-  category(id: $id) {
-    id
-    name
-    description
-    slug
-    image
-    isActive
-    sortOrder
-    createdAt
-    updatedAt
-    products {
-      id
-      name
-      description
-      price
-      salePrice
-      sku
-      images
-      attributes
-      isActive
-      stockQuantity
-      tags
-      rating
-      reviewCount
-      currentPrice
-      hasDiscount
-      discountPercentage
-      totalStock
-      isInStock
-    }
-  }
-}
-    `;
-
-/**
- * __useGetCategoryQuery__
- *
- * To run a query within a React component, call `useGetCategoryQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetCategoryQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetCategoryQuery({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useGetCategoryQuery(baseOptions: ApolloReactHooks.QueryHookOptions<GetCategoryQuery, GetCategoryQueryVariables> & ({ variables: GetCategoryQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useQuery<GetCategoryQuery, GetCategoryQueryVariables>(GetCategoryDocument, options);
-      }
-export function useGetCategoryLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetCategoryQuery, GetCategoryQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useLazyQuery<GetCategoryQuery, GetCategoryQueryVariables>(GetCategoryDocument, options);
-        }
-export function useGetCategorySuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetCategoryQuery, GetCategoryQueryVariables>) {
-          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useSuspenseQuery<GetCategoryQuery, GetCategoryQueryVariables>(GetCategoryDocument, options);
-        }
-export type GetCategoryQueryHookResult = ReturnType<typeof useGetCategoryQuery>;
-export type GetCategoryLazyQueryHookResult = ReturnType<typeof useGetCategoryLazyQuery>;
-export type GetCategorySuspenseQueryHookResult = ReturnType<typeof useGetCategorySuspenseQuery>;
-export type GetCategoryQueryResult = Apollo.QueryResult<GetCategoryQuery, GetCategoryQueryVariables>;
-export function refetchGetCategoryQuery(variables: GetCategoryQueryVariables) {
-      return { query: GetCategoryDocument, variables: variables }
-    }
-export const GetCategoryBySlugDocument = gql`
-    query GetCategoryBySlug($slug: String!) {
-  categoryBySlug(slug: $slug) {
-    id
-    name
-    description
-    slug
-    image
-    isActive
-    sortOrder
-    createdAt
-    updatedAt
-    products {
-      id
-      name
-      description
-      price
-      salePrice
-      sku
-      images
-      attributes
-      isActive
-      stockQuantity
-      tags
-      rating
-      reviewCount
-      currentPrice
-      hasDiscount
-      discountPercentage
-      totalStock
-      isInStock
-    }
-  }
-}
-    `;
-
-/**
- * __useGetCategoryBySlugQuery__
- *
- * To run a query within a React component, call `useGetCategoryBySlugQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetCategoryBySlugQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetCategoryBySlugQuery({
- *   variables: {
- *      slug: // value for 'slug'
- *   },
- * });
- */
-export function useGetCategoryBySlugQuery(baseOptions: ApolloReactHooks.QueryHookOptions<GetCategoryBySlugQuery, GetCategoryBySlugQueryVariables> & ({ variables: GetCategoryBySlugQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
-        const options = {...defaultOptions, ...baseOptions}
-        return ApolloReactHooks.useQuery<GetCategoryBySlugQuery, GetCategoryBySlugQueryVariables>(GetCategoryBySlugDocument, options);
-      }
-export function useGetCategoryBySlugLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetCategoryBySlugQuery, GetCategoryBySlugQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useLazyQuery<GetCategoryBySlugQuery, GetCategoryBySlugQueryVariables>(GetCategoryBySlugDocument, options);
-        }
-export function useGetCategoryBySlugSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetCategoryBySlugQuery, GetCategoryBySlugQueryVariables>) {
-          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return ApolloReactHooks.useSuspenseQuery<GetCategoryBySlugQuery, GetCategoryBySlugQueryVariables>(GetCategoryBySlugDocument, options);
-        }
-export type GetCategoryBySlugQueryHookResult = ReturnType<typeof useGetCategoryBySlugQuery>;
-export type GetCategoryBySlugLazyQueryHookResult = ReturnType<typeof useGetCategoryBySlugLazyQuery>;
-export type GetCategoryBySlugSuspenseQueryHookResult = ReturnType<typeof useGetCategoryBySlugSuspenseQuery>;
-export type GetCategoryBySlugQueryResult = Apollo.QueryResult<GetCategoryBySlugQuery, GetCategoryBySlugQueryVariables>;
-export function refetchGetCategoryBySlugQuery(variables: GetCategoryBySlugQueryVariables) {
-      return { query: GetCategoryBySlugDocument, variables: variables }
-    }
 export const CreateProductDocument = gql`
     mutation CreateProduct($input: CreateProductInput!) {
   createProduct(input: $input) {
-    id
-    name
-    description
-    price
-    salePrice
-    sku
-    images
-    attributes
-    isActive
-    stockQuantity
-    tags
-    rating
-    reviewCount
-    createdAt
-    updatedAt
-    currentPrice
-    hasDiscount
-    discountPercentage
-    totalStock
-    isInStock
-    category {
-      id
-      name
-      slug
-      image
+    data {
+      entity {
+        id
+        name
+        description
+        price
+        salePrice
+        sku
+        images
+        attributes
+        isActive
+        stockQuantity
+        tags
+        rating
+        reviewCount
+        createdAt
+        updatedAt
+        currentPrice
+        hasDiscount
+        discountPercentage
+        totalStock
+        isInStock
+        category {
+          id
+          name
+          slug
+          image
+        }
+      }
     }
   }
 }
@@ -5700,28 +6153,38 @@ export function refetchGetActiveSessionsQuery(variables: GetActiveSessionsQueryV
 export const CreateUserDocument = gql`
     mutation CreateUser($input: CreateUserProfileInput!) {
   createUser(input: $input) {
-    id
-    email
-    role
-    isActive
-    emailVerified
-    lastLoginAt
-    createdAt
-    updatedAt
-    profile {
+    success
+    message
+    code
+    timestamp
+    data {
+      entity {
+        id
+        email
+        role
+        isActive
+        emailVerified
+        lastLoginAt
+        createdAt
+        updatedAt
+        profile {
+          id
+          firstName
+          lastName
+          phone
+          dateOfBirth
+          avatar
+          role
+          emailVerified
+          isActive
+          lastLoginAt
+          createdAt
+          updatedAt
+          fullName
+        }
+      }
       id
-      firstName
-      lastName
-      phone
-      dateOfBirth
-      avatar
-      role
-      emailVerified
-      isActive
-      lastLoginAt
       createdAt
-      updatedAt
-      fullName
     }
   }
 }
