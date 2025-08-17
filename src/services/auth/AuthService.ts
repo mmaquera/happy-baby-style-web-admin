@@ -98,9 +98,15 @@ export abstract class BaseAuthService {
     
     return {
       accessToken,
-      refreshToken: refreshToken || undefined,
+      ...(refreshToken && { refreshToken }),  // Solo incluir si existe
       expiresAt: expiresAt ? new Date(expiresAt) : new Date(Date.now() + 3600000)
     };
+  }
+  
+  // Public method to get refresh token for external use
+  public getRefreshToken(): string | null {
+    const tokens = this.getStoredTokens();
+    return tokens?.refreshToken || null;
   }
   
   protected isTokenExpired(tokens: IAuthToken): boolean {

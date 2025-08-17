@@ -62,7 +62,7 @@ const statusConfig = {
 
 export const Orders: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<OrderStatus | ''>('');
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
 
   // Use custom hook for orders
@@ -71,7 +71,9 @@ export const Orders: React.FC = () => {
     loading: isLoading, 
     error, 
     refetch
-  } = useOrders({ filter: statusFilter ? { status: statusFilter as any } : undefined });
+  } = useOrders(statusFilter ? { 
+    filter: { status: statusFilter } 
+  } : {});
 
   // Filter orders based on search term
   const filteredOrders = orders.filter(order =>
@@ -219,7 +221,7 @@ export const Orders: React.FC = () => {
           
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={(e) => setStatusFilter(e.target.value as OrderStatus | '')}
             style={{
               padding: '0.75rem 1rem',
               border: `1px solid ${theme.colors.border.light}`,
@@ -355,7 +357,8 @@ export const Orders: React.FC = () => {
                         color: theme.colors.text.secondary,
                         fontSize: theme.fontSizes.sm
                       }}>
-                        {order.orderItems?.length || 0} producto{order.orderItems?.length !== 1 ? 's' : ''}
+                        {/* TODO: orderItems no está disponible en GraphQL actualmente */}
+                        0 productos
                       </p>
                     </div>
                     

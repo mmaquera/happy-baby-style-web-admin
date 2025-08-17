@@ -143,14 +143,17 @@ export const useUpdateUserOptimized = () => {
         variables: { id, input },
         // Optimize cache updates by only updating the specific user
         update: (cache, { data }) => {
-          if (data?.updateUser) {
-            if (data.updateUser.id && typeof data.updateUser.id === 'string') {
+          if (data?.updateUser?.id && typeof data.updateUser.id === 'string') {
+            const userId = data.updateUser.id; // TypeScript ahora sabe que es string
+            const cacheId = cache.identify({ __typename: 'User', id: userId });
+            
+            if (cacheId) {
               cache.modify({
-                id: cache.identify({ __typename: 'User', id: data.updateUser.id as string }),
+                id: cacheId,
                 fields: {
-                  email: () => data.updateUser.email,
-                  role: () => data.updateUser.role,
-                  isActive: () => data.updateUser.isActive,
+                  email: () => data.updateUser.email!,
+                  role: () => data.updateUser.role!,
+                  isActive: () => data.updateUser.isActive!,
                   profile: () => data.updateUser.profile,
                 },
               });

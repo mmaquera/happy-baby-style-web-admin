@@ -95,16 +95,5 @@ export interface GraphQLMiddlewareConfig {
 }
 
 // Export all types
-export type {
-  IAuthToken,
-  IAuthUser,
-  IAuthResponse,
-  IAuthError,
-  LoginCredentials,
-  RegisterCredentials,
-  AuthState,
-  AuthActions,
-  RoleAccess,
-  ITokenStorage,
-  GraphQLMiddlewareConfig,
-};
+// Note: Types are already exported individually above
+// No need for duplicate export statements

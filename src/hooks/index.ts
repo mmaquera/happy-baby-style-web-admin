@@ -19,3 +19,4 @@ export { useCategoriesGraphQL } from './useCategoriesGraphQL';
 export { useCategoryActions } from './useCategoryActions';
 export { useCategoryFilters } from './useCategoryFilters';
 export { useCreateCategory } from './useCreateCategory';
+export { useUpdateCategory } from './useUpdateCategory';

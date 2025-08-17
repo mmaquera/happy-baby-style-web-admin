@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useProducts, useCreateProduct, useDeleteProduct, useProductSearch } from '../hooks/useProductsGraphQL';
-import { CreateProductInput, ProductFilterInput } from '../generated/graphql';
+import { CreateProductInput, ProductFilterInput, Product } from '../generated/graphql';
 
 const ProductsGraphQL: React.FC = () => {
   const [filters, setFilters] = useState<ProductFilterInput>({
@@ -190,7 +190,7 @@ const ProductsGraphQL: React.FC = () => {
             {product.tags && product.tags.length > 0 && (
               <div className="mt-4">
                 <div className="flex flex-wrap gap-1">
-                  {product.tags.map((tag, index) => (
+                  {product.tags.map((tag: string, index: number) => (
                     <span
                       key={index}
                       className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"

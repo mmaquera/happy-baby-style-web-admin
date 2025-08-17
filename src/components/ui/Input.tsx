@@ -134,7 +134,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   rightIconClickable = false,
   rightIconAriaLabel,
   isError,
-  ...props
+  ...domProps
 }, ref) => {
   // Use icon as leftIcon if provided
   const finalLeftIcon = leftIcon || icon;
@@ -142,8 +142,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
   // Determine if there's an error (support both error and isError props)
   const hasError = !!(error || isError);
   
-  // Filter out custom props that shouldn't be passed to DOM
-  const { isError: _, ...domProps } = props;
+  // No need for second destructuring - domProps already contains all remaining props
   
   const handleRightIconClick = () => {
     if (rightIconClickable && onRightIconClick) {

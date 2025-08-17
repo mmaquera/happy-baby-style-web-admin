@@ -41,13 +41,15 @@ export const theme = {
     border: {
       light: 'rgba(139, 134, 128, 0.1)',
       medium: 'rgba(139, 134, 128, 0.3)',
-      accent: '#A285D1'
+      accent: '#A285D1',
+      dark: '#64748b' 
     }
   },
   
   fonts: {
     primary: "'Quicksand', sans-serif",
-    heading: "'Montserrat', sans-serif"
+    heading: "'Montserrat', sans-serif",
+    mono: 'JetBrains Mono, Consolas, monospace' 
   },
   
   fontWeights: {

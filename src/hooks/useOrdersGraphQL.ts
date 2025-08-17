@@ -12,9 +12,23 @@ import {
   OrderFilterInput,
   CreateOrderInput,
   UpdateOrderInput,
-  OrderStatus
+  OrderStatus,
+  PaginationInput
 } from '../generated/graphql';
 import toast from 'react-hot-toast';
+
+// Helper functions to map TypeScript types to GraphQL types
+const mapToGraphQLFilter = (filter: OrderFilterInput | undefined): OrderFilterInput | null => {
+  return filter || null;
+};
+
+const mapToGraphQLPagination = (limit: number, offset: number = 0): PaginationInput => {
+  return { limit, offset };
+};
+
+const mapToGraphQLString = (value: string | undefined): string | null => {
+  return value || null;
+};
 
 interface UseOrdersOptions {
   filter?: OrderFilterInput;
@@ -27,8 +41,8 @@ export const useOrders = (options: UseOrdersOptions = {}) => {
   
   const { data, loading, error, fetchMore, refetch } = useGetOrdersQuery({
     variables: {
-      filter,
-      pagination: { limit, offset: 0 }
+      filter: mapToGraphQLFilter(filter),
+      pagination: mapToGraphQLPagination(limit, 0)
     },
     skip,
     notifyOnNetworkStatusChange: true,
@@ -157,7 +171,12 @@ export const useShipOrder = () => {
   });
 
   const ship = (id: string, trackingNumber?: string) => {
-    return shipOrder({ variables: { id, trackingNumber } });
+    return shipOrder({ 
+      variables: { 
+        id, 
+        trackingNumber: mapToGraphQLString(trackingNumber) 
+      } 
+    });
   };
 
   return { ship, loading, error };

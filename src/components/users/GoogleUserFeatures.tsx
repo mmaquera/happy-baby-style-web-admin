@@ -171,7 +171,7 @@ export const GoogleUserFeatures: React.FC<GoogleUserFeaturesProps> = ({
   const { impersonateUser } = useUserImpersonation();
 
   // Encontrar cuenta de Google del usuario
-  const googleAccount = user.accounts?.find(account => account.provider === AuthProvider.GOOGLE);
+  const googleAccount = user.accounts?.find(account => account.provider === AuthProvider.google);
   
   if (!googleAccount) {
     return (

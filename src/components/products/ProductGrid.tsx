@@ -292,10 +292,10 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
           <ProductCard
             key={product.id}
             product={product}
-            onEdit={onEdit || undefined}
-            onDelete={onDelete || undefined}
-            onToggleStatus={onToggleStatus || undefined}
-            onViewDetails={onViewDetails || undefined}
+            {...(onEdit && { onEdit })}
+            {...(onDelete && { onDelete })}
+            {...(onToggleStatus && { onToggleStatus })}
+            {...(onViewDetails && { onViewDetails })}
           />
         ))}
       </GridContainer>

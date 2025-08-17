@@ -102,7 +102,7 @@ export const LoginForm: React.FC = () => {
               message: 'Ingresa un correo electrónico válido',
             },
           })}
-          error={errors.email?.message}
+          error={errors.email?.message || ''}
         />
 
         <Input
@@ -122,7 +122,7 @@ export const LoginForm: React.FC = () => {
               message: 'La contraseña debe tener al menos 6 caracteres',
             },
           })}
-          error={errors.password?.message}
+          error={errors.password?.message || ''}
         />
 
         <ForgotPasswordLink href="#" onClick={(e) => e.preventDefault()}>

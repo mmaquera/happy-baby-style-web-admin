@@ -198,7 +198,7 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
   // Remove specific filter
   const handleRemoveFilter = useCallback((key: string) => {
     const newFilters = { ...localFilters };
-    delete newFilters[key];
+    delete (newFilters as any)[key];
     setLocalFilters(newFilters);
     onFiltersChange(newFilters);
   }, [localFilters, onFiltersChange]);

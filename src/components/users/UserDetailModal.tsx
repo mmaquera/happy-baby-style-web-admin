@@ -282,7 +282,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
   const { sessions, loading: sessionsLoading, refetch: refetchSessions } = useUserSessions(user.id);
   
   // Verificar si el usuario tiene cuenta de Google
-  const hasGoogleAccount = user.accounts?.some(account => account.provider === AuthProvider.GOOGLE);
+  const hasGoogleAccount = user.accounts?.some(account => account.provider === AuthProvider.google);
   
   if (!isOpen) return null;
 
@@ -405,14 +405,14 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
                     </InfoItem>
                   )}
 
-                  {user.profile?.birthDate && (
+                  {user.profile?.dateOfBirth && (
                     <InfoItem>
                       <InfoIcon>
                         <Calendar size={16} />
                       </InfoIcon>
                       <InfoContent>
                         <InfoLabel>Fecha de Nacimiento</InfoLabel>
-                        <InfoValue>{formatDate(user.profile.birthDate)}</InfoValue>
+                        <InfoValue>{formatDate(user.profile.dateOfBirth)}</InfoValue>
                       </InfoContent>
                     </InfoItem>
                   )}
@@ -515,7 +515,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
                     {user.addresses.map((address) => (
                       <AddressItem key={address.id}>
                         <AddressTitle>
-                          {address.title}
+                          {address.fullName}
                           {address.isDefault && (
                             <StatusBadge status="active" style={{ marginLeft: theme.spacing[2] }}>
                               Predeterminada
@@ -524,8 +524,8 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
                         </AddressTitle>
                         <AddressText>
                           {address.firstName} {address.lastName}<br />
-                          {address.addressLine1}<br />
-                          {address.addressLine2 && <>{address.addressLine2}<br /></>}
+                          {address.address1}<br />
+                          {address.address2 && <>{address.address2}<br /></>}
                           {address.city}, {address.state} {address.postalCode}<br />
                           {address.country}
                         </AddressText>
@@ -543,12 +543,12 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
                 <Key size={20} />
                 Cuentas de Autenticación
               </SectionTitle>
-              <UserAuthAccounts 
+              {/*<UserAuthAccounts 
                 accounts={user.accounts || []} 
                 onAccountUnlinked={() => {
                   // Refresh user data when account is unlinked
                 }} 
-              />
+              />*/}
             </Section>
           )}
 
@@ -558,22 +558,22 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
                 <Activity size={20} />
                 Gestión de Sesiones
               </SectionTitle>
-              <UserSessionsManager 
+            {/*<UserSessionsManager 
                 userId={user.id}
                 sessions={sessions}
                 onSessionRevoked={refetchSessions}
-              />
+              />*/}
             </Section>
           )}
 
-          {activeTab === 'google-features' && hasGoogleAccount && (
+          {/*activeTab === 'google-features' && hasGoogleAccount && (
             <GoogleUserFeatures 
               user={user}
               onUserUpdated={() => {
                 // Refresh user data when needed
               }}
             />
-          )}
+          )*/}
         </TabContent>
       </ModalContent>
     </Modal>

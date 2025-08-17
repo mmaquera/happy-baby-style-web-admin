@@ -21,6 +21,24 @@ interface AuthStats {
   usersByRole: any;
 }
 
+// Nueva interfaz para las estadísticas del dashboard de proveedores de autenticación
+export interface AuthProviderStats {
+  totalUsers: number;
+  activeSessionsCount: number;
+  usersByProvider: Array<{
+    provider: AuthProvider;
+    count: number;
+    percentage: number;
+  }>;
+  recentLogins: Array<{
+    userId: string;
+    email: string;
+    provider: AuthProvider;
+    loginAt: string;
+    ipAddress?: string | null;
+  }>;
+}
+
 export const useAuthManagement = () => {
   const { user } = useAuth();
   const [stats, setStats] = useState<AuthStats | null>(null);
@@ -284,7 +302,7 @@ export const useUserImpersonation = () => {
 
 export const useAuthProviderStats = () => {
   const { user } = useAuth();
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<AuthProviderStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

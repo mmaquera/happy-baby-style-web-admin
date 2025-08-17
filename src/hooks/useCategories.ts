@@ -66,6 +66,22 @@ export interface UseCategoriesReturn {
 }
 
 export const useCategories = (): UseCategoriesReturn => {
+  // Helper function to map GraphQL filters to local filters
+  const mapGraphQLFiltersToLocal = useCallback((graphqlFilters: CategoryFilterInput) => {
+    const localFilters: any = {};
+    
+    // Only add properties that are not null or undefined
+    if (graphqlFilters.isActive !== null && graphqlFilters.isActive !== undefined) {
+      localFilters.isActive = graphqlFilters.isActive;
+    }
+    
+    if (graphqlFilters.search !== null && graphqlFilters.search !== undefined) {
+      localFilters.search = graphqlFilters.search;
+    }
+    
+    return localFilters;
+  }, []);
+
   // Core GraphQL operations
   const {
     categories,
@@ -187,8 +203,9 @@ export const useCategories = (): UseCategoriesReturn => {
 
   // Wrapper for set filters
   const setFilters = useCallback((newFilters: CategoryFilterInput) => {
-    setFiltersLocal(newFilters);
-  }, [setFiltersLocal]);
+    const localFilters = mapGraphQLFiltersToLocal(newFilters);
+    setFiltersLocal(localFilters);
+  }, [setFiltersLocal, mapGraphQLFiltersToLocal]);
 
   // Wrapper for update filter
   const updateFilter = useCallback((key: string, value: any) => {

@@ -167,12 +167,12 @@ export const useAuth = (): UseAuthReturn => {
   // Refresh token function
   const refreshToken = useCallback(async () => {
     try {
-      const tokens = authService.getStoredTokens();
-      if (!tokens?.refreshToken) {
+      const refreshTokenValue = authService.getRefreshToken();
+      if (!refreshTokenValue) {
         throw new Error('No refresh token available');
       }
       
-      await authService.refreshToken(tokens.refreshToken);
+      await authService.refreshToken(refreshTokenValue);
       
       // Re-fetch current user
       const user = await authService.getCurrentUser();
@@ -232,10 +232,10 @@ export const useRoleAccess = (requiredRoles: UserRole[]) => {
 
 // Custom hook for admin access
 export const useAdminAccess = () => {
-  return useRoleAccess([UserRole.ADMIN]);
+  return useRoleAccess([UserRole.admin]);
 };
 
 // Custom hook for staff access
 export const useStaffAccess = () => {
-  return useRoleAccess([UserRole.ADMIN, UserRole.STAFF]);
+  return useRoleAccess([UserRole.admin, UserRole.staff]);
 }; 

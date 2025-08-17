@@ -9,9 +9,19 @@ import {
   GetProductsDocument,
   ProductFilterInput,
   CreateProductInput,
-  UpdateProductInput
+  UpdateProductInput,
+  PaginationInput
 } from '../generated/graphql';
 import toast from 'react-hot-toast';
+
+// Helper functions to map TypeScript types to GraphQL types
+const mapToGraphQLFilter = (filter: ProductFilterInput | undefined): ProductFilterInput | null => {
+  return filter || null;
+};
+
+const mapToGraphQLPagination = (limit: number, offset: number = 0): PaginationInput => {
+  return { limit, offset };
+};
 
 interface UseProductsOptions {
   filter?: ProductFilterInput;
@@ -24,8 +34,8 @@ export const useProducts = (options: UseProductsOptions = {}) => {
   
   const { data, loading, error, fetchMore, refetch } = useGetProductsQuery({
     variables: {
-      filter: filter || undefined,
-      pagination: { limit, offset: 0 }
+      filter: mapToGraphQLFilter(filter),
+      pagination: mapToGraphQLPagination(limit, 0)
     },
     skip,
     notifyOnNetworkStatusChange: true,
@@ -33,22 +43,22 @@ export const useProducts = (options: UseProductsOptions = {}) => {
   });
 
   const loadMore = () => {
-    if (!data?.products.hasMore) return;
+    if (!data?.products?.data?.pagination?.hasMore) return;
     
     return fetchMore({
       variables: {
         pagination: {
           limit,
-          offset: data.products.products.length
+          offset: data.products?.data?.items?.length || 0
         }
       }
     });
   };
 
   return {
-    products: data?.products.products || [],
-    total: data?.products.total || 0,
-    hasMore: data?.products.hasMore || false,
+    products: data?.products?.data?.items || [],
+    total: data?.products?.data?.pagination?.total || 0,
+    hasMore: data?.products?.data?.pagination?.hasMore || false,
     loading,
     error,
     loadMore,
@@ -64,7 +74,7 @@ export const useProduct = (id: string, skip = false) => {
   });
 
   return {
-    product: data?.product,
+    product: data?.product?.data?.entity,
     loading,
     error,
     refetch

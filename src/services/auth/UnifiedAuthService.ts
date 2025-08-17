@@ -38,7 +38,7 @@ export class LocalTokenStorage implements ITokenStorage {
     
     return {
       accessToken,
-      refreshToken: refreshToken || undefined,
+      ...(refreshToken && { refreshToken }),  // Solo incluir si existe
       expiresAt: expiresAt ? new Date(expiresAt) : new Date(Date.now() + 3600000)
     };
   }
@@ -90,7 +90,7 @@ export class UnifiedAuthService {
       const user = this.mapGraphQLUserToAuthUser(response.user);
       const tokens: IAuthToken = {
         accessToken: response.accessToken || '',
-        refreshToken: response.refreshToken || undefined,
+        ...(response.refreshToken && { refreshToken: response.refreshToken }),  // Solo incluir si existe
         expiresAt: new Date(Date.now() + 3600000) // 1 hour
       };
 
@@ -223,14 +223,14 @@ export class UnifiedAuthService {
       role: this.mapGraphQLRoleToUserRole(graphqlUser.role),
       isActive: graphqlUser.isActive,
       emailVerified: graphqlUser.emailVerified,
-      lastLoginAt: graphqlUser.lastLoginAt || undefined,
+      ...(graphqlUser.lastLoginAt && { lastLoginAt: graphqlUser.lastLoginAt }),
       profile: graphqlUser.profile ? {
         id: graphqlUser.profile.id,
-        firstName: graphqlUser.profile.firstName || undefined,
-        lastName: graphqlUser.profile.lastName || undefined,
-        phone: graphqlUser.profile.phone || undefined,
-        birthDate: graphqlUser.profile.birthDate || undefined,
-        avatar: graphqlUser.profile.avatar || undefined,
+        ...(graphqlUser.profile.firstName && { firstName: graphqlUser.profile.firstName }),
+        ...(graphqlUser.profile.lastName && { lastName: graphqlUser.profile.lastName }),
+        ...(graphqlUser.profile.phone && { phone: graphqlUser.profile.phone }),
+        ...(graphqlUser.profile.birthDate && { birthDate: graphqlUser.profile.birthDate }),
+        ...(graphqlUser.profile.avatar && { avatar: graphqlUser.profile.avatar }),
       } : undefined
     };
   }

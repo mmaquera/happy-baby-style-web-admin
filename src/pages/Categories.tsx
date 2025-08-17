@@ -6,6 +6,8 @@ import {
   CategoryGrid,
   CategoryListView,
   CreateCategoryModal,
+  EditCategoryModal,
+  CategoryDetailModal,
   CategoryFilters
 } from '@/components/categories';
 import { useCategories } from '@/hooks/useCategories';
@@ -78,6 +80,9 @@ export const Categories: React.FC = () => {
   // State for UI
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<any>(null);
   const [showFilters, setShowFilters] = useState(false);
 
   // Use the main categories hook
@@ -89,6 +94,7 @@ export const Categories: React.FC = () => {
     filters,
     sortConfig,
     createCategory,
+    updateCategory,
     deleteCategory,
     toggleStatus,
     setFilters,
@@ -140,8 +146,22 @@ export const Categories: React.FC = () => {
   }, []);
 
   const handleEditCategory = useCallback((categoryId: string) => {
-    // TODO: Implement edit category modal/form
-    console.log('Edit category:', categoryId);
+    const category = categories.find(cat => cat.id === categoryId);
+    if (category) {
+      setSelectedCategory(category);
+      setIsEditModalOpen(true);
+    }
+  }, [categories]);
+
+  const handleEditModalClose = useCallback(() => {
+    setIsEditModalOpen(false);
+    setSelectedCategory(null);
+  }, []);
+
+  const handleEditCategorySuccess = useCallback((updatedCategory: any) => {
+    toast.success('Categoría actualizada exitosamente');
+    setIsEditModalOpen(false);
+    setSelectedCategory(null);
   }, []);
 
   const handleDeleteCategory = useCallback(async (categoryId: string) => {
@@ -163,8 +183,22 @@ export const Categories: React.FC = () => {
   }, [toggleStatus]);
 
   const handleViewDetails = useCallback((categoryId: string) => {
-    // TODO: Implement view details modal/page
-    console.log('View details:', categoryId);
+    const category = categories.find(cat => cat.id === categoryId);
+    if (category) {
+      setSelectedCategory(category);
+      setIsDetailModalOpen(true);
+    }
+  }, [categories]);
+
+  const handleDetailModalClose = useCallback(() => {
+    setIsDetailModalOpen(false);
+    setSelectedCategory(null);
+  }, []);
+
+  const handleEditFromDetail = useCallback((category: any) => {
+    setIsDetailModalOpen(false);
+    setSelectedCategory(category);
+    setIsEditModalOpen(true);
   }, []);
 
   const handleViewModeChange = useCallback((mode: 'grid' | 'list') => {
@@ -272,6 +306,22 @@ export const Categories: React.FC = () => {
         isOpen={isCreateModalOpen}
         onClose={handleCreateModalClose}
         onSuccess={handleCreateCategorySuccess}
+      />
+
+      {/* Edit Category Modal */}
+      <EditCategoryModal
+        isOpen={isEditModalOpen}
+        onClose={handleEditModalClose}
+        onSuccess={handleEditCategorySuccess}
+        category={selectedCategory}
+      />
+
+      {/* Category Detail Modal */}
+      <CategoryDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={handleDetailModalClose}
+        category={selectedCategory}
+        onEdit={handleEditFromDetail}
       />
     </CategoriesContainer>
   );

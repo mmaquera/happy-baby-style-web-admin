@@ -42,7 +42,6 @@
 
 **Files affected**:
 - `src/pages/Users.tsx` - Multiple type conflicts
-- `src/hooks/useMockUsers.ts` - Type mismatches
 - `src/hooks/useUsersGraphQL.ts` - Line 113
 
 **Solution**: Implement proper type conversion utilities

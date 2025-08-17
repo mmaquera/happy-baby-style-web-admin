@@ -11,9 +11,6 @@ export interface IEnvironmentConfig {
   graphqlUrl: string;
   graphqlPlaygroundEnabled: boolean;
   
-  // API Configuration
-  apiUrl: string;
-  
   // Application Configuration
   appName: string;
   mode: string;
@@ -40,10 +37,6 @@ class DevelopmentConfig implements IEnvironmentConfig {
 
   get graphqlPlaygroundEnabled(): boolean {
     return import.meta.env.VITE_GRAPHQL_PLAYGROUND_ENABLED === 'true';
-  }
-
-  get apiUrl(): string {
-    return import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
   }
 
   get appName(): string {
@@ -93,10 +86,6 @@ class ProductionConfig implements IEnvironmentConfig {
     return import.meta.env.VITE_GRAPHQL_PLAYGROUND_ENABLED === 'true';
   }
 
-  get apiUrl(): string {
-    return import.meta.env.VITE_API_URL || 'https://api.happybabystyle.com/api';
-  }
-
   get appName(): string {
     return import.meta.env.VITE_APP_NAME || 'Happy Baby Style Admin';
   }
@@ -144,10 +133,6 @@ class StagingConfig implements IEnvironmentConfig {
     return import.meta.env.VITE_GRAPHQL_PLAYGROUND_ENABLED === 'true';
   }
 
-  get apiUrl(): string {
-    return import.meta.env.VITE_API_URL || 'https://staging-api.happybabystyle.com/api';
-  }
-
   get appName(): string {
     return import.meta.env.VITE_APP_NAME || 'Happy Baby Style Admin (Staging)';
   }
@@ -193,10 +178,6 @@ class TestConfig implements IEnvironmentConfig {
 
   get graphqlPlaygroundEnabled(): boolean {
     return false;
-  }
-
-  get apiUrl(): string {
-    return 'http://localhost:3001/api';
   }
 
   get appName(): string {

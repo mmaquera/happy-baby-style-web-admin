@@ -258,6 +258,7 @@ export const UserActionsMenu: React.FC<UserActionsMenuProps> = ({
       document.addEventListener('click', handleClickOutside);
       return () => document.removeEventListener('click', handleClickOutside);
     }
+    return undefined;
   }, [isOpen]);
 
   // Recalculate position on scroll or resize
@@ -275,6 +276,7 @@ export const UserActionsMenu: React.FC<UserActionsMenuProps> = ({
         window.removeEventListener('resize', handleReposition);
       };
     }
+    return undefined;
   }, [isOpen]);
 
   // Recalculate position after menu is rendered
@@ -287,6 +289,7 @@ export const UserActionsMenu: React.FC<UserActionsMenuProps> = ({
       
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [isOpen]);
 
 

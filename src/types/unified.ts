@@ -45,7 +45,7 @@ export interface User {
   isActive: boolean;
   emailVerified: boolean;
   lastLoginAt?: string | null;
-  profile?: UserProfile;
+  profile?: UserProfile | null;
   accounts?: UserAccount[];
   sessions?: UserSession[];
   createdAt: string;
@@ -220,8 +220,8 @@ export const convertGraphQLUserToUser = (graphqlUser: GraphQLUser): User => {
     role: convertGraphQLUserRoleToUserRole(graphqlUser.role),
     isActive: graphqlUser.isActive,
     emailVerified: graphqlUser.emailVerified,
-    lastLoginAt: graphqlUser.lastLoginAt || undefined,
-    profile: graphqlUser.profile ? convertGraphQLUserProfileToUserProfile(graphqlUser.profile) : undefined,
+    lastLoginAt: graphqlUser.lastLoginAt || null,
+    profile: graphqlUser.profile ? convertGraphQLUserProfileToUserProfile(graphqlUser.profile) : null,
     accounts: graphqlUser.accounts?.map(convertGraphQLUserAccountToUserAccount) || [],
     sessions: graphqlUser.sessions?.map(convertGraphQLUserSessionToUserSession) || [],
     createdAt: graphqlUser.createdAt,
@@ -232,11 +232,11 @@ export const convertGraphQLUserToUser = (graphqlUser: GraphQLUser): User => {
 export const convertGraphQLUserProfileToUserProfile = (graphqlProfile: GraphQLUserProfile): UserProfile => {
   return {
     id: graphqlProfile.id,
-    firstName: graphqlProfile.firstName || undefined,
-    lastName: graphqlProfile.lastName || undefined,
-    phone: graphqlProfile.phone || undefined,
-    dateOfBirth: graphqlProfile.dateOfBirth || undefined,
-    avatar: graphqlProfile.avatar || undefined,
+    firstName: graphqlProfile.firstName || null,
+    lastName: graphqlProfile.lastName || null,
+    phone: graphqlProfile.phone || null,
+    dateOfBirth: graphqlProfile.dateOfBirth || null,
+    avatar: graphqlProfile.avatar || null,
     createdAt: graphqlProfile.createdAt,
     updatedAt: graphqlProfile.updatedAt
   };
@@ -250,7 +250,7 @@ export const convertGraphQLOrderToOrder = (graphqlOrder: GraphQLOrder): Order =>
     totalAmount: Number(graphqlOrder.totalAmount),
     shippingAddress: graphqlOrder.shippingAddress || {},
     items: graphqlOrder.items?.map(item => convertGraphQLOrderItemToOrderItem(item)) || [],
-    user: graphqlOrder.user ? convertGraphQLUserProfileToUserProfile(graphqlOrder.user) : undefined,
+    ...(graphqlOrder.user && { user: convertGraphQLUserProfileToUserProfile(graphqlOrder.user) }),
     createdAt: new Date(graphqlOrder.createdAt),
     updatedAt: new Date(graphqlOrder.updatedAt)
   };
@@ -264,7 +264,7 @@ export const convertGraphQLOrderItemToOrderItem = (graphqlOrderItem: GraphQLOrde
     quantity: graphqlOrderItem.quantity,
     unitPrice: Number(graphqlOrderItem.unitPrice),
     totalPrice: Number(graphqlOrderItem.totalPrice),
-    product: graphqlOrderItem.product ? convertGraphQLProductToProduct(graphqlOrderItem.product) : undefined,
+    ...(graphqlOrderItem.product && { product: convertGraphQLProductToProduct(graphqlOrderItem.product) }),
     createdAt: new Date(graphqlOrderItem.createdAt)
   };
 };
@@ -340,12 +340,12 @@ export const convertGraphQLUserAccountToUserAccount = (graphqlAccount: any): Use
     userId: graphqlAccount.userId,
     provider: convertGraphQLAuthProviderToAuthProvider(graphqlAccount.provider),
     providerAccountId: graphqlAccount.providerAccountId,
-    accessToken: graphqlAccount.accessToken || undefined,
-    refreshToken: graphqlAccount.refreshToken || undefined,
-    tokenType: graphqlAccount.tokenType || undefined,
-    scope: graphqlAccount.scope || undefined,
-    idToken: graphqlAccount.idToken || undefined,
-    expiresAt: graphqlAccount.expiresAt ? new Date(graphqlAccount.expiresAt).getTime() : undefined,
+    accessToken: graphqlAccount.accessToken || null,
+    refreshToken: graphqlAccount.refreshToken || null,
+    tokenType: graphqlAccount.tokenType || null,
+    scope: graphqlAccount.scope || null,
+    idToken: graphqlAccount.idToken || null,
+    expiresAt: graphqlAccount.expiresAt ? new Date(graphqlAccount.expiresAt).getTime() : null,
     createdAt: graphqlAccount.createdAt,
     updatedAt: graphqlAccount.updatedAt
   };

@@ -4,7 +4,7 @@ import { AuthProvider } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { theme } from '@/styles/theme';
-import { useAuthProviderStats, useProviderUtils } from '@/hooks/useAuthManagement';
+import { useAuthProviderStats, useProviderUtils, AuthProviderStats } from '@/hooks/useAuthManagement';
 import { 
   TrendingUp,
   Users,
@@ -307,7 +307,7 @@ export const AuthProviderDashboard: React.FC = () => {
         {/* Distribución por Proveedor */}
         <div>
           <SectionTitle>Distribución por Proveedor</SectionTitle>
-          {stats.usersByProvider.map((provider) => {
+          {stats.usersByProvider.map((provider: AuthProviderStats['usersByProvider'][0]) => {
             const color = getProviderColor(provider.provider);
             return (
               <ProviderCard key={provider.provider} color={color}>
@@ -351,7 +351,7 @@ export const AuthProviderDashboard: React.FC = () => {
           <SectionTitle>Actividad Reciente</SectionTitle>
           <RecentActivitySection>
             <ActivityList>
-              {stats.recentLogins.slice(0, 5).map((login, index) => {
+              {stats.recentLogins.slice(0, 5).map((login: AuthProviderStats['recentLogins'][0], index: number) => {
                 const color = getProviderColor(login.provider);
                 return (
                   <ActivityItem key={`${login.userId}-${index}`}>

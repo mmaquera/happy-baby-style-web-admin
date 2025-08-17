@@ -4,8 +4,6 @@ import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
-import { useCreateProduct } from '@/hooks/useCreateProduct';
-import ImageUploadService from '@/services/upload/ImageUploadService';
 import { 
   X,
   Plus,
@@ -20,12 +18,7 @@ import {
   AlertTriangle,
   Settings
 } from 'lucide-react';
-
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-}
+import type { Category, ProductFormData } from './types';
 
 interface CreateProductModalProps {
   isOpen: boolean;
@@ -33,20 +26,6 @@ interface CreateProductModalProps {
   onSuccess: (product: any) => void;
   categories: Category[];
   availableTags: string[];
-}
-
-interface ProductFormData {
-  name: string;
-  description: string;
-  price: string;
-  salePrice: string;
-  sku: string;
-  categoryId: string;
-  stockQuantity: string;
-  tags: string[];
-  isActive: boolean;
-  images: string[];
-  attributes: Record<string, string>;
 }
 
 const ModalOverlay = styled.div<{ isOpen: boolean }>`
@@ -478,27 +457,27 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'El nombre del producto es requerido';
+      newErrors['name'] = 'El nombre del producto es requerido';
     }
 
     if (!formData.sku.trim()) {
-      newErrors.sku = 'El SKU es requerido';
+      newErrors['sku'] = 'El SKU es requerido';
     }
 
     if (!formData.price || parseFloat(formData.price) <= 0) {
-      newErrors.price = 'El precio debe ser mayor a 0';
+      newErrors['price'] = 'El precio debe ser mayor a 0';
     }
 
     if (formData.salePrice && parseFloat(formData.salePrice) >= parseFloat(formData.price)) {
-      newErrors.salePrice = 'El precio de oferta debe ser menor al precio regular';
+      newErrors['salePrice'] = 'El precio de oferta debe ser menor al precio regular';
     }
 
     if (!formData.categoryId) {
-      newErrors.categoryId = 'Debe seleccionar una categoría';
+      newErrors['categoryId'] = 'Debe seleccionar una categoría';
     }
 
     if (parseInt(formData.stockQuantity) < 0) {
-      newErrors.stockQuantity = 'El stock no puede ser negativo';
+      newErrors['stockQuantity'] = 'El stock no puede ser negativo';
     }
 
     setErrors(newErrors);
@@ -625,10 +604,10 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
 
         <form onSubmit={handleSubmit}>
           <ModalBody>
-            {errors.submit && (
+            {errors['submit'] && (
               <ErrorMessage>
                 <AlertTriangle size={16} />
-                {errors.submit}
+                {errors['submit']}
               </ErrorMessage>
             )}
 
@@ -655,10 +634,10 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
                     placeholder="Ej: Body Orgánico para Bebé"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
-                    error={!!errors.name}
+                    error={!!errors['name'] ? errors['name'] : ''}
                     leftIcon={<Package size={16} />}
                   />
-                  {errors.name && <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>{errors.name}</span>}
+                  {errors['name'] && <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>{errors['name']}</span>}
                 </FormRow>
 
                 <FormRow>
@@ -669,10 +648,10 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
                     placeholder="Ej: BODY-ORG-001"
                     value={formData.sku}
                     onChange={(e) => handleInputChange('sku', e.target.value)}
-                    error={!!errors.sku}
+                    error={!!errors['sku'] ? errors['sku'] : ''}
                     leftIcon={<Hash size={16} />}
                   />
-                  {errors.sku && <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>{errors.sku}</span>}
+                  {errors['sku'] && <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>{errors['sku']}</span>}
                 </FormRow>
 
                 <FormRow>
@@ -690,7 +669,7 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
                       </option>
                     ))}
                   </Select>
-                  {errors.categoryId && <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>{errors.categoryId}</span>}
+                  {errors['categoryId'] && <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>{errors['categoryId']}</span>}
                 </FormRow>
 
                 <FormRow>
@@ -724,10 +703,10 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
                     placeholder="0.00"
                     value={formData.price}
                     onChange={(e) => handleInputChange('price', e.target.value)}
-                    error={!!errors.price}
+                    error={!!errors['price'] ? errors['price'] : ''}
                     leftIcon={<DollarSign size={16} />}
                   />
-                  {errors.price && <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>{errors.price}</span>}
+                  {errors['price'] && <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>{errors['price']}</span>}
                 </FormRow>
 
                 <FormRow>
@@ -739,10 +718,10 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
                     placeholder="0.00 (opcional)"
                     value={formData.salePrice}
                     onChange={(e) => handleInputChange('salePrice', e.target.value)}
-                    error={!!errors.salePrice}
+                    error={!!errors['salePrice'] ? errors['salePrice'] : ''}
                     leftIcon={<DollarSign size={16} />}
                   />
-                  {errors.salePrice && <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>{errors.salePrice}</span>}
+                  {errors['salePrice'] && <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>{errors['salePrice']}</span>}
                 </FormRow>
 
                 <FormRow>
@@ -755,10 +734,10 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
                     placeholder="0"
                     value={formData.stockQuantity}
                     onChange={(e) => handleInputChange('stockQuantity', e.target.value)}
-                    error={!!errors.stockQuantity}
+                    error={!!errors['stockQuantity'] ? errors['stockQuantity'] : ''}
                     leftIcon={<Package size={16} />}
                   />
-                  {errors.stockQuantity && <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>{errors.stockQuantity}</span>}
+                  {errors['stockQuantity'] && <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>{errors['stockQuantity']}</span>}
                 </FormRow>
 
                 <FormRow>
@@ -770,9 +749,11 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
                       checked={formData.isActive}
                       onChange={(e) => handleInputChange('isActive', e.target.checked)}
                     />
-                    <CheckboxLabel htmlFor="isActive">
-                      Producto activo en el catálogo
-                    </CheckboxLabel>
+                    <label htmlFor="isActive">
+                      <CheckboxLabel>
+                        Producto activo en el catálogo
+                      </CheckboxLabel>
+                    </label>
                   </CheckboxContainer>
                 </FormRow>
               </FormGrid>

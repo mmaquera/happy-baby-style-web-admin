@@ -4,24 +4,39 @@ import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
-import { useCreateCategory } from '@/hooks/useCreateCategory';
-import { CreateCategoryInput } from '@/generated/graphql';
+import { useUpdateCategory } from '@/hooks/useUpdateCategory';
+import { UpdateCategoryInput } from '@/generated/graphql';
 import { 
   X,
-  FolderPlus,
+  Edit3,
   Hash,
   FileText,
   Image as ImageIcon,
   Settings,
   CheckCircle,
   AlertTriangle,
-  SortAsc
+  SortAsc,
+  Calendar,
+  Clock
 } from 'lucide-react';
 
-interface CreateCategoryModalProps {
+interface Category {
+  id: string;
+  name: string;
+  description?: string | null;
+  slug: string;
+  image?: string | null;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface EditCategoryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (category: any) => void;
+  onSuccess: (category: Category) => void;
+  category: Category | null;
 }
 
 interface CategoryFormData {
@@ -29,7 +44,7 @@ interface CategoryFormData {
   description: string;
   slug: string;
   image: string;
-  isActive: boolean;
+  isActive: string;
   sortOrder: string;
 }
 
@@ -51,7 +66,7 @@ const ModalOverlay = styled.div<{ isOpen: boolean }>`
 
 const ModalContainer = styled(Card)`
   width: 100%;
-  max-width: 600px;
+  max-width: 700px;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
@@ -111,68 +126,34 @@ const FormSection = styled.div`
 const SectionTitle = styled.h3`
   font-family: ${theme.fonts.heading};
   font-size: ${theme.fontSizes.lg};
-  font-weight: ${theme.fontWeights.semibold};
+  font-weight: ${theme.fontWeights.medium};
   color: ${theme.colors.text.primary};
   margin: 0 0 ${theme.spacing[4]} 0;
   display: flex;
   align-items: center;
   gap: ${theme.spacing[2]};
-`;
-
-const FormRow = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: ${theme.spacing[4]};
-  margin-bottom: ${theme.spacing[4]};
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
+  padding-bottom: ${theme.spacing[2]};
+  border-bottom: 1px solid ${theme.colors.border.light};
 `;
 
 const FormField = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[2]};
+  margin-bottom: ${theme.spacing[4]};
 `;
 
 const Label = styled.label`
+  display: block;
   font-family: ${theme.fonts.primary};
   font-size: ${theme.fontSizes.sm};
   font-weight: ${theme.fontWeights.medium};
   color: ${theme.colors.text.primary};
-`;
-
-const ErrorMessage = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  padding: ${theme.spacing[3]};
-  background: ${theme.colors.error}15;
-  border: 1px solid ${theme.colors.error}30;
-  border-radius: ${theme.borderRadius.md};
-  color: ${theme.colors.error};
-  font-size: ${theme.fontSizes.sm};
-  margin-bottom: ${theme.spacing[4]};
-`;
-
-const SuccessMessage = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  padding: ${theme.spacing[3]};
-  background: ${theme.colors.success}15;
-  border: 1px solid ${theme.colors.success}30;
-  border-radius: ${theme.borderRadius.md};
-  color: ${theme.colors.success};
-  font-size: ${theme.fontSizes.sm};
-  margin-bottom: ${theme.spacing[4]};
+  margin-bottom: ${theme.spacing[2]};
 `;
 
 const SwitchContainer = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[3]};
+  margin-top: ${theme.spacing[4]};
 `;
 
 const Switch = styled.label`
@@ -235,6 +216,32 @@ const ModalFooter = styled.div`
   background: ${theme.colors.background.light};
 `;
 
+const ErrorMessage = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[2]};
+  padding: ${theme.spacing[3]};
+  background: ${theme.colors.error}15;
+  border: 1px solid ${theme.colors.error}30;
+  border-radius: ${theme.borderRadius.md};
+  color: ${theme.colors.error};
+  font-size: ${theme.fontSizes.sm};
+  margin-bottom: ${theme.spacing[4]};
+`;
+
+const SuccessMessage = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[2]};
+  padding: ${theme.spacing[3]};
+  background: ${theme.colors.success}15;
+  border: 1px solid ${theme.colors.success}30;
+  border-radius: ${theme.borderRadius.md};
+  color: ${theme.colors.success};
+  font-size: ${theme.fontSizes.sm};
+  margin-bottom: ${theme.spacing[4]};
+`;
+
 const LoadingOverlay = styled.div`
   position: absolute;
   top: 0;
@@ -263,40 +270,61 @@ const LoadingSpinner = styled.div`
   }
 `;
 
-export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
+const InfoSection = styled.div`
+  background: ${theme.colors.background.accent};
+  border-radius: ${theme.borderRadius.md};
+  padding: ${theme.spacing[4]};
+  margin-bottom: ${theme.spacing[4]};
+`;
+
+const InfoRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[2]};
+  margin-bottom: ${theme.spacing[2]};
+  font-size: ${theme.fontSizes.sm};
+  color: ${theme.colors.text.secondary};
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
   isOpen,
   onClose,
-  onSuccess
+  onSuccess,
+  category
 }) => {
   const [formData, setFormData] = useState<CategoryFormData>({
     name: '',
     description: '',
     slug: '',
     image: '',
-    isActive: true,
+    isActive: 'true',
     sortOrder: '0'
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [successMessage, setSuccessMessage] = useState('');
 
-  const { create, loading } = useCreateCategory();
+  const { update, loading } = useUpdateCategory();
 
-  // Reset form when modal opens
+  // Initialize form when modal opens or category changes
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && category) {
       setFormData({
-        name: '',
-        description: '',
-        slug: '',
-        image: '',
-        isActive: true,
-        sortOrder: '0'
+        name: category.name || '',
+        description: category.description || '',
+        slug: category.slug || '',
+        image: category.image || '',
+        isActive: category.isActive ? 'true' : 'false',
+        sortOrder: category.sortOrder?.toString() || '0'
       });
       setErrors({});
       setSuccessMessage('');
     }
-  }, [isOpen]);
+  }, [isOpen, category]);
 
   // Generate slug from name
   const generateSlug = useCallback((name: string) => {
@@ -321,17 +349,17 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
   const validateForm = useCallback((): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.name.trim()) {
+    if (!formData['name'].trim()) {
       newErrors['name'] = 'El nombre de la categoría es requerido';
     }
 
-    if (!formData.slug.trim()) {
+    if (!formData['slug'].trim()) {
       newErrors['slug'] = 'El slug es requerido';
-    } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
+    } else if (!/^[a-z0-9-]+$/.test(formData['slug'])) {
       newErrors['slug'] = 'El slug solo puede contener letras minúsculas, números y guiones';
     }
 
-    if (formData.sortOrder && parseInt(formData.sortOrder) < 0) {
+    if (formData['sortOrder'] && parseInt(formData['sortOrder']) < 0) {
       newErrors['sortOrder'] = 'El orden no puede ser negativo';
     }
 
@@ -351,40 +379,53 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
   const handleSubmit = useCallback(async (event: React.FormEvent) => {
     event.preventDefault();
     
-    if (!validateForm()) {
+    if (!validateForm() || !category) {
       return;
     }
 
     setErrors({});
 
     try {
-      const categoryData: CreateCategoryInput = {
-        name: formData.name.trim(),
-        description: formData.description.trim() || null,
-        slug: formData.slug.trim(),
-        image: formData.image.trim() || null,
-        isActive: formData.isActive,
-        sortOrder: formData.sortOrder ? parseInt(formData.sortOrder) : null
+      const categoryData: UpdateCategoryInput = {
+        name: formData['name'].trim(),
+        description: formData['description'].trim() || null,
+        slug: formData['slug'].trim(),
+        image: formData['image'].trim() || null,
+        isActive: formData['isActive'] === 'true',
+        sortOrder: formData['sortOrder'] ? parseInt(formData['sortOrder']) : null
       };
 
-      const result = await create(categoryData);
+      const result = await update(category.id, categoryData);
 
       if (result?.success) {
-        setSuccessMessage('Categoría creada exitosamente');
+        setSuccessMessage('Categoría actualizada exitosamente');
         
         // Wait a bit before closing to show success message
         setTimeout(() => {
-          onSuccess(result.data?.entity || categoryData);
+          const updatedCategory = {
+            ...category,
+            name: categoryData.name || category.name,
+            description: categoryData.description || category.description || null,
+            slug: categoryData.slug || category.slug,
+            image: categoryData.image || category.image || null,
+            isActive: categoryData.isActive || category.isActive,
+            sortOrder: categoryData.sortOrder || category.sortOrder
+          };
+          onSuccess(updatedCategory);
           onClose();
         }, 1500);
+      } else {
+        const errorMessage = result?.message || 'Error al actualizar la categoría';
+        setErrors({ submit: errorMessage });
       }
 
     } catch (error) {
-      setErrors({ submit: 'Error al crear la categoría. Intente nuevamente.' });
+      const errorMessage = error instanceof Error ? error.message : 'Error al actualizar la categoría. Intente nuevamente.';
+      setErrors({ submit: errorMessage });
     }
-  }, [formData, validateForm, create, onSuccess, onClose]);
+  }, [formData, validateForm, update, category, onSuccess, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !category) return null;
 
   return (
     <ModalOverlay isOpen={isOpen}>
@@ -397,8 +438,8 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
 
         <ModalHeader>
           <ModalTitle>
-            <FolderPlus size={24} />
-            Crear Nueva Categoría
+            <Edit3 size={24} />
+            Editar Categoría
           </ModalTitle>
           <CloseButton onClick={onClose}>
             <X size={20} />
@@ -421,6 +462,26 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
               </SuccessMessage>
             )}
 
+            {/* Información del Sistema */}
+            <InfoSection>
+              <SectionTitle>
+                <Settings size={20} />
+                Información del Sistema
+              </SectionTitle>
+              <InfoRow>
+                <Calendar size={16} />
+                <span>Creada: {new Date(category.createdAt).toLocaleDateString('es-ES')}</span>
+              </InfoRow>
+              <InfoRow>
+                <Clock size={16} />
+                <span>Última actualización: {new Date(category.updatedAt).toLocaleDateString('es-ES')}</span>
+              </InfoRow>
+              <InfoRow>
+                <Hash size={16} />
+                <span>ID: {category.id}</span>
+              </InfoRow>
+            </InfoSection>
+
             {/* Información Básica */}
             <FormSection>
               <SectionTitle>
@@ -434,7 +495,7 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
                   id="name"
                   type="text"
                   placeholder="Ej: Ropa para Bebés"
-                  value={formData.name}
+                  value={formData['name']}
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   error={!!errors['name'] ? errors['name'] : ''}
                   disabled={loading}
@@ -448,41 +509,28 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
                   id="description"
                   type="text"
                   placeholder="Descripción opcional de la categoría"
-                  value={formData.description}
+                  value={formData['description']}
                   onChange={(e) => handleInputChange('description', e.target.value)}
                   disabled={loading}
                 />
               </FormField>
 
-              <FormRow>
-                <FormField>
-                  <Label htmlFor="slug">Slug *</Label>
-                  <Input
-                    id="slug"
-                    type="text"
-                    placeholder="ejemplo-slug"
-                    value={formData.slug}
-                    onChange={(e) => handleInputChange('slug', e.target.value)}
-                    error={!!errors['slug'] ? errors['slug'] : ''}
-                    disabled={loading}
-                  />
-                  {errors['slug'] && <small style={{ color: theme.colors.error }}>{errors['slug']}</small>}
-                </FormField>
-
-                <FormField>
-                  <Label htmlFor="sortOrder">Orden de Clasificación</Label>
-                  <Input
-                    id="sortOrder"
-                    type="number"
-                    placeholder="0"
-                    value={formData.sortOrder}
-                    onChange={(e) => handleInputChange('sortOrder', e.target.value)}
-                    error={!!errors['sortOrder'] ? errors['sortOrder'] : ''}
-                    disabled={loading}
-                  />
-                  {errors['sortOrder'] && <small style={{ color: theme.colors.error }}>{errors['sortOrder']}</small>}
-                </FormField>
-              </FormRow>
+              <FormField>
+                <Label htmlFor="slug">Slug *</Label>
+                <Input
+                  id="slug"
+                  type="text"
+                  placeholder="ropa-para-bebes"
+                  value={formData['slug']}
+                  onChange={(e) => handleInputChange('slug', e.target.value)}
+                  error={!!errors['slug'] ? errors['slug'] : ''}
+                  disabled={loading}
+                />
+                {errors['slug'] && <small style={{ color: theme.colors.error }}>{errors['slug']}</small>}
+                <small style={{ color: theme.colors.text.secondary, marginTop: theme.spacing[1] }}>
+                  El slug se usa en la URL y debe ser único
+                </small>
+              </FormField>
             </FormSection>
 
             {/* Configuración */}
@@ -493,12 +541,29 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
               </SectionTitle>
 
               <FormField>
+                <Label htmlFor="sortOrder">Orden de Clasificación</Label>
+                <Input
+                  id="sortOrder"
+                  type="number"
+                  placeholder="0"
+                  value={formData['sortOrder']}
+                  onChange={(e) => handleInputChange('sortOrder', e.target.value)}
+                  error={!!errors['sortOrder'] ? errors['sortOrder'] : ''}
+                  disabled={loading}
+                />
+                {errors['sortOrder'] && <small style={{ color: theme.colors.error }}>{errors['sortOrder']}</small>}
+                <small style={{ color: theme.colors.text.secondary, marginTop: theme.spacing[1] }}>
+                  Número menor = aparece primero
+                </small>
+              </FormField>
+
+              <FormField>
                 <Label htmlFor="image">URL de Imagen</Label>
                 <Input
                   id="image"
                   type="url"
                   placeholder="https://ejemplo.com/imagen.jpg"
-                  value={formData.image}
+                  value={formData['image']}
                   onChange={(e) => handleInputChange('image', e.target.value)}
                   disabled={loading}
                 />
@@ -508,8 +573,8 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
                 <Switch>
                   <SwitchInput
                     type="checkbox"
-                    checked={formData.isActive}
-                    onChange={(e) => handleInputChange('isActive', e.target.checked)}
+                    checked={formData['isActive'] === 'true'}
+                    onChange={(e) => handleInputChange('isActive', e.target.checked ? 'true' : 'false')}
                     disabled={loading}
                   />
                   <Slider />
@@ -530,9 +595,9 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
             </Button>
             <Button
               type="submit"
-              disabled={loading || !formData.name.trim() || !formData.slug.trim()}
+              disabled={loading || !formData['name'].trim() || !formData['slug'].trim()}
             >
-              {loading ? 'Creando...' : 'Crear Categoría'}
+              {loading ? 'Actualizando...' : 'Actualizar Categoría'}
             </Button>
           </ModalFooter>
         </form>

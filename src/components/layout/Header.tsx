@@ -287,7 +287,9 @@ export const Header: React.FC = () => {
     // If it's an email, use the part before @
     if (name.includes('@')) {
       const emailUser = name.split('@')[0];
-      return emailUser.charAt(0).toUpperCase();
+      if (emailUser) {
+        return emailUser.charAt(0).toUpperCase();
+      }
     }
     
     // If it's a regular name, use first letters of words

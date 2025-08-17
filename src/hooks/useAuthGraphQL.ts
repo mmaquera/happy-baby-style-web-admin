@@ -7,7 +7,8 @@ import {
   LoginUserMutationVariables,
   RefreshTokenMutation,
   RefreshTokenMutationVariables,
-  LogoutUserMutation 
+  LogoutUserMutation,
+  UserRole
 } from '@/generated/graphql';
 
 export interface LoginCredentials {
@@ -18,25 +19,25 @@ export interface LoginCredentials {
 export interface AuthUser {
   id: string;
   email: string;
-  role: string;
+  role: UserRole;
   isActive: boolean;
   emailVerified: boolean;
-  lastLoginAt?: string;
+  lastLoginAt?: string | null;
   profile?: {
     id: string;
-    firstName?: string;
-    lastName?: string;
-    phone?: string;
-    birthDate?: string;
-    avatar?: string;
-  };
+    firstName?: string | null;
+    lastName?: string | null;
+    phone?: string | null;
+    birthDate?: string | null;
+    avatar?: string | null;
+  } | null;
 }
 
 export interface AuthResult {
   success: boolean;
-  user?: AuthUser;
-  accessToken?: string;
-  refreshToken?: string;
+  user?: AuthUser | null;
+  accessToken?: string | null;
+  refreshToken?: string | null;
   message: string;
 }
 
@@ -64,18 +65,18 @@ export const useAuthGraphQL = () => {
             role: response.user.role,
             isActive: response.user.isActive,
             emailVerified: response.user.emailVerified,
-            lastLoginAt: response.user.lastLoginAt || undefined,
+            lastLoginAt: response.user.lastLoginAt ?? null,
             profile: response.user.profile ? {
               id: response.user.profile.id,
-              firstName: response.user.profile.firstName || undefined,
-              lastName: response.user.profile.lastName || undefined,
-              phone: response.user.profile.phone || undefined,
-              birthDate: response.user.profile.birthDate || undefined,
-              avatar: response.user.profile.avatar || undefined,
-            } : undefined
-          } : undefined,
-          accessToken: response.accessToken || undefined,
-          refreshToken: response.refreshToken || undefined,
+              firstName: response.user.profile.firstName ?? null,
+              lastName: response.user.profile.lastName ?? null,
+              phone: response.user.profile.phone ?? null,
+              birthDate: response.user.profile.dateOfBirth ?? null,
+              avatar: response.user.profile.avatar ?? null,
+            } : null
+          } : null,
+          accessToken: response.accessToken ?? null,
+          refreshToken: response.refreshToken ?? null,
           message: response.message
         };
       }
@@ -129,18 +130,18 @@ export const useAuthGraphQL = () => {
             role: response.user.role,
             isActive: response.user.isActive,
             emailVerified: response.user.emailVerified,
-            lastLoginAt: response.user.lastLoginAt || undefined,
+            lastLoginAt: response.user.lastLoginAt ?? null,
             profile: response.user.profile ? {
               id: response.user.profile.id,
-              firstName: response.user.profile.firstName || undefined,
-              lastName: response.user.profile.lastName || undefined,
-              phone: response.user.profile.phone || undefined,
-              birthDate: response.user.profile.birthDate || undefined,
-              avatar: response.user.profile.avatar || undefined,
-            } : undefined
-          } : undefined,
-          accessToken: response.accessToken || undefined,
-          refreshToken: response.refreshToken || undefined,
+              firstName: response.user.profile.firstName ?? null,
+              lastName: response.user.profile.lastName ?? null,
+              phone: response.user.profile.phone ?? null,
+              birthDate: response.user.profile.dateOfBirth ?? null,
+              avatar: response.user.profile.avatar ?? null,
+            } : null
+          } : null,
+          accessToken: response.accessToken ?? null,
+          refreshToken: response.refreshToken ?? null,
           message: response.message
         };
       }

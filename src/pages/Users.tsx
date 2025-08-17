@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import { useUsers, useUserStats, useCreateUser, useUpdateUserOptimized } from '@/hooks/useUsersGraphQL';
-// import { useMockUsers, useMockUserStats } from '@/hooks/useMockUsers';
 import { User, UserRole } from '@/types';
 import { InputMaybe } from '@/generated/graphql';
 import { Card } from '@/components/ui/Card';

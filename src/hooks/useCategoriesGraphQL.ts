@@ -197,7 +197,7 @@ export const useCategoriesGraphQL = (): UseCategoriesGraphQLReturn => {
       });
 
       if (result.errors && result.errors.length > 0) {
-        throw new Error(result.errors[0].message);
+        throw new Error(result.errors[0]?.message || 'Error desconocido');
       }
 
       const response = result.data?.createCategory;
@@ -235,7 +235,7 @@ export const useCategoriesGraphQL = (): UseCategoriesGraphQLReturn => {
       });
 
       if (result.errors && result.errors.length > 0) {
-        throw new Error(result.errors[0].message);
+        throw new Error(result.errors[0]?.message || 'Error desconocido');
       }
 
       const response = result.data?.updateCategory;
@@ -276,7 +276,7 @@ export const useCategoriesGraphQL = (): UseCategoriesGraphQLReturn => {
       });
 
       if (result.errors && result.errors.length > 0) {
-        throw new Error(result.errors[0].message);
+        throw new Error(result.errors[0]?.message || 'Error desconocido');
       }
 
       const response = result.data?.deleteCategory;

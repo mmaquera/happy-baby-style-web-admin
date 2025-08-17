@@ -1,6 +1,12 @@
 import { useCallback, useState, useMemo } from 'react';
 import { CategoryFilterInput, PaginationInput } from '@/generated/graphql';
 
+// Local types for internal state management
+export interface LocalPaginationInput {
+  limit: number;
+  offset: number;
+}
+
 export interface CategoryFilters {
   isActive?: boolean;
   search?: string;
@@ -24,8 +30,9 @@ export interface UseCategoryFiltersReturn {
   handleSort: (field: string) => void;
   
   // Pagination
-  pagination: PaginationInput;
-  setPagination: (pagination: PaginationInput) => void;
+  pagination: LocalPaginationInput;
+  setPagination: (pagination: LocalPaginationInput) => void;
+  setPaginationFromGraphQL: (pagination: PaginationInput) => void;
   goToPage: (page: number) => void;
   nextPage: () => void;
   prevPage: () => void;
@@ -42,7 +49,6 @@ export interface UseCategoryFiltersReturn {
 }
 
 const DEFAULT_FILTERS: CategoryFilters = {
-  isActive: undefined,
   search: ''
 };
 
@@ -51,12 +57,20 @@ const DEFAULT_SORT: SortConfig = {
   direction: 'asc'
 };
 
-const DEFAULT_PAGINATION: PaginationInput = {
+const DEFAULT_PAGINATION: LocalPaginationInput = {
   limit: 10,
   offset: 0
 };
 
 export const useCategoryFilters = (totalItems: number = 0) => {
+  // Helper function to map GraphQL pagination to local pagination
+  const mapGraphQLPaginationToLocal = useCallback((graphqlPagination: PaginationInput): LocalPaginationInput => {
+    return {
+      limit: graphqlPagination.limit ?? 10,
+      offset: graphqlPagination.offset ?? 0,
+    };
+  }, []);
+
   // Filters state
   const [filters, setFilters] = useState<CategoryFilters>(DEFAULT_FILTERS);
   
@@ -64,7 +78,13 @@ export const useCategoryFilters = (totalItems: number = 0) => {
   const [sortConfig, setSortConfig] = useState<SortConfig>(DEFAULT_SORT);
   
   // Pagination state
-  const [pagination, setPagination] = useState<PaginationInput>(DEFAULT_PAGINATION);
+  const [pagination, setPagination] = useState<LocalPaginationInput>(DEFAULT_PAGINATION);
+
+  // Set pagination from GraphQL input
+  const setPaginationFromGraphQL = useCallback((graphqlPagination: PaginationInput) => {
+    const localPagination = mapGraphQLPaginationToLocal(graphqlPagination);
+    setPagination(localPagination);
+  }, [mapGraphQLPaginationToLocal]);
 
   // Update specific filter
   const updateFilter = useCallback((key: keyof CategoryFilters, value: any) => {
@@ -188,6 +208,7 @@ export const useCategoryFilters = (totalItems: number = 0) => {
     // Pagination
     pagination,
     setPagination,
+    setPaginationFromGraphQL,
     goToPage,
     nextPage,
     prevPage,

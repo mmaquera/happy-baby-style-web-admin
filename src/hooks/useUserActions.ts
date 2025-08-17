@@ -88,7 +88,7 @@ export const useUserActions = () => {
 
     setLoading(true);
     try {
-      await updateUserMutation.update(user.id, { role: UserRole.CUSTOMER as any });
+      await updateUserMutation.update(user.id, { role: UserRole.customer as any });
       toast.success(`Permisos de administrador removidos de ${user.email}`);
     } catch (error) {
       toast.error('Error al actualizar permisos');

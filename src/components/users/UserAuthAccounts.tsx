@@ -134,13 +134,13 @@ const EmptyState = styled.div`
 // Helper function
 const getProviderBorderColor = (provider: AuthProvider) => {
   switch (provider) {
-    case AuthProvider.GOOGLE:
+    case AuthProvider.google:
       return '#4285f4';
-    case AuthProvider.FACEBOOK:
+    case AuthProvider.facebook:
       return '#1877f2';
-    case AuthProvider.APPLE:
+    case AuthProvider.apple:
       return '#000000';
-    case AuthProvider.EMAIL:
+    case AuthProvider.email:
       return theme.colors.primaryPurple;
     default:
       return theme.colors.border.light;
@@ -205,7 +205,7 @@ export const UserAuthAccounts: React.FC<UserAuthAccountsProps> = ({
             </ProviderInfo>
             
             <AccountActions>
-              {account.provider !== AuthProvider.EMAIL && (
+              {account.provider !== AuthProvider.email && (
                 <Button
                   variant="outline"
                   size="small"

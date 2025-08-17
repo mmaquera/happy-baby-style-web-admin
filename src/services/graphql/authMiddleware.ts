@@ -5,7 +5,7 @@ import { ApolloClient, ApolloLink, InMemoryCache, createHttpLink, from } from '@
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { RetryLink } from '@apollo/client/link/retry';
-import { AuthServiceFactory, GraphQLAuthService } from '../auth/AuthService';
+import { AuthServiceFactory, GraphQLAuthService, IAuthToken } from '../auth/AuthService';
 
 export interface AuthMiddlewareConfig {
   uri: string;
@@ -63,7 +63,7 @@ export class AuthMiddleware {
       if (graphQLErrors) {
         for (const err of graphQLErrors) {
           // Handle authentication errors
-          if (err.extensions?.code === 'UNAUTHENTICATED' || err.message.includes('jwt')) {
+          if (err.extensions?.['code'] === 'UNAUTHENTICATED' || err.message.includes('jwt')) {
             console.warn('Authentication error detected:', err.message);
             
             // Clear tokens and redirect to login
@@ -73,7 +73,7 @@ export class AuthMiddleware {
           }
           
           // Handle authorization errors
-          if (err.extensions?.code === 'FORBIDDEN') {
+          if (err.extensions?.['code'] === 'FORBIDDEN') {
             console.warn('Authorization error detected:', err.message);
             // Could redirect to unauthorized page or show error
             return;
@@ -109,7 +109,7 @@ export class AuthMiddleware {
         max: config.maxRetries || 3,
         retryIf: (error, _operation) => {
           // Don't retry auth errors
-          if (error?.extensions?.code === 'UNAUTHENTICATED') {
+          if (error?.extensions?.['code'] === 'UNAUTHENTICATED') {
             return false;
           }
           
@@ -154,27 +154,31 @@ export class AuthMiddleware {
 
   // Utility methods
   private getStoredTokens() {
+    // Usar el método público getRefreshToken y recrear la estructura
+    const refreshToken = this.authService.getRefreshToken();
+    if (!refreshToken) return null;
+    
+    // Obtener tokens del localStorage directamente para este caso específico
+    // ya que AuthService no expone getStoredTokens públicamente
     const accessToken = localStorage.getItem('accessToken');
-    const refreshToken = localStorage.getItem('refreshToken');
     const expiresAt = localStorage.getItem('tokenExpiresAt');
     
     if (!accessToken) return null;
     
     return {
       accessToken,
-      refreshToken: refreshToken || undefined,
+      refreshToken,
       expiresAt: expiresAt ? new Date(expiresAt) : new Date(Date.now() + 3600000)
     };
   }
 
-  private isTokenExpired(tokens: any): boolean {
+  private isTokenExpired(tokens: IAuthToken): boolean {
     return tokens.expiresAt < new Date();
   }
 
   private clearTokens(): void {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('tokenExpiresAt');
+    // Usar AuthService para limpiar tokens
+    this.authService.logout();
   }
 
   private redirectToLogin(): void {

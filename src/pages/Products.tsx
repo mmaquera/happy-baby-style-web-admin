@@ -28,6 +28,22 @@ import {
   Settings
 } from 'lucide-react';
 
+// Local interface for mock products that matches the actual data structure
+interface MockProduct {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  salePrice: number | null;
+  images: string[];
+  stockQuantity: number;
+  isActive: boolean;
+  rating: number;
+  reviewCount: number;
+  tags: string[];
+  category: { id: string; name: string; slug: string };
+}
+
 // Mock data for demonstration - in real app this would come from API
 const mockCategories = [
   { id: '1', name: 'Ropa para Bebés', slug: 'ropa-bebes' },
@@ -88,14 +104,22 @@ const LoadingText = styled.p`
 
 export const Products: React.FC = () => {
   // State for filters
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<{
+    search: string;
+    categoryId: string;
+    isActive: boolean;
+    inStock: boolean;
+    minPrice: number | null;
+    maxPrice: number | null;
+    tags: string[];
+  }>({
     search: '',
     categoryId: '',
     isActive: true,
     inStock: true,
-    minPrice: undefined as number | undefined,
-    maxPrice: undefined as number | undefined,
-    tags: [] as string[]
+    minPrice: null,
+    maxPrice: null,
+    tags: []
   });
 
   // State for UI
@@ -113,7 +137,7 @@ export const Products: React.FC = () => {
   });
 
   // Mock products data - in real app this would come from GraphQL
-  const [products] = useState([
+  const [products] = useState<MockProduct[]>([
     {
       id: '1',
       name: 'Body Orgánico para Recién Nacido',
@@ -126,21 +150,21 @@ export const Products: React.FC = () => {
       rating: 4.8,
       reviewCount: 127,
       tags: ['orgánico', 'recién nacido', 'algodón'],
-      category: { name: 'Ropa para Bebés', slug: 'ropa-bebes' }
+      category: { id: '1', name: 'Ropa para Bebés', slug: 'ropa-bebes' }
     },
     {
       id: '2',
       name: 'Juguete Educativo de Madera',
       description: 'Juguete de construcción de madera natural, perfecto para desarrollar habilidades motoras',
       price: 34.99,
-      salePrice: undefined,
+      salePrice: null,
       images: ['https://via.placeholder.com/300x300/98FB98/000000?text=Juguete+Madera'],
       stockQuantity: 8,
       isActive: true,
       rating: 4.6,
       reviewCount: 89,
       tags: ['educativo', 'madera', 'desarrollo'],
-      category: { name: 'Juguetes', slug: 'juguetes' }
+      category: { id: '2', name: 'Juguetes', slug: 'juguetes' }
     },
     {
       id: '3',
@@ -154,21 +178,21 @@ export const Products: React.FC = () => {
       rating: 4.9,
       reviewCount: 234,
       tags: ['fórmula', 'premium', 'nutrición'],
-      category: { name: 'Alimentación', slug: 'alimentacion' }
+      category: { id: '3', name: 'Alimentación', slug: 'alimentacion' }
     },
     {
       id: '4',
       name: 'Pañales Ecológicos Talla 3',
       description: 'Pañales biodegradables, hipoalergénicos y súper absorbentes',
       price: 32.99,
-      salePrice: undefined,
+      salePrice: null,
       images: ['https://via.placeholder.com/300x300/F0E68C/000000?text=Pañales+Eco'],
       stockQuantity: 67,
       isActive: true,
       rating: 4.7,
       reviewCount: 156,
       tags: ['ecológico', 'biodegradable', 'hipoalergénico'],
-      category: { name: 'Higiene', slug: 'higiene' }
+      category: { id: '4', name: 'Higiene', slug: 'higiene' }
     },
     {
       id: '5',
@@ -182,23 +206,38 @@ export const Products: React.FC = () => {
       rating: 4.5,
       reviewCount: 78,
       tags: ['premium', 'plegable', 'viaje'],
-      category: { name: 'Accesorios', slug: 'accesorios' }
+      category: { id: '5', name: 'Accesorios', slug: 'accesorios' }
     },
     {
       id: '6',
       name: 'Mantita de Recepción Suave',
       description: 'Mantita de algodón y poliéster, ideal para envolver al bebé',
       price: 18.99,
-      salePrice: undefined,
+      salePrice: null,
       images: ['https://via.placeholder.com/300x300/FFE4B5/000000?text=Mantita'],
       stockQuantity: 23,
       isActive: false,
       rating: 4.3,
       reviewCount: 45,
       tags: ['mantita', 'suave', 'envolver'],
-      category: { name: 'Ropa para Bebés', slug: 'ropa-bebes' }
+      category: { id: '1', name: 'Ropa para Bebés', slug: 'ropa-bebes' }
     }
   ]);
+
+  // Function to map MockProduct to Product type
+  const mapMockToProduct = (mockProduct: MockProduct): any => ({
+    ...mockProduct,
+    sku: `SKU-${mockProduct.id}`,
+    attributes: {},
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    currentPrice: mockProduct.salePrice || mockProduct.price,
+    hasDiscount: !!mockProduct.salePrice,
+    discountPercentage: mockProduct.salePrice ? Math.round(((mockProduct.price - mockProduct.salePrice) / mockProduct.price) * 100) : 0,
+    totalStock: mockProduct.stockQuantity,
+    isInStock: mockProduct.stockQuantity > 0,
+    variants: []
+  });
 
   // Filter products based on current filters
   const filteredProducts = products.filter(product => {
@@ -250,8 +289,8 @@ export const Products: React.FC = () => {
       categoryId: '',
       isActive: true,
       inStock: true,
-      minPrice: undefined,
-      maxPrice: undefined,
+      minPrice: null,
+      maxPrice: null,
       tags: []
     });
   }, []);
@@ -345,7 +384,20 @@ export const Products: React.FC = () => {
       />
 
       <ProductFilters
-        filters={filters}
+        filters={(() => {
+          const filterObj: any = {
+            search: filters.search,
+            categoryId: filters.categoryId,
+            isActive: filters.isActive,
+            inStock: filters.inStock,
+            tags: filters.tags
+          };
+          
+          if (filters.minPrice !== null) filterObj.minPrice = filters.minPrice;
+          if (filters.maxPrice !== null) filterObj.maxPrice = filters.maxPrice;
+          
+          return filterObj;
+        })()}
         categories={mockCategories}
         availableTags={mockAvailableTags}
         onFilterChange={handleFilterChange}
@@ -354,37 +406,37 @@ export const Products: React.FC = () => {
 
       {viewMode === 'grid' ? (
       
-          <ProductGrid
-            products={filteredProducts}
-            loading={isLoading}
-            error={error}
-            hasMore={false} // TODO: Implement pagination
-            onLoadMore={handleLoadMore}
-            onEdit={handleEditProduct}
-            onDelete={handleDeleteProduct}
-            onToggleStatus={handleToggleStatus}
-            onViewDetails={handleViewDetails}
-            emptyMessage="No se encontraron productos que coincidan con los filtros aplicados."
-          />
+                  <ProductGrid
+          products={filteredProducts.map(mapMockToProduct)}
+          loading={isLoading}
+          error={error}
+          hasMore={false} // TODO: Implement pagination
+          onLoadMore={handleLoadMore}
+          onEdit={handleEditProduct}
+          onDelete={handleDeleteProduct}
+          onToggleStatus={handleToggleStatus}
+          onViewDetails={handleViewDetails}
+          emptyMessage="No se encontraron productos que coincidan con los filtros aplicados."
+        />
         
       ) : (
         
-          <ProductListView
-            products={filteredProducts}
-            loading={isLoading}
-            error={error}
-            total={filteredProducts.length}
-            currentPage={1}
-            totalPages={1}
-            hasMore={false}
-            onPageChange={() => {}} // TODO: Implement pagination
-            onEdit={handleEditProduct}
-            onDelete={handleDeleteProduct}
-            onToggleStatus={handleToggleStatus}
-            onViewDetails={handleViewDetails}
-            onSort={() => {}} // TODO: Implement sorting
-            onFilter={() => {}} // TODO: Implement filtering
-          />
+                  <ProductListView
+          products={filteredProducts.map(mapMockToProduct)}
+          loading={isLoading}
+          error={error}
+          total={filteredProducts.length}
+          currentPage={1}
+          totalPages={1}
+          hasMore={false}
+          onPageChange={() => {}} // TODO: Implement pagination
+          onEdit={handleEditProduct}
+          onDelete={handleDeleteProduct}
+          onToggleStatus={handleToggleStatus}
+          onViewDetails={handleViewDetails}
+          onSort={() => {}} // TODO: Implement sorting
+          onFilter={() => {}} // TODO: Implement filtering
+        />
   
       )}
 

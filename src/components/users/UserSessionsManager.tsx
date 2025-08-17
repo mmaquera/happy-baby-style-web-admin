@@ -280,14 +280,14 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
               <SessionHeader>
                 <SessionInfo>
                   <DeviceIcon isActive={true}>
-                    {getDeviceIcon(session.userAgent)}
+                    {getDeviceIcon(session.userAgent || '')}
                   </DeviceIcon>
                   <div>
                     <div style={{ 
                       fontWeight: theme.fontWeights.semibold,
                       color: theme.colors.text.primary 
                     }}>
-                      {getDeviceInfo(session.userAgent)}
+                      {getDeviceInfo(session.userAgent || '')}
                     </div>
                     <div style={{ 
                       fontSize: theme.fontSizes.sm,
@@ -369,14 +369,14 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
                 <SessionHeader>
                   <SessionInfo>
                     <DeviceIcon isActive={false}>
-                      {getDeviceIcon(session.userAgent)}
+                      {getDeviceIcon(session.userAgent || '')}
                     </DeviceIcon>
                     <div>
                       <div style={{ 
                         fontWeight: theme.fontWeights.semibold,
                         color: theme.colors.text.primary 
                       }}>
-                        {getDeviceInfo(session.userAgent)}
+                        {getDeviceInfo(session.userAgent || '')}
                       </div>
                       <div style={{ 
                         fontSize: theme.fontSizes.sm,
