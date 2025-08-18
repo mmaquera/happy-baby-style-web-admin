@@ -27,11 +27,24 @@ export interface IAuthUser {
   } | undefined;
 }
 
+// Response metadata interface following Single Responsibility Principle
+export interface IResponseMetadata {
+  requestId?: string;
+  traceId?: string;
+  duration?: number;
+  timestamp: string;
+}
+
+// Enhanced authentication response interface following Open/Closed Principle
 export interface IAuthResponse {
   success: boolean;
   user: IAuthUser;
   tokens: IAuthToken;
   message: string;
+  // New fields from backend schema
+  code: string;
+  timestamp: string;
+  metadata?: IResponseMetadata;
 }
 
 export interface IAuthError {

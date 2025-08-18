@@ -1,6 +1,6 @@
-// Login Page - Following SOLID principles and Clean Architecture
-// Single Responsibility: Orchestrates login components only
-// Open/Closed: Extensible for new login features
+// Register Page - Following SOLID principles and Clean Architecture
+// Single Responsibility: Orchestrates registration components only
+// Open/Closed: Extensible for new registration features
 // Liskov Substitution: Consistent page behavior
 // Interface Segregation: No props interface needed
 // Dependency Inversion: Depends on component abstractions
@@ -11,11 +11,11 @@ import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Card } from '@/components/ui/Card';
 import { LoginLogo } from '@/components/auth/LoginLogo';
-import { LoginForm } from '@/components/auth/LoginForm';
+import { RegisterForm } from '@/components/auth/RegisterForm';
 import { useAuth } from '@/contexts/AuthContext';
 
 // Styled Components following Single Responsibility Principle
-const LoginContainer = styled.div`
+const RegisterContainer = styled.div`
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -24,9 +24,9 @@ const LoginContainer = styled.div`
   padding: ${theme.spacing[4]};
 `;
 
-const LoginCard = styled(Card)`
+const RegisterCard = styled(Card)`
   width: 100%;
-  max-width: 400px;
+  max-width: 700px;
   text-align: center;
   position: relative;
   overflow: visible;
@@ -39,8 +39,32 @@ const FooterText = styled.p`
   text-align: center;
 `;
 
+const LoginLink = styled.button`
+  font-size: ${theme.fontSizes.sm};
+  color: ${theme.colors.primary};
+  text-decoration: none;
+  font-weight: ${theme.fontWeights.medium};
+  transition: color ${theme.transitions.fast};
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: ${theme.spacing[2]};
+  border-radius: ${theme.borderRadius.sm};
+  margin-top: ${theme.spacing[4]};
+
+  &:hover {
+    color: ${theme.colors.coralAccent};
+    text-decoration: underline;
+    background: ${theme.colors.background.accent};
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+`;
+
 // Component following Single Responsibility Principle
-export const Login: React.FC = () => {
+export const Register: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, isInitialized, isLoading } = useAuth();
@@ -53,7 +77,7 @@ export const Login: React.FC = () => {
     }
   }, [isAuthenticated, isInitialized, navigate, location]);
 
-  // Clean invalid tokens on login page load
+  // Clean invalid tokens on register page load
   useEffect(() => {
     const token = localStorage.getItem('authToken');
     if (token) {
@@ -79,28 +103,44 @@ export const Login: React.FC = () => {
   // Show loading state while initializing, but still render the form
   if (isLoading && !isInitialized) {
     return (
-      <LoginContainer>
-        <LoginCard shadow="large" padding="large">
+      <RegisterContainer>
+        <RegisterCard shadow="large" padding="large">
           <LoginLogo />
           <div style={{ padding: '2rem', textAlign: 'center' }}>
             <p>Inicializando...</p>
           </div>
-        </LoginCard>
-      </LoginContainer>
+        </RegisterCard>
+      </RegisterContainer>
     );
   }
 
+  const handleRegistrationSuccess = () => {
+    // Redirect to login page after successful registration
+    navigate('/login', { 
+      state: { 
+        message: 'Usuario registrado exitosamente. Por favor inicia sesión.' 
+      } 
+    });
+  };
+
+  const handleGoToLogin = () => {
+    navigate('/login');
+  };
+
   return (
-    <LoginContainer>
-      <LoginCard shadow="large" padding="large">
+    <RegisterContainer>
+      <RegisterCard shadow="large" padding="large">
         <LoginLogo />
-        <LoginForm />
+        <RegisterForm onSuccess={handleRegistrationSuccess} />
+        <LoginLink onClick={handleGoToLogin}>
+          ¿Ya tienes una cuenta? Inicia sesión
+        </LoginLink>
         <FooterText>
           © 2025 Happy Baby Style. Todos los derechos reservados.
         </FooterText>
-      </LoginCard>
-    </LoginContainer>
+      </RegisterCard>
+    </RegisterContainer>
   );
 };
 
-export default Login; 
+export default Register;

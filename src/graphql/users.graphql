@@ -793,27 +793,38 @@ mutation ForcePasswordReset($userId: ID!) {
 }
 
 # Impersonate user
+# Returns AuthResponse with nested data structure
 mutation ImpersonateUser($userId: ID!) {
   impersonateUser(userId: $userId) {
     success
     message
-    accessToken
-    refreshToken
-    user {
-      id
-      email
-      role
-      isActive
-      emailVerified
-      lastLoginAt
-      profile {
+    code
+    timestamp
+    data {
+      user {
         id
-        firstName
-        lastName
-        phone
-        dateOfBirth
-        avatar
+        email
+        role
+        isActive
+        emailVerified
+        lastLoginAt
+        profile {
+          id
+          firstName
+          lastName
+          phone
+          dateOfBirth
+          avatar
+        }
       }
+      accessToken
+      refreshToken
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
     }
   }
 }

@@ -8,7 +8,8 @@ import {
   LoginUserDocument, 
   RefreshTokenDocument, 
   LogoutUserDocument, 
-  GetCurrentUserDocument 
+  GetCurrentUserDocument,
+  RegisterUserDocument
 } from '@/generated/graphql';
 import { UserRole } from '@/types/unified';
 import {
@@ -71,6 +72,47 @@ export class UnifiedAuthService {
     return tokens !== null && !this.tokenStorage.isTokenExpired(tokens);
   }
 
+  // Register user
+  async register(input: { email: string; password: string; role?: UserRole; firstName?: string; lastName?: string; phone?: string; dateOfBirth?: string | null }): Promise<IAuthResponse> {
+    try {
+      const { data } = await this.client.mutate({
+        mutation: RegisterUserDocument,
+        variables: { input }
+      });
+
+      if (!data?.registerUser?.success) {
+        throw new AuthError('REGISTRATION_FAILED', data?.registerUser?.message || 'Registration failed');
+      }
+
+      const response = data.registerUser;
+      const user = this.mapGraphQLUserToAuthUser(response.data?.user);
+      const tokens: IAuthToken = {
+        accessToken: response.data?.accessToken || '',
+        ...(response.data?.refreshToken && { refreshToken: response.data.refreshToken }),
+        expiresAt: new Date(Date.now() + 3600000) // 1 hour
+      };
+
+      await this.tokenStorage.storeTokens(tokens);
+
+      return {
+        success: true,
+        user,
+        tokens,
+        message: response.message,
+        code: response.code,
+        timestamp: response.timestamp,
+        metadata: response.metadata ? {
+          ...(response.metadata.requestId && { requestId: response.metadata.requestId }),
+          ...(response.metadata.traceId && { traceId: response.metadata.traceId }),
+          ...(response.metadata.duration && { duration: response.metadata.duration }),
+          timestamp: response.metadata.timestamp
+        } : undefined
+      };
+    } catch (error: any) {
+      throw new AuthError('REGISTRATION_FAILED', error.message || 'Registration failed');
+    }
+  }
+
   // Login user
   async login(credentials: { email: string; password: string }): Promise<IAuthResponse> {
     try {
@@ -87,10 +129,10 @@ export class UnifiedAuthService {
       }
 
       const response = data.loginUser;
-      const user = this.mapGraphQLUserToAuthUser(response.user);
+      const user = this.mapGraphQLUserToAuthUser(response.data?.user);
       const tokens: IAuthToken = {
-        accessToken: response.accessToken || '',
-        ...(response.refreshToken && { refreshToken: response.refreshToken }),  // Solo incluir si existe
+        accessToken: response.data?.accessToken || '',
+        ...(response.data?.refreshToken && { refreshToken: response.data.refreshToken }),  // Solo incluir si existe
         expiresAt: new Date(Date.now() + 3600000) // 1 hour
       };
 
@@ -100,7 +142,16 @@ export class UnifiedAuthService {
         success: true,
         user,
         tokens,
-        message: response.message
+        message: response.message,
+        // New fields from backend schema
+        code: response.code,
+        timestamp: response.timestamp,
+        metadata: response.metadata ? {
+          ...(response.metadata.requestId && { requestId: response.metadata.requestId }),
+          ...(response.metadata.traceId && { traceId: response.metadata.traceId }),
+          ...(response.metadata.duration && { duration: response.metadata.duration }),
+          timestamp: response.metadata.timestamp
+        } : undefined
       };
     } catch (error: any) {
       throw new AuthError('LOGIN_FAILED', error.message || 'Login failed');
@@ -134,8 +185,8 @@ export class UnifiedAuthService {
 
       const response = data.refreshToken;
       const tokens: IAuthToken = {
-        accessToken: response.accessToken || '',
-        refreshToken: response.refreshToken,
+        accessToken: response.data?.accessToken || '',
+        refreshToken: response.data?.refreshToken,
         expiresAt: new Date(Date.now() + 3600000)
       };
 

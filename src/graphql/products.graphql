@@ -219,8 +219,13 @@ query SearchProducts($query: String!, $filter: ProductFilterInput, $pagination: 
 # =====================================================
 
 # Create new product
+# Returns CreateProductResponse with nested data structure
 mutation CreateProduct($input: CreateProductInput!) {
   createProduct(input: $input) {
+    success
+    message
+    code
+    timestamp
     data {
       entity {
         id
@@ -252,49 +257,89 @@ mutation CreateProduct($input: CreateProductInput!) {
           image
         }
       }
+      id
+      createdAt
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
     }
   }
 }
 
 # Update existing product
+# Returns UpdateProductResponse with nested data structure
 mutation UpdateProduct($id: ID!, $input: UpdateProductInput!) {
   updateProduct(id: $id, input: $input) {
-    id
-    name
-    description
-    price
-    salePrice
-    sku
-    images
-    attributes
-    isActive
-    stockQuantity
-    tags
-    rating
-    reviewCount
-    createdAt
-    updatedAt
-    # Computed fields
-    currentPrice
-    hasDiscount
-    discountPercentage
-    totalStock
-    isInStock
-    # Relations
-    category {
+    success
+    message
+    code
+    timestamp
+    data {
+      entity {
+        id
+        name
+        description
+        price
+        salePrice
+        sku
+        images
+        attributes
+        isActive
+        stockQuantity
+        tags
+        rating
+        reviewCount
+        createdAt
+        updatedAt
+        # Computed fields
+        currentPrice
+        hasDiscount
+        discountPercentage
+        totalStock
+        isInStock
+        # Relations
+        category {
+          id
+          name
+          slug
+          image
+        }
+      }
       id
-      name
-      slug
-      image
+      updatedAt
+      changes
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
     }
   }
 }
 
 # Delete product
+# Returns DeleteProductResponse with nested data structure
 mutation DeleteProduct($id: ID!) {
   deleteProduct(id: $id) {
     success
     message
+    code
+    timestamp
+    data {
+      id
+      deletedAt
+      softDelete
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
   }
 }
 

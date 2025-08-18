@@ -58,6 +58,13 @@ export type AuditLog = {
   userId?: Maybe<Scalars['String']['output']>;
 };
 
+export type AuthData = {
+  __typename?: 'AuthData';
+  accessToken?: Maybe<Scalars['String']['output']>;
+  refreshToken?: Maybe<Scalars['String']['output']>;
+  user?: Maybe<User>;
+};
+
 export enum AuthProvider {
   apple = 'apple',
   email = 'email',
@@ -67,11 +74,12 @@ export enum AuthProvider {
 
 export type AuthResponse = {
   __typename?: 'AuthResponse';
-  accessToken?: Maybe<Scalars['String']['output']>;
+  code: Scalars['String']['output'];
+  data?: Maybe<AuthData>;
   message: Scalars['String']['output'];
-  refreshToken?: Maybe<Scalars['String']['output']>;
+  metadata?: Maybe<ResponseMetadata>;
   success: Scalars['Boolean']['output'];
-  user?: Maybe<User>;
+  timestamp: Scalars['String']['output'];
 };
 
 export type BaseResponse = {
@@ -433,6 +441,23 @@ export type DeleteCategoryResponse = {
   timestamp: Scalars['String']['output'];
 };
 
+export type DeleteProductData = {
+  __typename?: 'DeleteProductData';
+  deletedAt: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  softDelete: Scalars['Boolean']['output'];
+};
+
+export type DeleteProductResponse = {
+  __typename?: 'DeleteProductResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<DeleteProductData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
 export type DeliverySlot = {
   __typename?: 'DeliverySlot';
   createdAt: Scalars['DateTime']['output'];
@@ -610,7 +635,7 @@ export type Mutation = {
   deleteCoupon: SuccessResponse;
   deleteOrderItem: SuccessResponse;
   deletePaymentMethod: SuccessResponse;
-  deleteProduct: SuccessResponse;
+  deleteProduct: DeleteProductResponse;
   deleteProductReview: SuccessResponse;
   deleteProductVariant: SuccessResponse;
   deleteReviewVote: SuccessResponse;
@@ -649,7 +674,7 @@ export type Mutation = {
   updateOrderItem: OrderItem;
   updateOrderStatus: Order;
   updatePaymentMethod: PaymentMethod;
-  updateProduct: Product;
+  updateProduct: UpdateProductResponse;
   updateProductReview: ProductReview;
   updateProductVariant: ProductVariant;
   updateSavedPaymentMethod: SavedPaymentMethod;
@@ -2123,6 +2148,14 @@ export type UpdatePaymentMethodInput = {
   type?: InputMaybe<PaymentMethodType>;
 };
 
+export type UpdateProductData = {
+  __typename?: 'UpdateProductData';
+  changes: Array<Scalars['String']['output']>;
+  entity: Product;
+  id: Scalars['ID']['output'];
+  updatedAt: Scalars['String']['output'];
+};
+
 export type UpdateProductInput = {
   attributes?: InputMaybe<Scalars['JSON']['input']>;
   categoryId?: InputMaybe<Scalars['ID']['input']>;
@@ -2135,6 +2168,16 @@ export type UpdateProductInput = {
   sku?: InputMaybe<Scalars['String']['input']>;
   stockQuantity?: InputMaybe<Scalars['Int']['input']>;
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+export type UpdateProductResponse = {
+  __typename?: 'UpdateProductResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<UpdateProductData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
 };
 
 export type UpdateProductReviewInput = {
@@ -2411,7 +2454,7 @@ export type RegisterUserMutationVariables = Exact<{
 }>;
 
 
-export type RegisterUserMutation = { __typename?: 'Mutation', registerUser: { __typename?: 'AuthResponse', success: boolean, message: string, accessToken?: string | null, refreshToken?: string | null, user?: { __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, profile?: { __typename?: 'UserProfile', id: string, firstName: string, lastName: string, phone?: string | null, dateOfBirth?: string | null, avatar?: string | null } | null } | null } };
+export type RegisterUserMutation = { __typename?: 'Mutation', registerUser: { __typename?: 'AuthResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'AuthData', accessToken?: string | null, refreshToken?: string | null, user?: { __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, profile?: { __typename?: 'UserProfile', id: string, firstName: string, lastName: string, phone?: string | null, dateOfBirth?: string | null, avatar?: string | null } | null } | null } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
 
 export type LoginUserMutationVariables = Exact<{
   email: Scalars['String']['input'];
@@ -2419,7 +2462,7 @@ export type LoginUserMutationVariables = Exact<{
 }>;
 
 
-export type LoginUserMutation = { __typename?: 'Mutation', loginUser: { __typename?: 'AuthResponse', success: boolean, message: string, accessToken?: string | null, refreshToken?: string | null, user?: { __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, profile?: { __typename?: 'UserProfile', id: string, firstName: string, lastName: string, phone?: string | null, dateOfBirth?: string | null, avatar?: string | null } | null } | null } };
+export type LoginUserMutation = { __typename?: 'Mutation', loginUser: { __typename?: 'AuthResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'AuthData', accessToken?: string | null, refreshToken?: string | null, user?: { __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, profile?: { __typename?: 'UserProfile', id: string, firstName: string, lastName: string, phone?: string | null, dateOfBirth?: string | null, avatar?: string | null } | null } | null } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
 
 export type LogoutUserMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -2431,7 +2474,7 @@ export type RefreshTokenMutationVariables = Exact<{
 }>;
 
 
-export type RefreshTokenMutation = { __typename?: 'Mutation', refreshToken: { __typename?: 'AuthResponse', success: boolean, message: string, accessToken?: string | null, refreshToken?: string | null, user?: { __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, profile?: { __typename?: 'UserProfile', id: string, firstName: string, lastName: string, phone?: string | null, dateOfBirth?: string | null, avatar?: string | null } | null } | null } };
+export type RefreshTokenMutation = { __typename?: 'Mutation', refreshToken: { __typename?: 'AuthResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'AuthData', accessToken?: string | null, refreshToken?: string | null, user?: { __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, profile?: { __typename?: 'UserProfile', id: string, firstName: string, lastName: string, phone?: string | null, dateOfBirth?: string | null, avatar?: string | null } | null } | null } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
 
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2620,7 +2663,7 @@ export type CreateProductMutationVariables = Exact<{
 }>;
 
 
-export type CreateProductMutation = { __typename?: 'Mutation', createProduct: { __typename?: 'CreateProductResponse', data?: { __typename?: 'CreateProductData', entity: { __typename?: 'Product', id: string, name: string, description?: string | null, price: number, salePrice?: number | null, sku: string, images: Array<string>, attributes: any, isActive: boolean, stockQuantity: number, tags: Array<string>, rating?: number | null, reviewCount: number, createdAt: string, updatedAt: string, currentPrice: number, hasDiscount: boolean, discountPercentage: number, totalStock: number, isInStock: boolean, category?: { __typename?: 'Category', id: string, name: string, slug: string, image?: string | null } | null } } | null } };
+export type CreateProductMutation = { __typename?: 'Mutation', createProduct: { __typename?: 'CreateProductResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'CreateProductData', id: string, createdAt: string, entity: { __typename?: 'Product', id: string, name: string, description?: string | null, price: number, salePrice?: number | null, sku: string, images: Array<string>, attributes: any, isActive: boolean, stockQuantity: number, tags: Array<string>, rating?: number | null, reviewCount: number, createdAt: string, updatedAt: string, currentPrice: number, hasDiscount: boolean, discountPercentage: number, totalStock: number, isInStock: boolean, category?: { __typename?: 'Category', id: string, name: string, slug: string, image?: string | null } | null } } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
 
 export type UpdateProductMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -2628,14 +2671,14 @@ export type UpdateProductMutationVariables = Exact<{
 }>;
 
 
-export type UpdateProductMutation = { __typename?: 'Mutation', updateProduct: { __typename?: 'Product', id: string, name: string, description?: string | null, price: number, salePrice?: number | null, sku: string, images: Array<string>, attributes: any, isActive: boolean, stockQuantity: number, tags: Array<string>, rating?: number | null, reviewCount: number, createdAt: string, updatedAt: string, currentPrice: number, hasDiscount: boolean, discountPercentage: number, totalStock: number, isInStock: boolean, category?: { __typename?: 'Category', id: string, name: string, slug: string, image?: string | null } | null } };
+export type UpdateProductMutation = { __typename?: 'Mutation', updateProduct: { __typename?: 'UpdateProductResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'UpdateProductData', id: string, updatedAt: string, changes: Array<string>, entity: { __typename?: 'Product', id: string, name: string, description?: string | null, price: number, salePrice?: number | null, sku: string, images: Array<string>, attributes: any, isActive: boolean, stockQuantity: number, tags: Array<string>, rating?: number | null, reviewCount: number, createdAt: string, updatedAt: string, currentPrice: number, hasDiscount: boolean, discountPercentage: number, totalStock: number, isInStock: boolean, category?: { __typename?: 'Category', id: string, name: string, slug: string, image?: string | null } | null } } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
 
 export type DeleteProductMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type DeleteProductMutation = { __typename?: 'Mutation', deleteProduct: { __typename?: 'SuccessResponse', success: boolean, message: string } };
+export type DeleteProductMutation = { __typename?: 'Mutation', deleteProduct: { __typename?: 'DeleteProductResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'DeleteProductData', id: string, deletedAt: string, softDelete: boolean } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
 
 export type CreateProductVariantMutationVariables = Exact<{
   input: CreateProductVariantInput;
@@ -2908,7 +2951,7 @@ export type ImpersonateUserMutationVariables = Exact<{
 }>;
 
 
-export type ImpersonateUserMutation = { __typename?: 'Mutation', impersonateUser: { __typename?: 'AuthResponse', success: boolean, message: string, accessToken?: string | null, refreshToken?: string | null, user?: { __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, profile?: { __typename?: 'UserProfile', id: string, firstName: string, lastName: string, phone?: string | null, dateOfBirth?: string | null, avatar?: string | null } | null } | null } };
+export type ImpersonateUserMutation = { __typename?: 'Mutation', impersonateUser: { __typename?: 'AuthResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'AuthData', accessToken?: string | null, refreshToken?: string | null, user?: { __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, profile?: { __typename?: 'UserProfile', id: string, firstName: string, lastName: string, phone?: string | null, dateOfBirth?: string | null, avatar?: string | null } | null } | null } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
 
 
 export const RegisterUserDocument = gql`
@@ -2916,23 +2959,33 @@ export const RegisterUserDocument = gql`
   registerUser(input: $input) {
     success
     message
-    accessToken
-    refreshToken
-    user {
-      id
-      email
-      role
-      isActive
-      emailVerified
-      lastLoginAt
-      profile {
+    code
+    timestamp
+    data {
+      user {
         id
-        firstName
-        lastName
-        phone
-        dateOfBirth
-        avatar
+        email
+        role
+        isActive
+        emailVerified
+        lastLoginAt
+        profile {
+          id
+          firstName
+          lastName
+          phone
+          dateOfBirth
+          avatar
+        }
       }
+      accessToken
+      refreshToken
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
     }
   }
 }
@@ -2968,23 +3021,33 @@ export const LoginUserDocument = gql`
   loginUser(email: $email, password: $password) {
     success
     message
-    accessToken
-    refreshToken
-    user {
-      id
-      email
-      role
-      isActive
-      emailVerified
-      lastLoginAt
-      profile {
+    code
+    timestamp
+    data {
+      user {
         id
-        firstName
-        lastName
-        phone
-        dateOfBirth
-        avatar
+        email
+        role
+        isActive
+        emailVerified
+        lastLoginAt
+        profile {
+          id
+          firstName
+          lastName
+          phone
+          dateOfBirth
+          avatar
+        }
       }
+      accessToken
+      refreshToken
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
     }
   }
 }
@@ -3054,23 +3117,33 @@ export const RefreshTokenDocument = gql`
   refreshToken(refreshToken: $refreshToken) {
     success
     message
-    accessToken
-    refreshToken
-    user {
-      id
-      email
-      role
-      isActive
-      emailVerified
-      lastLoginAt
-      profile {
+    code
+    timestamp
+    data {
+      user {
         id
-        firstName
-        lastName
-        phone
-        dateOfBirth
-        avatar
+        email
+        role
+        isActive
+        emailVerified
+        lastLoginAt
+        profile {
+          id
+          firstName
+          lastName
+          phone
+          dateOfBirth
+          avatar
+        }
       }
+      accessToken
+      refreshToken
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
     }
   }
 }
@@ -4787,6 +4860,10 @@ export function refetchSearchProductsQuery(variables: SearchProductsQueryVariabl
 export const CreateProductDocument = gql`
     mutation CreateProduct($input: CreateProductInput!) {
   createProduct(input: $input) {
+    success
+    message
+    code
+    timestamp
     data {
       entity {
         id
@@ -4816,6 +4893,14 @@ export const CreateProductDocument = gql`
           image
         }
       }
+      id
+      createdAt
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
     }
   }
 }
@@ -4849,31 +4934,48 @@ export type CreateProductMutationOptions = Apollo.BaseMutationOptions<CreateProd
 export const UpdateProductDocument = gql`
     mutation UpdateProduct($id: ID!, $input: UpdateProductInput!) {
   updateProduct(id: $id, input: $input) {
-    id
-    name
-    description
-    price
-    salePrice
-    sku
-    images
-    attributes
-    isActive
-    stockQuantity
-    tags
-    rating
-    reviewCount
-    createdAt
-    updatedAt
-    currentPrice
-    hasDiscount
-    discountPercentage
-    totalStock
-    isInStock
-    category {
+    success
+    message
+    code
+    timestamp
+    data {
+      entity {
+        id
+        name
+        description
+        price
+        salePrice
+        sku
+        images
+        attributes
+        isActive
+        stockQuantity
+        tags
+        rating
+        reviewCount
+        createdAt
+        updatedAt
+        currentPrice
+        hasDiscount
+        discountPercentage
+        totalStock
+        isInStock
+        category {
+          id
+          name
+          slug
+          image
+        }
+      }
       id
-      name
-      slug
-      image
+      updatedAt
+      changes
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
     }
   }
 }
@@ -4910,6 +5012,19 @@ export const DeleteProductDocument = gql`
   deleteProduct(id: $id) {
     success
     message
+    code
+    timestamp
+    data {
+      id
+      deletedAt
+      softDelete
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
   }
 }
     `;
@@ -6893,23 +7008,33 @@ export const ImpersonateUserDocument = gql`
   impersonateUser(userId: $userId) {
     success
     message
-    accessToken
-    refreshToken
-    user {
-      id
-      email
-      role
-      isActive
-      emailVerified
-      lastLoginAt
-      profile {
+    code
+    timestamp
+    data {
+      user {
         id
-        firstName
-        lastName
-        phone
-        dateOfBirth
-        avatar
+        email
+        role
+        isActive
+        emailVerified
+        lastLoginAt
+        profile {
+          id
+          firstName
+          lastName
+          phone
+          dateOfBirth
+          avatar
+        }
       }
+      accessToken
+      refreshToken
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
     }
   }
 }

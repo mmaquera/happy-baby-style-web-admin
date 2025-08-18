@@ -33,12 +33,22 @@ export interface AuthUser {
   } | null;
 }
 
+// Enhanced AuthResult interface following Open/Closed Principle
 export interface AuthResult {
   success: boolean;
   user?: AuthUser | null;
   accessToken?: string | null;
   refreshToken?: string | null;
   message: string;
+  // New fields from backend schema
+  code?: string;
+  timestamp?: string;
+  metadata?: {
+    requestId?: string;
+    traceId?: string;
+    duration?: number;
+    timestamp?: string;
+  } | undefined;
 }
 
 export const useAuthGraphQL = () => {
@@ -59,25 +69,34 @@ export const useAuthGraphQL = () => {
         const response = data.loginUser;
         return {
           success: response.success,
-          user: response.user ? {
-            id: response.user.id,
-            email: response.user.email,
-            role: response.user.role,
-            isActive: response.user.isActive,
-            emailVerified: response.user.emailVerified,
-            lastLoginAt: response.user.lastLoginAt ?? null,
-            profile: response.user.profile ? {
-              id: response.user.profile.id,
-              firstName: response.user.profile.firstName ?? null,
-              lastName: response.user.profile.lastName ?? null,
-              phone: response.user.profile.phone ?? null,
-              birthDate: response.user.profile.dateOfBirth ?? null,
-              avatar: response.user.profile.avatar ?? null,
+          user: response.data?.user ? {
+            id: response.data.user.id,
+            email: response.data.user.email,
+            role: response.data.user.role,
+            isActive: response.data.user.isActive,
+            emailVerified: response.data.user.emailVerified,
+            lastLoginAt: response.data.user.lastLoginAt ?? null,
+            profile: response.data.user.profile ? {
+              id: response.data.user.profile.id,
+              firstName: response.data.user.profile.firstName ?? null,
+              lastName: response.data.user.profile.lastName ?? null,
+              phone: response.data.user.profile.phone ?? null,
+              birthDate: response.data.user.profile.dateOfBirth ?? null,
+              avatar: response.data.user.profile.avatar ?? null,
             } : null
           } : null,
-          accessToken: response.accessToken ?? null,
-          refreshToken: response.refreshToken ?? null,
-          message: response.message
+          accessToken: response.data?.accessToken ?? null,
+          refreshToken: response.data?.refreshToken ?? null,
+          message: response.message,
+          // New fields from backend schema
+          code: response.code,
+          timestamp: response.timestamp,
+          metadata: response.metadata ? {
+            ...(response.metadata.requestId && { requestId: response.metadata.requestId }),
+            ...(response.metadata.traceId && { traceId: response.metadata.traceId }),
+            ...(response.metadata.duration && { duration: response.metadata.duration }),
+            timestamp: response.metadata.timestamp
+          } : undefined
         };
       }
 
@@ -124,25 +143,34 @@ export const useAuthGraphQL = () => {
         const response = data.refreshToken;
         return {
           success: response.success,
-          user: response.user ? {
-            id: response.user.id,
-            email: response.user.email,
-            role: response.user.role,
-            isActive: response.user.isActive,
-            emailVerified: response.user.emailVerified,
-            lastLoginAt: response.user.lastLoginAt ?? null,
-            profile: response.user.profile ? {
-              id: response.user.profile.id,
-              firstName: response.user.profile.firstName ?? null,
-              lastName: response.user.profile.lastName ?? null,
-              phone: response.user.profile.phone ?? null,
-              birthDate: response.user.profile.dateOfBirth ?? null,
-              avatar: response.user.profile.avatar ?? null,
+          user: response.data?.user ? {
+            id: response.data.user.id,
+            email: response.data.user.email,
+            role: response.data.user.role,
+            isActive: response.data.user.isActive,
+            emailVerified: response.data.user.emailVerified,
+            lastLoginAt: response.data.user.lastLoginAt ?? null,
+            profile: response.data.user.profile ? {
+              id: response.data.user.profile.id,
+              firstName: response.data.user.profile.firstName ?? null,
+              lastName: response.data.user.profile.lastName ?? null,
+              phone: response.data.user.profile.phone ?? null,
+              birthDate: response.data.user.profile.dateOfBirth ?? null,
+              avatar: response.data.user.profile.avatar ?? null,
             } : null
           } : null,
-          accessToken: response.accessToken ?? null,
-          refreshToken: response.refreshToken ?? null,
-          message: response.message
+          accessToken: response.data?.accessToken ?? null,
+          refreshToken: response.data?.refreshToken ?? null,
+          message: response.message,
+          // New fields from backend schema
+          code: response.code,
+          timestamp: response.timestamp,
+          metadata: response.metadata ? {
+            ...(response.metadata.requestId && { requestId: response.metadata.requestId }),
+            ...(response.metadata.traceId && { traceId: response.metadata.traceId }),
+            ...(response.metadata.duration && { duration: response.metadata.duration }),
+            timestamp: response.metadata.timestamp
+          } : undefined
         };
       }
 

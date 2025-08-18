@@ -137,32 +137,10 @@ export const useAuth = (): UseAuthReturn => {
     }
   }, [authService]);
 
-  // Register function
+  // Register function - Not implemented in this hook
   const register = useCallback(async (credentials: RegisterCredentials) => {
-    try {
-      setState(prev => ({ ...prev, isLoading: true, error: null }));
-      
-      // TODO: Implement register mutation
-      // const response = await authService.register(credentials);
-      
-      // For now, just login after registration
-      await login({ email: credentials.email, password: credentials.password });
-    } catch (error) {
-      const errorMessage = error instanceof AuthError 
-        ? error.message 
-        : error instanceof Error 
-          ? error.message 
-          : 'Registration failed';
-      
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: errorMessage
-      }));
-      
-      throw error;
-    }
-  }, [authService, login]);
+    throw new Error('Registration is not available in useAuth. Please use useUnifiedAuth instead.');
+  }, []);
 
   // Refresh token function
   const refreshToken = useCallback(async () => {

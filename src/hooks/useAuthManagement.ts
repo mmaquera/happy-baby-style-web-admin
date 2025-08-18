@@ -278,7 +278,7 @@ export const useUserImpersonation = () => {
         
         // En una implementación real, aquí se manejaría la redirección
         // o cambio de contexto de usuario
-        const { accessToken } = result.data.impersonateUser;
+        const { accessToken } = result.data.impersonateUser.data || {};
         console.log('Impersonation token:', accessToken);
         
       } else {

@@ -27,6 +27,7 @@ interface AuthState {
 // Hook actions interface
 interface AuthActions {
   login: (credentials: { email: string; password: string }) => Promise<boolean>;
+  register: (input: { email: string; password: string; role?: UserRole; firstName?: string; lastName?: string; phone?: string; dateOfBirth?: string | null }) => Promise<boolean>;
   logout: () => Promise<void>;
   refreshToken: () => Promise<void>;
   clearError: () => void;
@@ -90,6 +91,39 @@ export const useUnifiedAuth = (): UseUnifiedAuthReturn => {
     };
 
     initializeAuth();
+  }, [authService]);
+
+  // Register function
+  const register = useCallback(async (input: { email: string; password: string; role?: UserRole; firstName?: string; lastName?: string; phone?: string; dateOfBirth?: string | null }): Promise<boolean> => {
+    try {
+      setState(prev => ({ ...prev, isLoading: true, error: null }));
+      
+      const response = await authService.register(input);
+      
+      setState({
+        user: response.user,
+        isAuthenticated: true,
+        isLoading: false,
+        error: null,
+        isInitialized: true,
+      });
+      
+      return true;
+    } catch (error) {
+      const errorMessage = error instanceof AuthError 
+        ? error.message 
+        : error instanceof Error 
+          ? error.message 
+          : 'Registration failed';
+      
+      setState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: errorMessage,
+      }));
+      
+      return false;
+    }
   }, [authService]);
 
   // Login function
@@ -193,6 +227,7 @@ export const useUnifiedAuth = (): UseUnifiedAuthReturn => {
   return {
     ...state,
     login,
+    register,
     logout,
     refreshToken,
     clearError,

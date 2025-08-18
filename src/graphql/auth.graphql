@@ -5,64 +5,88 @@
 # - Single Responsibility: Authentication operations only
 # - Interface Segregation: Specific operations for auth
 # - Dependency Inversion: Depends on backend schema
+# - Open/Closed: Extensible for future auth methods
 
 # =====================================================
 # MUTATIONS
 # =====================================================
 
 # User registration with email and password
+# Returns AuthResponse with nested data structure
 mutation RegisterUser($input: CreateUserProfileInput!) {
   registerUser(input: $input) {
     success
     message
-    accessToken
-    refreshToken
-    user {
-      id
-      email
-      role
-      isActive
-      emailVerified
-      lastLoginAt
-      profile {
+    code
+    timestamp
+    data {
+      user {
         id
-        firstName
-        lastName
-        phone
-        dateOfBirth
-        avatar
+        email
+        role
+        isActive
+        emailVerified
+        lastLoginAt
+        profile {
+          id
+          firstName
+          lastName
+          phone
+          dateOfBirth
+          avatar
+        }
       }
+      accessToken
+      refreshToken
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
     }
   }
 }
 
 # User login with email and password
+# Returns AuthResponse with nested data structure
 mutation LoginUser($email: String!, $password: String!) {
   loginUser(email: $email, password: $password) {
     success
     message
-    accessToken
-    refreshToken
-    user {
-      id
-      email
-      role
-      isActive
-      emailVerified
-      lastLoginAt
-      profile {
+    code
+    timestamp
+    data {
+      user {
         id
-        firstName
-        lastName
-        phone
-        dateOfBirth
-        avatar
+        email
+        role
+        isActive
+        emailVerified
+        lastLoginAt
+        profile {
+          id
+          firstName
+          lastName
+          phone
+          dateOfBirth
+          avatar
+        }
       }
+      accessToken
+      refreshToken
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
     }
   }
 }
 
 # User logout
+# Returns SuccessResponse for confirmation
 mutation LogoutUser {
   logoutUser {
     success
@@ -71,27 +95,38 @@ mutation LogoutUser {
 }
 
 # Refresh access token
+# Returns AuthResponse with new tokens
 mutation RefreshToken($refreshToken: String!) {
   refreshToken(refreshToken: $refreshToken) {
     success
     message
-    accessToken
-    refreshToken
-    user {
-      id
-      email
-      role
-      isActive
-      emailVerified
-      lastLoginAt
-      profile {
+    code
+    timestamp
+    data {
+      user {
         id
-        firstName
-        lastName
-        phone
-        dateOfBirth
-        avatar
+        email
+        role
+        isActive
+        emailVerified
+        lastLoginAt
+        profile {
+          id
+          firstName
+          lastName
+          phone
+          dateOfBirth
+          avatar
+        }
       }
+      accessToken
+      refreshToken
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
     }
   }
 }
@@ -101,6 +136,7 @@ mutation RefreshToken($refreshToken: String!) {
 # =====================================================
 
 # Get current authenticated user
+# Returns User object directly
 query GetCurrentUser {
   currentUser {
     id

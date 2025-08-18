@@ -678,6 +678,33 @@ type CreateProductData {
   id: ID!
   createdAt: String!
 }
+type UpdateProductResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: UpdateProductData
+  metadata: ResponseMetadata
+}
+type UpdateProductData {
+  entity: Product!
+  id: ID!
+  updatedAt: String!
+  changes: [String!]!
+}
+type DeleteProductResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: DeleteProductData
+  metadata: ResponseMetadata
+}
+type DeleteProductData {
+  id: ID!
+  deletedAt: String!
+  softDelete: Boolean!
+}
 type GetProductsResponse {
   success: Boolean!
   message: String!
@@ -782,10 +809,16 @@ type DeleteCategoryData {
 }
 type AuthResponse {
   success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: AuthData
+  metadata: ResponseMetadata
+}
+type AuthData {
   user: User
   accessToken: String
   refreshToken: String
-  message: String!
 }
 type SuccessResponse {
   success: Boolean!
@@ -954,8 +987,8 @@ type Mutation {
   updateCategory(id: ID!, input: UpdateCategoryInput!): UpdateCategoryResponse!
   deleteCategory(id: ID!): DeleteCategoryResponse!
   createProduct(input: CreateProductInput!): CreateProductResponse!
-  updateProduct(id: ID!, input: UpdateProductInput!): Product!
-  deleteProduct(id: ID!): SuccessResponse!
+  updateProduct(id: ID!, input: UpdateProductInput!): UpdateProductResponse!
+  deleteProduct(id: ID!): DeleteProductResponse!
   createProductVariant(input: CreateProductVariantInput!): ProductVariant!
   updateProductVariant(id: ID!, input: UpdateProductVariantInput!): ProductVariant!
   deleteProductVariant(id: ID!): SuccessResponse!

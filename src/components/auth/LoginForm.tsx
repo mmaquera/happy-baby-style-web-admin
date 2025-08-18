@@ -5,13 +5,14 @@
 // Interface Segregation: Specific props interface
 // Dependency Inversion: Depends on hook abstraction
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useLoginForm } from '@/hooks/useLoginForm';
+import { ForgotPasswordModal } from './ForgotPasswordModal';
 
 // Styled Components following Single Responsibility Principle
 const FormContainer = styled.form`
@@ -35,7 +36,7 @@ const FormSubtitle = styled.p`
   margin: 0 0 ${theme.spacing[4]} 0;
 `;
 
-const ForgotPasswordLink = styled.a`
+const ForgotPasswordLink = styled.button`
   font-size: ${theme.fontSizes.sm};
   color: ${theme.colors.primaryPurple};
   text-decoration: none;
@@ -43,10 +44,20 @@ const ForgotPasswordLink = styled.a`
   transition: color ${theme.transitions.fast};
   align-self: flex-end;
   margin-top: -${theme.spacing[2]};
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: ${theme.spacing[1]};
+  border-radius: ${theme.borderRadius.sm};
 
   &:hover {
     color: ${theme.colors.coralAccent};
     text-decoration: underline;
+    background: ${theme.colors.background.accent};
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 `;
 
@@ -72,6 +83,8 @@ export const LoginForm: React.FC = () => {
     clearError,
   } = useLoginForm();
 
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+
   const { register, handleSubmit, formState: { errors } } = form;
 
   // Clear error when component mounts or error changes
@@ -80,6 +93,16 @@ export const LoginForm: React.FC = () => {
       clearError();
     }
   }, [error, clearError]);
+
+  // Handle forgot password modal
+  const handleForgotPassword = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsForgotPasswordOpen(true);
+  };
+
+  const closeForgotPassword = () => {
+    setIsForgotPasswordOpen(false);
+  };
 
   return (
     <>
@@ -125,7 +148,11 @@ export const LoginForm: React.FC = () => {
           error={errors.password?.message || ''}
         />
 
-        <ForgotPasswordLink href="#" onClick={(e) => e.preventDefault()}>
+        <ForgotPasswordLink 
+          type="button"
+          onClick={handleForgotPassword}
+          aria-label="¿Olvidaste tu contraseña?"
+        >
           ¿Olvidaste tu contraseña?
         </ForgotPasswordLink>
 
@@ -145,6 +172,11 @@ export const LoginForm: React.FC = () => {
           {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
         </Button>
       </FormContainer>
+
+      <ForgotPasswordModal
+        isOpen={isForgotPasswordOpen}
+        onClose={closeForgotPassword}
+      />
     </>
   );
 };
