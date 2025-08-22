@@ -230,6 +230,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const isOutOfStock = product.stockQuantity === 0;
   
   const currentPrice = product.salePrice || product.price;
+  const safeCurrentPrice = typeof currentPrice === 'number' ? currentPrice : product.price;
 
   return (
     <Card hover clickable shadow="medium" padding="small">
@@ -254,7 +255,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             color: theme.colors.warmGray,
             fontSize: theme.fontSizes.sm
           }}>
-            <Package size={24} />
+            <Package size={24} data-testid="placeholder-icon" />
           </div>
         )}
         
@@ -285,10 +286,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         )}
         
         <PriceContainer>
-          <CurrentPrice>${currentPrice.toFixed(2)}</CurrentPrice>
+          <CurrentPrice>S/ {safeCurrentPrice.toFixed(2)}</CurrentPrice>
           {hasDiscount && (
             <>
-              <OriginalPrice>${product.price.toFixed(2)}</OriginalPrice>
+              <OriginalPrice>S/ {product.price.toFixed(2)}</OriginalPrice>
               <DiscountBadge>-{discountPercentage}%</DiscountBadge>
             </>
           )}
@@ -321,6 +322,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               size="small"
               onClick={() => onViewDetails(product.id)}
               fullWidth
+              aria-label="Ver detalles del producto"
             >
               <Eye size={14} />
               Ver Detalles
@@ -332,6 +334,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               variant="outline"
               size="small"
               onClick={() => onEdit(product.id)}
+              aria-label="Editar producto"
             >
               <Edit size={14} />
               Editar
@@ -343,6 +346,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               variant={product.isActive ? "ghost" : "secondary"}
               size="small"
               onClick={() => onToggleStatus(product.id, !product.isActive)}
+              aria-label="Cambiar estado del producto"
             >
               {product.isActive ? 'Desactivar' : 'Activar'}
             </Button>
@@ -353,6 +357,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               variant="danger"
               size="small"
               onClick={() => onDelete(product.id)}
+              aria-label="Eliminar producto"
             >
               <Trash2 size={14} />
               Eliminar

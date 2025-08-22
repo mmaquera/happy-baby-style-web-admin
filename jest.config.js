@@ -1,7 +1,7 @@
 // Jest Configuration - Following testing best practices
 // Configured for TypeScript and React testing
 
-module.exports = {
+export default {
   // Test environment
   testEnvironment: 'jsdom',
   
@@ -54,7 +54,7 @@ module.exports = {
   ],
   
   // Module name mapping
-  moduleNameMapping: {
+  moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@/components/(.*)$': '<rootDir>/src/components/$1',
     '^@/pages/(.*)$': '<rootDir>/src/pages/$1',
@@ -107,25 +107,8 @@ module.exports = {
   // Coverage directory
   coverageDirectory: 'coverage',
   
-  // Test results processor
-  testResultsProcessor: 'jest-sonar-reporter',
-  
   // Reporters
-  reporters: [
-    'default',
-    ['jest-junit', {
-      outputDirectory: 'coverage',
-      outputName: 'junit.xml',
-      classNameTemplate: '{classname}',
-      titleTemplate: '{title}',
-      ancestorSeparator: ' › ',
-      usePathForSuiteName: true
-    }]
-  ],
-  
-  // Global setup and teardown
-  globalSetup: '<rootDir>/src/setupTests.ts',
-  globalTeardown: '<rootDir>/src/teardownTests.ts',
+  reporters: ['default'],
   
   // Test environment options
   testEnvironmentOptions: {
@@ -140,15 +123,6 @@ module.exports = {
   ],
   
   // Watch plugins
-  watchPlugins: [
-    'jest-watch-typeahead/filename',
-    'jest-watch-typeahead/testname'
-  ],
-  
-  // Notify mode
-  notify: true,
-  
-  // Notify mode options
-  notifyMode: 'failure-change'
+  watchPlugins: []
 };
 

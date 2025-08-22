@@ -10,9 +10,18 @@ export const GlobalStyles = createGlobalStyle`
     box-sizing: border-box;
   }
 
+  #root {
+    overflow-x: hidden !important;
+    width: 100%;
+    max-width: 100vw;
+    position: relative;
+  }
+
   html {
     font-size: 16px;
     scroll-behavior: smooth;
+    overflow-x: hidden !important;
+    max-width: 100vw;
   }
 
   body {
@@ -23,6 +32,20 @@ export const GlobalStyles = createGlobalStyle`
     background: ${theme.colors.background.light};
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden !important;
+    max-width: 100vw;
+    position: relative;
+  }
+
+  /* Forzar que ningún elemento cause scroll horizontal */
+  * {
+    max-width: 100%;
+  }
+
+  /* Específicamente para elementos que podrían causar overflow */
+  div, span, p, h1, h2, h3, h4, h5, h6, section, article, aside, nav {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
   }
 
   h1, h2, h3, h4, h5, h6 {

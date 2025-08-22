@@ -84,11 +84,18 @@ export const useProduct = (id: string, skip = false) => {
 export const useCreateProduct = () => {
   const [createProduct, { loading, error }] = useCreateProductMutation({
     refetchQueries: [GetProductsDocument],
-    onCompleted: () => {
-      toast.success('Producto creado exitosamente');
+    // ✅ Restaurado onCompleted con lógica condicional para evitar toasts duplicados
+    onCompleted: (data) => {
+      // Solo mostrar toast si realmente fue exitoso según el servidor
+      if (data?.createProduct?.success === true) {
+        toast.success('Producto creado exitosamente');
+      }
+      // Si success: false, no mostrar toast - useProductActions maneja el error
     },
     onError: (error) => {
-      toast.error(`Error al crear producto: ${error.message}`);
+      // ❌ Solo se ejecuta en caso de error de red/GraphQL, no errores de negocio
+      console.log('🚨 useCreateProduct - Error de GraphQL/Red:', error.message);
+      // No mostrar toast aquí - useProductActions maneja todos los casos
     }
   });
 
@@ -101,11 +108,18 @@ export const useCreateProduct = () => {
 
 export const useUpdateProduct = () => {
   const [updateProduct, { loading, error }] = useUpdateProductMutation({
-    onCompleted: () => {
-      toast.success('Producto actualizado exitosamente');
+    // ✅ Restaurado onCompleted con lógica condicional para evitar toasts duplicados
+    onCompleted: (data) => {
+      // Solo mostrar toast si realmente fue exitoso según el servidor
+      if (data?.updateProduct?.success === true) {
+        toast.success('Producto actualizado exitosamente');
+      }
+      // Si success: false, no mostrar toast - useProductActions maneja el error
     },
     onError: (error) => {
-      toast.error(`Error al actualizar producto: ${error.message}`);
+      // ❌ Solo se ejecuta en caso de error de red/GraphQL, no errores de negocio
+      console.log('🚨 useUpdateProduct - Error de GraphQL/Red:', error.message);
+      // No mostrar toast aquí - useProductActions maneja todos los casos
     }
   });
 
@@ -119,11 +133,18 @@ export const useUpdateProduct = () => {
 export const useDeleteProduct = () => {
   const [deleteProduct, { loading, error }] = useDeleteProductMutation({
     refetchQueries: [GetProductsDocument],
+    // ✅ Restaurado onCompleted con lógica condicional para evitar toasts duplicados
     onCompleted: (data) => {
-      toast.success('Producto eliminado exitosamente');
+      // Solo mostrar toast si realmente fue exitoso según el servidor
+      if (data?.deleteProduct?.success === true) {
+        toast.success('Producto eliminado exitosamente');
+      }
+      // Si success: false, no mostrar toast - useProductActions maneja el error
     },
     onError: (error) => {
-      toast.error(`Error al eliminar producto: ${error.message}`);
+      // ❌ Solo se ejecuta en caso de error de red/GraphQL, no errores de negocio
+      console.log('🚨 useDeleteProduct - Error de GraphQL/Red:', error.message);
+      // No mostrar toast aquí - useProductActions maneja todos los casos
     }
   });
 
@@ -136,18 +157,23 @@ export const useDeleteProduct = () => {
 
 export const useUploadProductImage = () => {
   const [uploadImage, { loading, error }] = useUploadImageMutation({
-    onCompleted: (data) => {
-      toast.success('Imagen subida exitosamente');
-    },
-    onError: (error) => {
-      toast.error(`Error al subir imagen: ${error.message}`);
-    }
+    // ✅ Removidos los toasts automáticos para evitar duplicación
+    // Los mensajes se manejan centralmente en useProductActions
   });
 
   const upload = (file: File, productId: string) => {
+    // ✅ VERIFICACIÓN: Logs para diagnosticar el problema
+    console.log('📁 useUploadProductImage - Archivo recibido:', file);
+    console.log('📁 useUploadProductImage - ProductId recibido:', productId);
+    console.log('📁 useUploadProductImage - Variables a enviar:', { 
+      file,
+      entityId: productId, 
+      entityType: 'product' 
+    });
+    
     return uploadImage({ 
       variables: { 
-        file, 
+        file,
         entityId: productId, 
         entityType: 'product' 
       } 

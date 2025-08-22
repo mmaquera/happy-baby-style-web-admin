@@ -3,9 +3,9 @@ import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { CURRENCY_SYMBOL } from '@/config/currency';
 import { 
   List,
-  Grid3X3,
   Eye,
   Edit,
   Trash2,
@@ -14,15 +14,8 @@ import {
   AlertTriangle,
   XCircle,
   Star,
-  Tag,
-  Filter,
-  Search,
   SortAsc,
-  SortDesc,
-  MoreHorizontal,
-  Download,
-  Upload,
-  Settings
+  SortDesc
 } from 'lucide-react';
 
 interface Product {
@@ -81,6 +74,10 @@ interface ProductListViewProps {
   onFilter: (filters: any) => void;
 }
 
+// =====================================================
+// STYLED COMPONENTS - Minimalist Design
+// =====================================================
+
 const ListViewContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -95,46 +92,35 @@ const ListViewHeader = styled.div`
   background: ${theme.colors.background.light};
   border-radius: ${theme.borderRadius.lg};
   border: 1px solid ${theme.colors.border.light};
+  
+  @media (max-width: ${theme.breakpoints.md}) {
+    flex-direction: column;
+    gap: ${theme.spacing[3]};
+    align-items: stretch;
+  }
 `;
 
 const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[4]};
-`;
-
-const ViewToggleContainer = styled.div`
-  display: flex;
-  gap: ${theme.spacing[2]};
-`;
-
-const ViewToggleButton = styled.button<{ isActive: boolean }>`
-  padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  background: ${({ isActive }) => 
-    isActive ? theme.colors.primaryPurple : theme.colors.background.accent};
-  color: ${({ isActive }) => 
-    isActive ? theme.colors.white : theme.colors.text.secondary};
-  border: 1px solid ${({ isActive }) => 
-    isActive ? theme.colors.primaryPurple : theme.colors.border.light};
-  border-radius: ${theme.borderRadius.md};
-  font-size: ${theme.fontSizes.sm};
-  cursor: pointer;
-  transition: all ${theme.transitions.base};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-
-  &:hover {
-    background: ${({ isActive }) => 
-      isActive ? theme.colors.primaryPurple : theme.colors.softPurple};
-    border-color: ${theme.colors.primaryPurple};
+  
+  @media (max-width: ${theme.breakpoints.md}) {
+    justify-content: center;
+    gap: ${theme.spacing[2]};
   }
 `;
 
-const HeaderRight = styled.div`
+const ViewModeIndicator = styled.div`
   display: flex;
-  gap: ${theme.spacing[3]};
   align-items: center;
+  gap: ${theme.spacing[2]};
+  padding: ${theme.spacing[2]} ${theme.spacing[3]};
+  background: ${theme.colors.primaryPurple};
+  color: ${theme.colors.white};
+  border-radius: ${theme.borderRadius.md};
+  font-size: ${theme.fontSizes.sm};
+  font-weight: ${theme.fontWeights.medium};
 `;
 
 const ProductCount = styled.span`
@@ -160,6 +146,13 @@ const TableHeader = styled.div`
   font-weight: ${theme.fontWeights.medium};
   font-size: ${theme.fontSizes.sm};
   color: ${theme.colors.text.primary};
+  
+  @media (max-width: ${theme.breakpoints.lg}) {
+    grid-template-columns: 50px 150px 100px 80px 80px 80px 80px 80px;
+    gap: ${theme.spacing[2]};
+    padding: ${theme.spacing[3]};
+    font-size: ${theme.fontSizes.xs};
+  }
 `;
 
 const TableHeaderCell = styled.div<{ sortable?: boolean }>`
@@ -197,6 +190,12 @@ const ProductRow = styled.div`
 
   &:last-child {
     border-bottom: none;
+  }
+  
+  @media (max-width: ${theme.breakpoints.lg}) {
+    grid-template-columns: 50px 150px 100px 80px 80px 80px 80px 80px;
+    gap: ${theme.spacing[2]};
+    padding: ${theme.spacing[3]};
   }
 `;
 
@@ -336,6 +335,11 @@ const PaginationContainer = styled.div`
   background: ${theme.colors.white};
   border-radius: ${theme.borderRadius.lg};
   border: 1px solid ${theme.colors.border.light};
+  
+  @media (max-width: ${theme.breakpoints.md}) {
+    flex-wrap: wrap;
+    gap: ${theme.spacing[2]};
+  }
 `;
 
 const PageButton = styled.button<{ isActive?: boolean }>`
@@ -391,6 +395,10 @@ const EmptyMessage = styled.p`
   color: ${theme.colors.text.secondary};
   margin: 0;
 `;
+
+// =====================================================
+// COMPONENT - Clean and Focused
+// =====================================================
 
 export const ProductListView: React.FC<ProductListViewProps> = ({
   products,
@@ -465,43 +473,20 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
 
   return (
     <ListViewContainer>
+      {/* Simplified Header - Only Context Information */}
       <ListViewHeader>
         <HeaderLeft>
-          <ViewToggleContainer>
-            <ViewToggleButton isActive={true}>
-              <List size={16} />
-              Lista
-            </ViewToggleButton>
-            <ViewToggleButton isActive={false}>
-              <Grid3X3 size={16} />
-              Grid
-            </ViewToggleButton>
-          </ViewToggleContainer>
+          <ViewModeIndicator>
+            <List size={16} />
+            Vista de Lista
+          </ViewModeIndicator>
           <ProductCount>
             Mostrando {products.length} de {total} productos
           </ProductCount>
         </HeaderLeft>
-
-        <HeaderRight>
-          <Button variant="outline" size="small">
-            <Filter size={16} />
-            Filtros
-          </Button>
-          <Button variant="outline" size="small">
-            <Download size={16} />
-            Exportar
-          </Button>
-          <Button variant="outline" size="small">
-            <Upload size={16} />
-            Importar
-          </Button>
-          <Button variant="outline" size="small">
-            <Settings size={16} />
-            Acciones
-          </Button>
-        </HeaderRight>
       </ListViewHeader>
 
+      {/* Product Table - Clean and Focused */}
       <ProductTable>
         <TableHeader>
           <div>Imagen</div>
@@ -549,10 +534,10 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
             </ProductCategory>
 
             <PriceContainer>
-              <CurrentPrice>${product.currentPrice}</CurrentPrice>
+              <CurrentPrice>{CURRENCY_SYMBOL} {product.currentPrice}</CurrentPrice>
               {product.hasDiscount && (
                 <>
-                  <OriginalPrice>${product.price}</OriginalPrice>
+                  <OriginalPrice>{CURRENCY_SYMBOL} {product.price}</OriginalPrice>
                   <DiscountBadge>-{product.discountPercentage}%</DiscountBadge>
                 </>
               )}
@@ -604,6 +589,7 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
         ))}
       </ProductTable>
 
+      {/* Pagination - Clean and Accessible */}
       {totalPages > 1 && (
         <PaginationContainer>
           <PageButton

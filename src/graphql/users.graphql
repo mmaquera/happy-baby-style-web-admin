@@ -13,54 +13,72 @@
 # Get paginated users with filtering
 query GetUsers($filter: UserFilterInput, $pagination: PaginationInput) {
   users(filter: $filter, pagination: $pagination) {
-    users {
-      id
-      email
-      role
-      isActive
-      emailVerified
-      lastLoginAt
-      createdAt
-      updatedAt
-      profile {
+    success
+    message
+    code
+    timestamp
+    data {
+      items {
         id
-        firstName
-        lastName
-        phone
-        dateOfBirth
-        avatar
+        email
         role
-        emailVerified
         isActive
+        emailVerified
         lastLoginAt
         createdAt
         updatedAt
-        # Computed fields
-        fullName
+        profile {
+          id
+          firstName
+          lastName
+          phone
+          dateOfBirth
+          avatar
+          role
+          emailVerified
+          isActive
+          lastLoginAt
+          createdAt
+          updatedAt
+          # Computed fields
+          fullName
+        }
+        addresses {
+          id
+          type
+          firstName
+          lastName
+          company
+          address1
+          address2
+          city
+          state
+          postalCode
+          country
+          phone
+          isDefault
+          createdAt
+          updatedAt
+          # Computed fields
+          fullName
+          fullAddress
+        }
       }
-      addresses {
-        id
-        type
-        firstName
-        lastName
-        company
-        address1
-        address2
-        city
-        state
-        postalCode
-        country
-        phone
-        isDefault
-        createdAt
-        updatedAt
-        # Computed fields
-        fullName
-        fullAddress
+      pagination {
+        total
+        limit
+        offset
+        hasMore
+        currentPage
+        totalPages
       }
     }
-    total
-    hasMore
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
   }
 }
 
@@ -191,64 +209,186 @@ query GetUserProfile($userId: ID!) {
 # Get user stats
 query GetUserStats {
   userStats {
-    totalUsers
-    activeUsers
-    newUsersThisMonth
-    usersByRole
+    success
+    message
+    code
+    timestamp
+    data {
+      totalUsers
+      activeUsers
+      newUsersThisMonth
+      usersByRole
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
+  }
+}
+
+# Get users with recent activity for dashboard
+query GetUsersWithRecentActivity($limit: Int = 10) {
+  users(filter: { isActive: true }, pagination: { limit: $limit, offset: 0 }) {
+    success
+    message
+    code
+    timestamp
+    data {
+      items {
+        id
+        email
+        lastLoginAt
+        profile {
+          firstName
+          lastName
+        }
+        accounts {
+          provider
+          providerAccountId
+        }
+        sessions {
+          id
+          userAgent
+          ipAddress
+          createdAt
+          expiresAt
+          isActive
+        }
+      }
+      pagination {
+        total
+        limit
+        offset
+        hasMore
+        currentPage
+        totalPages
+      }
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
+  }
+}
+
+# Get active sessions count for dashboard
+query GetActiveSessionsCount {
+  users(filter: { isActive: true }, pagination: { limit: 1000, offset: 0 }) {
+    success
+    message
+    code
+    timestamp
+    data {
+      items {
+        id
+        sessions {
+          id
+          isActive
+          createdAt
+          expiresAt
+        }
+      }
+      pagination {
+        total
+        limit
+        offset
+        hasMore
+        currentPage
+        totalPages
+      }
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
   }
 }
 
 # Get user addresses
 query GetUserAddresses($userId: ID!) {
   userAddresses(userId: $userId) {
-    id
-    type
-    firstName
-    lastName
-    company
-    address1
-    address2
-    city
-    state
-    postalCode
-    country
-    phone
-    isDefault
-    createdAt
-    updatedAt
-    # Computed fields
-    fullName
-    fullAddress
+    success
+    message
+    timestamp
+    code
+    data {
+      items {
+        id
+        type
+        firstName
+        lastName
+        company
+        address1
+        address2
+        city
+        state
+        postalCode
+        country
+        phone
+        isDefault
+        createdAt
+        updatedAt
+        # Computed fields
+        fullName
+        fullAddress
+      }
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
   }
 }
 
 # Get user address by ID
 query GetUserAddress($id: ID!) {
   userAddress(id: $id) {
-    id
-    type
-    firstName
-    lastName
-    company
-    address1
-    address2
-    city
-    state
-    postalCode
-    country
-    phone
-    isDefault
-    createdAt
-    updatedAt
-    # Computed fields
-    fullName
-    fullAddress
-    # Relations
-    user {
-      id
-      email
-      firstName
-      lastName
+    success
+    message
+    timestamp
+    code
+    data {
+      entity {
+        id
+        type
+        firstName
+        lastName
+        company
+        address1
+        address2
+        city
+        state
+        postalCode
+        country
+        phone
+        isDefault
+        createdAt
+        updatedAt
+        # Computed fields
+        fullName
+        fullAddress
+        # Relations
+        user {
+          id
+          email
+          firstName
+          lastName
+        }
+      }
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
     }
   }
 }
@@ -346,29 +486,41 @@ query GetUsersByRole($role: UserRole!) {
 # Get users by provider
 query GetUsersByProvider($provider: AuthProvider!) {
   usersByProvider(provider: $provider) {
-    id
-    email
-    role
-    isActive
-    emailVerified
-    lastLoginAt
-    createdAt
-    updatedAt
-    profile {
+    success
+    message
+    code
+    timestamp
+    data {
       id
-      firstName
-      lastName
-      phone
-      dateOfBirth
-      avatar
+      email
       role
-      emailVerified
       isActive
+      emailVerified
       lastLoginAt
       createdAt
       updatedAt
-      # Computed fields
-      fullName
+      profile {
+        id
+        firstName
+        lastName
+        phone
+        dateOfBirth
+        avatar
+        role
+        emailVerified
+        isActive
+        lastLoginAt
+        createdAt
+        updatedAt
+        # Computed fields
+        fullName
+      }
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
     }
   }
 }
@@ -461,6 +613,7 @@ query GetUserAccounts($userId: ID!) {
 query GetUserSessions($userId: ID!) {
   userSessions(userId: $userId) {
     id
+    userId
     sessionToken
     accessToken
     refreshToken
@@ -477,6 +630,7 @@ query GetUserSessions($userId: ID!) {
 query GetActiveSessions($userId: ID!) {
   activeSessions(userId: $userId) {
     id
+    userId
     sessionToken
     accessToken
     refreshToken
@@ -699,48 +853,81 @@ mutation DeleteUserProfile($userId: ID!) {
 # Create user address
 mutation CreateUserAddress($input: CreateUserAddressInput!) {
   createUserAddress(input: $input) {
-    id
-    type
-    firstName
-    lastName
-    company
-    address1
-    address2
-    city
-    state
-    postalCode
-    country
-    phone
-    isDefault
-    createdAt
-    updatedAt
-    # Computed fields
-    fullName
-    fullAddress
+    success
+    message
+    code
+    timestamp
+    data {
+      entity {
+        id
+        type
+        firstName
+        lastName
+        company
+        address1
+        address2
+        city
+        state
+        postalCode
+        country
+        phone
+        isDefault
+        createdAt
+        updatedAt
+        # Computed fields
+        fullName
+        fullAddress
+      }
+      id
+      createdAt
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
   }
 }
 
 # Update user address
 mutation UpdateUserAddress($id: ID!, $input: UpdateUserAddressInput!) {
   updateUserAddress(id: $id, input: $input) {
-    id
-    type
-    firstName
-    lastName
-    company
-    address1
-    address2
-    city
-    state
-    postalCode
-    country
-    phone
-    isDefault
-    createdAt
-    updatedAt
-    # Computed fields
-    fullName
-    fullAddress
+    success
+    message
+    code
+    timestamp
+    data {
+      entity {
+        id
+        type
+        firstName
+        lastName
+        company
+        address1
+        address2
+        city
+        state
+        postalCode
+        country
+        phone
+        isDefault
+        createdAt
+        updatedAt
+        # Computed fields
+        fullName
+        fullAddress
+      }
+      id
+      updatedAt
+      changes
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
   }
 }
 
@@ -761,18 +948,47 @@ mutation SetDefaultAddress($userId: ID!, $addressId: ID!) {
 }
 
 # Revoke user session
-mutation RevokeUserSession($sessionId: ID!) {
-  revokeUserSession(sessionId: $sessionId) {
+mutation RevokeUserSession($sessionId: ID!, $userId: ID!) {
+  revokeUserSession(sessionId: $sessionId, userId: $userId) {
     success
     message
+    code
+    timestamp
+    data {
+      sessionId
+      revokedAt
+      reason
+      analyticsCleaned
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
   }
 }
 
 # Revoke all user sessions
-mutation RevokeAllUserSessions($userId: ID!) {
-  revokeAllUserSessions(userId: $userId) {
+mutation RevokeAllUserSessions($userId: ID!, $requestingUserId: ID!) {
+  revokeAllUserSessions(userId: $userId, requestingUserId: $requestingUserId) {
     success
     message
+    code
+    timestamp
+    data {
+      userId
+      sessionsRevoked
+      analyticsCleaned
+      revokedAt
+      reason
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
   }
 }
 

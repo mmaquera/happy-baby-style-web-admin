@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useProducts, useCreateProduct, useDeleteProduct, useProductSearch } from '../hooks/useProductsGraphQL';
 import { CreateProductInput, ProductFilterInput, Product } from '../generated/graphql';
+import { theme } from '@/styles/theme';
+import { CURRENCY_SYMBOL } from '@/config';
 
 const ProductsGraphQL: React.FC = () => {
   const [filters, setFilters] = useState<ProductFilterInput>({
@@ -148,25 +150,24 @@ const ProductsGraphQL: React.FC = () => {
               
               <div className="flex justify-between">
                 <span className="text-sm text-gray-500">Precio:</span>
-                <div className="text-right">
-                  {product.hasDiscount ? (
-                    <>
-                      <span className="text-sm line-through text-gray-400">
-                        ${product.price}
-                      </span>
-                      <span className="text-lg font-bold text-green-600 ml-2">
-                        ${product.currentPrice}
-                      </span>
-                      <span className="text-xs text-green-600 block">
-                        -{product.discountPercentage}%
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-lg font-bold text-gray-900">
-                      ${product.currentPrice}
-                    </span>
-                  )}
-                </div>
+                <div style={{ marginBottom: theme.spacing[2] }}>
+                <span style={{ 
+                  fontSize: theme.fontSizes.lg, 
+                  fontWeight: theme.fontWeights.bold,
+                  color: theme.colors.primary
+                }}>
+                  S/ {product.currentPrice}
+                </span>
+                {product.hasDiscount && (
+                  <span style={{ 
+                    textDecoration: 'line-through',
+                    color: theme.colors.text.secondary,
+                    marginLeft: theme.spacing[2]
+                  }}>
+                    S/ {product.price}
+                  </span>
+                )}
+              </div>
               </div>
               
               <div className="flex justify-between">

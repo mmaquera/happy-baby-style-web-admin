@@ -207,7 +207,7 @@ export const GoogleUserFeatures: React.FC<GoogleUserFeaturesProps> = ({
     });
   };
 
-  const isTokenExpired = (expiresAt?: number) => {
+  const isTokenExpired = (expiresAt?: string) => {
     if (!expiresAt) return false;
     return new Date() > new Date(expiresAt);
   };

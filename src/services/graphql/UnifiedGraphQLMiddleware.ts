@@ -2,7 +2,8 @@
 // Single Responsibility: Handles GraphQL authentication middleware
 // Dependency Inversion: Depends on UnifiedAuthService abstraction
 
-import { ApolloClient, ApolloLink, InMemoryCache, createHttpLink, from } from '@apollo/client';
+import { ApolloClient, ApolloLink, InMemoryCache, from, createHttpLink } from '@apollo/client';
+import { createUploadLink } from 'apollo-upload-client';
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { RetryLink } from '@apollo/client/link/retry';
@@ -68,6 +69,52 @@ export class UnifiedGraphQLMiddleware {
       }
     });
   }
+
+  // Create CORS-aware link for handling cross-origin requests
+  private createCorsLink(): ApolloLink {
+    return new ApolloLink((operation, forward) => {
+      const context = operation.getContext();
+      const isLocalhost = context['uri']?.includes('localhost') || 
+                         context['uri']?.includes('127.0.0.1');
+      
+      operation.setContext({
+        ...context,
+        fetchOptions: {
+          mode: 'cors',
+          credentials: isLocalhost ? 'include' : 'same-origin',
+        },
+      });
+      
+      return forward(operation);
+    });
+  }
+
+  // Create upload link using apollo-upload-client (configuración estándar)
+  private createUploadLink(config: GraphQLMiddlewareConfig): ApolloLink {
+    return createUploadLink({
+      uri: config.uri,
+      // ✅ Configuración estándar para multipart/form-data
+      fetchOptions: {
+        mode: 'cors',
+        credentials: 'include',
+      },
+      // ✅ Logs de debug para verificar el envío
+      isExtractableFile: (value: any) => {
+        const isFile = value instanceof File || value instanceof Blob;
+        console.log('🔍 UploadLink - isExtractableFile:', { value, isFile, type: typeof value });
+        return isFile;
+      },
+      // ✅ Logs de debug para FormData
+      formDataAppendFile: (formData: FormData, fieldName: string, file: any) => {
+        console.log('🔍 UploadLink - formDataAppendFile:', { fieldName, file, formDataEntries: Array.from(formData.entries()) });
+        if (file instanceof File || file instanceof Blob) {
+          formData.append(fieldName, file, file instanceof File ? file.name : 'blob');
+        }
+      },
+    });
+  }
+
+  // ✅ CSRF Link eliminado - servidor tiene csrfPrevention: false
 
   // Create retry link with authentication-aware retry logic
   private createRetryLink(config: GraphQLMiddlewareConfig): ApolloLink {
@@ -136,9 +183,7 @@ export class UnifiedGraphQLMiddleware {
   static createClient(config: GraphQLMiddlewareConfig): ApolloClient<any> {
     // Don't clear stored tokens automatically - let the auth system handle token validation
     
-    const httpLink = createHttpLink({
-      uri: config.uri,
-    });
+
 
     const client = new ApolloClient({
       cache: new InMemoryCache(),
@@ -158,9 +203,10 @@ export class UnifiedGraphQLMiddleware {
     const authLink = middleware.createAuthLink();
     const errorLink = middleware.createErrorLink();
     const retryLink = middleware.createRetryLink(config);
+    const uploadLink = middleware.createUploadLink(config);
 
-    // Set the link chain
-    client.setLink(from([retryLink, errorLink, authLink, httpLink]));
+    // Set the link chain with upload link primero para evitar interferencias
+    client.setLink(from([uploadLink, retryLink, errorLink, authLink]));
 
     return client;
   }
@@ -177,4 +223,12 @@ export const defaultGraphQLConfig: GraphQLMiddlewareConfig = {
   enableRetry: true,
   maxRetries: 3,
   retryDelay: 300,
+  enableUploads: true,
+  maxFileSize: 5 * 1024 * 1024, // 5MB
+  allowedFileTypes: [
+    'image/jpeg', // ✅ JPEG
+    'image/jpg',  // ✅ JPG (alias de JPEG)
+    'image/png',  // ✅ PNG
+    'image/webp'  // ✅ WebP
+  ],
 };

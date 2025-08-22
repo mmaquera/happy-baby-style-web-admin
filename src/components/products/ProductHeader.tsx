@@ -12,7 +12,6 @@ import {
   Settings,
   Download,
   Upload,
-  Printer,
   Grid3X3,
   List
 } from 'lucide-react';
@@ -34,6 +33,10 @@ interface ProductHeaderProps {
   onViewModeChange?: (mode: 'grid' | 'list') => void;
 }
 
+// =====================================================
+// STYLED COMPONENTS - Minimalist Design
+// =====================================================
+
 const HeaderContainer = styled.div`
   margin-bottom: ${theme.spacing[6]};
 `;
@@ -45,12 +48,22 @@ const MainHeader = styled.div`
   margin-bottom: ${theme.spacing[4]};
   flex-wrap: wrap;
   gap: ${theme.spacing[4]};
+  
+  @media (max-width: ${theme.breakpoints.md}) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: ${theme.spacing[3]};
+  }
 `;
 
 const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[3]};
+  
+  @media (max-width: ${theme.breakpoints.md}) {
+    justify-content: center;
+  }
 `;
 
 const HeaderIcon = styled.div`
@@ -77,12 +90,21 @@ const HeaderTitle = styled.h1`
   color: ${theme.colors.text.primary};
   margin: 0;
   line-height: 1.2;
+  
+  @media (max-width: ${theme.breakpoints.md}) {
+    font-size: ${theme.fontSizes['2xl']};
+    text-align: center;
+  }
 `;
 
 const HeaderSubtitle = styled.p`
   font-size: ${theme.fontSizes.base};
   color: ${theme.colors.text.secondary};
   margin: 0;
+  
+  @media (max-width: ${theme.breakpoints.md}) {
+    text-align: center;
+  }
 `;
 
 const HeaderActions = styled.div`
@@ -90,6 +112,44 @@ const HeaderActions = styled.div`
   gap: ${theme.spacing[3]};
   flex-wrap: wrap;
   align-items: center;
+  justify-content: flex-end;
+  
+  @media (max-width: ${theme.breakpoints.md}) {
+    justify-content: center;
+    gap: ${theme.spacing[2]};
+  }
+`;
+
+const ViewToggleContainer = styled.div`
+  display: flex;
+  gap: ${theme.spacing[1]};
+  border: 1px solid ${theme.colors.border.light};
+  border-radius: ${theme.borderRadius.md};
+  padding: ${theme.spacing[1]};
+  background: ${theme.colors.background.light};
+`;
+
+const ViewToggleButton = styled.button<{ isActive: boolean }>`
+  padding: ${theme.spacing[2]} ${theme.spacing[3]};
+  background: ${({ isActive }) => 
+    isActive ? theme.colors.primaryPurple : 'transparent'};
+  color: ${({ isActive }) => 
+    isActive ? theme.colors.white : theme.colors.text.secondary};
+  border: none;
+  border-radius: ${theme.borderRadius.sm};
+  font-size: ${theme.fontSizes.sm};
+  cursor: pointer;
+  transition: all ${theme.transitions.base};
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[1]};
+  min-width: 60px;
+  justify-content: center;
+
+  &:hover {
+    background: ${({ isActive }) => 
+      isActive ? theme.colors.primaryPurple : theme.colors.background.accent};
+  }
 `;
 
 const StatsGrid = styled.div`
@@ -97,15 +157,22 @@ const StatsGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: ${theme.spacing[4]};
   margin-bottom: ${theme.spacing[4]};
+  
+  @media (max-width: ${theme.breakpoints.md}) {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: ${theme.spacing[3]};
+  }
 `;
 
 const StatCard = styled(Card)`
   text-align: center;
   padding: ${theme.spacing[4]};
   transition: transform ${theme.transitions.base};
+  border: 1px solid ${theme.colors.border.light};
 
   &:hover {
     transform: translateY(-2px);
+    border-color: ${theme.colors.primaryPurple};
   }
 `;
 
@@ -145,31 +212,14 @@ const StatChange = styled.div<{ isPositive: boolean }>`
   margin-top: ${theme.spacing[1]};
 `;
 
-const QuickActionsContainer = styled.div`
-  display: flex;
-  gap: ${theme.spacing[3]};
-  flex-wrap: wrap;
-  align-items: center;
-  padding: ${theme.spacing[4]};
-  background: ${theme.colors.background.accent};
-  border-radius: ${theme.borderRadius.lg};
-  border: 1px solid ${theme.colors.border.light};
-`;
-
-const QuickActionsLabel = styled.span`
-  font-size: ${theme.fontSizes.sm};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${theme.colors.text.secondary};
-`;
-
-const QuickActionButton = styled(Button)`
-  font-size: ${theme.fontSizes.sm};
-`;
+// =====================================================
+// COMPONENT - Clean and Focused
+// =====================================================
 
 export const ProductHeader: React.FC<ProductHeaderProps> = ({
   title = "Productos Happy Baby Style",
   stats,
-  viewMode = 'grid',
+  viewMode = 'list',
   onAddProduct,
   onBulkActions,
   onExport,
@@ -177,7 +227,6 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
   showActions = true,
   onViewModeChange
 }) => {
-  console.log('ProductHeader recibió viewMode:', viewMode);
   const hasStats = stats && Object.values(stats).some(value => value !== undefined);
 
   return (
@@ -195,11 +244,35 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
 
         {showActions && (
           <HeaderActions>
+            {/* View Mode Toggle - Consolidated */}
+            {onViewModeChange && (
+              <ViewToggleContainer>
+                <ViewToggleButton 
+                  isActive={viewMode === 'list'}
+                  onClick={() => onViewModeChange('list')}
+                  title="Vista de lista"
+                >
+                  <List size={16} />
+                  Lista
+                </ViewToggleButton>
+                <ViewToggleButton 
+                  isActive={viewMode === 'grid'}
+                  onClick={() => onViewModeChange('grid')}
+                  title="Vista de cuadrícula"
+                >
+                  <Grid3X3 size={16} />
+                  Grid
+                </ViewToggleButton>
+              </ViewToggleContainer>
+            )}
+
+            {/* Primary Actions */}
             {onImport && (
               <Button
                 variant="ghost"
                 size="medium"
                 onClick={onImport}
+                title="Importar productos"
               >
                 <Upload size={16} />
                 Importar
@@ -211,6 +284,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
                 variant="ghost"
                 size="medium"
                 onClick={onExport}
+                title="Exportar productos"
               >
                 <Download size={16} />
                 Exportar
@@ -222,38 +296,11 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
                 variant="secondary"
                 size="medium"
                 onClick={onBulkActions}
+                title="Acciones masivas"
               >
                 <Settings size={16} />
                 Acciones Masivas
               </Button>
-            )}
-            
-            {onViewModeChange && (
-              <div style={{ display: 'flex', gap: theme.spacing[2] }}>
-              
-                <Button
-                  variant={viewMode === 'list' ? 'primary' : 'outline'}
-                  size="small"
-                  onClick={() => {
-                    console.log('Botón Lista clickeado, viewMode actual:', viewMode);
-                    onViewModeChange('list');
-                  }}
-                >
-                  <List size={16} />
-                  Lista
-                </Button>
-                <Button
-                  variant={viewMode === 'grid' ? 'primary' : 'outline'}
-                  size="small"
-                  onClick={() => {
-                    console.log('Botón Grid clickeado, viewMode actual:', viewMode);
-                    onViewModeChange('grid');
-                  }}
-                >
-                  <Grid3X3 size={16} />
-                  Grid
-                </Button>
-              </div>
             )}
             
             {onAddProduct && (
@@ -261,6 +308,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
                 variant="primary"
                 size="medium"
                 onClick={onAddProduct}
+                title="Agregar nuevo producto"
               >
                 <Plus size={16} />
                 Nuevo Producto
@@ -270,6 +318,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
         )}
       </MainHeader>
 
+      {/* Statistics - Clean and Informative */}
       {hasStats && (
         <StatsGrid>
           {stats.totalProducts !== undefined && (
@@ -316,54 +365,6 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
             </StatCard>
           )}
         </StatsGrid>
-      )}
-
-      {showActions && (
-        <QuickActionsContainer>
-          <QuickActionsLabel>Acciones rápidas:</QuickActionsLabel>
-          
-          {onAddProduct && (
-            <QuickActionButton
-              variant="outline"
-              size="small"
-              onClick={onAddProduct}
-            >
-              <Plus size={14} />
-              Agregar Producto
-            </QuickActionButton>
-          )}
-          
-          {onBulkActions && (
-            <QuickActionButton
-              variant="outline"
-              size="small"
-              onClick={onBulkActions}
-            >
-              <Settings size={14} />
-              Acciones Masivas
-            </QuickActionButton>
-          )}
-          
-          {onExport && (
-            <QuickActionButton
-              variant="ghost"
-              size="small"
-              onClick={onExport}
-            >
-              <Download size={14} />
-              Exportar Lista
-            </QuickActionButton>
-          )}
-          
-          <QuickActionButton
-            variant="ghost"
-            size="small"
-            onClick={() => window.print()}
-          >
-            <Printer size={14} />
-            Imprimir
-          </QuickActionButton>
-        </QuickActionsContainer>
       )}
     </HeaderContainer>
   );

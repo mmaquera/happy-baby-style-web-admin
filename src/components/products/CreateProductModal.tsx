@@ -4,6 +4,7 @@ import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
+import { ImageUpload } from './ImageUpload';
 import { 
   X,
   Plus,
@@ -11,21 +12,27 @@ import {
   Image as ImageIcon,
   Package,
   Tag,
-  DollarSign,
   Hash,
   FileText,
   CheckCircle,
   AlertTriangle,
-  Settings
+  Settings,
+  BadgeDollarSign,
+  Trash2
 } from 'lucide-react';
-import type { Category, ProductFormData } from './types';
+import type { Category, ProductFormData, Product, TagWithMetadata } from './types';
+import { useProductActions } from '@/hooks/useProductActions';
+import { useCategories } from '@/hooks/useCategories';
+import { useTags } from '@/hooks/useTags';
+import type { UploadResult } from '@/types/upload';
+import { toast } from 'react-hot-toast';
 
 interface CreateProductModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (product: any) => void;
+  onSuccess: (product: Product) => void;
   categories: Category[];
-  availableTags: string[];
+  availableTags?: string[]; // Optional for backward compatibility
 }
 
 const ModalOverlay = styled.div<{ isOpen: boolean }>`
@@ -210,26 +217,50 @@ const TagsContainer = styled.div`
   margin-top: ${theme.spacing[2]};
 `;
 
-const TagChip = styled.div<{ isSelected: boolean }>`
+const TagChip = styled.div<{ isSelected: boolean; color?: string }>`
   padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  background: ${({ isSelected }) => 
-    isSelected ? theme.colors.primaryPurple : theme.colors.background.accent};
+  background: ${({ isSelected, color }) => 
+    isSelected 
+      ? (color || theme.colors.primaryPurple)
+      : theme.colors.background.accent};
   color: ${({ isSelected }) => 
     isSelected ? theme.colors.white : theme.colors.text.secondary};
   border-radius: ${theme.borderRadius.full};
   font-size: ${theme.fontSizes.xs};
   cursor: pointer;
   transition: all ${theme.transitions.base};
-  border: 1px solid ${({ isSelected }) => 
-    isSelected ? theme.colors.primaryPurple : theme.colors.border.light};
+  border: 1px solid ${({ isSelected, color }) => 
+    isSelected 
+      ? (color || theme.colors.primaryPurple)
+      : theme.colors.border.light};
   display: flex;
   align-items: center;
   gap: ${theme.spacing[1]};
+  position: relative;
 
   &:hover {
-    background: ${({ isSelected }) => 
-      isSelected ? theme.colors.primaryPurple : theme.colors.softPurple};
+    background: ${({ isSelected, color }) => 
+      isSelected 
+        ? (color || theme.colors.primaryPurple)
+        : theme.colors.softPurple};
     transform: translateY(-1px);
+  }
+
+  &:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: ${theme.colors.text.primary};
+    color: ${theme.colors.white};
+    padding: ${theme.spacing[1]} ${theme.spacing[2]};
+    border-radius: ${theme.borderRadius.md};
+    font-size: ${theme.fontSizes.xs};
+    white-space: nowrap;
+    z-index: 1000;
+    margin-bottom: ${theme.spacing[2]};
+    pointer-events: none;
   }
 `;
 
@@ -409,9 +440,11 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
   isOpen,
   onClose,
   onSuccess,
-  categories,
+  categories: propCategories, // Renamed to avoid conflict
   availableTags
 }) => {
+  const { createProduct, loading: isCreating, error: createError, uploadProductImage } = useProductActions();
+  
   const [formData, setFormData] = useState<ProductFormData>({
     name: '',
     description: '',
@@ -427,10 +460,22 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [newAttributeKey, setNewAttributeKey] = useState('');
   const [newAttributeValue, setNewAttributeValue] = useState('');
+  const [newTagName, setNewTagName] = useState('');
+  const [newTagColor, setNewTagColor] = useState('#ff6b6b');
+  const [newTagDescription, setNewTagDescription] = useState('');
+
+  // Generar ID de sesión único para agrupar todas las imágenes del producto
+  const [sessionId] = useState(() => `product-session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
+
+  // Log para debugging - verificar que el sessionId se genera correctamente
+  useEffect(() => {
+    if (isOpen) {
+      console.log('🔗 CreateProductModal - Session ID generado:', sessionId);
+    }
+  }, [isOpen, sessionId]);
 
   // Reset form when modal opens
   useEffect(() => {
@@ -450,6 +495,7 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
       });
       setErrors({});
       setSuccessMessage('');
+      
     }
   }, [isOpen]);
 
@@ -480,6 +526,14 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
       newErrors['stockQuantity'] = 'El stock no puede ser negativo';
     }
 
+    // Validate that all images are real URLs (not blob URLs)
+    if (formData.images.length > 0) {
+      const hasInvalidImages = formData.images.some(img => img.startsWith('blob:'));
+      if (hasInvalidImages) {
+        newErrors['images'] = 'Todas las imágenes deben ser subidas antes de crear el producto';
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }, [formData]);
@@ -502,14 +556,14 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
     }));
   }, []);
 
-  const handleImageUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      // In real app, upload to server and get URLs
-      const newImages = Array.from(files).map(file => URL.createObjectURL(file));
+
+
+  const handleImageUploadSuccess = useCallback((result: UploadResult) => {
+    if (result.success && result.url) {
+      // Agregar la imagen subida al formulario
       setFormData(prev => ({
         ...prev,
-        images: [...prev.images, ...newImages]
+        images: [...prev.images, result.url!]
       }));
     }
   }, []);
@@ -550,43 +604,116 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
       return;
     }
 
-    setIsLoading(true);
     setErrors({});
 
     try {
-      // In real app, call GraphQL mutation
+      // Validate that images are real URLs from backend
+      const hasValidImages = formData.images.every(img => 
+        img.startsWith('http') && !img.startsWith('blob:')
+      );
+      
+      if (formData.images.length > 0 && !hasValidImages) {
+        setErrors({ submit: 'Las imágenes deben ser subidas antes de crear el producto' });
+        return;
+      }
+
+      // Prepare product data for GraphQL mutation
       const productData = {
-        ...formData,
+        name: formData.name.trim(),
+        description: formData.description.trim() || null,
         price: parseFloat(formData.price),
         salePrice: formData.salePrice ? parseFloat(formData.salePrice) : null,
+        sku: formData.sku.trim(),
+        categoryId: formData.categoryId,
         stockQuantity: parseInt(formData.stockQuantity),
-        attributes: JSON.stringify(formData.attributes)
+        tags: formData.tags,
+        isActive: formData.isActive,
+        images: formData.images,
+        attributes: formData.attributes
       };
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      setSuccessMessage('Producto creado exitosamente');
+      // Call GraphQL mutation
+      const result = await createProduct(productData);
       
-      // Wait a bit before closing to show success message
-      setTimeout(() => {
-        onSuccess(productData);
-        onClose();
-      }, 1500);
+      if (result) {
+        setSuccessMessage('Producto creado exitosamente');
+        // ✅ Removido toast duplicado - useProductActions ya muestra el toast
+        
+        // Close modal after success
+        setTimeout(() => {
+          onSuccess(result);
+          onClose();
+        }, 1500);
+      } else {
+        setErrors({ submit: 'No se pudo crear el producto. Verifique los datos e intente nuevamente.' });
+      }
 
-    } catch (error) {
-      setErrors({ submit: 'Error al crear el producto. Intente nuevamente.' });
-    } finally {
-      setIsLoading(false);
+    } catch (error: any) {
+      const errorMessage = error.message || 'Error al crear el producto. Intente nuevamente.';
+      setErrors({ submit: errorMessage });
+      toast.error(errorMessage);
     }
-  }, [formData, validateForm, onSuccess, onClose]);
+  }, [formData, validateForm, createProduct, onSuccess, onClose]);
+
+  // GraphQL integration for categories
+  const { 
+    categories: graphqlCategories, 
+    loading: categoriesLoading, 
+    error: categoriesError 
+  } = useCategories();
+
+  // Enhanced tags management with metadata
+  const { 
+    activeTags, 
+    createTag, 
+    isLoading: tagsLoading, 
+    error: tagsError 
+  } = useTags();
+
+  // Handle creating new custom tags
+  const handleCreateTag = useCallback(async () => {
+    if (!newTagName.trim()) return;
+
+    try {
+      const result = await createTag(newTagName.trim(), {
+        color: newTagColor,
+        description: newTagDescription.trim() || newTagName.trim(),
+        category: 'personalizado',
+        isActive: true
+      });
+
+      if (result.success) {
+        // Add the new tag to the form
+        setFormData(prev => ({
+          ...prev,
+          tags: [...prev.tags, newTagName.trim()]
+        }));
+
+        // Reset form
+        setNewTagName('');
+        setNewTagColor('#ff6b6b');
+        setNewTagDescription('');
+        
+        toast.success('Etiqueta creada exitosamente');
+      } else {
+        toast.error(result.error || 'Error al crear la etiqueta');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Error al crear la etiqueta');
+    }
+  }, [newTagName, newTagColor, newTagDescription, createTag]);
+
+  // Use GraphQL categories if available, fallback to prop categories
+  const availableCategories = graphqlCategories.length > 0 
+    ? graphqlCategories.filter(cat => cat.isActive).sort((a, b) => a.sortOrder - b.sortOrder)
+    : propCategories || [];
 
   if (!isOpen) return null;
 
   return (
     <ModalOverlay isOpen={isOpen}>
       <ModalContainer>
-        {isLoading && (
+        {isCreating && (
           <LoadingOverlay>
             <LoadingSpinner />
           </LoadingOverlay>
@@ -604,10 +731,10 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
 
         <form onSubmit={handleSubmit}>
           <ModalBody>
-            {errors['submit'] && (
+            {(errors['submit'] || createError) && (
               <ErrorMessage>
                 <AlertTriangle size={16} />
-                {errors['submit']}
+                {errors['submit'] || createError}
               </ErrorMessage>
             )}
 
@@ -634,10 +761,9 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
                     placeholder="Ej: Body Orgánico para Bebé"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
-                    error={!!errors['name'] ? errors['name'] : ''}
+                    error={errors['name'] || ''}
                     leftIcon={<Package size={16} />}
                   />
-                  {errors['name'] && <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>{errors['name']}</span>}
                 </FormRow>
 
                 <FormRow>
@@ -648,10 +774,9 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
                     placeholder="Ej: BODY-ORG-001"
                     value={formData.sku}
                     onChange={(e) => handleInputChange('sku', e.target.value)}
-                    error={!!errors['sku'] ? errors['sku'] : ''}
+                    error={errors['sku'] || ''}
                     leftIcon={<Hash size={16} />}
                   />
-                  {errors['sku'] && <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>{errors['sku']}</span>}
                 </FormRow>
 
                 <FormRow>
@@ -661,14 +786,42 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
                   <Select
                     value={formData.categoryId}
                     onChange={(e) => handleInputChange('categoryId', e.target.value)}
+                    disabled={categoriesLoading && availableCategories.length === 0}
                   >
-                    <option value="">Seleccionar categoría</option>
-                    {categories.map(category => (
+                    <option value="">
+                      {categoriesLoading && availableCategories.length === 0
+                        ? 'Cargando categorías...' 
+                        : categoriesError && availableCategories.length === 0
+                          ? 'Error al cargar categorías' 
+                          : 'Seleccionar categoría'
+                      }
+                    </option>
+                    {availableCategories.map(category => (
                       <option key={category.id} value={category.id}>
                         {category.name}
                       </option>
                     ))}
                   </Select>
+                  {/* Only show loading indicator when no categories are available */}
+                  {categoriesLoading && availableCategories.length === 0 && (
+                    <div style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: theme.spacing[2], 
+                      marginTop: theme.spacing[1],
+                      fontSize: theme.fontSizes.sm,
+                      color: theme.colors.text.secondary
+                    }}>
+                      <LoadingSpinner />
+                      Cargando categorías...
+                    </div>
+                  )}
+                  {/* Only show error when no categories are available */}
+                  {categoriesError && availableCategories.length === 0 && (
+                    <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>
+                      Error: {categoriesError}
+                    </span>
+                  )}
                   {errors['categoryId'] && <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>{errors['categoryId']}</span>}
                 </FormRow>
 
@@ -687,7 +840,7 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
             {/* Precios y Stock */}
             <FormSection>
               <SectionTitle>
-                <DollarSign size={20} />
+                <BadgeDollarSign size={20} />
                 Precios y Stock
               </SectionTitle>
               
@@ -700,13 +853,12 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
                     type="number"
                     step="0.01"
                     min="0"
-                    placeholder="0.00"
+                    placeholder="S/ 0.00"
                     value={formData.price}
                     onChange={(e) => handleInputChange('price', e.target.value)}
-                    error={!!errors['price'] ? errors['price'] : ''}
-                    leftIcon={<DollarSign size={16} />}
+                    error={errors['price'] || ''}
+                    leftIcon={<BadgeDollarSign size={16} />}
                   />
-                  {errors['price'] && <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>{errors['price']}</span>}
                 </FormRow>
 
                 <FormRow>
@@ -715,13 +867,12 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
                     type="number"
                     step="0.01"
                     min="0"
-                    placeholder="0.00 (opcional)"
+                    placeholder="S/ 0.00 (opcional)"
                     value={formData.salePrice}
                     onChange={(e) => handleInputChange('salePrice', e.target.value)}
-                    error={!!errors['salePrice'] ? errors['salePrice'] : ''}
-                    leftIcon={<DollarSign size={16} />}
+                    error={errors['salePrice'] || ''}
+                    leftIcon={<BadgeDollarSign size={16} />}
                   />
-                  {errors['salePrice'] && <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>{errors['salePrice']}</span>}
                 </FormRow>
 
                 <FormRow>
@@ -734,10 +885,9 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
                     placeholder="0"
                     value={formData.stockQuantity}
                     onChange={(e) => handleInputChange('stockQuantity', e.target.value)}
-                    error={!!errors['stockQuantity'] ? errors['stockQuantity'] : ''}
+                    error={errors['stockQuantity'] || ''}
                     leftIcon={<Package size={16} />}
                   />
-                  {errors['stockQuantity'] && <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>{errors['stockQuantity']}</span>}
                 </FormRow>
 
                 <FormRow>
@@ -767,18 +917,89 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
               </SectionTitle>
               
               <FormLabel>Seleccionar Etiquetas</FormLabel>
+              
+              {/* Enhanced Tags with Metadata */}
               <TagsContainer>
-                {availableTags.map(tag => (
+                {Object.entries(activeTags).map(([tagName, tagMetadata]) => (
                   <TagChip
-                    key={tag}
-                    isSelected={formData.tags.includes(tag)}
-                    onClick={() => handleTagToggle(tag)}
+                    key={tagName}
+                    isSelected={formData.tags.includes(tagName)}
+                    onClick={() => handleTagToggle(tagName)}
+                    color={tagMetadata.color}
+                    title={tagMetadata.description}
                   >
                     <Tag size={12} />
-                    {tag}
+                    {tagName}
                   </TagChip>
                 ))}
               </TagsContainer>
+
+              {/* Fallback to prop tags if no enhanced tags available */}
+              {Object.keys(activeTags).length === 0 && (availableTags || []).length > 0 && (
+                <TagsContainer>
+                  {(availableTags || []).map(tag => (
+                    <TagChip
+                      key={tag}
+                      isSelected={formData.tags.includes(tag)}
+                      onClick={() => handleTagToggle(tag)}
+                    >
+                      <Tag size={12} />
+                      {tag}
+                    </TagChip>
+                  ))}
+                </TagsContainer>
+              )}
+
+              {/* Tag Creation Section */}
+              <div style={{ marginTop: theme.spacing[4] }}>
+                <FormLabel>Crear Nueva Etiqueta</FormLabel>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing[3] }}>
+                  <div style={{ display: 'flex', gap: theme.spacing[2] }}>
+                    <Input
+                      placeholder="Nombre de la etiqueta"
+                      value={newTagName}
+                      onChange={(e) => setNewTagName(e.target.value)}
+                      leftIcon={<Tag size={16} />}
+                    />
+                    <div style={{ display: 'flex', gap: theme.spacing[1] }}>
+                      {['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'].map(color => (
+                        <button
+                          key={color}
+                          type="button"
+                          onClick={() => setNewTagColor(color)}
+                          style={{
+                            width: '32px',
+                            height: '32px',
+                            backgroundColor: color,
+                            border: newTagColor === color ? '3px solid white' : '2px solid #e2e8f0',
+                            borderRadius: '50%',
+                            cursor: 'pointer',
+                            boxShadow: newTagColor === color ? '0 0 0 2px #3b82f6' : 'none'
+                          }}
+                          title={`Color: ${color}`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <Input
+                    placeholder="Descripción (opcional)"
+                    value={newTagDescription}
+                    onChange={(e) => setNewTagDescription(e.target.value)}
+                    leftIcon={<Tag size={16} />}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="small"
+                    onClick={handleCreateTag}
+                    disabled={!newTagName.trim() || tagsLoading}
+                    isLoading={tagsLoading}
+                  >
+                    <Plus size={16} />
+                    Crear Etiqueta
+                  </Button>
+                </div>
+              </div>
             </FormSection>
 
             {/* Imágenes */}
@@ -788,40 +1009,42 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
                 Imágenes del Producto
               </SectionTitle>
               
-              <ImageUploadContainer>
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  style={{ display: 'none' }}
-                  id="image-upload"
-                />
-                <label htmlFor="image-upload">
-                  <ImageUploadIcon>
-                    <Upload size={32} />
-                  </ImageUploadIcon>
-                  <ImageUploadText>
-                    Arrastra y suelta imágenes aquí o haz clic para seleccionar
-                  </ImageUploadText>
-                  <ImageUploadButton variant="outline" size="small">
-                    <ImageIcon size={16} />
-                    Seleccionar Imágenes
-                  </ImageUploadButton>
-                </label>
-              </ImageUploadContainer>
+              <ImageUpload
+                onUpload={handleImageUploadSuccess}
+                maxFiles={5}
+                maxSize={5 * 1024 * 1024} // 5MB
+                allowedTypes={['image/jpeg', 'image/jpg', 'image/png', 'image/webp']}
+                entityId={sessionId}
+                entityType="product-draft"
+                disabled={isCreating}
+              />
 
+              {/* Preview de imágenes se maneja internamente en ImageUpload */}
               {formData.images.length > 0 && (
-                <ImagePreviewContainer>
-                  {formData.images.map((image, index) => (
-                    <ImagePreview key={index}>
-                      <ImagePreviewImg src={image} alt={`Preview ${index + 1}`} />
-                      <RemoveImageButton onClick={() => removeImage(index)}>
-                        ×
-                      </RemoveImageButton>
-                    </ImagePreview>
-                  ))}
-                </ImagePreviewContainer>
+                <div style={{ 
+                  marginTop: '12px', 
+                  padding: '12px', 
+                  background: 'rgba(34, 197, 94, 0.1)', 
+                  borderRadius: '8px',
+                  border: '1px solid rgba(34, 197, 94, 0.2)'
+                }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '8px',
+                    color: 'rgba(34, 197, 94, 0.8)',
+                    fontSize: '14px',
+                    fontWeight: '500'
+                  }}>
+                    <div style={{ 
+                      width: '8px', 
+                      height: '8px', 
+                      background: 'rgba(34, 197, 94, 0.8)', 
+                      borderRadius: '50%' 
+                    }} />
+                    {formData.images.length} imagen{formData.images.length !== 1 ? 'es' : ''} lista{formData.images.length !== 1 ? 's' : ''} para el producto
+                  </div>
+                </div>
               )}
             </FormSection>
 
@@ -877,14 +1100,14 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
           </ModalBody>
 
           <ModalFooter>
-            <Button variant="ghost" onClick={onClose} disabled={isLoading}>
+            <Button variant="ghost" onClick={onClose} disabled={isCreating}>
               Cancelar
             </Button>
             <Button
               type="submit"
               variant="primary"
-              disabled={isLoading}
-              isLoading={isLoading}
+              disabled={isCreating}
+              isLoading={isCreating}
             >
               <Plus size={16} />
               Crear Producto

@@ -42,13 +42,13 @@ export const useUsers = (options: UseUsersOptions = {}) => {
   });
 
   const loadMore = () => {
-    if (!data?.users.hasMore) return;
+    if (!data?.users?.data?.pagination?.hasMore) return;
     
     return fetchMore({
       variables: {
         pagination: {
           limit,
-          offset: data.users.users.length
+          offset: data.users.data?.items?.length || 0
         }
       }
     });
@@ -57,17 +57,17 @@ export const useUsers = (options: UseUsersOptions = {}) => {
   // 🔍 DEBUGGING: Log de respuesta de la query
   console.log('🔍 DEBUG useUsers hook - Respuesta de la query:', {
     data,
-    users: data?.users?.users || [],
-    total: data?.users?.total || 0,
-    hasMore: data?.users?.hasMore || false,
+    users: data?.users?.data?.items || [],
+    total: data?.users?.data?.pagination?.total || 0,
+    hasMore: data?.users?.data?.pagination?.hasMore || false,
     loading,
     error
   });
 
   return {
-    users: data?.users.users || [],
-    total: data?.users.total || 0,
-    hasMore: data?.users.hasMore || false,
+    users: data?.users?.data?.items || [],
+    total: data?.users?.data?.pagination?.total || 0,
+    hasMore: data?.users?.data?.pagination?.hasMore || false,
     loading,
     error,
     loadMore,
@@ -182,7 +182,7 @@ export const useUserStats = () => {
   });
 
   return {
-    stats: data?.userStats,
+    stats: data?.userStats?.data,
     loading,
     error,
     refetch

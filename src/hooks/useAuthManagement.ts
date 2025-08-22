@@ -8,6 +8,8 @@ import {
   useUnlinkUserAccountMutation,
   useForcePasswordResetMutation,
   useImpersonateUserMutation,
+  useGetUsersWithRecentActivityQuery,
+  useGetActiveSessionsCountQuery,
   AuthProvider,
   useGetUserStatsQuery
 } from '@/generated/graphql';
@@ -36,6 +38,7 @@ export interface AuthProviderStats {
     provider: AuthProvider;
     loginAt: string;
     ipAddress?: string | null;
+    userAgent?: string | null;
   }>;
 }
 
@@ -49,12 +52,12 @@ export const useAuthManagement = () => {
   const { data, loading: queryLoading, error: queryError, refetch } = useGetUserStatsQuery();
 
   useEffect(() => {
-    if (data?.userStats) {
+    if (data?.userStats?.data) {
       setStats({
-        totalUsers: data.userStats.totalUsers,
-        activeUsers: data.userStats.activeUsers,
-        newUsersThisMonth: data.userStats.newUsersThisMonth,
-        usersByRole: data.userStats.usersByRole
+        totalUsers: data.userStats.data.totalUsers,
+        activeUsers: data.userStats.data.activeUsers,
+        newUsersThisMonth: data.userStats.data.newUsersThisMonth,
+        usersByRole: data.userStats.data.usersByRole
       });
     }
   }, [data]);
@@ -133,15 +136,19 @@ export const useActiveSessions = (userId: string) => {
 
 export const useSessionManagement = () => {
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth(); // Obtener el usuario actual para requestingUserId
   
   const [revokeSessionMutation] = useRevokeUserSessionMutation();
   const [revokeAllSessionsMutation] = useRevokeAllUserSessionsMutation();
 
-  const revokeSession = async (sessionId: string) => {
+  const revokeSession = async (sessionId: string, userId: string) => {
     setLoading(true);
     try {
       const result = await revokeSessionMutation({
-        variables: { sessionId }
+        variables: { 
+          sessionId,
+          userId 
+        }
       });
       
       if (result.data?.revokeUserSession?.success) {
@@ -164,10 +171,18 @@ export const useSessionManagement = () => {
       return;
     }
 
+    if (!user?.id) {
+      toast.error('Usuario no autenticado');
+      return;
+    }
+
     setLoading(true);
     try {
       const result = await revokeAllSessionsMutation({
-        variables: { userId }
+        variables: { 
+          userId,
+          requestingUserId: user.id 
+        }
       });
       
       if (result.data?.revokeAllUserSessions?.success) {
@@ -306,6 +321,17 @@ export const useAuthProviderStats = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Query para obtener usuarios con actividad reciente
+  const { data: recentActivityData, loading: recentActivityLoading, error: recentActivityError } = useGetUsersWithRecentActivityQuery({
+    variables: { limit: 10 },
+    errorPolicy: 'all'
+  });
+
+  // Query para obtener conteo de sesiones activas
+  const { data: activeSessionsData, loading: activeSessionsLoading, error: activeSessionsError } = useGetActiveSessionsCountQuery({
+    errorPolicy: 'all'
+  });
+
   // Usar useGetUserStatsQuery para obtener datos básicos
   const { data: userStatsData, loading: userStatsLoading, error: userStatsError, refetch: refetchUserStats } = useGetUserStatsQuery();
   
@@ -331,14 +357,51 @@ export const useAuthProviderStats = () => {
   });
 
   useEffect(() => {
-    if (userStatsData?.userStats && googleUsersData && facebookUsersData && appleUsersData && emailUsersData) {
-      const totalUsers = userStatsData.userStats.totalUsers;
+    // Crear datos de fallback con valores en 0
+    const createFallbackStats = (): AuthProviderStats => ({
+      totalUsers: 0,
+      activeSessionsCount: 0,
+      usersByProvider: [
+        {
+          provider: AuthProvider.google,
+          count: 0,
+          percentage: 0
+        },
+        {
+          provider: AuthProvider.facebook,
+          count: 0,
+          percentage: 0
+        },
+        {
+          provider: AuthProvider.apple,
+          count: 0,
+          percentage: 0
+        },
+        {
+          provider: AuthProvider.email,
+          count: 0,
+          percentage: 0
+        }
+      ],
+      recentLogins: []
+    });
+
+    // Si tenemos datos reales, usarlos; si no, usar fallback
+    if (userStatsData?.userStats?.data && 
+        googleUsersData?.usersByProvider?.data && 
+        facebookUsersData?.usersByProvider?.data && 
+        appleUsersData?.usersByProvider?.data && 
+        emailUsersData?.usersByProvider?.data &&
+        recentActivityData?.users?.data?.items &&
+        activeSessionsData?.users?.data?.items) {
       
-      // Calcular estadísticas por proveedor
-      const googleCount = googleUsersData.usersByProvider?.length || 0;
-      const facebookCount = facebookUsersData.usersByProvider?.length || 0;
-      const appleCount = appleUsersData.usersByProvider?.length || 0;
-      const emailCount = emailUsersData.usersByProvider?.length || 0;
+      const totalUsers = userStatsData.userStats.data.totalUsers;
+      
+      // Calcular estadísticas por proveedor usando datos reales
+      const googleCount = Array.isArray(googleUsersData.usersByProvider.data) ? googleUsersData.usersByProvider.data.length : 0;
+      const facebookCount = Array.isArray(facebookUsersData.usersByProvider.data) ? facebookUsersData.usersByProvider.data.length : 0;
+      const appleCount = Array.isArray(appleUsersData.usersByProvider.data) ? appleUsersData.usersByProvider.data.length : 0;
+      const emailCount = Array.isArray(emailUsersData.usersByProvider.data) ? emailUsersData.usersByProvider.data.length : 0;
       
       const usersByProvider = [
         {
@@ -363,44 +426,79 @@ export const useAuthProviderStats = () => {
         }
       ].filter(provider => provider.count > 0); // Solo mostrar proveedores con usuarios
 
-      // Mock de datos para sesiones activas y logins recientes (temporal)
-      const activeSessionsCount = Math.floor(totalUsers * 0.7); // 70% de usuarios tienen sesiones activas
+      // Calcular sesiones activas usando datos reales
+      const activeSessionsCount = activeSessionsData.users.data.items.reduce((total, user) => {
+        return total + (user.sessions?.filter(session => session.isActive)?.length || 0);
+      }, 0);
       
-      const recentLogins = [
-        {
-          userId: '1',
-          email: 'admin@happybabystyle.com',
-          provider: AuthProvider.email,
-          loginAt: new Date().toISOString(),
-          ipAddress: '192.168.1.100'
-        },
-        {
-          userId: '2',
-          email: 'user@gmail.com',
-          provider: AuthProvider.google,
-          loginAt: new Date(Date.now() - 3600000).toISOString(), // 1 hora atrás
-          ipAddress: '192.168.1.101'
-        }
-      ];
+      // Generar logins recientes usando datos reales de lastLoginAt
+      const recentLogins = recentActivityData.users.data.items
+        .filter(user => user.lastLoginAt) // Solo usuarios con login reciente
+        .sort((a, b) => new Date(b.lastLoginAt!).getTime() - new Date(a.lastLoginAt!).getTime()) // Ordenar por fecha más reciente
+        .slice(0, 5) // Tomar solo los 5 más recientes
+        .map(user => {
+          // Determinar el proveedor principal del usuario
+          const primaryProvider = user.accounts?.[0]?.provider || AuthProvider.email;
+          
+          return {
+            userId: user.id,
+            email: user.email,
+            provider: primaryProvider,
+            loginAt: user.lastLoginAt!,
+            ipAddress: user.sessions?.[0]?.ipAddress || 'N/A',
+            userAgent: user.sessions?.[0]?.userAgent || 'N/A'
+          };
+        });
 
       setStats({
         totalUsers,
         activeSessionsCount,
-        usersByProvider,
+        usersByProvider: usersByProvider.length > 0 ? usersByProvider : createFallbackStats().usersByProvider,
         recentLogins
       });
+    } else {
+      // Usar datos de fallback cuando no hay datos reales
+      setStats(createFallbackStats());
     }
-  }, [userStatsData, googleUsersData, facebookUsersData, appleUsersData, emailUsersData]);
+  }, [
+    userStatsData, 
+    googleUsersData, 
+    facebookUsersData, 
+    appleUsersData, 
+    emailUsersData,
+    recentActivityData,
+    activeSessionsData
+  ]);
 
   useEffect(() => {
-    setLoading(userStatsLoading || googleLoading || facebookLoading || appleLoading || emailLoading);
-  }, [userStatsLoading, googleLoading, facebookLoading, appleLoading, emailLoading]);
+    setLoading(
+      userStatsLoading || 
+      googleLoading || 
+      facebookLoading || 
+      appleLoading || 
+      emailLoading ||
+      recentActivityLoading ||
+      activeSessionsLoading
+    );
+  }, [
+    userStatsLoading, 
+    googleLoading, 
+    facebookLoading, 
+    appleLoading, 
+    emailLoading,
+    recentActivityLoading,
+    activeSessionsLoading
+  ]);
 
   useEffect(() => {
-    if (userStatsError) {
-      setError(userStatsError.message);
+    if (userStatsError || recentActivityError || activeSessionsError) {
+      const errorMessage = userStatsError?.message || 
+                          recentActivityError?.message || 
+                          activeSessionsError?.message || 
+                          'Error al cargar estadísticas';
+      setError(errorMessage);
     }
-  }, [userStatsError]);
+  }, [userStatsError, recentActivityError, activeSessionsError]);
 
   const refetch = async () => {
     try {

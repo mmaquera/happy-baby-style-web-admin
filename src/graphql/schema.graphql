@@ -587,6 +587,34 @@ type PaginatedUsers {
   total: Int!
   hasMore: Boolean!
 }
+type GetUsersResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: GetUsersData
+  metadata: ResponseMetadata
+}
+type GetUsersData {
+  items: [User!]!
+  pagination: UserPaginationInfo!
+}
+type UserPaginationInfo {
+  total: Int!
+  limit: Int!
+  offset: Int!
+  hasMore: Boolean!
+  currentPage: Int!
+  totalPages: Int!
+}
+type GetUsersByProviderResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: [User!]!
+  metadata: ResponseMetadata
+}
 type UserOrderHistoryResponse {
   orders: [Order!]!
   total: Int!
@@ -618,6 +646,14 @@ type ProductStats {
   activeProducts: Int!
   totalCategories: Int!
 }
+type ProductStatsResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: ProductStats!
+  metadata: ResponseMetadata
+}
 type OrderStats {
   totalOrders: Int!
   pendingOrders: Int!
@@ -628,11 +664,27 @@ type OrderStats {
   totalRevenue: Decimal!
   averageOrderValue: Decimal!
 }
+type OrderStatsResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: OrderStats!
+  metadata: ResponseMetadata
+}
 type UserStats {
   totalUsers: Int!
   activeUsers: Int!
   newUsersThisMonth: Int!
   usersByRole: JSON!
+}
+type UserStatsResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: UserStats!
+  metadata: ResponseMetadata
 }
 type PaginatedReviews {
   reviews: [ProductReview!]!
@@ -807,6 +859,150 @@ type DeleteCategoryData {
   deletedAt: String!
   softDelete: Boolean!
 }
+type CreateUserSessionAnalyticsResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: CreateUserSessionAnalyticsData
+  metadata: ResponseMetadata
+}
+type CreateUserSessionAnalyticsData {
+  entity: UserSessionAnalytics!
+  id: ID!
+  createdAt: String!
+}
+type UpdateUserSessionAnalyticsResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: UpdateUserSessionAnalyticsData
+  metadata: ResponseMetadata
+}
+type UpdateUserSessionAnalyticsData {
+  entity: UserSessionAnalytics!
+  id: ID!
+  updatedAt: String!
+  changes: [String!]!
+}
+type DeleteUserSessionAnalyticsResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: DeleteUserSessionAnalyticsData
+  metadata: ResponseMetadata
+}
+type DeleteUserSessionAnalyticsData {
+  id: ID!
+  deletedAt: String!
+  softDelete: Boolean!
+}
+type RevokeUserSessionResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: RevokeUserSessionData
+  metadata: ResponseMetadata
+}
+type RevokeUserSessionData {
+  sessionId: ID!
+  revokedAt: String!
+  reason: String
+  analyticsCleaned: Boolean!
+}
+type RevokeAllUserSessionsResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: RevokeAllUserSessionsData
+  metadata: ResponseMetadata
+}
+type RevokeAllUserSessionsData {
+  userId: ID!
+  sessionsRevoked: Int!
+  analyticsCleaned: Int!
+  revokedAt: String!
+  reason: String
+}
+type CreateUserAddressResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: CreateUserAddressData
+  metadata: ResponseMetadata
+}
+type CreateUserAddressData {
+  entity: UserAddress!
+  id: ID!
+  createdAt: String!
+}
+type UpdateUserAddressResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: UpdateUserAddressData
+  metadata: ResponseMetadata
+}
+type UpdateUserAddressData {
+  entity: UserAddress!
+  id: ID!
+  updatedAt: String!
+  changes: [String!]!
+}
+type DeleteUserAddressResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: DeleteUserAddressData
+  metadata: ResponseMetadata
+}
+type DeleteUserAddressData {
+  id: ID!
+  deletedAt: String!
+  softDelete: Boolean!
+}
+type SetDefaultAddressResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: SetDefaultAddressData
+  metadata: ResponseMetadata
+}
+type SetDefaultAddressData {
+  userId: ID!
+  addressId: ID!
+  updatedAt: String!
+}
+type GetUserAddressResponse {
+  success: Boolean!
+  message: String!
+  timestamp: String!
+  code: String!
+  data: GetUserAddressData
+  metadata: ResponseMetadata
+}
+type GetUserAddressData {
+  entity: UserAddress!
+}
+type GetUserAddressesResponse {
+  success: Boolean!
+  message: String!
+  timestamp: String!
+  code: String!
+  data: GetUserAddressesData
+  metadata: ResponseMetadata
+}
+type GetUserAddressesData {
+  items: [UserAddress!]!
+}
 type AuthResponse {
   success: Boolean!
   message: String!
@@ -824,11 +1020,18 @@ type SuccessResponse {
   success: Boolean!
   message: String!
 }
-type UploadResponse {
+type UploadImageResponse {
   success: Boolean!
-  url: String
-  filename: String
   message: String!
+  code: String!
+  timestamp: String!
+  data: UploadImageData
+  metadata: ResponseMetadata
+}
+type UploadImageData {
+  url: String!
+  filename: String!
+  imageId: ID!
 }
 type DashboardMetrics {
   totalUsers: Int!
@@ -873,19 +1076,19 @@ type Query {
   productAnalytics: ProductAnalytics!
   orderAnalytics: OrderAnalytics!
   userAnalytics: UserAnalytics!
-  productStats: ProductStats!
-  orderStats: OrderStats!
-  userStats: UserStats!
-  users(filter: UserFilterInput, pagination: PaginationInput): PaginatedUsers!
+  productStats: ProductStatsResponse!
+  orderStats: OrderStatsResponse!
+  userStats: UserStatsResponse!
+  users(filter: UserFilterInput, pagination: PaginationInput): GetUsersResponse!
   user(id: ID!): User
   userProfile(userId: ID!): UserProfile
-  userAddresses(userId: ID!): [UserAddress!]!
-  userAddress(id: ID!): UserAddress
+  userAddresses(userId: ID!): GetUserAddressesResponse!
+  userAddress(id: ID!): GetUserAddressResponse!
   currentUser: User
   searchUsers(query: String!): [User!]!
   activeUsers: [User!]!
   usersByRole(role: UserRole!): [User!]!
-  usersByProvider(provider: AuthProvider!): [User!]!
+  usersByProvider(provider: AuthProvider!): GetUsersByProviderResponse!
   userOrderHistory(userId: ID!, filter: UserOrderHistoryFilter, pagination: PaginationInput): UserOrderHistoryResponse!
   userFavoriteStats(userId: ID!): UserFavoriteStats!
   userActivitySummary(userId: ID!): UserActivitySummary!
@@ -971,18 +1174,18 @@ type Mutation {
   updateUserPassword(userId: ID!, currentPassword: String!, newPassword: String!): SuccessResponse!
   requestPasswordReset(email: String!): SuccessResponse!
   resetPassword(token: String!, newPassword: String!): SuccessResponse!
-  revokeUserSession(sessionId: ID!): SuccessResponse!
-  revokeAllUserSessions(userId: ID!): SuccessResponse!
+  revokeUserSession(sessionId: ID!, userId: ID!, reason: String): RevokeUserSessionResponse!
+  revokeAllUserSessions(userId: ID!, requestingUserId: ID!, reason: String, excludeCurrentSession: Boolean): RevokeAllUserSessionsResponse!
   unlinkUserAccount(accountId: ID!): SuccessResponse!
   forcePasswordReset(userId: ID!): SuccessResponse!
   impersonateUser(userId: ID!): AuthResponse!
   createUserProfile(input: CreateUserProfileInput!): UserProfile!
   updateUserProfile(userId: ID!, input: UpdateUserProfileInput!): UserProfile!
   deleteUserProfile(userId: ID!): SuccessResponse!
-  createUserAddress(input: CreateUserAddressInput!): UserAddress!
-  updateUserAddress(id: ID!, input: UpdateUserAddressInput!): UserAddress!
-  deleteUserAddress(id: ID!): SuccessResponse!
-  setDefaultAddress(userId: ID!, addressId: ID!): SuccessResponse!
+  createUserAddress(input: CreateUserAddressInput!): CreateUserAddressResponse!
+  updateUserAddress(id: ID!, input: UpdateUserAddressInput!): UpdateUserAddressResponse!
+  deleteUserAddress(id: ID!): DeleteUserAddressResponse!
+  setDefaultAddress(userId: ID!, addressId: ID!): SetDefaultAddressResponse!
   createCategory(input: CreateCategoryInput!): CreateCategoryResponse!
   updateCategory(id: ID!, input: UpdateCategoryInput!): UpdateCategoryResponse!
   deleteCategory(id: ID!): DeleteCategoryResponse!
@@ -1040,7 +1243,10 @@ type Mutation {
   createNotificationTemplate(input: CreateNotificationTemplateInput!): NotificationTemplate!
   subscribeToNewsletter(email: String!, userId: String): NewsletterSubscription!
   unsubscribeFromNewsletter(email: String!): SuccessResponse!
-  uploadImage(file: Upload!, entityType: String!, entityId: String!): UploadResponse!
+  createUserSessionAnalytics(input: CreateUserSessionAnalyticsInput!): CreateUserSessionAnalyticsResponse!
+  updateUserSessionAnalytics(id: ID!, input: UpdateUserSessionAnalyticsInput!): UpdateUserSessionAnalyticsResponse!
+  deleteUserSessionAnalytics(id: ID!): DeleteUserSessionAnalyticsResponse!
+  uploadImage(file: Upload!, entityType: String!, entityId: String!): UploadImageResponse!
   bulkUpdateProducts(updates: [UpdateProductInput!]!): [Product!]!
   bulkUpdateOrderStatus(orders: [ID!]!, status: OrderStatus!): [Order!]!
 }
@@ -1419,6 +1625,30 @@ input UserOrderHistoryFilter {
 input PaginationInput {
   limit: Int = 10
   offset: Int = 0
+}
+input CreateUserSessionAnalyticsInput {
+  sessionId: String!
+  userId: ID!
+  pageViews: Int
+  timeSpent: Int
+  bounceRate: Float
+  conversionRate: Float
+  deviceType: String
+  browser: String
+  os: String
+  country: String
+  city: String
+}
+input UpdateUserSessionAnalyticsInput {
+  pageViews: Int
+  timeSpent: Int
+  bounceRate: Float
+  conversionRate: Float
+  deviceType: String
+  browser: String
+  os: String
+  country: String
+  city: String
 }
 "Exposes a URL that specifies the behavior of this scalar."
 directive @specifiedBy(

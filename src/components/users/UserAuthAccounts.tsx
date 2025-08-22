@@ -173,10 +173,9 @@ export const UserAuthAccounts: React.FC<UserAuthAccountsProps> = ({
     });
   };
 
-  const isTokenExpired = (expiresAt?: number | null) => {
+  const isTokenExpired = (expiresAt?: string | null) => {
     if (!expiresAt) return false;
-    const expiryDate = typeof expiresAt === 'number' ? new Date(expiresAt * 1000) : new Date(expiresAt);
-    return new Date() > expiryDate;
+    return new Date() > new Date(expiresAt);
   };
 
   if (accounts.length === 0) {

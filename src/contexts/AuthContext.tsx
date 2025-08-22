@@ -231,8 +231,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       dispatch({ type: 'LOGOUT_SUCCESS' });
     } catch (error) {
       console.error('Logout failed:', error);
-      // Still clear local state even if server logout fails
-      dispatch({ type: 'LOGOUT_SUCCESS' });
+      
+      // Evaluar si debemos limpiar el estado local basado en el tipo de error
+      if (error instanceof AuthError) {
+        // Si es un error de autenticación, limpiar estado local
+        if (error.code === 'UNAUTHENTICATED' || error.code === 'TOKEN_EXPIRED') {
+          dispatch({ type: 'LOGOUT_SUCCESS' });
+        } else {
+          // Para otros errores de auth, mantener estado pero mostrar error
+          dispatch({ type: 'SET_LOADING', payload: false });
+          throw error; // Re-lanzar para que el hook pueda manejarlo
+        }
+      } else {
+        // Para errores de red o servidor, limpiar estado local como fallback
+        // pero registrar el error para debugging
+        console.warn('Server logout failed, clearing local state as fallback:', error);
+        dispatch({ type: 'LOGOUT_SUCCESS' });
+      }
     }
   }, [authService]);
 

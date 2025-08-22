@@ -5,12 +5,13 @@ import { Search, Bell, User, Settings, LogOut, ChevronDown } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext';
 import { useLogout } from '@/hooks/useLogout';
 import { LogoutConfirmModal } from '@/components/auth/LogoutConfirmModal';
+import { useSidebar } from '@/contexts/SidebarContext';
 
-const HeaderContainer = styled.header`
+const HeaderContainer = styled.header<{ sidebarWidth: number }>`
   position: fixed;
   top: 0;
   right: 0;
-  left: 280px; // Sidebar width
+  left: ${props => props.sidebarWidth}px;
   height: 80px;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
@@ -20,6 +21,7 @@ const HeaderContainer = styled.header`
   align-items: center;
   justify-content: space-between;
   padding: 0 ${theme.spacing[6]};
+  transition: left ${theme.transitions.base};
 
   @media (max-width: ${theme.breakpoints.lg}) {
     left: 0;
@@ -36,11 +38,12 @@ const HeaderContainer = styled.header`
   }
 `;
 
-const SearchContainer = styled.div`
+const SearchContainer = styled.div<{ isCollapsed: boolean }>`
   flex: 1;
-  max-width: 400px;
+  max-width: ${props => props.isCollapsed ? '500px' : '400px'};
   position: relative;
   margin-right: ${theme.spacing[6]};
+  transition: max-width ${theme.transitions.base};
 
   @media (max-width: ${theme.breakpoints.md}) {
     max-width: 300px;
@@ -256,6 +259,7 @@ const DropdownArrow = styled(ChevronDown)<{ isOpen: boolean }>`
 
 export const Header: React.FC = () => {
   const { user } = useAuth();
+  const { isCollapsed } = useSidebar();
   const { 
     isLogoutModalOpen, 
     isLoggingOut, 
@@ -264,6 +268,8 @@ export const Header: React.FC = () => {
     handleLogout 
   } = useLogout();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const sidebarWidth = isCollapsed ? 80 : 280;
 
   const handleUserClick = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -302,12 +308,12 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <HeaderContainer>
+    <HeaderContainer sidebarWidth={sidebarWidth}>
       <MobileMenuButton>
         <Settings size={24} />
       </MobileMenuButton>
 
-      <SearchContainer>
+      <SearchContainer isCollapsed={isCollapsed}>
         <SearchIcon />
         <SearchInput 
           placeholder="Buscar productos, pedidos..." 

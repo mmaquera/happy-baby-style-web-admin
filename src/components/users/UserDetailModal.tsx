@@ -6,7 +6,10 @@ import { Button } from '@/components/ui/Button';
 import { UserAuthAccounts } from './UserAuthAccounts';
 import { UserSessionsManager } from './UserSessionsManager';
 import { GoogleUserFeatures } from './GoogleUserFeatures';
+import { UserProfileEditForm } from './UserProfileEditForm';
+import { UserAddressManager } from './UserAddressManager';
 import { useUserSessions } from '@/hooks/useAuthManagement';
+import { useUserProfile } from '@/hooks/useUserProfile';
 import { AuthProvider } from '@/types';
 import { theme } from '@/styles/theme';
 import { 
@@ -21,7 +24,9 @@ import {
   XCircle,
   Key,
   Activity,
-  AtSign
+  AtSign,
+  Edit,
+  Save
 } from 'lucide-react';
 
 interface UserDetailModalProps {
@@ -144,41 +149,23 @@ const InfoValue = styled.div`
 const StatusBadge = styled.span<{ status: 'active' | 'inactive' | 'verified' | 'unverified' }>`
   display: inline-flex;
   align-items: center;
-  gap: ${theme.spacing[1]};
   padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.full};
+  border-radius: ${theme.borderRadius.sm};
   font-size: ${theme.fontSizes.xs};
   font-weight: ${theme.fontWeights.medium};
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  background: ${theme.colors.background.secondary};
   
   ${({ status }) => {
     switch (status) {
       case 'active':
-        return `
-          background: ${theme.colors.success}20;
-          color: ${theme.colors.success};
-        `;
-      case 'inactive':
-        return `
-          background: ${theme.colors.error}20;
-          color: ${theme.colors.error};
-        `;
       case 'verified':
-        return `
-          background: ${theme.colors.success}20;
-          color: ${theme.colors.success};
-        `;
+        return `color: ${theme.colors.success};`;
+      case 'inactive':
+        return `color: ${theme.colors.error};`;
       case 'unverified':
-        return `
-          background: ${theme.colors.warning}20;
-          color: ${theme.colors.warning};
-        `;
+        return `color: ${theme.colors.warning};`;
       default:
-        return `
-          background: ${theme.colors.text.secondary}20;
-          color: ${theme.colors.text.secondary};
-        `;
+        return `color: ${theme.colors.text.secondary};`;
     }
   }}
 `;
@@ -186,33 +173,13 @@ const StatusBadge = styled.span<{ status: 'active' | 'inactive' | 'verified' | '
 const RoleBadge = styled.span<{ role: string }>`
   display: inline-flex;
   align-items: center;
-  gap: ${theme.spacing[1]};
   padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.full};
+  border-radius: ${theme.borderRadius.sm};
   font-size: ${theme.fontSizes.xs};
   font-weight: ${theme.fontWeights.medium};
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  
-  ${({ role }) => {
-    switch (role) {
-      case 'admin':
-        return `
-          background: ${theme.colors.error}20;
-          color: ${theme.colors.error};
-        `;
-      case 'staff':
-        return `
-          background: ${theme.colors.coralAccent}20;
-          color: ${theme.colors.coralAccent};
-        `;
-      default:
-        return `
-          background: ${theme.colors.primaryPurple}20;
-          color: ${theme.colors.primaryPurple};
-        `;
-    }
-  }}
+  text-transform: capitalize;
+  background: ${theme.colors.background.secondary};
+  color: ${theme.colors.text.secondary};
 `;
 
 const AddressList = styled.div`
@@ -280,6 +247,27 @@ const TabContent = styled.div`
 export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, onClose }) => {
   const [activeTab, setActiveTab] = useState<'general' | 'auth' | 'sessions' | 'google-features'>('general');
   const { sessions, loading: sessionsLoading, refetch: refetchSessions } = useUserSessions(user.id);
+  
+  // Hook para manejar el perfil del usuario
+  const {
+    profile,
+    loading: profileLoading,
+    isEditing,
+    updatingProfile,
+    updateProfile,
+    startEditing,
+    cancelEditing,
+    editingAddressId,
+    creatingAddress,
+    updatingAddress,
+    deletingAddress,
+    settingDefault,
+    createAddress,
+    updateAddress,
+    deleteAddress,
+    setDefaultAddress,
+    refetch: refetchProfile
+  } = useUserProfile({ userId: user.id, skip: !isOpen });
   
   // Verificar si el usuario tiene cuenta de Google
   const hasGoogleAccount = user.accounts?.some(account => account.provider === AuthProvider.google);
@@ -366,77 +354,101 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
                   <SectionTitle>
                     <UserIcon size={20} />
                     Información Personal
+                    {!isEditing && (
+                      <Button
+                        variant="ghost"
+                        size="small"
+                        onClick={startEditing}
+                        icon={<Edit size={16} />}
+                        style={{ marginLeft: 'auto' }}
+                      >
+                        Editar
+                      </Button>
+                    )}
                   </SectionTitle>
                   
-                  <InfoItem>
-                    <InfoIcon>
-                      <UserIcon size={16} />
-                    </InfoIcon>
-                    <InfoContent>
-                      <InfoLabel>Nombre Completo</InfoLabel>
-                      <InfoValue>
-                        {user.profile?.firstName && user.profile?.lastName 
-                          ? `${user.profile.firstName} ${user.profile.lastName}`
-                          : 'No especificado'
-                        }
-                      </InfoValue>
-                    </InfoContent>
-                  </InfoItem>
+                  {isEditing ? (
+                    <UserProfileEditForm
+                      profile={(profile || user.profile) as any}
+                      onSave={async (input) => {
+                        await updateProfile(input);
+                      }}
+                      onCancel={cancelEditing}
+                      loading={updatingProfile}
+                    />
+                  ) : (
+                    <>
+                      <InfoItem>
+                        <InfoIcon>
+                          <UserIcon size={16} />
+                        </InfoIcon>
+                        <InfoContent>
+                          <InfoLabel>Nombre Completo</InfoLabel>
+                          <InfoValue>
+                            {user.profile?.firstName && user.profile?.lastName 
+                              ? `${user.profile.firstName} ${user.profile.lastName}`
+                              : 'No especificado'
+                            }
+                          </InfoValue>
+                        </InfoContent>
+                      </InfoItem>
 
-                  <InfoItem>
-                    <InfoIcon>
-                      <AtSign size={16} />
-                    </InfoIcon>
-                    <InfoContent>
-                      <InfoLabel>Email</InfoLabel>
-                      <InfoValue>{user.email}</InfoValue>
-                    </InfoContent>
-                  </InfoItem>
+                      <InfoItem>
+                        <InfoIcon>
+                          <AtSign size={16} />
+                        </InfoIcon>
+                        <InfoContent>
+                          <InfoLabel>Email</InfoLabel>
+                          <InfoValue>{user.email}</InfoValue>
+                        </InfoContent>
+                      </InfoItem>
 
-                  {user.profile?.phone && (
-                    <InfoItem>
-                      <InfoIcon>
-                        <Phone size={16} />
-                      </InfoIcon>
-                      <InfoContent>
-                        <InfoLabel>Teléfono</InfoLabel>
-                        <InfoValue>{user.profile.phone}</InfoValue>
-                      </InfoContent>
-                    </InfoItem>
-                  )}
+                      {user.profile?.phone && (
+                        <InfoItem>
+                          <InfoIcon>
+                            <Phone size={16} />
+                          </InfoIcon>
+                          <InfoContent>
+                            <InfoLabel>Teléfono</InfoLabel>
+                            <InfoValue>{user.profile.phone}</InfoValue>
+                          </InfoContent>
+                        </InfoItem>
+                      )}
 
-                  {user.profile?.dateOfBirth && (
-                    <InfoItem>
-                      <InfoIcon>
-                        <Calendar size={16} />
-                      </InfoIcon>
-                      <InfoContent>
-                        <InfoLabel>Fecha de Nacimiento</InfoLabel>
-                        <InfoValue>{formatDate(user.profile.dateOfBirth)}</InfoValue>
-                      </InfoContent>
-                    </InfoItem>
-                  )}
+                      {user.profile?.dateOfBirth && (
+                        <InfoItem>
+                          <InfoIcon>
+                            <Calendar size={16} />
+                          </InfoIcon>
+                          <InfoContent>
+                            <InfoLabel>Fecha de Nacimiento</InfoLabel>
+                            <InfoValue>{formatDate(user.profile.dateOfBirth)}</InfoValue>
+                          </InfoContent>
+                        </InfoItem>
+                      )}
 
-                  <InfoItem>
-                    <InfoIcon>
-                      <Calendar size={16} />
-                    </InfoIcon>
-                    <InfoContent>
-                      <InfoLabel>Fecha de Registro</InfoLabel>
-                      <InfoValue>{formatDate(user.createdAt)}</InfoValue>
-                    </InfoContent>
-                  </InfoItem>
+                      <InfoItem>
+                        <InfoIcon>
+                          <Calendar size={16} />
+                        </InfoIcon>
+                        <InfoContent>
+                          <InfoLabel>Fecha de Registro</InfoLabel>
+                          <InfoValue>{formatDate(user.createdAt)}</InfoValue>
+                        </InfoContent>
+                      </InfoItem>
 
-                  {user.lastLoginAt && (
-                    <InfoItem>
-                      <InfoIcon>
-                        <Activity size={16} />
-                      </InfoIcon>
-                      <InfoContent>
-                        <InfoLabel>Último Acceso</InfoLabel>
-                        <InfoValue>{formatDate(user.lastLoginAt)}</InfoValue>
-                      </InfoContent>
-                    </InfoItem>
+                      {user.lastLoginAt && (
+                        <InfoItem>
+                          <InfoIcon>
+                            <Activity size={16} />
+                          </InfoIcon>
+                          <InfoContent>
+                            <InfoLabel>Último Acceso</InfoLabel>
+                            <InfoValue>{formatDate(user.lastLoginAt)}</InfoValue>
+                          </InfoContent>
+                        </InfoItem>
+                      )}
+                    </>
                   )}
                 </Section>
 
@@ -504,36 +516,22 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
               </ContentGrid>
 
               {/* Addresses */}
-              {user.addresses && user.addresses.length > 0 && (
-                <Section>
-                  <SectionTitle>
-                    <MapPin size={20} />
-                    Direcciones ({user.addresses.length})
-                  </SectionTitle>
-                  
-                  <AddressList>
-                    {user.addresses.map((address) => (
-                      <AddressItem key={address.id}>
-                        <AddressTitle>
-                          {address.fullName}
-                          {address.isDefault && (
-                            <StatusBadge status="active" style={{ marginLeft: theme.spacing[2] }}>
-                              Predeterminada
-                            </StatusBadge>
-                          )}
-                        </AddressTitle>
-                        <AddressText>
-                          {address.firstName} {address.lastName}<br />
-                          {address.address1}<br />
-                          {address.address2 && <>{address.address2}<br /></>}
-                          {address.city}, {address.state} {address.postalCode}<br />
-                          {address.country}
-                        </AddressText>
-                      </AddressItem>
-                    ))}
-                  </AddressList>
-                </Section>
-              )}
+              <Section>
+                <SectionTitle>
+                  <MapPin size={20} />
+                  Direcciones
+                </SectionTitle>
+                
+                <UserAddressManager
+                  addresses={user.addresses || []}
+                  userId={user.id}
+                  onCreateAddress={createAddress}
+                  onUpdateAddress={updateAddress}
+                  onDeleteAddress={deleteAddress}
+                  onSetDefaultAddress={setDefaultAddress}
+                  loading={creatingAddress || updatingAddress || deletingAddress || settingDefault}
+                />
+              </Section>
             </>
           )}
 
@@ -543,12 +541,12 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
                 <Key size={20} />
                 Cuentas de Autenticación
               </SectionTitle>
-              {/*<UserAuthAccounts 
+              <UserAuthAccounts 
                 accounts={user.accounts || []} 
                 onAccountUnlinked={() => {
                   // Refresh user data when account is unlinked
                 }} 
-              />*/}
+              />
             </Section>
           )}
 
@@ -558,22 +556,22 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
                 <Activity size={20} />
                 Gestión de Sesiones
               </SectionTitle>
-            {/*<UserSessionsManager 
+              <UserSessionsManager 
                 userId={user.id}
                 sessions={sessions}
                 onSessionRevoked={refetchSessions}
-              />*/}
+              />
             </Section>
           )}
 
-          {/*activeTab === 'google-features' && hasGoogleAccount && (
+          {activeTab === 'google-features' && hasGoogleAccount && (
             <GoogleUserFeatures 
               user={user}
               onUserUpdated={() => {
                 // Refresh user data when needed
               }}
             />
-          )*/}
+          )}
         </TabContent>
       </ModalContent>
     </Modal>

@@ -22,3 +22,9 @@ export { useCategoryActions } from './useCategoryActions';
 export { useCategoryFilters } from './useCategoryFilters';
 export { useCreateCategory } from './useCreateCategory';
 export { useUpdateCategory } from './useUpdateCategory';
+
+// User hooks
+export { useUserProfile } from './useUserProfile';
+
+// Sidebar hooks
+export { useSidebarTooltip } from './useSidebarTooltip';

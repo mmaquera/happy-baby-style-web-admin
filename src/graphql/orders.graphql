@@ -208,14 +208,26 @@ query GetOrderItems($orderId: ID!) {
 # Get order stats
 query GetOrderStats {
   orderStats {
-    totalOrders
-    pendingOrders
-    processingOrders
-    shippedOrders
-    deliveredOrders
-    cancelledOrders
-    totalRevenue
-    averageOrderValue
+    success
+    message
+    code
+    timestamp
+    data {
+      totalOrders
+      pendingOrders
+      processingOrders
+      shippedOrders
+      deliveredOrders
+      cancelledOrders
+      totalRevenue
+      averageOrderValue
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
   }
 }
 

@@ -206,7 +206,7 @@ export const useOrderStats = () => {
   });
 
   return {
-    stats: data?.orderStats,
+    stats: data?.orderStats?.data,
     loading,
     error,
     refetch

@@ -370,7 +370,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           
           {filters.minPrice && (
             <ActiveFilterTag>
-              Precio mínimo: ${filters.minPrice}
+              Precio mínimo: S/ {filters.minPrice}
               <RemoveFilterButton onClick={() => handleInputChange('minPrice', undefined)}>
                 <X size={12} />
               </RemoveFilterButton>
@@ -379,7 +379,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           
           {filters.maxPrice && (
             <ActiveFilterTag>
-              Precio máximo: ${filters.maxPrice}
+              Precio máximo: S/ {filters.maxPrice}
               <RemoveFilterButton onClick={() => handleInputChange('maxPrice', undefined)}>
                 <X size={12} />
               </RemoveFilterButton>

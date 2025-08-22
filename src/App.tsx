@@ -7,6 +7,7 @@ import { client } from './services/graphql';
 import { GlobalStyles } from '@/styles/GlobalStyles';
 import { theme } from '@/styles/theme';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { SidebarProvider } from '@/contexts/SidebarContext';
 import { Layout } from '@/components/layout/Layout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Login } from '@/pages/Login';
@@ -23,7 +24,8 @@ function App() {
       <ThemeProvider theme={theme}>
         <GlobalStyles />
         <AuthProvider>
-          <Router>
+          <SidebarProvider>
+            <Router>
             <Routes>
               {/* Public routes */}
               <Route path="/login" element={<Login />} />
@@ -95,6 +97,7 @@ function App() {
               } />
             </Routes>
           </Router>
+          </SidebarProvider>
           <Toaster
             position="top-right"
             toastOptions={{

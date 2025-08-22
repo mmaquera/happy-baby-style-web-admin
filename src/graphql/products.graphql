@@ -403,8 +403,19 @@ mutation DeleteProductVariant($id: ID!) {
 mutation UploadImage($file: Upload!, $entityId: String!, $entityType: String!) {
   uploadImage(file: $file, entityId: $entityId, entityType: $entityType) {
     success
-    url
-    filename
     message
+    code
+    timestamp
+    data {
+      url
+      filename
+      imageId
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
   }
 }

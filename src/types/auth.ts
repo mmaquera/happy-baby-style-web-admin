@@ -105,6 +105,9 @@ export interface GraphQLMiddlewareConfig {
   enableRetry?: boolean;
   maxRetries?: number;
   retryDelay?: number;
+  enableUploads?: boolean;
+  maxFileSize?: number;
+  allowedFileTypes?: string[];
 }
 
 // Export all types

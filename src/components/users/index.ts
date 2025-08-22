@@ -8,3 +8,6 @@ export { CreateUserModal } from './CreateUserModal';
 export { ImprovedCreateUserModal } from './ImprovedCreateUserModal';
 export { PasswordManagementModal } from './PasswordManagementModal';
 export { PasswordHistoryCard } from './PasswordHistoryCard';
+export { UserProfileEditForm } from './UserProfileEditForm';
+export { UserAddressEditForm } from './UserAddressEditForm';
+export { UserAddressManager } from './UserAddressManager';

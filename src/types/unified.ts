@@ -112,7 +112,7 @@ export interface UserAccount {
   tokenType?: string | null;
   scope?: string | null;
   idToken?: string | null;
-  expiresAt?: number | null;
+  expiresAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -345,7 +345,7 @@ export const convertGraphQLUserAccountToUserAccount = (graphqlAccount: any): Use
     tokenType: graphqlAccount.tokenType || null,
     scope: graphqlAccount.scope || null,
     idToken: graphqlAccount.idToken || null,
-    expiresAt: graphqlAccount.expiresAt ? new Date(graphqlAccount.expiresAt).getTime() : null,
+    expiresAt: graphqlAccount.expiresAt || null,
     createdAt: graphqlAccount.createdAt,
     updatedAt: graphqlAccount.updatedAt
   };

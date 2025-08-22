@@ -16,18 +16,26 @@ import {
 } from 'lucide-react';
 import { useLogout } from '@/hooks/useLogout';
 import { LogoutConfirmModal } from '@/components/auth/LogoutConfirmModal';
+import { useSidebar } from '@/contexts/SidebarContext';
+import { Tooltip } from '@/components/ui/Tooltip';
+import { CollapsibleNavItem } from './CollapsibleNavItem';
+import { LogoutButtonWithTooltip } from './LogoutButtonWithTooltip';
 
-const SidebarContainer = styled.aside`
+const SidebarContainer = styled.aside<{ isCollapsed: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
-  width: 280px;
+  width: ${props => props.isCollapsed ? '80px' : '280px'};
   height: 100vh;
   background: ${theme.colors.white};
   border-right: 1px solid ${theme.colors.border.light};
   display: flex;
   flex-direction: column;
   z-index: ${theme.zIndex.header + 1};
+  transition: width ${theme.transitions.base};
+  overflow: visible;
+  box-sizing: border-box;
+  flex-shrink: 0;
   
   @media (max-width: ${theme.breakpoints.lg}) {
     transform: translateX(-100%);
@@ -35,12 +43,15 @@ const SidebarContainer = styled.aside`
   }
 `;
 
-const Logo = styled.div`
-  padding: ${theme.spacing[6]};
+const Logo = styled.div<{ isCollapsed: boolean }>`
+  padding: ${props => props.isCollapsed ? theme.spacing[4] : theme.spacing[6]};
   border-bottom: 1px solid ${theme.colors.border.light};
   display: flex;
   align-items: center;
-  gap: ${theme.spacing[3]};
+  gap: ${props => props.isCollapsed ? 0 : theme.spacing[3]};
+  justify-content: ${props => props.isCollapsed ? 'center' : 'flex-start'};
+  min-height: 80px;
+  position: relative;
 `;
 
 const LogoIcon = styled.div`
@@ -55,9 +66,12 @@ const LogoIcon = styled.div`
   font-size: ${theme.fontSizes.xl};
 `;
 
-const LogoText = styled.div`
-  display: flex;
+const LogoText = styled.div<{ isCollapsed: boolean }>`
+  display: ${props => props.isCollapsed ? 'none' : 'flex'};
   flex-direction: column;
+  opacity: ${props => props.isCollapsed ? 0 : 1};
+  transition: opacity ${theme.transitions.base};
+  overflow: hidden;
 `;
 
 const LogoTitle = styled.h1`
@@ -85,27 +99,36 @@ const NavSection = styled.div`
   margin-bottom: ${theme.spacing[6]};
 `;
 
-const NavSectionTitle = styled.h3`
+const NavSectionTitle = styled.h3<{ isCollapsed: boolean }>`
   font-size: ${theme.fontSizes.xs};
   font-weight: ${theme.fontWeights.medium};
   color: ${theme.colors.text.secondary};
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0 0 ${theme.spacing[3]} 0;
-  padding: 0 ${theme.spacing[6]};
+  padding: 0 ${props => props.isCollapsed ? theme.spacing[2] : theme.spacing[6]};
+  text-align: ${props => props.isCollapsed ? 'center' : 'left'};
+  opacity: ${props => props.isCollapsed ? 0 : 1};
+  transition: opacity ${theme.transitions.base};
+  height: ${props => props.isCollapsed ? 0 : 'auto'};
+  overflow: hidden;
+  white-space: nowrap;
 `;
 
-const NavItem = styled(NavLink)`
+const NavItem = styled(NavLink)<{ isCollapsed: boolean }>`
   display: flex;
   align-items: center;
-  gap: ${theme.spacing[3]};
-  padding: ${theme.spacing[3]} ${theme.spacing[6]};
+  gap: ${props => props.isCollapsed ? 0 : theme.spacing[3]};
+  padding: ${props => props.isCollapsed ? theme.spacing[4] : theme.spacing[3]} ${props => props.isCollapsed ? theme.spacing[2] : theme.spacing[6]};
   color: ${theme.colors.text.secondary};
   text-decoration: none;
   transition: all ${theme.transitions.base};
   font-size: ${theme.fontSizes.base};
   font-weight: ${theme.fontWeights.normal};
   border-right: 3px solid transparent;
+  justify-content: ${props => props.isCollapsed ? 'center' : 'flex-start'};
+  position: relative;
+  min-height: 48px;
 
   &:hover {
     background: ${theme.colors.background.accent};
@@ -124,45 +147,33 @@ const NavItem = styled(NavLink)`
     height: 20px;
     flex-shrink: 0;
   }
+
+  span {
+    opacity: ${props => props.isCollapsed ? 0 : 1};
+    transition: opacity ${theme.transitions.base};
+    white-space: nowrap;
+    overflow: hidden;
+    width: ${props => props.isCollapsed ? 0 : 'auto'};
+  }
 `;
 
-const FooterSection = styled.div`
-  padding: ${theme.spacing[4]} ${theme.spacing[6]};
+const FooterSection = styled.div<{ isCollapsed: boolean }>`
+  padding: ${props => props.isCollapsed ? theme.spacing[4] : theme.spacing[4]} ${props => props.isCollapsed ? theme.spacing[2] : theme.spacing[6]};
   border-top: 1px solid ${theme.colors.border.light};
 `;
 
-const LogoutButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-  width: 100%;
-  padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  background: none;
-  border: 1px solid ${theme.colors.border.light};
-  border-radius: ${theme.borderRadius.md};
-  color: ${theme.colors.error};
-  font-size: ${theme.fontSizes.sm};
-  cursor: pointer;
-  transition: all ${theme.transitions.base};
-  margin-bottom: ${theme.spacing[3]};
 
-  &:hover {
-    background: ${theme.colors.error}10;
-    border-color: ${theme.colors.error};
-    color: ${theme.colors.error};
-  }
 
-  svg {
-    width: 18px;
-    height: 18px;
-  }
-`;
-
-const FooterText = styled.div`
+const FooterText = styled.div<{ isCollapsed: boolean }>`
   font-size: ${theme.fontSizes.xs};
   color: ${theme.colors.text.secondary};
   text-align: center;
   line-height: 1.4;
+  opacity: ${props => props.isCollapsed ? 0 : 1};
+  transition: opacity ${theme.transitions.base};
+  height: ${props => props.isCollapsed ? 0 : 'auto'};
+  overflow: hidden;
+  white-space: nowrap;
 `;
 
 const BrandText = styled.span`
@@ -179,13 +190,15 @@ export const Sidebar: React.FC = () => {
     handleLogout 
   } = useLogout();
 
+  const { isCollapsed } = useSidebar();
+
   return (
-    <SidebarContainer>
-      <Logo>
+    <SidebarContainer isCollapsed={isCollapsed}>
+      <Logo isCollapsed={isCollapsed}>
         <LogoIcon>
           <Baby size={24} />
         </LogoIcon>
-        <LogoText>
+        <LogoText isCollapsed={isCollapsed}>
           <LogoTitle>Happy Baby Style</LogoTitle>
           <LogoSubtitle>Panel de Administración</LogoSubtitle>
         </LogoText>
@@ -193,61 +206,53 @@ export const Sidebar: React.FC = () => {
 
       <Navigation>
         <NavSection>
-          <NavSectionTitle>Principal</NavSectionTitle>
-          <NavItem to="/" end>
-            <Home />
+          <NavSectionTitle isCollapsed={isCollapsed}>Principal</NavSectionTitle>
+          <CollapsibleNavItem to="/" end isCollapsed={isCollapsed} icon={<Home />}>
             Dashboard
-          </NavItem>
+          </CollapsibleNavItem>
         </NavSection>
 
         <NavSection>
-          <NavSectionTitle>Gestión</NavSectionTitle>
-          <NavItem to="/products">
-            <Package />
+          <NavSectionTitle isCollapsed={isCollapsed}>Gestión</NavSectionTitle>
+          <CollapsibleNavItem to="/products" isCollapsed={isCollapsed} icon={<Package />}>
             Productos
-          </NavItem>
-          <NavItem to="/categories">
-            <Folder />
+          </CollapsibleNavItem>
+          <CollapsibleNavItem to="/categories" isCollapsed={isCollapsed} icon={<Folder />}>
             Categorías
-          </NavItem>
-          <NavItem to="/orders">
-            <ShoppingCart />
+          </CollapsibleNavItem>
+          <CollapsibleNavItem to="/orders" isCollapsed={isCollapsed} icon={<ShoppingCart />}>
             Pedidos
-          </NavItem>
-          <NavItem to="/users">
-            <Users />
+          </CollapsibleNavItem>
+          <CollapsibleNavItem to="/users" isCollapsed={isCollapsed} icon={<Users />}>
             Usuarios
-          </NavItem>
-          <NavItem to="/images">
-            <ImageIcon />
+          </CollapsibleNavItem>
+          <CollapsibleNavItem to="/images" isCollapsed={isCollapsed} icon={<ImageIcon />}>
             Imágenes
-          </NavItem>
+          </CollapsibleNavItem>
         </NavSection>
 
         <NavSection>
-          <NavSectionTitle>Análisis</NavSectionTitle>
-          <NavItem to="/analytics">
-            <BarChart3 />
+          <NavSectionTitle isCollapsed={isCollapsed}>Análisis</NavSectionTitle>
+          <CollapsibleNavItem to="/analytics" isCollapsed={isCollapsed} icon={<BarChart3 />}>
             Estadísticas
-          </NavItem>
+          </CollapsibleNavItem>
         </NavSection>
 
         <NavSection>
-          <NavSectionTitle>Configuración</NavSectionTitle>
-          <NavItem to="/settings">
-            <Settings />
+          <NavSectionTitle isCollapsed={isCollapsed}>Configuración</NavSectionTitle>
+          <CollapsibleNavItem to="/settings" isCollapsed={isCollapsed} icon={<Settings />}>
             Ajustes
-          </NavItem>
+          </CollapsibleNavItem>
         </NavSection>
       </Navigation>
 
-      <FooterSection>
-        <LogoutButton onClick={openLogoutModal}>
-          <LogOut />
-          Cerrar Sesión
-        </LogoutButton>
+      <FooterSection isCollapsed={isCollapsed}>
+        <LogoutButtonWithTooltip 
+          onClick={openLogoutModal} 
+          isCollapsed={isCollapsed} 
+        />
         
-        <FooterText>
+        <FooterText isCollapsed={isCollapsed}>
           © 2025 <BrandText>Happy Baby Style</BrandText>
           <br />
           Hecho con amor para tu bebé

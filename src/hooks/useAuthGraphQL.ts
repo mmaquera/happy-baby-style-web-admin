@@ -204,9 +204,42 @@ export const useAuthGraphQL = () => {
       };
     } catch (error: any) {
       console.error('Logout error:', error);
+      
+      // Manejar errores específicos de GraphQL
+      if (error?.graphQLErrors?.length > 0) {
+        const graphQLError = error.graphQLErrors[0];
+        const errorCode = graphQLError.extensions?.['code'];
+        
+        switch (errorCode) {
+          case 'UNAUTHENTICATED':
+            return {
+              success: false,
+              message: 'Sesión expirada o inválida'
+            };
+          case 'FORBIDDEN':
+            return {
+              success: false,
+              message: 'No tienes permisos para realizar esta acción'
+            };
+          default:
+            return {
+              success: false,
+              message: graphQLError.message || 'Error al cerrar sesión'
+            };
+        }
+      }
+      
+      // Manejar errores de red
+      if (error?.networkError) {
+        return {
+          success: false,
+          message: 'Error de conexión. Verifica tu conexión a internet.'
+        };
+      }
+      
       return {
         success: false,
-        message: error.message || 'Error al cerrar sesión'
+        message: error.message || 'Error inesperado al cerrar sesión'
       };
     }
   };

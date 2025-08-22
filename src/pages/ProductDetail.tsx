@@ -493,11 +493,11 @@ export const ProductDetail: React.FC = () => {
         <InfoSection>
           <PriceSection>
             <CurrentPrice>
-              ${product.salePrice || product.price}
+              S/ {product.salePrice || product.price}
             </CurrentPrice>
             {hasDiscount && (
               <>
-                <OriginalPrice>${product.price}</OriginalPrice>
+                <OriginalPrice>S/ {product.price}</OriginalPrice>
                 <DiscountBadge>-{discountPercentage}%</DiscountBadge>
               </>
             )}
@@ -546,7 +546,7 @@ export const ProductDetail: React.FC = () => {
                 {product.variants.map((variant) => (
                   <VariantCard key={variant.id} isActive={variant.isActive}>
                     <VariantName>{variant.name}</VariantName>
-                    <VariantPrice>${variant.price}</VariantPrice>
+                    <VariantPrice>S/ {variant.price}</VariantPrice>
                     <VariantStock>
                       Stock: {variant.stockQuantity}
                     </VariantStock>
@@ -591,9 +591,9 @@ export const ProductDetail: React.FC = () => {
             Información de Precios
           </InfoCardTitle>
           <InfoCardContent>
-            <p><strong>Precio base:</strong> ${product.price}</p>
+            <p><strong>Precio base:</strong> S/ {product.price}</p>
             {hasDiscount && (
-              <p><strong>Precio de oferta:</strong> ${product.salePrice}</p>
+              <p><strong>Precio de oferta:</strong> S/ {product.salePrice}</p>
             )}
             <p><strong>Descuento:</strong> {hasDiscount ? `${discountPercentage}%` : 'Sin descuento'}</p>
             <p><strong>Margen estimado:</strong> 35%</p>

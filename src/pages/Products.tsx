@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { 
@@ -8,7 +8,10 @@ import {
   ProductListView,
   CreateProductModal
 } from '@/components/products';
-import { useProducts } from '@/hooks/useProductsGraphQL';
+import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from '@/hooks/useProductsGraphQL';
+import { useProductActions } from '@/hooks/useProductActions';
+import { useCategories } from '@/hooks/useCategories';
+import type { Category, Product, ProductFilterInput } from '@/components/products/types';
 import { 
   Package,
   Search,
@@ -27,36 +30,18 @@ import {
   Upload,
   Settings
 } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Card } from '@/components/ui/Card';
 
-// Local interface for mock products that matches the actual data structure
-interface MockProduct {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  salePrice: number | null;
-  images: string[];
-  stockQuantity: number;
-  isActive: boolean;
-  rating: number;
-  reviewCount: number;
-  tags: string[];
-  category: { id: string; name: string; slug: string };
-}
-
-// Mock data for demonstration - in real app this would come from API
-const mockCategories = [
-  { id: '1', name: 'Ropa para Bebés', slug: 'ropa-bebes' },
-  { id: '2', name: 'Juguetes', slug: 'juguetes' },
-  { id: '3', name: 'Alimentación', slug: 'alimentacion' },
-  { id: '4', name: 'Higiene', slug: 'higiene' },
-  { id: '5', name: 'Accesorios', slug: 'accesorios' }
-];
-
-const mockAvailableTags = [
-  'recién nacido', '0-3 meses', '3-6 meses', '6-12 meses', 
-  '12-24 meses', 'orgánico', 'ecológico', 'premium', 'básico'
-];
+// =====================================================
+// PRODUCTS PAGE - GraphQL Integration
+// =====================================================
+// Following Clean Architecture principles and DEVELOPMENT_STANDARDS.md
+// - Single Responsibility: Product management only
+// - Dependency Inversion: Depends on hooks, not implementations
+// - Error handling: Centralized and consistent
+// - State management: Local UI state + GraphQL state
 
 const ProductsContainer = styled.div`
   padding: ${theme.spacing[6]};
@@ -82,28 +67,50 @@ const LoadingOverlay = styled.div`
 `;
 
 const LoadingSpinner = styled.div`
-  width: 48px;
-  height: 48px;
-  border: 4px solid ${theme.colors.background.accent};
-  border-top: 4px solid ${theme.colors.primaryPurple};
+  width: 40px;
+  height: 40px;
+  border: 4px solid ${theme.colors.border.light};
+  border-top: 4px solid ${theme.colors.primary};
   border-radius: 50%;
   animation: spin 1s linear infinite;
-
+  
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
 `;
 
-const LoadingText = styled.p`
+const LoadingText = styled.div`
   margin-top: ${theme.spacing[4]};
-  font-size: ${theme.fontSizes.lg};
   color: ${theme.colors.text.secondary};
+  font-size: ${theme.fontSizes.base};
+`;
+
+const ErrorState = styled.div`
   text-align: center;
+  padding: ${theme.spacing[6]};
+  color: ${theme.colors.error};
+`;
+
+const EmptyState = styled.div`
+  text-align: center;
+  padding: ${theme.spacing[6]};
+  color: ${theme.colors.text.secondary};
 `;
 
 export const Products: React.FC = () => {
-  // State for filters
+  // =====================================================
+  // STATE MANAGEMENT - Following Clean Architecture
+  // =====================================================
+  
+  // UI State - Local component state only
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sortField, setSortField] = useState<string>('');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  // Filter State - Mapped to GraphQL filters
   const [filters, setFilters] = useState<{
     search: string;
     categoryId: string;
@@ -122,165 +129,108 @@ export const Products: React.FC = () => {
     tags: []
   });
 
-  // State for UI
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  // =====================================================
+  // HELPER FUNCTIONS - Clean and focused
+  // =====================================================
+  
+  // Map local filters to GraphQL filter format
+  const mapFiltersToGraphQL = useCallback((localFilters: typeof filters): ProductFilterInput => {
+    const graphqlFilters: ProductFilterInput = {
+      isActive: localFilters.isActive,
+      inStock: localFilters.inStock,
+      tags: localFilters.tags.length > 0 ? localFilters.tags : null
+    };
 
-  // Mock stats - in real app this would come from API
-  const [stats] = useState({
-    totalProducts: 156,
-    activeProducts: 148,
-    lowStockProducts: 12,
-    outOfStockProducts: 4
+    // Add optional filters only if they have values
+    if (localFilters.categoryId) {
+      graphqlFilters.categoryId = localFilters.categoryId;
+    }
+    if (localFilters.minPrice !== null) {
+      graphqlFilters.minPrice = localFilters.minPrice;
+    }
+    if (localFilters.maxPrice !== null) {
+      graphqlFilters.maxPrice = localFilters.maxPrice;
+    }
+    if (localFilters.search) {
+      graphqlFilters.search = localFilters.search;
+    }
+
+    return graphqlFilters;
+  }, []);
+
+  // =====================================================
+  // GRAPHQL INTEGRATION - Using existing hooks
+  // =====================================================
+  
+  // Products data from GraphQL
+  const { 
+    products, 
+    loading: productsLoading, 
+    error: productsError, 
+    total, 
+    hasMore, 
+    loadMore, 
+    refetch: refetchProducts 
+  } = useProducts({ 
+    filter: mapFiltersToGraphQL(filters),
+    limit: 20 
   });
 
-  // Mock products data - in real app this would come from GraphQL
-  const [products] = useState<MockProduct[]>([
-    {
-      id: '1',
-      name: 'Body Orgánico para Recién Nacido',
-      description: 'Body 100% algodón orgánico, suave y transpirable para la piel sensible del bebé',
-      price: 25.99,
-      salePrice: 19.99,
-      images: ['https://via.placeholder.com/300x300/FFB6C1/000000?text=Body+Bebe'],
-      stockQuantity: 45,
-      isActive: true,
-      rating: 4.8,
-      reviewCount: 127,
-      tags: ['orgánico', 'recién nacido', 'algodón'],
-      category: { id: '1', name: 'Ropa para Bebés', slug: 'ropa-bebes' }
-    },
-    {
-      id: '2',
-      name: 'Juguete Educativo de Madera',
-      description: 'Juguete de construcción de madera natural, perfecto para desarrollar habilidades motoras',
-      price: 34.99,
-      salePrice: null,
-      images: ['https://via.placeholder.com/300x300/98FB98/000000?text=Juguete+Madera'],
-      stockQuantity: 8,
-      isActive: true,
-      rating: 4.6,
-      reviewCount: 89,
-      tags: ['educativo', 'madera', 'desarrollo'],
-      category: { id: '2', name: 'Juguetes', slug: 'juguetes' }
-    },
-    {
-      id: '3',
-      name: 'Leche de Fórmula Premium',
-      description: 'Fórmula nutricional completa con DHA y prebióticos para el desarrollo cerebral',
-      price: 45.99,
-      salePrice: 39.99,
-      images: ['https://via.placeholder.com/300x300/87CEEB/000000?text=Formula+Bebe'],
-      stockQuantity: 0,
-      isActive: true,
-      rating: 4.9,
-      reviewCount: 234,
-      tags: ['fórmula', 'premium', 'nutrición'],
-      category: { id: '3', name: 'Alimentación', slug: 'alimentacion' }
-    },
-    {
-      id: '4',
-      name: 'Pañales Ecológicos Talla 3',
-      description: 'Pañales biodegradables, hipoalergénicos y súper absorbentes',
-      price: 32.99,
-      salePrice: null,
-      images: ['https://via.placeholder.com/300x300/F0E68C/000000?text=Pañales+Eco'],
-      stockQuantity: 67,
-      isActive: true,
-      rating: 4.7,
-      reviewCount: 156,
-      tags: ['ecológico', 'biodegradable', 'hipoalergénico'],
-      category: { id: '4', name: 'Higiene', slug: 'higiene' }
-    },
-    {
-      id: '5',
-      name: 'Cochecito Plegable Premium',
-      description: 'Cochecito ligero y compacto, perfecto para viajes y paseos urbanos',
-      price: 299.99,
-      salePrice: 249.99,
-      images: ['https://via.placeholder.com/300x300/DDA0DD/000000?text=Cochecito'],
-      stockQuantity: 3,
-      isActive: true,
-      rating: 4.5,
-      reviewCount: 78,
-      tags: ['premium', 'plegable', 'viaje'],
-      category: { id: '5', name: 'Accesorios', slug: 'accesorios' }
-    },
-    {
-      id: '6',
-      name: 'Mantita de Recepción Suave',
-      description: 'Mantita de algodón y poliéster, ideal para envolver al bebé',
-      price: 18.99,
-      salePrice: null,
-      images: ['https://via.placeholder.com/300x300/FFE4B5/000000?text=Mantita'],
-      stockQuantity: 23,
-      isActive: false,
-      rating: 4.3,
-      reviewCount: 45,
-      tags: ['mantita', 'suave', 'envolver'],
-      category: { id: '1', name: 'Ropa para Bebés', slug: 'ropa-bebes' }
+  // Categories data from GraphQL
+  const { 
+    categories: graphqlCategories, 
+    loading: categoriesLoading, 
+    error: categoriesError,
+    refetchCategories 
+  } = useCategories();
+
+  // Product mutations
+  const { create: createProduct, loading: creatingProduct } = useCreateProduct();
+  const { update: updateProduct, loading: updatingProduct } = useUpdateProduct();
+  const { remove: deleteProduct, loading: deletingProduct } = useDeleteProduct();
+
+  // =====================================================
+  // COMPUTED VALUES - Using useMemo for performance
+  // =====================================================
+  
+  // Compute available categories (GraphQL + fallback)
+  const availableCategories = useMemo(() => {
+    if (graphqlCategories.length > 0) {
+      return graphqlCategories
+        .filter(cat => cat.isActive)
+        .sort((a, b) => a.sortOrder - b.sortOrder);
     }
-  ]);
+    return [];
+  }, [graphqlCategories]);
 
-  // Function to map MockProduct to Product type
-  const mapMockToProduct = (mockProduct: MockProduct): any => ({
-    ...mockProduct,
-    sku: `SKU-${mockProduct.id}`,
-    attributes: {},
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    currentPrice: mockProduct.salePrice || mockProduct.price,
-    hasDiscount: !!mockProduct.salePrice,
-    discountPercentage: mockProduct.salePrice ? Math.round(((mockProduct.price - mockProduct.salePrice) / mockProduct.price) * 100) : 0,
-    totalStock: mockProduct.stockQuantity,
-    isInStock: mockProduct.stockQuantity > 0,
-    variants: []
-  });
+  // Compute product statistics from real data
+  const productStats = useMemo(() => {
+    if (!products.length) return {
+      totalProducts: 0,
+      activeProducts: 0,
+      lowStockProducts: 0,
+      outOfStockProducts: 0
+    };
 
-  // Filter products based on current filters
-  const filteredProducts = products.filter(product => {
-    // Search filter
-    if (filters.search && !product.name.toLowerCase().includes(filters.search.toLowerCase()) &&
-        !product.description?.toLowerCase().includes(filters.search.toLowerCase())) {
-      return false;
-    }
+    const activeProducts = products.filter(p => p.isActive).length;
+    const lowStockProducts = products.filter(p => p.stockQuantity <= 10 && p.stockQuantity > 0).length;
+    const outOfStockProducts = products.filter(p => p.stockQuantity === 0).length;
 
-    // Category filter
-    if (filters.categoryId && product.category?.id !== filters.categoryId) {
-      return false;
-    }
+    return {
+      totalProducts: total,
+      activeProducts,
+      lowStockProducts,
+      outOfStockProducts
+    };
+  }, [products, total]);
 
-    // Active status filter
-    if (filters.isActive !== undefined && product.isActive !== filters.isActive) {
-      return false;
-    }
-
-    // Stock filter
-    if (filters.inStock && product.stockQuantity === 0) {
-      return false;
-    }
-
-    // Price range filter
-    if (filters.minPrice && product.price < filters.minPrice) {
-      return false;
-    }
-    if (filters.maxPrice && product.price > filters.maxPrice) {
-      return false;
-    }
-
-    // Tags filter
-    if (filters.tags.length > 0 && !filters.tags.some(tag => product.tags.includes(tag))) {
-      return false;
-    }
-
-    return true;
-  });
-
-  // Event handlers
+  // =====================================================
+  // EVENT HANDLERS - Following Single Responsibility
+  // =====================================================
+  
   const handleFilterChange = useCallback((newFilters: Partial<typeof filters>) => {
     setFilters(prev => ({ ...prev, ...newFilters }));
+    setCurrentPage(1); // Reset to first page when filters change
   }, []);
 
   const handleClearFilters = useCallback(() => {
@@ -293,35 +243,21 @@ export const Products: React.FC = () => {
       maxPrice: null,
       tags: []
     });
+    setCurrentPage(1);
   }, []);
 
   const handleAddProduct = useCallback(() => {
     setIsCreateModalOpen(true);
   }, []);
 
-  const handleCreateProductSuccess = useCallback((product: any) => {
-    console.log('Producto creado:', product);
-    // TODO: Refresh products list or add to current list
+  const handleCreateProductSuccess = useCallback((product: Product) => {
+    console.log('Producto creado exitosamente:', product);
+    refetchProducts(); // Refresh products list
     setIsCreateModalOpen(false);
-  }, []);
+  }, [refetchProducts]);
 
   const handleCloseCreateModal = useCallback(() => {
     setIsCreateModalOpen(false);
-  }, []);
-
-  const handleBulkActions = useCallback(() => {
-    // TODO: Implement bulk actions
-    console.log('Bulk actions clicked');
-  }, []);
-
-  const handleExport = useCallback(() => {
-    // TODO: Implement export functionality
-    console.log('Export clicked');
-  }, []);
-
-  const handleImport = useCallback(() => {
-    // TODO: Implement import functionality
-    console.log('Import clicked');
   }, []);
 
   const handleEditProduct = useCallback((productId: string) => {
@@ -329,60 +265,182 @@ export const Products: React.FC = () => {
     console.log('Edit product:', productId);
   }, []);
 
-  const handleDeleteProduct = useCallback((productId: string) => {
-    // TODO: Implement delete confirmation
+  const handleDeleteProduct = useCallback(async (productId: string) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar este producto?')) {
-      console.log('Delete product:', productId);
+      try {
+        await deleteProduct(productId);
+        // Product will be automatically removed from list via Apollo cache
+      } catch (error) {
+        console.error('Error deleting product:', error);
+      }
     }
-  }, []);
+  }, [deleteProduct]);
 
-  const handleToggleStatus = useCallback((productId: string, isActive: boolean) => {
-    // TODO: Implement status toggle
-    console.log('Toggle status:', productId, isActive);
-  }, []);
+  const handleToggleStatus = useCallback(async (productId: string, isActive: boolean) => {
+    try {
+      const product = products.find(p => p.id === productId);
+      if (!product) return;
+
+      await updateProduct(productId, { isActive });
+      // Product will be automatically updated via Apollo cache
+    } catch (error) {
+      console.error('Error updating product status:', error);
+    }
+  }, [products, updateProduct]);
 
   const handleViewDetails = useCallback((productId: string) => {
     // TODO: Implement view details modal/page
     console.log('View details:', productId);
   }, []);
 
-  const handleLoadMore = useCallback(() => {
-    // TODO: Implement pagination
-    console.log('Load more products');
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
+    // TODO: Implement pagination with GraphQL
+    // This would require updating the useProducts hook to support page-based pagination
   }, []);
 
+  const handleSort = useCallback((field: string, direction: 'asc' | 'desc') => {
+    setSortField(field);
+    setSortDirection(direction);
+    // TODO: Implement sorting with GraphQL
+    // This would require updating the useProducts hook to support sorting
+  }, []);
+
+  const handleLoadMore = useCallback(() => {
+    if (hasMore) {
+      loadMore();
+    }
+  }, [hasMore, loadMore]);
+
   const handleViewModeChange = useCallback((mode: 'grid' | 'list') => {
-    console.log('Cambiando vista a:', mode);
     setViewMode(mode);
   }, []);
 
-  // Loading state
-  if (isLoading) {
+  // =====================================================
+  // LOADING AND ERROR STATES - Following standards
+  // =====================================================
+  
+  // Initial loading state - only show when loading categories for the first time
+  const isInitialLoading = categoriesLoading && graphqlCategories.length === 0;
+  
+  // Products loading state
+  const isProductsLoading = productsLoading && products.length === 0;
+
+  // Show loading overlay only on initial load
+  if (isInitialLoading) {
     return (
-      <LoadingOverlay>
-        <div style={{ textAlign: 'center' }}>
+      <ProductsContainer>
+        <LoadingOverlay>
           <LoadingSpinner />
-          <LoadingText>Cargando productos...</LoadingText>
-        </div>
-      </LoadingOverlay>
+          <LoadingText>
+            Cargando módulo de productos...
+          </LoadingText>
+        </LoadingOverlay>
+      </ProductsContainer>
     );
   }
 
-  console.log('Estado actual viewMode:', viewMode);
+  // Error state for categories - only show if we can't get any categories
+  if (categoriesError && graphqlCategories.length === 0) {
+    return (
+      <ProductsContainer>
+        <Card>
+          <ErrorState>
+            <AlertTriangle size={48} style={{ marginBottom: theme.spacing[4] }} />
+            <h2>Error al cargar categorías</h2>
+            <p>{categoriesError}</p>
+            <Button 
+              variant="primary" 
+              onClick={() => refetchCategories()}
+              style={{ marginTop: theme.spacing[4] }}
+            >
+              Reintentar
+            </Button>
+          </ErrorState>
+        </Card>
+      </ProductsContainer>
+    );
+  }
+
+  // Error state for products
+  if (productsError && products.length === 0) {
+    return (
+      <ProductsContainer>
+        <Card>
+          <ErrorState>
+            <AlertTriangle size={48} style={{ marginBottom: theme.spacing[4] }} />
+            <h2>Error al cargar productos</h2>
+            <p>{productsError.message}</p>
+            <Button 
+              variant="primary" 
+              onClick={() => refetchProducts()}
+              style={{ marginTop: theme.spacing[4] }}
+            >
+              Reintentar
+            </Button>
+          </ErrorState>
+        </Card>
+      </ProductsContainer>
+    );
+  }
+
+  // =====================================================
+  // RENDER - Clean and focused
+  // =====================================================
   
   return (
     <ProductsContainer>
+      {/* Consolidated ProductHeader with all controls */}
       <ProductHeader
         title="Productos Happy Baby Style"
-        stats={stats}
+        stats={productStats}
         viewMode={viewMode}
         onAddProduct={handleAddProduct}
-        onBulkActions={handleBulkActions}
-        onExport={handleExport}
-        onImport={handleImport}
+        onBulkActions={() => console.log('Bulk actions clicked')}
+        onExport={() => console.log('Export clicked')}
+        onImport={() => console.log('Import clicked')}
         onViewModeChange={handleViewModeChange}
       />
 
+      {/* Subtle loading indicator for category updates */}
+      {categoriesLoading && graphqlCategories.length > 0 && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: theme.spacing[2],
+          padding: theme.spacing[2],
+          backgroundColor: theme.colors.background.accent,
+          borderRadius: theme.borderRadius.base,
+          marginBottom: theme.spacing[4],
+          fontSize: theme.fontSizes.sm,
+          color: theme.colors.text.secondary
+        }}>
+          <LoadingSpinner style={{ width: '16px', height: '16px', borderWidth: '2px' }} />
+          Actualizando categorías...
+        </div>
+      )}
+
+      {/* Subtle loading indicator for product updates */}
+      {productsLoading && products.length > 0 && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: theme.spacing[2],
+          padding: theme.spacing[2],
+          backgroundColor: theme.colors.background.accent,
+          borderRadius: theme.borderRadius.base,
+          marginBottom: theme.spacing[4],
+          fontSize: theme.fontSizes.sm,
+          color: theme.colors.text.secondary
+        }}>
+          <LoadingSpinner style={{ width: '16px', height: '16px', borderWidth: '2px' }} />
+          Actualizando productos...
+        </div>
+      )}
+
+      {/* Product Filters - Clean and focused */}
       <ProductFilters
         filters={(() => {
           const filterObj: any = {
@@ -398,19 +456,19 @@ export const Products: React.FC = () => {
           
           return filterObj;
         })()}
-        categories={mockCategories}
-        availableTags={mockAvailableTags}
+        categories={availableCategories}
+        availableTags={[]} // TODO: Implement tags from GraphQL
         onFilterChange={handleFilterChange}
         onClearFilters={handleClearFilters}
       />
 
+      {/* Products Display - Single source of truth for view mode */}
       {viewMode === 'grid' ? (
-      
-                  <ProductGrid
-          products={filteredProducts.map(mapMockToProduct)}
-          loading={isLoading}
-          error={error}
-          hasMore={false} // TODO: Implement pagination
+        <ProductGrid
+          products={products}
+          loading={isProductsLoading}
+          error={productsError?.message || null}
+          hasMore={hasMore}
           onLoadMore={handleLoadMore}
           onEdit={handleEditProduct}
           onDelete={handleDeleteProduct}
@@ -418,35 +476,33 @@ export const Products: React.FC = () => {
           onViewDetails={handleViewDetails}
           emptyMessage="No se encontraron productos que coincidan con los filtros aplicados."
         />
-        
       ) : (
-        
-                  <ProductListView
-          products={filteredProducts.map(mapMockToProduct)}
-          loading={isLoading}
-          error={error}
-          total={filteredProducts.length}
-          currentPage={1}
-          totalPages={1}
-          hasMore={false}
-          onPageChange={() => {}} // TODO: Implement pagination
+        <ProductListView
+          products={products}
+          loading={isProductsLoading}
+          error={productsError?.message || null}
+          total={total}
+          currentPage={currentPage}
+          totalPages={Math.ceil(total / 20)}
+          hasMore={hasMore}
+          onPageChange={handlePageChange}
           onEdit={handleEditProduct}
           onDelete={handleDeleteProduct}
           onToggleStatus={handleToggleStatus}
           onViewDetails={handleViewDetails}
-          onSort={() => {}} // TODO: Implement sorting
-          onFilter={() => {}} // TODO: Implement filtering
+          onSort={handleSort}
+          onFilter={handleFilterChange}
         />
-  
       )}
 
-        <CreateProductModal
-          isOpen={isCreateModalOpen}
-          onClose={handleCloseCreateModal}
-          onSuccess={handleCreateProductSuccess}
-          categories={mockCategories}
-          availableTags={mockAvailableTags}
-        />
-      </ProductsContainer>
-    );
-  };
+      {/* Create Product Modal */}
+      <CreateProductModal
+        isOpen={isCreateModalOpen}
+        onClose={handleCloseCreateModal}
+        onSuccess={handleCreateProductSuccess}
+        categories={availableCategories}
+        availableTags={[]} // TODO: Implement tags from GraphQL
+      />
+    </ProductsContainer>
+  );
+};

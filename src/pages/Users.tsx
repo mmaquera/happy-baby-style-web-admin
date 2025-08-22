@@ -877,7 +877,7 @@ export const UsersPage: React.FC = () => {
         <ErrorMessage>Error al cargar usuarios: Error desconocido</ErrorMessage>
       ) : (
         <UsersGrid>
-          {users.map((user) => {
+          {users.map((user: any) => {
             // Determinar el proveedor principal del usuario
             const primaryProvider = AuthProvider.email;
             console.log(user);

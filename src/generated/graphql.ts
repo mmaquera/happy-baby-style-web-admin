@@ -366,6 +366,13 @@ export type CreateStockAlertInput = {
   type: StockAlertType;
 };
 
+export type CreateUserAddressData = {
+  __typename?: 'CreateUserAddressData';
+  createdAt: Scalars['String']['output'];
+  entity: UserAddress;
+  id: Scalars['ID']['output'];
+};
+
 export type CreateUserAddressInput = {
   address1: Scalars['String']['input'];
   address2?: InputMaybe<Scalars['String']['input']>;
@@ -380,6 +387,16 @@ export type CreateUserAddressInput = {
   state: Scalars['String']['input'];
   type: Scalars['String']['input'];
   userId: Scalars['ID']['input'];
+};
+
+export type CreateUserAddressResponse = {
+  __typename?: 'CreateUserAddressResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<CreateUserAddressData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
 };
 
 export type CreateUserData = {
@@ -405,6 +422,37 @@ export type CreateUserResponse = {
   __typename?: 'CreateUserResponse';
   code: Scalars['String']['output'];
   data?: Maybe<CreateUserData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
+export type CreateUserSessionAnalyticsData = {
+  __typename?: 'CreateUserSessionAnalyticsData';
+  createdAt: Scalars['String']['output'];
+  entity: UserSessionAnalytics;
+  id: Scalars['ID']['output'];
+};
+
+export type CreateUserSessionAnalyticsInput = {
+  bounceRate?: InputMaybe<Scalars['Float']['input']>;
+  browser?: InputMaybe<Scalars['String']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
+  conversionRate?: InputMaybe<Scalars['Float']['input']>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  deviceType?: InputMaybe<Scalars['String']['input']>;
+  os?: InputMaybe<Scalars['String']['input']>;
+  pageViews?: InputMaybe<Scalars['Int']['input']>;
+  sessionId: Scalars['String']['input'];
+  timeSpent?: InputMaybe<Scalars['Int']['input']>;
+  userId: Scalars['ID']['input'];
+};
+
+export type CreateUserSessionAnalyticsResponse = {
+  __typename?: 'CreateUserSessionAnalyticsResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<CreateUserSessionAnalyticsData>;
   message: Scalars['String']['output'];
   metadata?: Maybe<ResponseMetadata>;
   success: Scalars['Boolean']['output'];
@@ -452,6 +500,40 @@ export type DeleteProductResponse = {
   __typename?: 'DeleteProductResponse';
   code: Scalars['String']['output'];
   data?: Maybe<DeleteProductData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
+export type DeleteUserAddressData = {
+  __typename?: 'DeleteUserAddressData';
+  deletedAt: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  softDelete: Scalars['Boolean']['output'];
+};
+
+export type DeleteUserAddressResponse = {
+  __typename?: 'DeleteUserAddressResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<DeleteUserAddressData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
+export type DeleteUserSessionAnalyticsData = {
+  __typename?: 'DeleteUserSessionAnalyticsData';
+  deletedAt: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  softDelete: Scalars['Boolean']['output'];
+};
+
+export type DeleteUserSessionAnalyticsResponse = {
+  __typename?: 'DeleteUserSessionAnalyticsResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<DeleteUserSessionAnalyticsData>;
   message: Scalars['String']['output'];
   metadata?: Maybe<ResponseMetadata>;
   success: Scalars['Boolean']['output'];
@@ -550,6 +632,62 @@ export type GetProductsResponse = {
   timestamp: Scalars['String']['output'];
 };
 
+export type GetUserAddressData = {
+  __typename?: 'GetUserAddressData';
+  entity: UserAddress;
+};
+
+export type GetUserAddressResponse = {
+  __typename?: 'GetUserAddressResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<GetUserAddressData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
+export type GetUserAddressesData = {
+  __typename?: 'GetUserAddressesData';
+  items: Array<UserAddress>;
+};
+
+export type GetUserAddressesResponse = {
+  __typename?: 'GetUserAddressesResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<GetUserAddressesData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
+export type GetUsersByProviderResponse = {
+  __typename?: 'GetUsersByProviderResponse';
+  code: Scalars['String']['output'];
+  data: Array<User>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
+export type GetUsersData = {
+  __typename?: 'GetUsersData';
+  items: Array<User>;
+  pagination: UserPaginationInfo;
+};
+
+export type GetUsersResponse = {
+  __typename?: 'GetUsersResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<GetUsersData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
 export type Image = {
   __typename?: 'Image';
   bucket?: Maybe<Scalars['String']['output']>;
@@ -627,8 +765,9 @@ export type Mutation = {
   createShippingZone: ShippingZone;
   createStockAlert: StockAlert;
   createUser: CreateUserResponse;
-  createUserAddress: UserAddress;
+  createUserAddress: CreateUserAddressResponse;
   createUserProfile: UserProfile;
+  createUserSessionAnalytics: CreateUserSessionAnalyticsResponse;
   deactivateUser: User;
   deleteCarrier: SuccessResponse;
   deleteCategory: DeleteCategoryResponse;
@@ -642,8 +781,9 @@ export type Mutation = {
   deleteSavedPaymentMethod: SuccessResponse;
   deleteStockAlert: SuccessResponse;
   deleteUser: SuccessResponse;
-  deleteUserAddress: SuccessResponse;
+  deleteUserAddress: DeleteUserAddressResponse;
   deleteUserProfile: SuccessResponse;
+  deleteUserSessionAnalytics: DeleteUserSessionAnalyticsResponse;
   deliverOrder: Order;
   forcePasswordReset: SuccessResponse;
   impersonateUser: AuthResponse;
@@ -658,9 +798,9 @@ export type Mutation = {
   removeFromFavorites: SuccessResponse;
   requestPasswordReset: SuccessResponse;
   resetPassword: SuccessResponse;
-  revokeAllUserSessions: SuccessResponse;
-  revokeUserSession: SuccessResponse;
-  setDefaultAddress: SuccessResponse;
+  revokeAllUserSessions: RevokeAllUserSessionsResponse;
+  revokeUserSession: RevokeUserSessionResponse;
+  setDefaultAddress: SetDefaultAddressResponse;
   shipOrder: Order;
   subscribeToNewsletter: NewsletterSubscription;
   toggleFavorite: UserFavorite;
@@ -680,10 +820,11 @@ export type Mutation = {
   updateSavedPaymentMethod: SavedPaymentMethod;
   updateStockAlert: StockAlert;
   updateUser: User;
-  updateUserAddress: UserAddress;
+  updateUserAddress: UpdateUserAddressResponse;
   updateUserPassword: SuccessResponse;
   updateUserProfile: UserProfile;
-  uploadImage: UploadResponse;
+  updateUserSessionAnalytics: UpdateUserSessionAnalyticsResponse;
+  uploadImage: UploadImageResponse;
 };
 
 
@@ -837,6 +978,11 @@ export type MutationCreateUserProfileArgs = {
 };
 
 
+export type MutationCreateUserSessionAnalyticsArgs = {
+  input: CreateUserSessionAnalyticsInput;
+};
+
+
 export type MutationDeactivateUserArgs = {
   id: Scalars['ID']['input'];
 };
@@ -913,6 +1059,11 @@ export type MutationDeleteUserProfileArgs = {
 };
 
 
+export type MutationDeleteUserSessionAnalyticsArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeliverOrderArgs = {
   id: Scalars['ID']['input'];
 };
@@ -982,12 +1133,17 @@ export type MutationResetPasswordArgs = {
 
 
 export type MutationRevokeAllUserSessionsArgs = {
+  excludeCurrentSession?: InputMaybe<Scalars['Boolean']['input']>;
+  reason?: InputMaybe<Scalars['String']['input']>;
+  requestingUserId: Scalars['ID']['input'];
   userId: Scalars['ID']['input'];
 };
 
 
 export type MutationRevokeUserSessionArgs = {
+  reason?: InputMaybe<Scalars['String']['input']>;
   sessionId: Scalars['ID']['input'];
+  userId: Scalars['ID']['input'];
 };
 
 
@@ -1132,6 +1288,12 @@ export type MutationUpdateUserProfileArgs = {
 };
 
 
+export type MutationUpdateUserSessionAnalyticsArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateUserSessionAnalyticsInput;
+};
+
+
 export type MutationUploadImageArgs = {
   entityId: Scalars['String']['input'];
   entityType: Scalars['String']['input'];
@@ -1237,6 +1399,16 @@ export type OrderStats = {
   shippedOrders: Scalars['Int']['output'];
   totalOrders: Scalars['Int']['output'];
   totalRevenue: Scalars['Decimal']['output'];
+};
+
+export type OrderStatsResponse = {
+  __typename?: 'OrderStatsResponse';
+  code: Scalars['String']['output'];
+  data: OrderStats;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
 };
 
 export enum OrderStatus {
@@ -1414,6 +1586,16 @@ export type ProductStats = {
   totalProducts: Scalars['Int']['output'];
 };
 
+export type ProductStatsResponse = {
+  __typename?: 'ProductStatsResponse';
+  code: Scalars['String']['output'];
+  data: ProductStats;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
 export type ProductVariant = {
   __typename?: 'ProductVariant';
   attributes: Scalars['JSON']['output'];
@@ -1481,7 +1663,7 @@ export type Query = {
   orderAnalytics: OrderAnalytics;
   orderByNumber?: Maybe<Order>;
   orderItems: Array<OrderItem>;
-  orderStats: OrderStats;
+  orderStats: OrderStatsResponse;
   orderTracking: Array<OrderTracking>;
   orderTransactions: Array<Transaction>;
   orders: PaginatedOrders;
@@ -1492,7 +1674,7 @@ export type Query = {
   productAppEvents: Array<AppEvent>;
   productBySku: GetProductResponse;
   productReviews: PaginatedReviews;
-  productStats: ProductStats;
+  productStats: ProductStatsResponse;
   productVariant?: Maybe<ProductVariant>;
   productVariants: Array<ProductVariant>;
   products: GetProductsResponse;
@@ -1515,8 +1697,8 @@ export type Query = {
   user?: Maybe<User>;
   userAccounts: Array<UserAccount>;
   userActivitySummary: UserActivitySummary;
-  userAddress?: Maybe<UserAddress>;
-  userAddresses: Array<UserAddress>;
+  userAddress: GetUserAddressResponse;
+  userAddresses: GetUserAddressesResponse;
   userAnalytics: UserAnalytics;
   userAppEvents: Array<AppEvent>;
   userAuditLogs: Array<AuditLog>;
@@ -1535,10 +1717,10 @@ export type Query = {
   userSecurityEvents: Array<SecurityEvent>;
   userSessionAnalytics: Array<UserSessionAnalytics>;
   userSessions: Array<UserSession>;
-  userStats: UserStats;
+  userStats: UserStatsResponse;
   userTransactions: Array<Transaction>;
-  users: PaginatedUsers;
-  usersByProvider: Array<User>;
+  users: GetUsersResponse;
+  usersByProvider: GetUsersByProviderResponse;
   usersByRole: Array<User>;
 };
 
@@ -1910,6 +2092,43 @@ export type ReviewVote = {
   userId: Scalars['ID']['output'];
 };
 
+export type RevokeAllUserSessionsData = {
+  __typename?: 'RevokeAllUserSessionsData';
+  analyticsCleaned: Scalars['Int']['output'];
+  reason?: Maybe<Scalars['String']['output']>;
+  revokedAt: Scalars['String']['output'];
+  sessionsRevoked: Scalars['Int']['output'];
+  userId: Scalars['ID']['output'];
+};
+
+export type RevokeAllUserSessionsResponse = {
+  __typename?: 'RevokeAllUserSessionsResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<RevokeAllUserSessionsData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
+export type RevokeUserSessionData = {
+  __typename?: 'RevokeUserSessionData';
+  analyticsCleaned: Scalars['Boolean']['output'];
+  reason?: Maybe<Scalars['String']['output']>;
+  revokedAt: Scalars['String']['output'];
+  sessionId: Scalars['ID']['output'];
+};
+
+export type RevokeUserSessionResponse = {
+  __typename?: 'RevokeUserSessionResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<RevokeUserSessionData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
 export type RewardPoint = {
   __typename?: 'RewardPoint';
   createdAt: Scalars['DateTime']['output'];
@@ -1957,6 +2176,23 @@ export type SecurityEvent = {
   user?: Maybe<UserProfile>;
   userAgent?: Maybe<Scalars['String']['output']>;
   userId?: Maybe<Scalars['String']['output']>;
+};
+
+export type SetDefaultAddressData = {
+  __typename?: 'SetDefaultAddressData';
+  addressId: Scalars['ID']['output'];
+  updatedAt: Scalars['String']['output'];
+  userId: Scalars['ID']['output'];
+};
+
+export type SetDefaultAddressResponse = {
+  __typename?: 'SetDefaultAddressResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<SetDefaultAddressData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
 };
 
 export type ShippingRate = {
@@ -2202,6 +2438,14 @@ export type UpdateSavedPaymentMethodInput = {
   metadata?: InputMaybe<Scalars['JSON']['input']>;
 };
 
+export type UpdateUserAddressData = {
+  __typename?: 'UpdateUserAddressData';
+  changes: Array<Scalars['String']['output']>;
+  entity: UserAddress;
+  id: Scalars['ID']['output'];
+  updatedAt: Scalars['String']['output'];
+};
+
 export type UpdateUserAddressInput = {
   address1?: InputMaybe<Scalars['String']['input']>;
   address2?: InputMaybe<Scalars['String']['input']>;
@@ -2215,6 +2459,16 @@ export type UpdateUserAddressInput = {
   postalCode?: InputMaybe<Scalars['String']['input']>;
   state?: InputMaybe<Scalars['String']['input']>;
   type?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateUserAddressResponse = {
+  __typename?: 'UpdateUserAddressResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<UpdateUserAddressData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
 };
 
 export type UpdateUserInput = {
@@ -2234,12 +2488,51 @@ export type UpdateUserProfileInput = {
   role?: InputMaybe<UserRole>;
 };
 
-export type UploadResponse = {
-  __typename?: 'UploadResponse';
-  filename?: Maybe<Scalars['String']['output']>;
+export type UpdateUserSessionAnalyticsData = {
+  __typename?: 'UpdateUserSessionAnalyticsData';
+  changes: Array<Scalars['String']['output']>;
+  entity: UserSessionAnalytics;
+  id: Scalars['ID']['output'];
+  updatedAt: Scalars['String']['output'];
+};
+
+export type UpdateUserSessionAnalyticsInput = {
+  bounceRate?: InputMaybe<Scalars['Float']['input']>;
+  browser?: InputMaybe<Scalars['String']['input']>;
+  city?: InputMaybe<Scalars['String']['input']>;
+  conversionRate?: InputMaybe<Scalars['Float']['input']>;
+  country?: InputMaybe<Scalars['String']['input']>;
+  deviceType?: InputMaybe<Scalars['String']['input']>;
+  os?: InputMaybe<Scalars['String']['input']>;
+  pageViews?: InputMaybe<Scalars['Int']['input']>;
+  timeSpent?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type UpdateUserSessionAnalyticsResponse = {
+  __typename?: 'UpdateUserSessionAnalyticsResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<UpdateUserSessionAnalyticsData>;
   message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
   success: Scalars['Boolean']['output'];
-  url?: Maybe<Scalars['String']['output']>;
+  timestamp: Scalars['String']['output'];
+};
+
+export type UploadImageData = {
+  __typename?: 'UploadImageData';
+  filename: Scalars['String']['output'];
+  imageId: Scalars['ID']['output'];
+  url: Scalars['String']['output'];
+};
+
+export type UploadImageResponse = {
+  __typename?: 'UploadImageResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<UploadImageData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
 };
 
 export type User = {
@@ -2368,6 +2661,16 @@ export type UserOrderHistoryStats = {
   totalSpent: Scalars['Decimal']['output'];
 };
 
+export type UserPaginationInfo = {
+  __typename?: 'UserPaginationInfo';
+  currentPage: Scalars['Int']['output'];
+  hasMore: Scalars['Boolean']['output'];
+  limit: Scalars['Int']['output'];
+  offset: Scalars['Int']['output'];
+  total: Scalars['Int']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
 export type UserProfile = {
   __typename?: 'UserProfile';
   addresses: Array<UserAddress>;
@@ -2447,6 +2750,16 @@ export type UserStats = {
   newUsersThisMonth: Scalars['Int']['output'];
   totalUsers: Scalars['Int']['output'];
   usersByRole: Scalars['JSON']['output'];
+};
+
+export type UserStatsResponse = {
+  __typename?: 'UserStatsResponse';
+  code: Scalars['String']['output'];
+  data: UserStats;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
 };
 
 export type RegisterUserMutationVariables = Exact<{
@@ -2557,7 +2870,7 @@ export type GetOrderItemsQuery = { __typename?: 'Query', orderItems: Array<{ __t
 export type GetOrderStatsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetOrderStatsQuery = { __typename?: 'Query', orderStats: { __typename?: 'OrderStats', totalOrders: number, pendingOrders: number, processingOrders: number, shippedOrders: number, deliveredOrders: number, cancelledOrders: number, totalRevenue: number, averageOrderValue: number } };
+export type GetOrderStatsQuery = { __typename?: 'Query', orderStats: { __typename?: 'OrderStatsResponse', success: boolean, message: string, code: string, timestamp: string, data: { __typename?: 'OrderStats', totalOrders: number, pendingOrders: number, processingOrders: number, shippedOrders: number, deliveredOrders: number, cancelledOrders: number, totalRevenue: number, averageOrderValue: number }, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
 
 export type CreateOrderMutationVariables = Exact<{
   input: CreateOrderInput;
@@ -2709,7 +3022,7 @@ export type UploadImageMutationVariables = Exact<{
 }>;
 
 
-export type UploadImageMutation = { __typename?: 'Mutation', uploadImage: { __typename?: 'UploadResponse', success: boolean, url?: string | null, filename?: string | null, message: string } };
+export type UploadImageMutation = { __typename?: 'Mutation', uploadImage: { __typename?: 'UploadImageResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'UploadImageData', url: string, filename: string, imageId: string } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
 
 export type GetUsersQueryVariables = Exact<{
   filter?: InputMaybe<UserFilterInput>;
@@ -2717,7 +3030,7 @@ export type GetUsersQueryVariables = Exact<{
 }>;
 
 
-export type GetUsersQuery = { __typename?: 'Query', users: { __typename?: 'PaginatedUsers', total: number, hasMore: boolean, users: Array<{ __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, createdAt: string, updatedAt: string, profile?: { __typename?: 'UserProfile', id: string, firstName: string, lastName: string, phone?: string | null, dateOfBirth?: string | null, avatar?: string | null, role: UserRole, emailVerified: boolean, isActive: boolean, lastLoginAt?: string | null, createdAt: string, updatedAt: string, fullName?: string | null } | null, addresses: Array<{ __typename?: 'UserAddress', id: string, type: string, firstName: string, lastName: string, company?: string | null, address1: string, address2?: string | null, city: string, state: string, postalCode: string, country: string, phone?: string | null, isDefault: boolean, createdAt: string, updatedAt: string, fullName: string, fullAddress: string }> }> } };
+export type GetUsersQuery = { __typename?: 'Query', users: { __typename?: 'GetUsersResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'GetUsersData', items: Array<{ __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, createdAt: string, updatedAt: string, profile?: { __typename?: 'UserProfile', id: string, firstName: string, lastName: string, phone?: string | null, dateOfBirth?: string | null, avatar?: string | null, role: UserRole, emailVerified: boolean, isActive: boolean, lastLoginAt?: string | null, createdAt: string, updatedAt: string, fullName?: string | null } | null, addresses: Array<{ __typename?: 'UserAddress', id: string, type: string, firstName: string, lastName: string, company?: string | null, address1: string, address2?: string | null, city: string, state: string, postalCode: string, country: string, phone?: string | null, isDefault: boolean, createdAt: string, updatedAt: string, fullName: string, fullAddress: string }> }>, pagination: { __typename?: 'UserPaginationInfo', total: number, limit: number, offset: number, hasMore: boolean, currentPage: number, totalPages: number } } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
 
 export type GetUserQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -2736,21 +3049,33 @@ export type GetUserProfileQuery = { __typename?: 'Query', userProfile?: { __type
 export type GetUserStatsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetUserStatsQuery = { __typename?: 'Query', userStats: { __typename?: 'UserStats', totalUsers: number, activeUsers: number, newUsersThisMonth: number, usersByRole: any } };
+export type GetUserStatsQuery = { __typename?: 'Query', userStats: { __typename?: 'UserStatsResponse', success: boolean, message: string, code: string, timestamp: string, data: { __typename?: 'UserStats', totalUsers: number, activeUsers: number, newUsersThisMonth: number, usersByRole: any }, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
+
+export type GetUsersWithRecentActivityQueryVariables = Exact<{
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetUsersWithRecentActivityQuery = { __typename?: 'Query', users: { __typename?: 'GetUsersResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'GetUsersData', items: Array<{ __typename?: 'User', id: string, email: string, lastLoginAt?: string | null, profile?: { __typename?: 'UserProfile', firstName: string, lastName: string } | null, accounts: Array<{ __typename?: 'UserAccount', provider: AuthProvider, providerAccountId: string }>, sessions: Array<{ __typename?: 'UserSession', id: string, userAgent?: string | null, ipAddress?: string | null, createdAt: string, expiresAt: string, isActive: boolean }> }>, pagination: { __typename?: 'UserPaginationInfo', total: number, limit: number, offset: number, hasMore: boolean, currentPage: number, totalPages: number } } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
+
+export type GetActiveSessionsCountQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetActiveSessionsCountQuery = { __typename?: 'Query', users: { __typename?: 'GetUsersResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'GetUsersData', items: Array<{ __typename?: 'User', id: string, sessions: Array<{ __typename?: 'UserSession', id: string, isActive: boolean, createdAt: string, expiresAt: string }> }>, pagination: { __typename?: 'UserPaginationInfo', total: number, limit: number, offset: number, hasMore: boolean, currentPage: number, totalPages: number } } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
 
 export type GetUserAddressesQueryVariables = Exact<{
   userId: Scalars['ID']['input'];
 }>;
 
 
-export type GetUserAddressesQuery = { __typename?: 'Query', userAddresses: Array<{ __typename?: 'UserAddress', id: string, type: string, firstName: string, lastName: string, company?: string | null, address1: string, address2?: string | null, city: string, state: string, postalCode: string, country: string, phone?: string | null, isDefault: boolean, createdAt: string, updatedAt: string, fullName: string, fullAddress: string }> };
+export type GetUserAddressesQuery = { __typename?: 'Query', userAddresses: { __typename?: 'GetUserAddressesResponse', success: boolean, message: string, timestamp: string, code: string, data?: { __typename?: 'GetUserAddressesData', items: Array<{ __typename?: 'UserAddress', id: string, type: string, firstName: string, lastName: string, company?: string | null, address1: string, address2?: string | null, city: string, state: string, postalCode: string, country: string, phone?: string | null, isDefault: boolean, createdAt: string, updatedAt: string, fullName: string, fullAddress: string }> } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
 
 export type GetUserAddressQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type GetUserAddressQuery = { __typename?: 'Query', userAddress?: { __typename?: 'UserAddress', id: string, type: string, firstName: string, lastName: string, company?: string | null, address1: string, address2?: string | null, city: string, state: string, postalCode: string, country: string, phone?: string | null, isDefault: boolean, createdAt: string, updatedAt: string, fullName: string, fullAddress: string, user: { __typename?: 'UserProfile', id: string, email: string, firstName: string, lastName: string } } | null };
+export type GetUserAddressQuery = { __typename?: 'Query', userAddress: { __typename?: 'GetUserAddressResponse', success: boolean, message: string, timestamp: string, code: string, data?: { __typename?: 'GetUserAddressData', entity: { __typename?: 'UserAddress', id: string, type: string, firstName: string, lastName: string, company?: string | null, address1: string, address2?: string | null, city: string, state: string, postalCode: string, country: string, phone?: string | null, isDefault: boolean, createdAt: string, updatedAt: string, fullName: string, fullAddress: string, user: { __typename?: 'UserProfile', id: string, email: string, firstName: string, lastName: string } } } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
 
 export type SearchUsersQueryVariables = Exact<{
   query: Scalars['String']['input'];
@@ -2776,7 +3101,7 @@ export type GetUsersByProviderQueryVariables = Exact<{
 }>;
 
 
-export type GetUsersByProviderQuery = { __typename?: 'Query', usersByProvider: Array<{ __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, createdAt: string, updatedAt: string, profile?: { __typename?: 'UserProfile', id: string, firstName: string, lastName: string, phone?: string | null, dateOfBirth?: string | null, avatar?: string | null, role: UserRole, emailVerified: boolean, isActive: boolean, lastLoginAt?: string | null, createdAt: string, updatedAt: string, fullName?: string | null } | null }> };
+export type GetUsersByProviderQuery = { __typename?: 'Query', usersByProvider: { __typename?: 'GetUsersByProviderResponse', success: boolean, message: string, code: string, timestamp: string, data: Array<{ __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, createdAt: string, updatedAt: string, profile?: { __typename?: 'UserProfile', id: string, firstName: string, lastName: string, phone?: string | null, dateOfBirth?: string | null, avatar?: string | null, role: UserRole, emailVerified: boolean, isActive: boolean, lastLoginAt?: string | null, createdAt: string, updatedAt: string, fullName?: string | null } | null }>, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
 
 export type GetUserOrderHistoryQueryVariables = Exact<{
   userId: Scalars['ID']['input'];
@@ -2813,14 +3138,14 @@ export type GetUserSessionsQueryVariables = Exact<{
 }>;
 
 
-export type GetUserSessionsQuery = { __typename?: 'Query', userSessions: Array<{ __typename?: 'UserSession', id: string, sessionToken: string, accessToken: string, refreshToken?: string | null, expiresAt: string, userAgent?: string | null, ipAddress?: string | null, isActive: boolean, createdAt: string, updatedAt: string }> };
+export type GetUserSessionsQuery = { __typename?: 'Query', userSessions: Array<{ __typename?: 'UserSession', id: string, userId: string, sessionToken: string, accessToken: string, refreshToken?: string | null, expiresAt: string, userAgent?: string | null, ipAddress?: string | null, isActive: boolean, createdAt: string, updatedAt: string }> };
 
 export type GetActiveSessionsQueryVariables = Exact<{
   userId: Scalars['ID']['input'];
 }>;
 
 
-export type GetActiveSessionsQuery = { __typename?: 'Query', activeSessions: Array<{ __typename?: 'UserSession', id: string, sessionToken: string, accessToken: string, refreshToken?: string | null, expiresAt: string, userAgent?: string | null, ipAddress?: string | null, isActive: boolean, createdAt: string, updatedAt: string }> };
+export type GetActiveSessionsQuery = { __typename?: 'Query', activeSessions: Array<{ __typename?: 'UserSession', id: string, userId: string, sessionToken: string, accessToken: string, refreshToken?: string | null, expiresAt: string, userAgent?: string | null, ipAddress?: string | null, isActive: boolean, createdAt: string, updatedAt: string }> };
 
 export type CreateUserMutationVariables = Exact<{
   input: CreateUserProfileInput;
@@ -2893,7 +3218,7 @@ export type CreateUserAddressMutationVariables = Exact<{
 }>;
 
 
-export type CreateUserAddressMutation = { __typename?: 'Mutation', createUserAddress: { __typename?: 'UserAddress', id: string, type: string, firstName: string, lastName: string, company?: string | null, address1: string, address2?: string | null, city: string, state: string, postalCode: string, country: string, phone?: string | null, isDefault: boolean, createdAt: string, updatedAt: string, fullName: string, fullAddress: string } };
+export type CreateUserAddressMutation = { __typename?: 'Mutation', createUserAddress: { __typename?: 'CreateUserAddressResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'CreateUserAddressData', id: string, createdAt: string, entity: { __typename?: 'UserAddress', id: string, type: string, firstName: string, lastName: string, company?: string | null, address1: string, address2?: string | null, city: string, state: string, postalCode: string, country: string, phone?: string | null, isDefault: boolean, createdAt: string, updatedAt: string, fullName: string, fullAddress: string } } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
 
 export type UpdateUserAddressMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -2901,14 +3226,14 @@ export type UpdateUserAddressMutationVariables = Exact<{
 }>;
 
 
-export type UpdateUserAddressMutation = { __typename?: 'Mutation', updateUserAddress: { __typename?: 'UserAddress', id: string, type: string, firstName: string, lastName: string, company?: string | null, address1: string, address2?: string | null, city: string, state: string, postalCode: string, country: string, phone?: string | null, isDefault: boolean, createdAt: string, updatedAt: string, fullName: string, fullAddress: string } };
+export type UpdateUserAddressMutation = { __typename?: 'Mutation', updateUserAddress: { __typename?: 'UpdateUserAddressResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'UpdateUserAddressData', id: string, updatedAt: string, changes: Array<string>, entity: { __typename?: 'UserAddress', id: string, type: string, firstName: string, lastName: string, company?: string | null, address1: string, address2?: string | null, city: string, state: string, postalCode: string, country: string, phone?: string | null, isDefault: boolean, createdAt: string, updatedAt: string, fullName: string, fullAddress: string } } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
 
 export type DeleteUserAddressMutationVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type DeleteUserAddressMutation = { __typename?: 'Mutation', deleteUserAddress: { __typename?: 'SuccessResponse', success: boolean, message: string } };
+export type DeleteUserAddressMutation = { __typename?: 'Mutation', deleteUserAddress: { __typename?: 'DeleteUserAddressResponse', success: boolean, message: string } };
 
 export type SetDefaultAddressMutationVariables = Exact<{
   userId: Scalars['ID']['input'];
@@ -2916,21 +3241,23 @@ export type SetDefaultAddressMutationVariables = Exact<{
 }>;
 
 
-export type SetDefaultAddressMutation = { __typename?: 'Mutation', setDefaultAddress: { __typename?: 'SuccessResponse', success: boolean, message: string } };
+export type SetDefaultAddressMutation = { __typename?: 'Mutation', setDefaultAddress: { __typename?: 'SetDefaultAddressResponse', success: boolean, message: string } };
 
 export type RevokeUserSessionMutationVariables = Exact<{
   sessionId: Scalars['ID']['input'];
-}>;
-
-
-export type RevokeUserSessionMutation = { __typename?: 'Mutation', revokeUserSession: { __typename?: 'SuccessResponse', success: boolean, message: string } };
-
-export type RevokeAllUserSessionsMutationVariables = Exact<{
   userId: Scalars['ID']['input'];
 }>;
 
 
-export type RevokeAllUserSessionsMutation = { __typename?: 'Mutation', revokeAllUserSessions: { __typename?: 'SuccessResponse', success: boolean, message: string } };
+export type RevokeUserSessionMutation = { __typename?: 'Mutation', revokeUserSession: { __typename?: 'RevokeUserSessionResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'RevokeUserSessionData', sessionId: string, revokedAt: string, reason?: string | null, analyticsCleaned: boolean } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
+
+export type RevokeAllUserSessionsMutationVariables = Exact<{
+  userId: Scalars['ID']['input'];
+  requestingUserId: Scalars['ID']['input'];
+}>;
+
+
+export type RevokeAllUserSessionsMutation = { __typename?: 'Mutation', revokeAllUserSessions: { __typename?: 'RevokeAllUserSessionsResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'RevokeAllUserSessionsData', userId: string, sessionsRevoked: number, analyticsCleaned: number, revokedAt: string, reason?: string | null } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
 
 export type UnlinkUserAccountMutationVariables = Exact<{
   accountId: Scalars['ID']['input'];
@@ -3977,14 +4304,26 @@ export function refetchGetOrderItemsQuery(variables: GetOrderItemsQueryVariables
 export const GetOrderStatsDocument = gql`
     query GetOrderStats {
   orderStats {
-    totalOrders
-    pendingOrders
-    processingOrders
-    shippedOrders
-    deliveredOrders
-    cancelledOrders
-    totalRevenue
-    averageOrderValue
+    success
+    message
+    code
+    timestamp
+    data {
+      totalOrders
+      pendingOrders
+      processingOrders
+      shippedOrders
+      deliveredOrders
+      cancelledOrders
+      totalRevenue
+      averageOrderValue
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
   }
 }
     `;
@@ -5189,9 +5528,20 @@ export const UploadImageDocument = gql`
     mutation UploadImage($file: Upload!, $entityId: String!, $entityType: String!) {
   uploadImage(file: $file, entityId: $entityId, entityType: $entityType) {
     success
-    url
-    filename
     message
+    code
+    timestamp
+    data {
+      url
+      filename
+      imageId
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
   }
 }
     `;
@@ -5226,52 +5576,70 @@ export type UploadImageMutationOptions = Apollo.BaseMutationOptions<UploadImageM
 export const GetUsersDocument = gql`
     query GetUsers($filter: UserFilterInput, $pagination: PaginationInput) {
   users(filter: $filter, pagination: $pagination) {
-    users {
-      id
-      email
-      role
-      isActive
-      emailVerified
-      lastLoginAt
-      createdAt
-      updatedAt
-      profile {
+    success
+    message
+    code
+    timestamp
+    data {
+      items {
         id
-        firstName
-        lastName
-        phone
-        dateOfBirth
-        avatar
+        email
         role
-        emailVerified
         isActive
+        emailVerified
         lastLoginAt
         createdAt
         updatedAt
-        fullName
+        profile {
+          id
+          firstName
+          lastName
+          phone
+          dateOfBirth
+          avatar
+          role
+          emailVerified
+          isActive
+          lastLoginAt
+          createdAt
+          updatedAt
+          fullName
+        }
+        addresses {
+          id
+          type
+          firstName
+          lastName
+          company
+          address1
+          address2
+          city
+          state
+          postalCode
+          country
+          phone
+          isDefault
+          createdAt
+          updatedAt
+          fullName
+          fullAddress
+        }
       }
-      addresses {
-        id
-        type
-        firstName
-        lastName
-        company
-        address1
-        address2
-        city
-        state
-        postalCode
-        country
-        phone
-        isDefault
-        createdAt
-        updatedAt
-        fullName
-        fullAddress
+      pagination {
+        total
+        limit
+        offset
+        hasMore
+        currentPage
+        totalPages
       }
     }
-    total
-    hasMore
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
   }
 }
     `;
@@ -5506,10 +5874,22 @@ export function refetchGetUserProfileQuery(variables: GetUserProfileQueryVariabl
 export const GetUserStatsDocument = gql`
     query GetUserStats {
   userStats {
-    totalUsers
-    activeUsers
-    newUsersThisMonth
-    usersByRole
+    success
+    message
+    code
+    timestamp
+    data {
+      totalUsers
+      activeUsers
+      newUsersThisMonth
+      usersByRole
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
   }
 }
     `;
@@ -5548,26 +5928,193 @@ export type GetUserStatsQueryResult = Apollo.QueryResult<GetUserStatsQuery, GetU
 export function refetchGetUserStatsQuery(variables?: GetUserStatsQueryVariables) {
       return { query: GetUserStatsDocument, variables: variables }
     }
+export const GetUsersWithRecentActivityDocument = gql`
+    query GetUsersWithRecentActivity($limit: Int = 10) {
+  users(filter: {isActive: true}, pagination: {limit: $limit, offset: 0}) {
+    success
+    message
+    code
+    timestamp
+    data {
+      items {
+        id
+        email
+        lastLoginAt
+        profile {
+          firstName
+          lastName
+        }
+        accounts {
+          provider
+          providerAccountId
+        }
+        sessions {
+          id
+          userAgent
+          ipAddress
+          createdAt
+          expiresAt
+          isActive
+        }
+      }
+      pagination {
+        total
+        limit
+        offset
+        hasMore
+        currentPage
+        totalPages
+      }
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetUsersWithRecentActivityQuery__
+ *
+ * To run a query within a React component, call `useGetUsersWithRecentActivityQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUsersWithRecentActivityQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUsersWithRecentActivityQuery({
+ *   variables: {
+ *      limit: // value for 'limit'
+ *   },
+ * });
+ */
+export function useGetUsersWithRecentActivityQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetUsersWithRecentActivityQuery, GetUsersWithRecentActivityQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetUsersWithRecentActivityQuery, GetUsersWithRecentActivityQueryVariables>(GetUsersWithRecentActivityDocument, options);
+      }
+export function useGetUsersWithRecentActivityLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetUsersWithRecentActivityQuery, GetUsersWithRecentActivityQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetUsersWithRecentActivityQuery, GetUsersWithRecentActivityQueryVariables>(GetUsersWithRecentActivityDocument, options);
+        }
+export function useGetUsersWithRecentActivitySuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetUsersWithRecentActivityQuery, GetUsersWithRecentActivityQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetUsersWithRecentActivityQuery, GetUsersWithRecentActivityQueryVariables>(GetUsersWithRecentActivityDocument, options);
+        }
+export type GetUsersWithRecentActivityQueryHookResult = ReturnType<typeof useGetUsersWithRecentActivityQuery>;
+export type GetUsersWithRecentActivityLazyQueryHookResult = ReturnType<typeof useGetUsersWithRecentActivityLazyQuery>;
+export type GetUsersWithRecentActivitySuspenseQueryHookResult = ReturnType<typeof useGetUsersWithRecentActivitySuspenseQuery>;
+export type GetUsersWithRecentActivityQueryResult = Apollo.QueryResult<GetUsersWithRecentActivityQuery, GetUsersWithRecentActivityQueryVariables>;
+export function refetchGetUsersWithRecentActivityQuery(variables?: GetUsersWithRecentActivityQueryVariables) {
+      return { query: GetUsersWithRecentActivityDocument, variables: variables }
+    }
+export const GetActiveSessionsCountDocument = gql`
+    query GetActiveSessionsCount {
+  users(filter: {isActive: true}, pagination: {limit: 1000, offset: 0}) {
+    success
+    message
+    code
+    timestamp
+    data {
+      items {
+        id
+        sessions {
+          id
+          isActive
+          createdAt
+          expiresAt
+        }
+      }
+      pagination {
+        total
+        limit
+        offset
+        hasMore
+        currentPage
+        totalPages
+      }
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetActiveSessionsCountQuery__
+ *
+ * To run a query within a React component, call `useGetActiveSessionsCountQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetActiveSessionsCountQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetActiveSessionsCountQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetActiveSessionsCountQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetActiveSessionsCountQuery, GetActiveSessionsCountQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetActiveSessionsCountQuery, GetActiveSessionsCountQueryVariables>(GetActiveSessionsCountDocument, options);
+      }
+export function useGetActiveSessionsCountLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetActiveSessionsCountQuery, GetActiveSessionsCountQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetActiveSessionsCountQuery, GetActiveSessionsCountQueryVariables>(GetActiveSessionsCountDocument, options);
+        }
+export function useGetActiveSessionsCountSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetActiveSessionsCountQuery, GetActiveSessionsCountQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetActiveSessionsCountQuery, GetActiveSessionsCountQueryVariables>(GetActiveSessionsCountDocument, options);
+        }
+export type GetActiveSessionsCountQueryHookResult = ReturnType<typeof useGetActiveSessionsCountQuery>;
+export type GetActiveSessionsCountLazyQueryHookResult = ReturnType<typeof useGetActiveSessionsCountLazyQuery>;
+export type GetActiveSessionsCountSuspenseQueryHookResult = ReturnType<typeof useGetActiveSessionsCountSuspenseQuery>;
+export type GetActiveSessionsCountQueryResult = Apollo.QueryResult<GetActiveSessionsCountQuery, GetActiveSessionsCountQueryVariables>;
+export function refetchGetActiveSessionsCountQuery(variables?: GetActiveSessionsCountQueryVariables) {
+      return { query: GetActiveSessionsCountDocument, variables: variables }
+    }
 export const GetUserAddressesDocument = gql`
     query GetUserAddresses($userId: ID!) {
   userAddresses(userId: $userId) {
-    id
-    type
-    firstName
-    lastName
-    company
-    address1
-    address2
-    city
-    state
-    postalCode
-    country
-    phone
-    isDefault
-    createdAt
-    updatedAt
-    fullName
-    fullAddress
+    success
+    message
+    timestamp
+    code
+    data {
+      items {
+        id
+        type
+        firstName
+        lastName
+        company
+        address1
+        address2
+        city
+        state
+        postalCode
+        country
+        phone
+        isDefault
+        createdAt
+        updatedAt
+        fullName
+        fullAddress
+      }
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
   }
 }
     `;
@@ -5610,28 +6157,42 @@ export function refetchGetUserAddressesQuery(variables: GetUserAddressesQueryVar
 export const GetUserAddressDocument = gql`
     query GetUserAddress($id: ID!) {
   userAddress(id: $id) {
-    id
-    type
-    firstName
-    lastName
-    company
-    address1
-    address2
-    city
-    state
-    postalCode
-    country
-    phone
-    isDefault
-    createdAt
-    updatedAt
-    fullName
-    fullAddress
-    user {
-      id
-      email
-      firstName
-      lastName
+    success
+    message
+    timestamp
+    code
+    data {
+      entity {
+        id
+        type
+        firstName
+        lastName
+        company
+        address1
+        address2
+        city
+        state
+        postalCode
+        country
+        phone
+        isDefault
+        createdAt
+        updatedAt
+        fullName
+        fullAddress
+        user {
+          id
+          email
+          firstName
+          lastName
+        }
+      }
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
     }
   }
 }
@@ -5869,28 +6430,40 @@ export function refetchGetUsersByRoleQuery(variables: GetUsersByRoleQueryVariabl
 export const GetUsersByProviderDocument = gql`
     query GetUsersByProvider($provider: AuthProvider!) {
   usersByProvider(provider: $provider) {
-    id
-    email
-    role
-    isActive
-    emailVerified
-    lastLoginAt
-    createdAt
-    updatedAt
-    profile {
+    success
+    message
+    code
+    timestamp
+    data {
       id
-      firstName
-      lastName
-      phone
-      dateOfBirth
-      avatar
+      email
       role
-      emailVerified
       isActive
+      emailVerified
       lastLoginAt
       createdAt
       updatedAt
-      fullName
+      profile {
+        id
+        firstName
+        lastName
+        phone
+        dateOfBirth
+        avatar
+        role
+        emailVerified
+        isActive
+        lastLoginAt
+        createdAt
+        updatedAt
+        fullName
+      }
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
     }
   }
 }
@@ -6165,6 +6738,7 @@ export const GetUserSessionsDocument = gql`
     query GetUserSessions($userId: ID!) {
   userSessions(userId: $userId) {
     id
+    userId
     sessionToken
     accessToken
     refreshToken
@@ -6217,6 +6791,7 @@ export const GetActiveSessionsDocument = gql`
     query GetActiveSessions($userId: ID!) {
   activeSessions(userId: $userId) {
     id
+    userId
     sessionToken
     accessToken
     refreshToken
@@ -6702,23 +7277,39 @@ export type DeleteUserProfileMutationOptions = Apollo.BaseMutationOptions<Delete
 export const CreateUserAddressDocument = gql`
     mutation CreateUserAddress($input: CreateUserAddressInput!) {
   createUserAddress(input: $input) {
-    id
-    type
-    firstName
-    lastName
-    company
-    address1
-    address2
-    city
-    state
-    postalCode
-    country
-    phone
-    isDefault
-    createdAt
-    updatedAt
-    fullName
-    fullAddress
+    success
+    message
+    code
+    timestamp
+    data {
+      entity {
+        id
+        type
+        firstName
+        lastName
+        company
+        address1
+        address2
+        city
+        state
+        postalCode
+        country
+        phone
+        isDefault
+        createdAt
+        updatedAt
+        fullName
+        fullAddress
+      }
+      id
+      createdAt
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
   }
 }
     `;
@@ -6751,23 +7342,40 @@ export type CreateUserAddressMutationOptions = Apollo.BaseMutationOptions<Create
 export const UpdateUserAddressDocument = gql`
     mutation UpdateUserAddress($id: ID!, $input: UpdateUserAddressInput!) {
   updateUserAddress(id: $id, input: $input) {
-    id
-    type
-    firstName
-    lastName
-    company
-    address1
-    address2
-    city
-    state
-    postalCode
-    country
-    phone
-    isDefault
-    createdAt
-    updatedAt
-    fullName
-    fullAddress
+    success
+    message
+    code
+    timestamp
+    data {
+      entity {
+        id
+        type
+        firstName
+        lastName
+        company
+        address1
+        address2
+        city
+        state
+        postalCode
+        country
+        phone
+        isDefault
+        createdAt
+        updatedAt
+        fullName
+        fullAddress
+      }
+      id
+      updatedAt
+      changes
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
   }
 }
     `;
@@ -6868,10 +7476,24 @@ export type SetDefaultAddressMutationHookResult = ReturnType<typeof useSetDefaul
 export type SetDefaultAddressMutationResult = Apollo.MutationResult<SetDefaultAddressMutation>;
 export type SetDefaultAddressMutationOptions = Apollo.BaseMutationOptions<SetDefaultAddressMutation, SetDefaultAddressMutationVariables>;
 export const RevokeUserSessionDocument = gql`
-    mutation RevokeUserSession($sessionId: ID!) {
-  revokeUserSession(sessionId: $sessionId) {
+    mutation RevokeUserSession($sessionId: ID!, $userId: ID!) {
+  revokeUserSession(sessionId: $sessionId, userId: $userId) {
     success
     message
+    code
+    timestamp
+    data {
+      sessionId
+      revokedAt
+      reason
+      analyticsCleaned
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
   }
 }
     `;
@@ -6891,6 +7513,7 @@ export type RevokeUserSessionMutationFn = Apollo.MutationFunction<RevokeUserSess
  * const [revokeUserSessionMutation, { data, loading, error }] = useRevokeUserSessionMutation({
  *   variables: {
  *      sessionId: // value for 'sessionId'
+ *      userId: // value for 'userId'
  *   },
  * });
  */
@@ -6902,10 +7525,25 @@ export type RevokeUserSessionMutationHookResult = ReturnType<typeof useRevokeUse
 export type RevokeUserSessionMutationResult = Apollo.MutationResult<RevokeUserSessionMutation>;
 export type RevokeUserSessionMutationOptions = Apollo.BaseMutationOptions<RevokeUserSessionMutation, RevokeUserSessionMutationVariables>;
 export const RevokeAllUserSessionsDocument = gql`
-    mutation RevokeAllUserSessions($userId: ID!) {
-  revokeAllUserSessions(userId: $userId) {
+    mutation RevokeAllUserSessions($userId: ID!, $requestingUserId: ID!) {
+  revokeAllUserSessions(userId: $userId, requestingUserId: $requestingUserId) {
     success
     message
+    code
+    timestamp
+    data {
+      userId
+      sessionsRevoked
+      analyticsCleaned
+      revokedAt
+      reason
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
   }
 }
     `;
@@ -6925,6 +7563,7 @@ export type RevokeAllUserSessionsMutationFn = Apollo.MutationFunction<RevokeAllU
  * const [revokeAllUserSessionsMutation, { data, loading, error }] = useRevokeAllUserSessionsMutation({
  *   variables: {
  *      userId: // value for 'userId'
+ *      requestingUserId: // value for 'requestingUserId'
  *   },
  * });
  */

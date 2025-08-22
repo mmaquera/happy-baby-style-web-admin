@@ -31,11 +31,8 @@ export const useLogout = (): UseLogoutReturn => {
     try {
       setIsLoggingOut(true);
       
-      // Simular delay para mostrar el estado de carga
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Ejecutar logout
-      logout();
+      // Ejecutar logout del servicio de autenticación
+      await logout();
       
       // Mostrar mensaje de éxito
       toast.success('Sesión cerrada exitosamente');
