@@ -27,45 +27,77 @@ export class UnifiedGraphQLMiddleware {
       try {
         const tokens = this.tokenStorage.getStoredTokens();
         
-        if (tokens && !this.tokenStorage.isTokenExpired(tokens)) {
-          const newHeaders = {
-            ...headers,
-            Authorization: `Bearer ${tokens.accessToken}`,
-          };
-          return { headers: newHeaders };
+        if (tokens) {
+          if (!this.tokenStorage.isTokenExpired(tokens)) {
+            const newHeaders = {
+              ...headers,
+              Authorization: `Bearer ${tokens.accessToken}`,
+            };
+            console.log('✅ AuthLink: Token válido, agregando header Authorization');
+            return { headers: newHeaders };
+          } else {
+            console.warn('⚠️ AuthLink: Token expirado, no se agrega header Authorization');
+            console.warn('Token expires at:', tokens.expiresAt, 'Current time:', new Date());
+          }
+        } else {
+          console.warn('⚠️ AuthLink: No hay tokens almacenados, no se agrega header Authorization');
         }
       } catch (error) {
-        // Silent error handling
+        console.error('❌ AuthLink: Error al obtener tokens:', error);
       }
       
       return { headers };
     });
   }
 
-  // Create error link that handles authentication errors
+  // Create error link that handles authentication errors - Following SOLID principles
   private createErrorLink(): ApolloLink {
     return onError(({ graphQLErrors, networkError, operation, forward }) => {
+      // Handle GraphQL errors following development standards
       if (graphQLErrors) {
-        graphQLErrors.forEach(({ message, extensions }) => {
-          // Handle authentication errors - but don't clear tokens immediately
+        graphQLErrors.forEach(({ message, extensions, locations, path }) => {
+          // Enhanced logging for debugging
+          console.error('GraphQL Error:', {
+            message,
+            code: extensions?.['code'],
+            locations,
+            path,
+            operation: operation.operationName
+          });
+          
+          // Handle authentication errors specifically
           if (extensions?.['code'] === 'UNAUTHENTICATED') {
-            // Only log the error, don't handle it here
-            // Let the auth context handle token refresh
-            console.warn('GraphQL authentication error:', message);
+            console.warn('Authentication error detected:', message);
+            // Don't clear tokens immediately - let the auth context handle it
             return;
           }
           
           // Handle authorization errors
           if (extensions?.['code'] === 'FORBIDDEN') {
-            // Don't clear tokens for authorization errors
-            console.warn('GraphQL authorization error:', message);
+            console.warn('Authorization error detected:', message);
+            return;
+          }
+          
+          // Handle validation errors
+          if (extensions?.['code'] === 'VALIDATION_ERROR') {
+            console.warn('Validation error detected:', message);
+            return;
           }
         });
       }
 
+      // Handle network errors following development standards
       if (networkError) {
+        console.error('Network Error:', {
+          message: networkError.message,
+          statusCode: 'statusCode' in networkError ? networkError.statusCode : undefined,
+          operation: operation.operationName
+        });
+        
         // Don't clear tokens for network errors
-        console.warn('GraphQL network error:', networkError);
+        if ('statusCode' in networkError && networkError.statusCode === 401) {
+          console.warn('Unauthorized network error - may need token refresh');
+        }
       }
     });
   }
@@ -205,8 +237,9 @@ export class UnifiedGraphQLMiddleware {
     const retryLink = middleware.createRetryLink(config);
     const uploadLink = middleware.createUploadLink(config);
 
-    // Set the link chain with upload link primero para evitar interferencias
-    client.setLink(from([uploadLink, retryLink, errorLink, authLink]));
+    // Set the link chain - authLink primero para agregar headers de autenticación
+    // Orden: authLink → errorLink → retryLink → uploadLink
+    client.setLink(from([authLink, errorLink, retryLink, uploadLink]));
 
     return client;
   }

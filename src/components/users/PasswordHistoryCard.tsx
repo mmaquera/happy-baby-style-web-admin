@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
+import { PasswordAction } from '@/hooks/usePasswordHistory';
 import { 
   Key,
   RefreshCw,
@@ -10,15 +11,6 @@ import {
   AlertTriangle,
   Shield
 } from 'lucide-react';
-
-interface PasswordAction {
-  id: string;
-  type: 'reset' | 'temporary' | 'admin_set' | 'user_change';
-  timestamp: Date;
-  description: string;
-  adminUser?: string;
-  status: 'completed' | 'pending' | 'failed';
-}
 
 interface PasswordHistoryCardProps {
   actions: PasswordAction[];

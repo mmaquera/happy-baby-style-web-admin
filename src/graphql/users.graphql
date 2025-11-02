@@ -643,6 +643,35 @@ query GetActiveSessions($userId: ID!) {
   }
 }
 
+# Get user password history (security events related to passwords)
+query GetUserPasswordHistory($userId: ID!) {
+  userSecurityEvents(userId: $userId) {
+    success
+    message
+    code
+    timestamp
+    data {
+      items {
+        id
+        eventType
+        description
+        createdAt
+        metadata
+        user {
+          id
+          email
+        }
+      }
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
+  }
+}
+
 # =====================================================
 # MUTATIONS
 # =====================================================
@@ -1005,6 +1034,27 @@ mutation ForcePasswordReset($userId: ID!) {
   forcePasswordReset(userId: $userId) {
     success
     message
+  }
+}
+
+# Set user password (Admin action)
+# Allows administrator to directly set a new password for a user
+mutation SetUserPassword($userId: ID!, $newPassword: String!) {
+  setUserPassword(userId: $userId, newPassword: $newPassword) {
+    success
+    message
+    code
+    timestamp
+    data {
+      userId
+      timestamp
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
   }
 }
 

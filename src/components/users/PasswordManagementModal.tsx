@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import { User } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useAccountManagement } from '@/hooks/useAuthManagement';
+import { useSetUserPassword } from '@/hooks/useSetUserPassword';
+import { usePasswordHistory } from '@/hooks/usePasswordHistory';
 import { PasswordHistoryCard } from './PasswordHistoryCard';
 import { theme } from '@/styles/theme';
 import { 
@@ -18,7 +20,8 @@ import {
   CheckCircle,
   AlertTriangle,
   Clock,
-  Lock
+  Lock,
+  AlertCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -310,6 +313,32 @@ const StatusBadge = styled.div<{ variant: 'success' | 'warning' | 'info' }>`
   }};
 `;
 
+const ServerErrorBanner = styled.div`
+  background: ${theme.colors.error}15;
+  border: 1px solid ${theme.colors.error}30;
+  border-radius: ${theme.borderRadius.md};
+  padding: ${theme.spacing[3]};
+  margin-bottom: ${theme.spacing[3]};
+  color: ${theme.colors.error};
+  font-size: ${theme.fontSizes.sm};
+  font-weight: ${theme.fontWeights.medium};
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[2]};
+  animation: slideIn 0.3s ease-out;
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
 // Component
 export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = ({
   user,
@@ -321,36 +350,20 @@ export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = (
   const [newPassword, setNewPassword] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isSetting, setIsSetting] = useState(false);
+  // ✅ Estados separados para errores locales y del servidor
+  const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
+  const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
 
   const { forcePasswordReset } = useAccountManagement();
-
-  // Mock data for password history - In production, this would come from the backend
-  const passwordHistory = [
-    {
-      id: '1',
-      type: 'reset' as const,
-      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
-      description: 'Reset de contraseña solicitado por el usuario',
-      status: 'completed' as const
-    },
-    {
-      id: '2',
-      type: 'admin_set' as const,
-      timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 1 week ago
-      description: 'Contraseña establecida por administrador',
-      adminUser: 'admin@happybabystyle.com',
-      status: 'completed' as const
-    },
-    {
-      id: '3',
-      type: 'temporary' as const,
-      timestamp: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // 2 weeks ago
-      description: 'Contraseña temporal generada para primer acceso',
-      adminUser: 'admin@happybabystyle.com',
-      status: 'completed' as const
-    }
-  ];
+  const { setUserPassword, loading: isSetting, error: setPasswordError, clearError: clearSetPasswordError } = useSetUserPassword();
+  
+  // ✅ Fetch password history from backend
+  const { 
+    passwordHistory, 
+    loading: historyLoading, 
+    error: historyError,
+    refetch: refetchHistory 
+  } = usePasswordHistory(user.id);
 
   const generateTempPassword = () => {
     setIsGenerating(true);
@@ -399,30 +412,83 @@ export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = (
   };
 
   const handleForceReset = async () => {
-    await forcePasswordReset(user.id, user.email);
+    try {
+      await forcePasswordReset(user.id, user.email);
+      // ✅ Refrescar historial después de forzar reset (si no hay error, fue exitoso)
+      refetchHistory();
+    } catch (error) {
+      // Error ya manejado por forcePasswordReset
+      console.error('Error al forzar reset:', error);
+    }
   };
 
+  // ✅ Función para procesar errores del servidor
+  const processServerError = useCallback((errorMessage: string): void => {
+    const newServerErrors: Record<string, string> = {};
+    
+    // ✅ Mapeo inteligente de errores
+    if (errorMessage.toLowerCase().includes('password') || 
+        errorMessage.toLowerCase().includes('contraseña')) {
+      newServerErrors['password'] = 'Error con la contraseña. Verifica que cumpla con los requisitos.';
+    } else if (errorMessage.toLowerCase().includes('user') || 
+               errorMessage.toLowerCase().includes('usuario')) {
+      newServerErrors['password'] = 'Error al procesar la solicitud. Usuario no encontrado.';
+    } else {
+      newServerErrors['password'] = errorMessage;
+    }
+    
+    setServerErrors(newServerErrors);
+  }, []);
+
+  // ✅ useEffect para manejar cambios en errores del servidor
+  useEffect(() => {
+    if (setPasswordError) {
+      processServerError(setPasswordError);
+    } else {
+      setServerErrors({});
+    }
+  }, [setPasswordError, processServerError]);
+
   const handleSetNewPassword = async () => {
+    // ✅ Limpiar errores previos
+    setLocalErrors({});
+    setServerErrors({});
+    clearSetPasswordError();
+
+    // ✅ Validación local básica (la validación completa está en el hook)
     if (!newPassword.trim()) {
+      setLocalErrors({ password: 'Ingrese una nueva contraseña' });
       toast.error('Ingrese una nueva contraseña');
       return;
     }
 
-    setIsSetting(true);
-    try {
-      // Aquí iría la lógica para establecer nueva contraseña
-      // await setUserPassword({ userId: user.id, password: newPassword });
+    // ✅ Ejecutar mutación usando el hook
+    const success = await setUserPassword(user.id, newPassword);
+    
+    if (success) {
+      // ✅ Limpiar el campo en caso de éxito
+      setNewPassword('');
+      setLocalErrors({});
+      setServerErrors({});
       
-      setTimeout(() => {
-        toast.success('Nueva contraseña establecida exitosamente');
-        setNewPassword('');
-        setIsSetting(false);
-      }, 1000);
-    } catch (error) {
-      toast.error('Error al establecer nueva contraseña');
-      setIsSetting(false);
+      // ✅ Refrescar historial de contraseñas después de establecer nueva contraseña
+      refetchHistory();
     }
   };
+
+  // ✅ Limpieza automática de errores cuando el usuario modifica el campo
+  const handlePasswordChange = useCallback((value: string) => {
+    setNewPassword(value);
+    
+    // Limpiar errores locales y del servidor
+    if (localErrors['password']) {
+      setLocalErrors(prev => ({ ...prev, password: '' }));
+    }
+    if (serverErrors['password']) {
+      setServerErrors(prev => ({ ...prev, password: '' }));
+      clearSetPasswordError();
+    }
+  }, [localErrors, serverErrors, clearSetPasswordError]);
 
   if (!isOpen) return null;
 
@@ -552,13 +618,22 @@ export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = (
               </div>
             </ActionHeader>
             <ActionContent>
+              {/* ✅ Banner de error del servidor */}
+              {setPasswordError && (
+                <ServerErrorBanner>
+                  <AlertCircle size={16} />
+                  {setPasswordError}
+                </ServerErrorBanner>
+              )}
+              
               <div className="input-group">
                 <Input
                   label="Nueva Contraseña"
                   type={showNewPassword ? 'text' : 'password'}
                   value={newPassword}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewPassword(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handlePasswordChange(e.target.value)}
                   placeholder="Ingrese nueva contraseña segura"
+                  error={localErrors['password'] || serverErrors['password'] || ''}
                   rightIcon={showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   onRightIconClick={() => setShowNewPassword(!showNewPassword)}
                   rightIconClickable={true}
@@ -573,8 +648,13 @@ export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = (
             <ActionButtons>
               <Button
                 variant="outline"
-                onClick={() => setNewPassword('')}
-                disabled={!newPassword.trim()}
+                onClick={() => {
+                  setNewPassword('');
+                  setLocalErrors({});
+                  setServerErrors({});
+                  clearSetPasswordError();
+                }}
+                disabled={!newPassword.trim() || isSetting}
               >
                 Limpiar
               </Button>
@@ -582,7 +662,7 @@ export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = (
                 variant="primary"
                 onClick={handleSetNewPassword}
                 isLoading={isSetting}
-                disabled={!newPassword.trim()}
+                disabled={!newPassword.trim() || isSetting || Object.keys(localErrors).length > 0}
               >
                 <Lock size={16} />
                 Establecer Contraseña
@@ -592,6 +672,33 @@ export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = (
         </Section>
 
         <Section>
+          {/* ✅ Display loading state */}
+          {historyLoading && passwordHistory.length === 0 && (
+            <div style={{ 
+              padding: theme.spacing[4], 
+              textAlign: 'center',
+              color: theme.colors.text.secondary 
+            }}>
+              Cargando historial de contraseñas...
+            </div>
+          )}
+          
+          {/* ✅ Display error state */}
+          {historyError && !historyLoading && (
+            <div style={{ 
+              padding: theme.spacing[4], 
+              background: `${theme.colors.error}15`,
+              border: `1px solid ${theme.colors.error}30`,
+              borderRadius: theme.borderRadius.md,
+              color: theme.colors.error,
+              marginBottom: theme.spacing[4]
+            }}>
+              <AlertCircle size={16} style={{ marginRight: theme.spacing[2], display: 'inline-block' }} />
+              Error al cargar historial: {historyError}
+            </div>
+          )}
+          
+          {/* ✅ Display password history */}
           <PasswordHistoryCard actions={passwordHistory} />
         </Section>
       </ModalContent>

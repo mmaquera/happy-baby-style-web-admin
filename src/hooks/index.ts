@@ -14,6 +14,8 @@ export { useLogout } from './useLogout';
 export { useAuthManagement } from './useAuthManagement';
 export { useForgotPassword } from './useForgotPassword';
 export { useRegisterUser } from './useRegisterUser';
+export { useSetUserPassword } from './useSetUserPassword';
+export { usePasswordHistory } from './usePasswordHistory';
 
 // Category hooks
 export { useCategories } from './useCategories';

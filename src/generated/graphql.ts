@@ -601,6 +601,16 @@ export type GetCategoryResponse = {
   timestamp: Scalars['String']['output'];
 };
 
+export type GetCurrentUserResponse = {
+  __typename?: 'GetCurrentUserResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<User>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
 export type GetProductData = {
   __typename?: 'GetProductData';
   entity: Product;
@@ -656,6 +666,36 @@ export type GetUserAddressesResponse = {
   __typename?: 'GetUserAddressesResponse';
   code: Scalars['String']['output'];
   data?: Maybe<GetUserAddressesData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
+export type GetUserAuditLogsData = {
+  __typename?: 'GetUserAuditLogsData';
+  items: Array<AuditLog>;
+};
+
+export type GetUserAuditLogsResponse = {
+  __typename?: 'GetUserAuditLogsResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<GetUserAuditLogsData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
+export type GetUserSecurityEventsData = {
+  __typename?: 'GetUserSecurityEventsData';
+  items: Array<SecurityEvent>;
+};
+
+export type GetUserSecurityEventsResponse = {
+  __typename?: 'GetUserSecurityEventsResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<GetUserSecurityEventsData>;
   message: Scalars['String']['output'];
   metadata?: Maybe<ResponseMetadata>;
   success: Scalars['Boolean']['output'];
@@ -796,11 +836,12 @@ export type Mutation = {
   removeCoupon: Order;
   removeFromCart: SuccessResponse;
   removeFromFavorites: SuccessResponse;
-  requestPasswordReset: SuccessResponse;
-  resetPassword: SuccessResponse;
+  requestPasswordReset: PasswordResetRequestResponse;
+  resetPassword: PasswordResetConfirmResponse;
   revokeAllUserSessions: RevokeAllUserSessionsResponse;
   revokeUserSession: RevokeUserSessionResponse;
   setDefaultAddress: SetDefaultAddressResponse;
+  setUserPassword: SetUserPasswordResponse;
   shipOrder: Order;
   subscribeToNewsletter: NewsletterSubscription;
   toggleFavorite: UserFavorite;
@@ -825,6 +866,7 @@ export type Mutation = {
   updateUserProfile: UserProfile;
   updateUserSessionAnalytics: UpdateUserSessionAnalyticsResponse;
   uploadImage: UploadImageResponse;
+  uploadSvg: UploadSvgResponse;
 };
 
 
@@ -1153,6 +1195,12 @@ export type MutationSetDefaultAddressArgs = {
 };
 
 
+export type MutationSetUserPasswordArgs = {
+  newPassword: Scalars['String']['input'];
+  userId: Scalars['ID']['input'];
+};
+
+
 export type MutationShipOrderArgs = {
   id: Scalars['ID']['input'];
   trackingNumber?: InputMaybe<Scalars['String']['input']>;
@@ -1277,8 +1325,8 @@ export type MutationUpdateUserAddressArgs = {
 
 export type MutationUpdateUserPasswordArgs = {
   currentPassword: Scalars['String']['input'];
+  email: Scalars['String']['input'];
   newPassword: Scalars['String']['input'];
-  userId: Scalars['ID']['input'];
 };
 
 
@@ -1298,6 +1346,15 @@ export type MutationUploadImageArgs = {
   entityId: Scalars['String']['input'];
   entityType: Scalars['String']['input'];
   file: Scalars['Upload']['input'];
+};
+
+
+export type MutationUploadSvgArgs = {
+  entityId: Scalars['String']['input'];
+  entityType: Scalars['String']['input'];
+  file: Scalars['Upload']['input'];
+  optimize?: InputMaybe<Scalars['Boolean']['input']>;
+  sanitize?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type NewsletterSubscription = {
@@ -1469,6 +1526,38 @@ export type PaginatedUsers = {
 export type PaginationInput = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type PasswordResetConfirmData = {
+  __typename?: 'PasswordResetConfirmData';
+  passwordUpdated: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
+export type PasswordResetConfirmResponse = {
+  __typename?: 'PasswordResetConfirmResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<PasswordResetConfirmData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
+export type PasswordResetRequestData = {
+  __typename?: 'PasswordResetRequestData';
+  email: Scalars['String']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
+export type PasswordResetRequestResponse = {
+  __typename?: 'PasswordResetRequestResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<PasswordResetRequestData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
 };
 
 export type PaymentMethod = {
@@ -1645,7 +1734,7 @@ export type Query = {
   coupon?: Maybe<Coupon>;
   couponByCode?: Maybe<Coupon>;
   coupons: Array<Coupon>;
-  currentUser?: Maybe<User>;
+  currentUser: GetCurrentUserResponse;
   dashboardMetrics: DashboardMetrics;
   deliverySlots: Array<DeliverySlot>;
   emailTemplates: Array<EmailTemplate>;
@@ -1701,7 +1790,7 @@ export type Query = {
   userAddresses: GetUserAddressesResponse;
   userAnalytics: UserAnalytics;
   userAppEvents: Array<AppEvent>;
-  userAuditLogs: Array<AuditLog>;
+  userAuditLogs: GetUserAuditLogsResponse;
   userCart: Array<ShoppingCart>;
   userCouponUsage: Array<CouponUsage>;
   userFavoriteStats: UserFavoriteStats;
@@ -1714,7 +1803,7 @@ export type Query = {
   userReviews: Array<ProductReview>;
   userRewardBalance: Scalars['Int']['output'];
   userRewardPoints: Array<RewardPoint>;
-  userSecurityEvents: Array<SecurityEvent>;
+  userSecurityEvents: GetUserSecurityEventsResponse;
   userSessionAnalytics: Array<UserSessionAnalytics>;
   userSessions: Array<UserSession>;
   userStats: UserStatsResponse;
@@ -2195,6 +2284,23 @@ export type SetDefaultAddressResponse = {
   timestamp: Scalars['String']['output'];
 };
 
+export type SetUserPasswordData = {
+  __typename?: 'SetUserPasswordData';
+  passwordUpdated: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+  userId: Scalars['ID']['output'];
+};
+
+export type SetUserPasswordResponse = {
+  __typename?: 'SetUserPasswordResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<SetUserPasswordData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
 export type ShippingRate = {
   __typename?: 'ShippingRate';
   createdAt: Scalars['DateTime']['output'];
@@ -2281,6 +2387,28 @@ export type SuccessResponse = {
   __typename?: 'SuccessResponse';
   message: Scalars['String']['output'];
   success: Scalars['Boolean']['output'];
+};
+
+export type Svg = {
+  __typename?: 'Svg';
+  createdAt: Scalars['DateTime']['output'];
+  dimensions?: Maybe<SvgDimensions>;
+  entityId?: Maybe<Scalars['String']['output']>;
+  entityType?: Maybe<Scalars['String']['output']>;
+  fileName: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  optimized: Scalars['Boolean']['output'];
+  originalName: Scalars['String']['output'];
+  path?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+  url: Scalars['String']['output'];
+  viewBox?: Maybe<Scalars['String']['output']>;
+};
+
+export type SvgDimensions = {
+  __typename?: 'SvgDimensions';
+  height?: Maybe<Scalars['Float']['output']>;
+  width?: Maybe<Scalars['Float']['output']>;
 };
 
 export type TaxRate = {
@@ -2529,6 +2657,26 @@ export type UploadImageResponse = {
   __typename?: 'UploadImageResponse';
   code: Scalars['String']['output'];
   data?: Maybe<UploadImageData>;
+  message: Scalars['String']['output'];
+  metadata?: Maybe<ResponseMetadata>;
+  success: Scalars['Boolean']['output'];
+  timestamp: Scalars['String']['output'];
+};
+
+export type UploadSvgData = {
+  __typename?: 'UploadSvgData';
+  dimensions?: Maybe<SvgDimensions>;
+  filename: Scalars['String']['output'];
+  optimized: Scalars['Boolean']['output'];
+  svgId: Scalars['ID']['output'];
+  url: Scalars['String']['output'];
+  viewBox?: Maybe<Scalars['String']['output']>;
+};
+
+export type UploadSvgResponse = {
+  __typename?: 'UploadSvgResponse';
+  code: Scalars['String']['output'];
+  data?: Maybe<UploadSvgData>;
   message: Scalars['String']['output'];
   metadata?: Maybe<ResponseMetadata>;
   success: Scalars['Boolean']['output'];
@@ -2792,7 +2940,7 @@ export type RefreshTokenMutation = { __typename?: 'Mutation', refreshToken: { __
 export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCurrentUserQuery = { __typename?: 'Query', currentUser?: { __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, profile?: { __typename?: 'UserProfile', id: string, firstName: string, lastName: string, phone?: string | null, dateOfBirth?: string | null, avatar?: string | null } | null } | null };
+export type GetCurrentUserQuery = { __typename?: 'Query', currentUser: { __typename?: 'GetCurrentUserResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'User', id: string, email: string, role: UserRole, isActive: boolean, emailVerified: boolean, lastLoginAt?: string | null, profile?: { __typename?: 'UserProfile', id: string, firstName: string, lastName: string, phone?: string | null, dateOfBirth?: string | null, avatar?: string | null } | null } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, timestamp: string } | null } };
 
 export type GetCategoriesQueryVariables = Exact<{
   filters?: InputMaybe<CategoryFilterInput>;
@@ -3024,6 +3172,17 @@ export type UploadImageMutationVariables = Exact<{
 
 export type UploadImageMutation = { __typename?: 'Mutation', uploadImage: { __typename?: 'UploadImageResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'UploadImageData', url: string, filename: string, imageId: string } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
 
+export type UploadSvgMutationVariables = Exact<{
+  file: Scalars['Upload']['input'];
+  entityType: Scalars['String']['input'];
+  entityId: Scalars['String']['input'];
+  optimize?: InputMaybe<Scalars['Boolean']['input']>;
+  sanitize?: InputMaybe<Scalars['Boolean']['input']>;
+}>;
+
+
+export type UploadSvgMutation = { __typename?: 'Mutation', uploadSvg: { __typename?: 'UploadSvgResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'UploadSvgData', url: string, filename: string, svgId: string, viewBox?: string | null, optimized: boolean, dimensions?: { __typename?: 'SvgDimensions', width?: number | null, height?: number | null } | null } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
+
 export type GetUsersQueryVariables = Exact<{
   filter?: InputMaybe<UserFilterInput>;
   pagination?: InputMaybe<PaginationInput>;
@@ -3146,6 +3305,13 @@ export type GetActiveSessionsQueryVariables = Exact<{
 
 
 export type GetActiveSessionsQuery = { __typename?: 'Query', activeSessions: Array<{ __typename?: 'UserSession', id: string, userId: string, sessionToken: string, accessToken: string, refreshToken?: string | null, expiresAt: string, userAgent?: string | null, ipAddress?: string | null, isActive: boolean, createdAt: string, updatedAt: string }> };
+
+export type GetUserPasswordHistoryQueryVariables = Exact<{
+  userId: Scalars['ID']['input'];
+}>;
+
+
+export type GetUserPasswordHistoryQuery = { __typename?: 'Query', userSecurityEvents: { __typename?: 'GetUserSecurityEventsResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'GetUserSecurityEventsData', items: Array<{ __typename?: 'SecurityEvent', id: string, eventType: string, description: string, createdAt: string, metadata: any, user?: { __typename?: 'UserProfile', id: string, email: string } | null }> } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
 
 export type CreateUserMutationVariables = Exact<{
   input: CreateUserProfileInput;
@@ -3272,6 +3438,14 @@ export type ForcePasswordResetMutationVariables = Exact<{
 
 
 export type ForcePasswordResetMutation = { __typename?: 'Mutation', forcePasswordReset: { __typename?: 'SuccessResponse', success: boolean, message: string } };
+
+export type SetUserPasswordMutationVariables = Exact<{
+  userId: Scalars['ID']['input'];
+  newPassword: Scalars['String']['input'];
+}>;
+
+
+export type SetUserPasswordMutation = { __typename?: 'Mutation', setUserPassword: { __typename?: 'SetUserPasswordResponse', success: boolean, message: string, code: string, timestamp: string, data?: { __typename?: 'SetUserPasswordData', userId: string, timestamp: string } | null, metadata?: { __typename?: 'ResponseMetadata', requestId?: string | null, traceId?: string | null, duration?: number | null, timestamp: string } | null } };
 
 export type ImpersonateUserMutationVariables = Exact<{
   userId: Scalars['ID']['input'];
@@ -3504,19 +3678,29 @@ export type RefreshTokenMutationOptions = Apollo.BaseMutationOptions<RefreshToke
 export const GetCurrentUserDocument = gql`
     query GetCurrentUser {
   currentUser {
-    id
-    email
-    role
-    isActive
-    emailVerified
-    lastLoginAt
-    profile {
+    success
+    message
+    code
+    timestamp
+    data {
       id
-      firstName
-      lastName
-      phone
-      dateOfBirth
-      avatar
+      email
+      role
+      isActive
+      emailVerified
+      lastLoginAt
+      profile {
+        id
+        firstName
+        lastName
+        phone
+        dateOfBirth
+        avatar
+      }
+    }
+    metadata {
+      requestId
+      timestamp
     }
   }
 }
@@ -5573,6 +5757,69 @@ export function useUploadImageMutation(baseOptions?: ApolloReactHooks.MutationHo
 export type UploadImageMutationHookResult = ReturnType<typeof useUploadImageMutation>;
 export type UploadImageMutationResult = Apollo.MutationResult<UploadImageMutation>;
 export type UploadImageMutationOptions = Apollo.BaseMutationOptions<UploadImageMutation, UploadImageMutationVariables>;
+export const UploadSvgDocument = gql`
+    mutation UploadSvg($file: Upload!, $entityType: String!, $entityId: String!, $optimize: Boolean, $sanitize: Boolean) {
+  uploadSvg(
+    file: $file
+    entityType: $entityType
+    entityId: $entityId
+    optimize: $optimize
+    sanitize: $sanitize
+  ) {
+    success
+    message
+    code
+    timestamp
+    data {
+      url
+      filename
+      svgId
+      dimensions {
+        width
+        height
+      }
+      viewBox
+      optimized
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
+  }
+}
+    `;
+export type UploadSvgMutationFn = Apollo.MutationFunction<UploadSvgMutation, UploadSvgMutationVariables>;
+
+/**
+ * __useUploadSvgMutation__
+ *
+ * To run a mutation, you first call `useUploadSvgMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUploadSvgMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [uploadSvgMutation, { data, loading, error }] = useUploadSvgMutation({
+ *   variables: {
+ *      file: // value for 'file'
+ *      entityType: // value for 'entityType'
+ *      entityId: // value for 'entityId'
+ *      optimize: // value for 'optimize'
+ *      sanitize: // value for 'sanitize'
+ *   },
+ * });
+ */
+export function useUploadSvgMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UploadSvgMutation, UploadSvgMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<UploadSvgMutation, UploadSvgMutationVariables>(UploadSvgDocument, options);
+      }
+export type UploadSvgMutationHookResult = ReturnType<typeof useUploadSvgMutation>;
+export type UploadSvgMutationResult = Apollo.MutationResult<UploadSvgMutation>;
+export type UploadSvgMutationOptions = Apollo.BaseMutationOptions<UploadSvgMutation, UploadSvgMutationVariables>;
 export const GetUsersDocument = gql`
     query GetUsers($filter: UserFilterInput, $pagination: PaginationInput) {
   users(filter: $filter, pagination: $pagination) {
@@ -6840,6 +7087,71 @@ export type GetActiveSessionsQueryResult = Apollo.QueryResult<GetActiveSessionsQ
 export function refetchGetActiveSessionsQuery(variables: GetActiveSessionsQueryVariables) {
       return { query: GetActiveSessionsDocument, variables: variables }
     }
+export const GetUserPasswordHistoryDocument = gql`
+    query GetUserPasswordHistory($userId: ID!) {
+  userSecurityEvents(userId: $userId) {
+    success
+    message
+    code
+    timestamp
+    data {
+      items {
+        id
+        eventType
+        description
+        createdAt
+        metadata
+        user {
+          id
+          email
+        }
+      }
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetUserPasswordHistoryQuery__
+ *
+ * To run a query within a React component, call `useGetUserPasswordHistoryQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserPasswordHistoryQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserPasswordHistoryQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetUserPasswordHistoryQuery(baseOptions: ApolloReactHooks.QueryHookOptions<GetUserPasswordHistoryQuery, GetUserPasswordHistoryQueryVariables> & ({ variables: GetUserPasswordHistoryQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<GetUserPasswordHistoryQuery, GetUserPasswordHistoryQueryVariables>(GetUserPasswordHistoryDocument, options);
+      }
+export function useGetUserPasswordHistoryLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetUserPasswordHistoryQuery, GetUserPasswordHistoryQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<GetUserPasswordHistoryQuery, GetUserPasswordHistoryQueryVariables>(GetUserPasswordHistoryDocument, options);
+        }
+export function useGetUserPasswordHistorySuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetUserPasswordHistoryQuery, GetUserPasswordHistoryQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetUserPasswordHistoryQuery, GetUserPasswordHistoryQueryVariables>(GetUserPasswordHistoryDocument, options);
+        }
+export type GetUserPasswordHistoryQueryHookResult = ReturnType<typeof useGetUserPasswordHistoryQuery>;
+export type GetUserPasswordHistoryLazyQueryHookResult = ReturnType<typeof useGetUserPasswordHistoryLazyQuery>;
+export type GetUserPasswordHistorySuspenseQueryHookResult = ReturnType<typeof useGetUserPasswordHistorySuspenseQuery>;
+export type GetUserPasswordHistoryQueryResult = Apollo.QueryResult<GetUserPasswordHistoryQuery, GetUserPasswordHistoryQueryVariables>;
+export function refetchGetUserPasswordHistoryQuery(variables: GetUserPasswordHistoryQueryVariables) {
+      return { query: GetUserPasswordHistoryDocument, variables: variables }
+    }
 export const CreateUserDocument = gql`
     mutation CreateUser($input: CreateUserProfileInput!) {
   createUser(input: $input) {
@@ -7642,6 +7954,53 @@ export function useForcePasswordResetMutation(baseOptions?: ApolloReactHooks.Mut
 export type ForcePasswordResetMutationHookResult = ReturnType<typeof useForcePasswordResetMutation>;
 export type ForcePasswordResetMutationResult = Apollo.MutationResult<ForcePasswordResetMutation>;
 export type ForcePasswordResetMutationOptions = Apollo.BaseMutationOptions<ForcePasswordResetMutation, ForcePasswordResetMutationVariables>;
+export const SetUserPasswordDocument = gql`
+    mutation SetUserPassword($userId: ID!, $newPassword: String!) {
+  setUserPassword(userId: $userId, newPassword: $newPassword) {
+    success
+    message
+    code
+    timestamp
+    data {
+      userId
+      timestamp
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
+  }
+}
+    `;
+export type SetUserPasswordMutationFn = Apollo.MutationFunction<SetUserPasswordMutation, SetUserPasswordMutationVariables>;
+
+/**
+ * __useSetUserPasswordMutation__
+ *
+ * To run a mutation, you first call `useSetUserPasswordMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetUserPasswordMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setUserPasswordMutation, { data, loading, error }] = useSetUserPasswordMutation({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *      newPassword: // value for 'newPassword'
+ *   },
+ * });
+ */
+export function useSetUserPasswordMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<SetUserPasswordMutation, SetUserPasswordMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<SetUserPasswordMutation, SetUserPasswordMutationVariables>(SetUserPasswordDocument, options);
+      }
+export type SetUserPasswordMutationHookResult = ReturnType<typeof useSetUserPasswordMutation>;
+export type SetUserPasswordMutationResult = Apollo.MutationResult<SetUserPasswordMutation>;
+export type SetUserPasswordMutationOptions = Apollo.BaseMutationOptions<SetUserPasswordMutation, SetUserPasswordMutationVariables>;
 export const ImpersonateUserDocument = gql`
     mutation ImpersonateUser($userId: ID!) {
   impersonateUser(userId: $userId) {
