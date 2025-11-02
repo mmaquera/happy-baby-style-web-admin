@@ -25,7 +25,15 @@ import {
   Users,
   MapPin,
   Globe,
-  Settings
+  Settings,
+  Activity,
+  AlertCircle,
+  Clock,
+  User,
+  ThumbsUp,
+  ImageIcon,
+  Database,
+  ShoppingBag
 } from 'lucide-react';
 import type { Product, Category } from './types';
 
@@ -59,6 +67,7 @@ const ModalContainer = styled(Card)`
   position: relative;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   padding: 0;
+  z-index: ${theme.zIndex.modal + 1};
 `;
 
 const ModalHeader = styled.div`
@@ -70,7 +79,7 @@ const ModalHeader = styled.div`
   position: sticky;
   top: 0;
   background: ${theme.colors.white};
-  z-index: 1;
+  z-index: ${theme.zIndex.modal + 2};
 `;
 
 const ModalTitle = styled.h2`
@@ -405,6 +414,7 @@ const ModalFooter = styled.div`
   background: ${theme.colors.background.light};
   position: sticky;
   bottom: 0;
+  z-index: ${theme.zIndex.modal + 2};
 `;
 
 export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
@@ -594,6 +604,211 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   </div>
                 </Section>
               )}
+
+              {/* Reviews Section */}
+              {product.reviews && product.reviews.length > 0 && (
+                <Section>
+                  <SectionTitle>
+                    <MessageSquare size={20} />
+                    Reseñas ({product.reviews.length})
+                  </SectionTitle>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing[3] }}>
+                    {product.reviews.slice(0, 5).map((review: any) => (
+                      <div key={review.id} style={{ 
+                        padding: theme.spacing[3], 
+                        background: theme.colors.white, 
+                        borderRadius: theme.borderRadius.md,
+                        border: '1px solid ' + theme.colors.border.light
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: theme.spacing[2] }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[2] }}>
+                            <User size={16} />
+                            <span style={{ fontWeight: theme.fontWeights.medium }}>
+                              {review.user?.firstName || 'Usuario'} {review.user?.lastName || ''}
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[1] }}>
+                            {renderStars(review.rating)}
+                            <span style={{ fontSize: theme.fontSizes.sm, color: theme.colors.text.secondary }}>
+                              {new Date(review.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                        {review.title && (
+                          <div style={{ fontWeight: theme.fontWeights.medium, marginBottom: theme.spacing[1] }}>
+                            {review.title}
+                          </div>
+                        )}
+                        {review.comment && (
+                          <div style={{ color: theme.colors.text.secondary, lineHeight: 1.5 }}>
+                            {review.comment}
+                          </div>
+                        )}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[2], marginTop: theme.spacing[2] }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[1] }}>
+                            <ThumbsUp size={14} />
+                            <span style={{ fontSize: theme.fontSizes.sm }}>
+                              {review.helpfulCount} útil
+                            </span>
+                          </div>
+                          {review.isVerified && (
+                            <div style={{ 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              gap: theme.spacing[1],
+                              color: theme.colors.success,
+                              fontSize: theme.fontSizes.sm
+                            }}>
+                              <CheckCircle size={14} />
+                              Verificado
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                    {product.reviews.length > 5 && (
+                      <div style={{ textAlign: 'center', padding: theme.spacing[2], color: theme.colors.text.secondary }}>
+                        Mostrando 5 de {product.reviews.length} reseñas
+                      </div>
+                    )}
+                  </div>
+                </Section>
+              )}
+
+              {/* Inventory Transactions */}
+              {product.inventoryTransactions && product.inventoryTransactions.length > 0 && (
+                <Section>
+                  <SectionTitle>
+                    <Activity size={20} />
+                    Transacciones de Inventario ({product.inventoryTransactions.length})
+                  </SectionTitle>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing[2] }}>
+                    {product.inventoryTransactions.slice(0, 10).map((transaction: any) => (
+                      <div key={transaction.id} style={{ 
+                        padding: theme.spacing[2], 
+                        background: theme.colors.white, 
+                        borderRadius: theme.borderRadius.md,
+                        border: '1px solid ' + theme.colors.border.light,
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[2] }}>
+                          <Database size={16} />
+                          <div>
+                            <div style={{ fontWeight: theme.fontWeights.medium }}>
+                              {transaction.type}
+                            </div>
+                            <div style={{ fontSize: theme.fontSizes.sm, color: theme.colors.text.secondary }}>
+                              {transaction.quantity} unidades
+                            </div>
+                          </div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <div style={{ fontSize: theme.fontSizes.sm, color: theme.colors.text.secondary }}>
+                            {new Date(transaction.createdAt).toLocaleDateString()}
+                          </div>
+                          {transaction.reference && (
+                            <div style={{ fontSize: theme.fontSizes.xs, color: theme.colors.text.secondary }}>
+                              Ref: {transaction.reference}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                    {product.inventoryTransactions.length > 10 && (
+                      <div style={{ textAlign: 'center', padding: theme.spacing[2], color: theme.colors.text.secondary }}>
+                        Mostrando 10 de {product.inventoryTransactions.length} transacciones
+                      </div>
+                    )}
+                  </div>
+                </Section>
+              )}
+
+              {/* Stock Alerts */}
+              {product.stockAlerts && product.stockAlerts.length > 0 && (
+                <Section>
+                  <SectionTitle>
+                    <AlertCircle size={20} />
+                    Alertas de Stock ({product.stockAlerts.length})
+                  </SectionTitle>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing[2] }}>
+                    {product.stockAlerts.map((alert: any) => (
+                      <div key={alert.id} style={{ 
+                        padding: theme.spacing[3], 
+                        background: alert.isActive ? theme.colors.warning + '20' : theme.colors.background.light, 
+                        borderRadius: theme.borderRadius.md,
+                        border: '1px solid ' + (alert.isActive ? theme.colors.warning + '40' : theme.colors.border.light)
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: theme.spacing[1] }}>
+                          <div style={{ fontWeight: theme.fontWeights.medium, color: theme.colors.warning }}>
+                            {alert.type === 'low_stock' ? 'Stock Bajo' : 
+                             alert.type === 'out_of_stock' ? 'Sin Stock' : 
+                             alert.type === 'overstock' ? 'Sobre Stock' : alert.type}
+                          </div>
+                          <div style={{ 
+                            padding: theme.spacing[1], 
+                            background: alert.isActive ? theme.colors.warning : theme.colors.background.accent,
+                            color: alert.isActive ? theme.colors.white : theme.colors.text.secondary,
+                            borderRadius: theme.borderRadius.sm,
+                            fontSize: theme.fontSizes.xs
+                          }}>
+                            {alert.isActive ? 'Activa' : 'Inactiva'}
+                          </div>
+                        </div>
+                        <div style={{ fontSize: theme.fontSizes.sm, color: theme.colors.text.secondary }}>
+                          Umbral: {alert.threshold} | Stock actual: {alert.currentStock}
+                        </div>
+                        <div style={{ fontSize: theme.fontSizes.xs, color: theme.colors.text.secondary, marginTop: theme.spacing[1] }}>
+                          Creada: {new Date(alert.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Section>
+              )}
+
+              {/* App Events */}
+              {product.appEvents && product.appEvents.length > 0 && (
+                <Section>
+                  <SectionTitle>
+                    <TrendingUp size={20} />
+                    Actividad Reciente ({product.appEvents.length})
+                  </SectionTitle>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing[2] }}>
+                    {product.appEvents.slice(0, 5).map((event: any) => (
+                      <div key={event.id} style={{ 
+                        padding: theme.spacing[2], 
+                        background: theme.colors.white, 
+                        borderRadius: theme.borderRadius.md,
+                        border: '1px solid ' + theme.colors.border.light
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[2] }}>
+                            <Activity size={16} />
+                            <span style={{ fontWeight: theme.fontWeights.medium }}>
+                              {event.eventType}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: theme.fontSizes.sm, color: theme.colors.text.secondary }}>
+                            {new Date(event.createdAt).toLocaleDateString()}
+                          </div>
+                        </div>
+                        {event.eventData && (
+                          <div style={{ fontSize: theme.fontSizes.sm, color: theme.colors.text.secondary, marginTop: theme.spacing[1] }}>
+                            {JSON.stringify(event.eventData)}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    {product.appEvents.length > 5 && (
+                      <div style={{ textAlign: 'center', padding: theme.spacing[2], color: theme.colors.text.secondary }}>
+                        Mostrando 5 de {product.appEvents.length} eventos
+                      </div>
+                    )}
+                  </div>
+                </Section>
+              )}
             </MainContent>
 
             <Sidebar>
@@ -610,11 +825,11 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 </Section>
               )}
 
-              {/* Statistics */}
+              {/* Usage Statistics */}
               <Section>
                 <SectionTitle>
                   <BarChart3 size={20} />
-                  Estadísticas
+                  Uso del Producto
                 </SectionTitle>
                 <StatsGrid>
                   <StatItem>
@@ -633,7 +848,45 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     <StatValue>{product.favorites?.length || 0}</StatValue>
                     <StatLabel>Favoritos</StatLabel>
                   </StatItem>
+                  <StatItem>
+                    <StatValue>{product.cartItems?.length || 0}</StatValue>
+                    <StatLabel>En Carrito</StatLabel>
+                  </StatItem>
+                  <StatItem>
+                    <StatValue>{product.orderItems?.length || 0}</StatValue>
+                    <StatLabel>Pedidos</StatLabel>
+                  </StatItem>
                 </StatsGrid>
+              </Section>
+
+              {/* Inventory Summary */}
+              <Section>
+                <SectionTitle>
+                  <ShoppingBag size={20} />
+                  Resumen de Inventario
+                </SectionTitle>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing[2] }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: theme.spacing[2], background: theme.colors.white, borderRadius: theme.borderRadius.md }}>
+                    <span>Stock Principal:</span>
+                    <strong>{product.stockQuantity}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: theme.spacing[2], background: theme.colors.white, borderRadius: theme.borderRadius.md }}>
+                    <span>Stock Total:</span>
+                    <strong>{product.totalStock}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: theme.spacing[2], background: theme.colors.white, borderRadius: theme.borderRadius.md }}>
+                    <span>Estado:</span>
+                    <div style={{ 
+                      padding: theme.spacing[1], 
+                      background: product.isInStock ? theme.colors.success + '20' : theme.colors.error + '20',
+                      color: product.isInStock ? theme.colors.success : theme.colors.error,
+                      borderRadius: theme.borderRadius.sm,
+                      fontSize: theme.fontSizes.xs
+                    }}>
+                      {product.isInStock ? 'Disponible' : 'Agotado'}
+                    </div>
+                  </div>
+                </div>
               </Section>
 
               {/* Dates */}

@@ -4,6 +4,7 @@ import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
+import { ImageUpload } from './ImageUpload';
 import { 
   X,
   Plus,
@@ -11,19 +12,24 @@ import {
   Image as ImageIcon,
   Package,
   Tag,
-  DollarSign,
   Hash,
   FileText,
   CheckCircle,
   AlertTriangle,
   Settings,
+  BadgeDollarSign,
+  Trash2,
   Edit3,
   Save,
-  BadgeDollarSign
+  RefreshCw
 } from 'lucide-react';
-import type { Category, Product, ProductFormData, ProductValidationErrors } from './types';
-import { useUpdateProduct } from '@/hooks/useProductsGraphQL';
+import type { Category, ProductFormData, Product, TagWithMetadata } from './types';
+import { useProductActions } from '@/hooks/useProductActions';
+import { useCategories } from '@/hooks/useCategories';
+import { useTags } from '@/hooks/useTags';
+import type { UploadResult } from '@/types/upload';
 import { toast } from 'react-hot-toast';
+import { convertImageUrlsToRelativePaths, validateBackendImageUrls } from '@/utils/imageUtils';
 
 interface EditProductModalProps {
   isOpen: boolean;
@@ -31,7 +37,7 @@ interface EditProductModalProps {
   onSuccess: (product: Product) => void;
   product: Product | null;
   categories: Category[];
-  availableTags: string[];
+  availableTags?: string[]; // Optional for backward compatibility
 }
 
 const ModalOverlay = styled.div<{ isOpen: boolean }>`
@@ -121,12 +127,9 @@ const SectionTitle = styled.h3`
 
 const FormGrid = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: ${theme.spacing[4]};
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
+  margin-bottom: ${theme.spacing[4]};
 `;
 
 const FormRow = styled.div`
@@ -135,18 +138,81 @@ const FormRow = styled.div`
   gap: ${theme.spacing[2]};
 `;
 
-const Label = styled.label`
-  font-family: ${theme.fonts.primary};
+const FormLabel = styled.label`
   font-size: ${theme.fontSizes.sm};
   font-weight: ${theme.fontWeights.medium};
   color: ${theme.colors.text.primary};
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[1]};
 `;
 
-const ErrorText = styled.span`
-  font-family: ${theme.fonts.primary};
-  font-size: ${theme.fontSizes.xs};
+const RequiredIndicator = styled.span`
   color: ${theme.colors.error};
-  margin-top: ${theme.spacing[1]};
+  font-weight: ${theme.fontWeights.bold};
+`;
+
+const Select = styled.select`
+  padding: ${theme.spacing[3]} ${theme.spacing[4]};
+  font-size: ${theme.fontSizes.base};
+  font-family: ${theme.fonts.primary};
+  background: ${theme.colors.white};
+  border: 2px solid ${theme.colors.border.light};
+  border-radius: ${theme.borderRadius.md};
+  transition: all ${theme.transitions.base};
+  outline: none;
+  cursor: pointer;
+
+  &:focus {
+    border-color: ${theme.colors.primaryPurple};
+    box-shadow: 0 0 0 3px ${theme.colors.primaryPurple}20;
+  }
+
+  &:hover {
+    border-color: ${theme.colors.border.medium};
+  }
+`;
+
+const Textarea = styled.textarea`
+  padding: ${theme.spacing[3]} ${theme.spacing[4]};
+  font-size: ${theme.fontSizes.base};
+  font-family: ${theme.fonts.primary};
+  background: ${theme.colors.white};
+  border: 2px solid ${theme.colors.border.light};
+  border-radius: ${theme.borderRadius.md};
+  transition: all ${theme.transitions.base};
+  outline: none;
+  resize: vertical;
+  min-height: 100px;
+
+  &:focus {
+    border-color: ${theme.colors.primaryPurple};
+    box-shadow: 0 0 0 3px ${theme.colors.primaryPurple}20;
+  }
+
+  &:hover {
+    border-color: ${theme.colors.border.medium};
+  }
+`;
+
+const CheckboxContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[2]};
+  cursor: pointer;
+`;
+
+const Checkbox = styled.input`
+  width: 18px;
+  height: 18px;
+  accent-color: ${theme.colors.primaryPurple};
+  cursor: pointer;
+`;
+
+const CheckboxLabel = styled.span`
+  font-size: ${theme.fontSizes.sm};
+  color: ${theme.colors.text.secondary};
+  cursor: pointer;
 `;
 
 const TagsContainer = styled.div`
@@ -156,94 +222,97 @@ const TagsContainer = styled.div`
   margin-top: ${theme.spacing[2]};
 `;
 
-const TagChip = styled.span<{ isSelected: boolean }>`
-  display: inline-flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
+const TagChip = styled.div<{ isSelected: boolean; color?: string }>`
   padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  background: ${({ isSelected }) => 
-    isSelected ? theme.colors.primary : theme.colors.background.light};
+  background: ${({ isSelected, color }) => 
+    isSelected 
+      ? (color || theme.colors.primaryPurple)
+      : theme.colors.background.accent};
   color: ${({ isSelected }) => 
-    isSelected ? theme.colors.white : theme.colors.text.primary};
-  border: 1px solid ${({ isSelected }) => 
-    isSelected ? theme.colors.primary : theme.colors.border.light};
+    isSelected ? theme.colors.white : theme.colors.text.secondary};
   border-radius: ${theme.borderRadius.full};
   font-size: ${theme.fontSizes.xs};
   cursor: pointer;
   transition: all ${theme.transitions.base};
-
-  &:hover {
-    background: ${({ isSelected }) => 
-      isSelected ? theme.colors.primaryPurple : theme.colors.background.accent};
-  }
-`;
-
-const RemoveTagButton = styled.button`
-  background: none;
-  border: none;
-  color: inherit;
-  cursor: pointer;
-  padding: 0;
+  border: 1px solid ${({ isSelected, color }) => 
+    isSelected 
+      ? (color || theme.colors.primaryPurple)
+      : theme.colors.border.light};
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: ${theme.fontSizes.xs};
-  opacity: 0.7;
-  transition: opacity ${theme.transitions.base};
+  gap: ${theme.spacing[1]};
+  position: relative;
 
   &:hover {
-    opacity: 1;
+    background: ${({ isSelected, color }) => 
+      isSelected 
+        ? (color || theme.colors.primaryPurple)
+        : theme.colors.softPurple};
+    transform: translateY(-1px);
+  }
+
+  &:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: ${theme.colors.text.primary};
+    color: ${theme.colors.white};
+    padding: ${theme.spacing[1]} ${theme.spacing[2]};
+    border-radius: ${theme.borderRadius.md};
+    font-size: ${theme.fontSizes.xs};
+    white-space: nowrap;
+    z-index: 1000;
+    margin-bottom: ${theme.spacing[2]};
+    pointer-events: none;
   }
 `;
 
-const ImageUploadSection = styled.div`
+const AttributesContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing[3]};
 `;
 
-const ImagePreviewGrid = styled.div`
+const AttributeRow = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: ${theme.spacing[2]};
-  margin-top: ${theme.spacing[2]};
+  grid-template-columns: 1fr 1fr auto;
+  gap: ${theme.spacing[3]};
+  align-items: end;
 `;
 
-const ImagePreview = styled.div`
-  position: relative;
-  width: 100px;
-  height: 100px;
-  border-radius: ${theme.borderRadius.md};
-  overflow: hidden;
-  border: 2px solid ${theme.colors.border.light};
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-`;
-
-const RemoveImageButton = styled.button`
-  position: absolute;
-  top: 4px;
-  right: 4px;
+const RemoveAttributeButton = styled.button`
   background: ${theme.colors.error};
   color: ${theme.colors.white};
   border: none;
-  border-radius: ${theme.borderRadius.full};
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: ${theme.borderRadius.md};
+  padding: ${theme.spacing[2]} ${theme.spacing[3]};
   cursor: pointer;
-  font-size: 12px;
-  transition: background ${theme.transitions.base};
+  font-size: ${theme.fontSizes.sm};
+  transition: all ${theme.transitions.base};
 
   &:hover {
-    background: ${theme.colors.error};
+    background: ${theme.colors.error}dd;
   }
+`;
+
+const AddAttributeButton = styled(Button)`
+  align-self: flex-start;
+`;
+
+const SkuFieldContainer = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[2]};
+`;
+
+const GenerateSkuButton = styled(Button)`
+  min-width: auto;
+  padding: ${theme.spacing[2]} ${theme.spacing[3]};
+  font-size: ${theme.fontSizes.sm};
+  white-space: nowrap;
 `;
 
 const ModalFooter = styled.div`
@@ -252,9 +321,61 @@ const ModalFooter = styled.div`
   gap: ${theme.spacing[3]};
   padding: ${theme.spacing[6]};
   border-top: 1px solid ${theme.colors.border.light};
-  background: ${theme.colors.background.light};
   position: sticky;
   bottom: 0;
+  background: ${theme.colors.white};
+  z-index: 1;
+`;
+
+const ErrorMessage = styled.div`
+  background: ${theme.colors.error}20;
+  color: ${theme.colors.error};
+  padding: ${theme.spacing[3]};
+  border-radius: ${theme.borderRadius.md};
+  margin-bottom: ${theme.spacing[4]};
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[2]};
+  font-size: ${theme.fontSizes.sm};
+`;
+
+const SuccessMessage = styled.div`
+  background: ${theme.colors.success}20;
+  color: ${theme.colors.success};
+  padding: ${theme.spacing[3]};
+  border-radius: ${theme.borderRadius.md};
+  margin-bottom: ${theme.spacing[4]};
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[2]};
+  font-size: ${theme.fontSizes.sm};
+`;
+
+const LoadingOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: ${theme.colors.white}80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+`;
+
+const LoadingSpinner = styled.div`
+  width: 48px;
+  height: 48px;
+  border: 4px solid ${theme.colors.background.accent};
+  border-top: 4px solid ${theme.colors.primaryPurple};
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 `;
 
 const initialFormData: ProductFormData = {
@@ -276,64 +397,127 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
   onClose,
   onSuccess,
   product,
-  categories,
+  categories: propCategories, // Renamed to avoid conflict
   availableTags
 }) => {
-  const [formData, setFormData] = useState<ProductFormData>(initialFormData);
-  const [errors, setErrors] = useState<ProductValidationErrors>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { updateProduct, loading: isUpdating, error: updateError, uploadProductImage } = useProductActions();
+  
+  const [formData, setFormData] = useState<ProductFormData>({
+    name: '',
+    description: '',
+    price: '',
+    salePrice: '',
+    sku: '',
+    categoryId: '',
+    stockQuantity: '0',
+    tags: [],
+    isActive: true,
+    images: [],
+    attributes: {}
+  });
 
-  const { update: updateProduct, loading: updateLoading } = useUpdateProduct();
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [successMessage, setSuccessMessage] = useState('');
+  const [newAttributeKey, setNewAttributeKey] = useState('');
+  const [newAttributeValue, setNewAttributeValue] = useState('');
+  const [newTagName, setNewTagName] = useState('');
+  const [newTagColor, setNewTagColor] = useState('#ff6b6b');
+  const [newTagDescription, setNewTagDescription] = useState('');
 
-  // Initialize form data when product changes
+  // Generar ID de sesión único para agrupar todas las imágenes del producto
+  const [sessionId] = useState(() => `product-edit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
+
+  // Función para generar SKU automáticamente
+  const generateShortSku = useCallback(() => {
+    return `SKU-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+  }, []);
+
+  // Load product data when modal opens or product changes
   useEffect(() => {
-    if (product) {
+    if (product && isOpen) {
       setFormData({
         name: product.name || '',
         description: product.description || '',
         price: product.price?.toString() || '',
         salePrice: product.salePrice?.toString() || '',
         sku: product.sku || '',
-        categoryId: product.categoryId || '',
-        stockQuantity: product.stockQuantity?.toString() || '',
+        categoryId: product.categoryId || product.category?.id || '',
+        stockQuantity: product.stockQuantity?.toString() || '0',
         tags: product.tags || [],
-        isActive: product.isActive,
+        isActive: product.isActive ?? true,
         images: product.images || [],
         attributes: product.attributes || {}
       });
       setErrors({});
+      setSuccessMessage('');
+      
+      console.log('🔗 EditProductModal - Product loaded:', product);
     }
-  }, [product]);
+  }, [product, isOpen]);
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setFormData({
+        name: '',
+        description: '',
+        price: '',
+        salePrice: '',
+        sku: '',
+        categoryId: '',
+        stockQuantity: '0',
+        tags: [],
+        isActive: true,
+        images: [],
+        attributes: {}
+      });
+      setErrors({});
+      setSuccessMessage('');
+      setNewAttributeKey('');
+      setNewAttributeValue('');
+      setNewTagName('');
+      setNewTagColor('#ff6b6b');
+      setNewTagDescription('');
+    }
+  }, [isOpen]);
 
   const validateForm = useCallback((): boolean => {
-    const newErrors: ProductValidationErrors = {};
+    const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'El nombre del producto es requerido';
-    }
-
-    if (!formData.price.trim()) {
-      newErrors.price = 'El precio es requerido';
-    } else if (isNaN(Number(formData.price)) || Number(formData.price) <= 0) {
-      newErrors.price = 'El precio debe ser un número mayor a 0';
-    }
-
-    if (formData.salePrice && (isNaN(Number(formData.salePrice)) || Number(formData.salePrice) < 0)) {
-      newErrors.salePrice = 'El precio de oferta debe ser un número válido';
+      newErrors['name'] = 'El nombre del producto es requerido';
     }
 
     if (!formData.sku.trim()) {
-      newErrors.sku = 'El SKU es requerido';
+      newErrors['sku'] = 'El SKU es requerido';
+    } else if (formData.sku.trim().length < 3) {
+      newErrors['sku'] = 'El SKU debe tener al menos 3 caracteres';
+    } else if (!/^[A-Z0-9-_]+$/i.test(formData.sku.trim())) {
+      newErrors['sku'] = 'El SKU solo puede contener letras, números, guiones y guiones bajos';
+    }
+
+    if (!formData.price || parseFloat(formData.price) <= 0) {
+      newErrors['price'] = 'El precio debe ser mayor a 0';
+    }
+
+    if (formData.salePrice && parseFloat(formData.salePrice) >= parseFloat(formData.price)) {
+      newErrors['salePrice'] = 'El precio de oferta debe ser menor al precio regular';
     }
 
     if (!formData.categoryId) {
-      newErrors.categoryId = 'La categoría es requerida';
+      newErrors['categoryId'] = 'Debe seleccionar una categoría';
     }
 
-    if (!formData.stockQuantity.trim()) {
-      newErrors.stockQuantity = 'La cantidad de stock es requerida';
-    } else if (isNaN(Number(formData.stockQuantity)) || Number(formData.stockQuantity) < 0) {
-      newErrors.stockQuantity = 'El stock debe ser un número mayor o igual a 0';
+    if (parseInt(formData.stockQuantity) < 0) {
+      newErrors['stockQuantity'] = 'El stock no puede ser negativo';
+    }
+
+    // Validate that all images are real URLs (not blob URLs)
+    if (formData.images.length > 0) {
+      const hasInvalidImages = formData.images.some(img => img.startsWith('blob:'));
+      if (hasInvalidImages) {
+        newErrors['images'] = 'Todas las imágenes deben ser subidas antes de actualizar el producto';
+      }
     }
 
     setErrors(newErrors);
@@ -344,8 +528,8 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
     setFormData(prev => ({ ...prev, [field]: value }));
     
     // Clear error when user starts typing
-    if (errors[field as keyof ProductValidationErrors]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
     }
   }, [errors]);
 
@@ -358,349 +542,654 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
     }));
   }, []);
 
-  const handleAddCustomTag = useCallback((tag: string) => {
-    if (tag.trim() && !formData.tags.includes(tag.trim())) {
+  const handleGenerateSku = useCallback(() => {
+    const newSku = generateShortSku();
+    handleInputChange('sku', newSku);
+  }, [generateShortSku, handleInputChange]);
+
+  const handleImageUploadSuccess = useCallback((result: UploadResult) => {
+    if (result.success && result.url) {
+      // Agregar la imagen subida al formulario
       setFormData(prev => ({
         ...prev,
-        tags: [...prev.tags, tag.trim()]
+        images: [...prev.images, result.url!]
       }));
     }
-  }, [formData.tags]);
+  }, []);
 
-  const handleRemoveTag = useCallback((tagToRemove: string) => {
+  const removeImage = useCallback((index: number) => {
     setFormData(prev => ({
       ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
+      images: prev.images.filter((_, i) => i !== index)
     }));
   }, []);
 
-  const handleImageUpload = useCallback((imageUrl: string) => {
-    setFormData(prev => ({
-      ...prev,
-      images: [...prev.images, imageUrl]
-    }));
+  const addAttribute = useCallback(() => {
+    if (newAttributeKey.trim() && newAttributeValue.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        attributes: {
+          ...prev.attributes,
+          [newAttributeKey.trim()]: newAttributeValue.trim()
+        }
+      }));
+      setNewAttributeKey('');
+      setNewAttributeValue('');
+    }
+  }, [newAttributeKey, newAttributeValue]);
+
+  const removeAttribute = useCallback((key: string) => {
+    setFormData(prev => {
+      const newAttributes = { ...prev.attributes };
+      delete newAttributes[key];
+      return { ...prev, attributes: newAttributes };
+    });
   }, []);
 
-  const handleRemoveImage = useCallback((imageUrl: string) => {
-    setFormData(prev => ({
-      ...prev,
-      images: prev.images.filter(img => img !== imageUrl)
-    }));
-  }, []);
-
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = useCallback(async (event: React.FormEvent) => {
+    event.preventDefault();
     
-    if (!validateForm() || !product) return;
+    if (!product || !validateForm()) {
+      return;
+    }
 
-    setIsSubmitting(true);
-    
+    setErrors({});
+
     try {
+      // Validate that images are real URLs from backend
+      const hasValidImages = validateBackendImageUrls(formData.images);
+      
+      if (formData.images.length > 0 && !hasValidImages) {
+        setErrors({ submit: 'Las imágenes deben ser subidas antes de actualizar el producto' });
+        return;
+      }
+
+      // Convert absolute URLs to relative paths for images field (same pattern as categories)
+      const relativeImages = convertImageUrlsToRelativePaths(formData.images);
+
+      // Prepare product data for GraphQL mutation
       const updateData = {
-        name: formData.name,
-        description: formData.description || null,
+        name: formData.name.trim(),
+        description: formData.description.trim() || null,
         price: parseFloat(formData.price),
         salePrice: formData.salePrice ? parseFloat(formData.salePrice) : null,
-        sku: formData.sku,
-        categoryId: formData.categoryId || null,
-        images: formData.images,
-        attributes: formData.attributes,
-        isActive: formData.isActive,
+        sku: formData.sku.trim(),
+        categoryId: formData.categoryId,
         stockQuantity: parseInt(formData.stockQuantity),
-        tags: formData.tags
+        tags: formData.tags,
+        isActive: formData.isActive,
+        images: relativeImages, // Store as relative paths
+        attributes: formData.attributes
       };
 
+      // Call GraphQL mutation
       const result = await updateProduct(product.id, updateData);
       
-      if (result.data?.updateProduct?.data?.entity) {
-        toast.success('Producto actualizado exitosamente');
-        // Convert the GraphQL result to our Product type
-        const graphqlProduct = result.data.updateProduct.data.entity;
-        const updatedProduct: Product = {
-          ...graphqlProduct,
-          variants: [],
-          cartItems: [],
-          favorites: [],
-          orderItems: [],
-          reviews: [],
-          appEvents: [],
-          inventoryTransactions: [],
-          stockAlerts: [],
-          category: graphqlProduct.category ? {
-            ...graphqlProduct.category,
-            description: null,
-            isActive: true,
-            sortOrder: 1,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            products: []
-          } : null
-        };
-        onSuccess(updatedProduct);
-        onClose();
+      if (result) {
+        setSuccessMessage('Producto actualizado exitosamente');
+        
+        // Close modal after success
+        setTimeout(() => {
+          onSuccess(result);
+          onClose();
+        }, 1500);
+      } else {
+        setErrors({ submit: 'No se pudo actualizar el producto. Verifique los datos e intente nuevamente.' });
       }
-    } catch (error) {
-      console.error('Error updating product:', error);
-      toast.error('Error al actualizar el producto');
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [formData, product, validateForm, updateProduct, onSuccess, onClose]);
 
-  const handleClose = useCallback(() => {
-    if (!isSubmitting) {
-      setFormData(initialFormData);
-      setErrors({});
-      onClose();
+    } catch (error: any) {
+      const errorMessage = error.message || 'Error al actualizar el producto. Intente nuevamente.';
+      setErrors({ submit: errorMessage });
+      toast.error(errorMessage);
     }
-  }, [isSubmitting, onClose]);
+  }, [formData, validateForm, product, updateProduct, onSuccess, onClose]);
 
-  if (!product) return null;
+  // GraphQL integration for categories
+  const { 
+    categories: graphqlCategories, 
+    loading: categoriesLoading, 
+    error: categoriesError 
+  } = useCategories();
+
+  // Enhanced tags management with metadata
+  const { 
+    activeTags, 
+    createTag, 
+    isLoading: tagsLoading, 
+    error: tagsError 
+  } = useTags();
+
+  // Handle creating new custom tags
+  const handleCreateTag = useCallback(async () => {
+    if (!newTagName.trim()) return;
+
+    try {
+      const result = await createTag(newTagName.trim(), {
+        color: newTagColor,
+        description: newTagDescription.trim() || newTagName.trim(),
+        category: 'personalizado',
+        isActive: true
+      });
+
+      if (result.success) {
+        // Add the new tag to the form
+        setFormData(prev => ({
+          ...prev,
+          tags: [...prev.tags, newTagName.trim()]
+        }));
+
+        // Reset form
+        setNewTagName('');
+        setNewTagColor('#ff6b6b');
+        setNewTagDescription('');
+        
+        toast.success('Etiqueta creada exitosamente');
+      } else {
+        toast.error(result.error || 'Error al crear la etiqueta');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Error al crear la etiqueta');
+    }
+  }, [newTagName, newTagColor, newTagDescription, createTag]);
+
+  // Use GraphQL categories if available, fallback to prop categories
+  const availableCategories = graphqlCategories.length > 0 
+    ? graphqlCategories.filter(cat => cat.isActive).sort((a, b) => a.sortOrder - b.sortOrder)
+    : propCategories || [];
+
+  if (!isOpen || !product) return null;
 
   return (
     <ModalOverlay isOpen={isOpen}>
       <ModalContainer>
+        {isUpdating && (
+          <LoadingOverlay>
+            <LoadingSpinner />
+          </LoadingOverlay>
+        )}
+
         <ModalHeader>
           <ModalTitle>
             <Edit3 size={24} />
             Editar Producto
           </ModalTitle>
-          <CloseButton onClick={handleClose} disabled={isSubmitting}>
+          <CloseButton onClick={onClose}>
             <X size={20} />
           </CloseButton>
         </ModalHeader>
 
         <form onSubmit={handleSubmit}>
           <ModalBody>
-            {/* Basic Information */}
+            {(errors['submit'] || updateError) && (
+              <ErrorMessage>
+                <AlertTriangle size={16} />
+                {errors['submit'] || updateError}
+              </ErrorMessage>
+            )}
+
+            {successMessage && (
+              <SuccessMessage>
+                <CheckCircle size={16} />
+                {successMessage}
+              </SuccessMessage>
+            )}
+
+            {/* Información Básica */}
             <FormSection>
               <SectionTitle>
-                <Package size={20} />
+                <FileText size={20} />
                 Información Básica
               </SectionTitle>
+              
               <FormGrid>
                 <FormRow>
-                  <Label htmlFor="name">Nombre del Producto *</Label>
+                  <FormLabel>
+                    Nombre del Producto <RequiredIndicator>*</RequiredIndicator>
+                  </FormLabel>
                   <Input
-                    id="name"
+                    placeholder="Ej: Body Orgánico para Bebé"
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
-                    placeholder="Ej: Cochecito para Bebé Premium"
-                    {...(errors.name && { error: errors.name })}
+                    error={errors['name'] || ''}
+                    leftIcon={<Package size={16} />}
                   />
-                  {errors.name && <ErrorText>{errors.name}</ErrorText>}
                 </FormRow>
 
                 <FormRow>
-                  <Label htmlFor="sku">SKU *</Label>
-                  <Input
-                    id="sku"
-                    value={formData.sku}
-                    onChange={(e) => handleInputChange('sku', e.target.value)}
-                    placeholder="Ej: COCHE-001"
-                    {...(errors.sku && { error: errors.sku })}
-                  />
-                  {errors.sku && <ErrorText>{errors.sku}</ErrorText>}
+                  <FormLabel>
+                    SKU <RequiredIndicator>*</RequiredIndicator>
+                  </FormLabel>
+                  <SkuFieldContainer>
+                    <Input
+                      placeholder="Ej: SKU-ABC123"
+                      value={formData.sku}
+                      onChange={(e) => handleInputChange('sku', e.target.value)}
+                      error={errors['sku'] || ''}
+                      leftIcon={<Hash size={16} />}
+                      style={{ flex: 1 }}
+                    />
+                    <GenerateSkuButton
+                      type="button"
+                      variant="outline"
+                      size="small"
+                      onClick={handleGenerateSku}
+                      title="Generar nuevo SKU automáticamente"
+                    >
+                      <RefreshCw size={14} />
+                      Generar
+                    </GenerateSkuButton>
+                  </SkuFieldContainer>
+                  <div style={{ 
+                    fontSize: theme.fontSizes.xs, 
+                    color: theme.colors.text.secondary,
+                    marginTop: theme.spacing[1],
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: theme.spacing[1]
+                  }}>
+                    <CheckCircle size={12} />
+                    Puedes editar el SKU existente o generar uno nuevo.
+                  </div>
                 </FormRow>
 
                 <FormRow>
-                  <Label htmlFor="categoryId">Categoría *</Label>
-                  <select
-                    id="categoryId"
+                  <FormLabel>
+                    Categoría <RequiredIndicator>*</RequiredIndicator>
+                  </FormLabel>
+                  <Select
                     value={formData.categoryId}
                     onChange={(e) => handleInputChange('categoryId', e.target.value)}
-                    style={{
-                      padding: theme.spacing[2],
-                      border: `1px solid ${errors.categoryId ? theme.colors.error : theme.colors.border.light}`,
-                      borderRadius: theme.borderRadius.md,
-                      fontFamily: theme.fonts.primary,
-                      fontSize: theme.fontSizes.sm
-                    }}
+                    disabled={categoriesLoading && availableCategories.length === 0}
                   >
-                    <option value="">Seleccionar categoría</option>
-                    {categories.map(category => (
+                    <option value="">
+                      {categoriesLoading && availableCategories.length === 0
+                        ? 'Cargando categorías...' 
+                        : categoriesError && availableCategories.length === 0
+                          ? 'Error al cargar categorías' 
+                          : 'Seleccionar categoría'
+                      }
+                    </option>
+                    {availableCategories.map(category => (
                       <option key={category.id} value={category.id}>
                         {category.name}
                       </option>
                     ))}
-                  </select>
-                  {errors.categoryId && <ErrorText>{errors.categoryId}</ErrorText>}
+                  </Select>
+                  {/* Only show loading indicator when no categories are available */}
+                  {categoriesLoading && availableCategories.length === 0 && (
+                    <div style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: theme.spacing[2], 
+                      marginTop: theme.spacing[1],
+                      fontSize: theme.fontSizes.sm,
+                      color: theme.colors.text.secondary
+                    }}>
+                      <LoadingSpinner />
+                      Cargando categorías...
+                    </div>
+                  )}
+                  {/* Only show error when no categories are available */}
+                  {categoriesError && availableCategories.length === 0 && (
+                    <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>
+                      Error: {categoriesError}
+                    </span>
+                  )}
+                  {errors['categoryId'] && <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>{errors['categoryId']}</span>}
                 </FormRow>
 
                 <FormRow>
-                  <Label htmlFor="stockQuantity">Stock *</Label>
-                  <Input
-                    id="stockQuantity"
-                    type="number"
-                    value={formData.stockQuantity}
-                    onChange={(e) => handleInputChange('stockQuantity', e.target.value)}
-                    placeholder="0"
-                    min="0"
-                    {...(errors.stockQuantity && { error: errors.stockQuantity })}
+                  <FormLabel>Descripción</FormLabel>
+                  <Textarea
+                    placeholder="Describe las características y beneficios del producto..."
+                    value={formData.description}
+                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    rows={3}
                   />
-                  {errors.stockQuantity && <ErrorText>{errors.stockQuantity}</ErrorText>}
                 </FormRow>
               </FormGrid>
-
-              <FormRow style={{ marginTop: theme.spacing[4] }}>
-                <Label htmlFor="description">Descripción</Label>
-                <textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
-                  placeholder="Describe las características y beneficios del producto..."
-                  rows={4}
-                  style={{
-                    padding: theme.spacing[2],
-                    border: `1px solid ${theme.colors.border.light}`,
-                    borderRadius: theme.borderRadius.md,
-                    fontFamily: theme.fonts.primary,
-                    fontSize: theme.fontSizes.sm,
-                    resize: 'vertical'
-                  }}
-                />
-              </FormRow>
             </FormSection>
 
-            {/* Pricing */}
+            {/* Precios y Stock */}
             <FormSection>
               <SectionTitle>
                 <BadgeDollarSign size={20} />
-                Precios
+                Precios y Stock
               </SectionTitle>
+              
               <FormGrid>
                 <FormRow>
-                  <Label htmlFor="price">Precio Regular *</Label>
+                  <FormLabel>
+                    Precio Regular <RequiredIndicator>*</RequiredIndicator>
+                  </FormLabel>
                   <Input
-                    id="price"
                     type="number"
                     step="0.01"
+                    min="0"
+                    placeholder="S/ 0.00"
                     value={formData.price}
                     onChange={(e) => handleInputChange('price', e.target.value)}
-                    placeholder="S/ 0.00"
-                    min="0"
-                    {...(errors.price && { error: errors.price })}
+                    error={errors['price'] || ''}
+                    leftIcon={<BadgeDollarSign size={16} />}
                   />
-                  {errors.price && <ErrorText>{errors.price}</ErrorText>}
                 </FormRow>
 
                 <FormRow>
-                  <Label htmlFor="salePrice">Precio de Oferta</Label>
+                  <FormLabel>Precio de Oferta</FormLabel>
                   <Input
-                    id="salePrice"
                     type="number"
                     step="0.01"
+                    min="0"
+                    placeholder="S/ 0.00 (opcional)"
                     value={formData.salePrice}
                     onChange={(e) => handleInputChange('salePrice', e.target.value)}
-                    placeholder="S/ 0.00"
-                    min="0"
-                    {...(errors.salePrice && { error: errors.salePrice })}
+                    error={errors['salePrice'] || ''}
+                    leftIcon={<BadgeDollarSign size={16} />}
                   />
-                  {errors.salePrice && <ErrorText>{errors.salePrice}</ErrorText>}
+                </FormRow>
+
+                <FormRow>
+                  <FormLabel>
+                    Stock Inicial <RequiredIndicator>*</RequiredIndicator>
+                  </FormLabel>
+                  <Input
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={formData.stockQuantity}
+                    onChange={(e) => handleInputChange('stockQuantity', e.target.value)}
+                    error={errors['stockQuantity'] || ''}
+                    leftIcon={<Package size={16} />}
+                  />
+                </FormRow>
+
+                <FormRow>
+                  <FormLabel>Estado del Producto</FormLabel>
+                  <CheckboxContainer>
+                    <Checkbox
+                      type="checkbox"
+                      id="isActive"
+                      checked={formData.isActive}
+                      onChange={(e) => handleInputChange('isActive', e.target.checked)}
+                    />
+                    <label htmlFor="isActive">
+                      <CheckboxLabel>
+                        Producto activo en el catálogo
+                      </CheckboxLabel>
+                    </label>
+                  </CheckboxContainer>
                 </FormRow>
               </FormGrid>
             </FormSection>
 
-            {/* Tags */}
+            {/* Etiquetas */}
             <FormSection>
               <SectionTitle>
                 <Tag size={20} />
-                Etiquetas
+                Etiquetas y Categorización
               </SectionTitle>
-              <FormRow>
-                <Label>Etiquetas Disponibles</Label>
+              
+              <FormLabel>Seleccionar Etiquetas</FormLabel>
+              
+              {/* Show all available tags including product's existing ones */}
+              <TagsContainer>
+                {/* Get all unique tags: activeTags + product's existing tags */}
+                {Array.from(new Set([
+                  ...Object.keys(activeTags),
+                  ...formData.tags
+                ])).map(tag => {
+                  const isSelected = formData.tags.includes(tag);
+                  const hasMetadata = activeTags[tag];
+                  
+                  return (
+                    <TagChip
+                      key={tag}
+                      isSelected={isSelected}
+                      onClick={() => handleTagToggle(tag)}
+                      {...(hasMetadata?.color && { color: hasMetadata.color })}
+                      title={hasMetadata?.description || "Etiqueta del producto"}
+                    >
+                      <Tag size={12} />
+                      {tag}
+                    </TagChip>
+                  );
+                })}
+              </TagsContainer>
+
+              {/* Fallback to prop tags if no enhanced tags available */}
+              {Object.keys(activeTags).length === 0 && (availableTags || []).length > 0 && (
                 <TagsContainer>
-                  {availableTags.map(tag => (
+                  {(availableTags || []).map(tag => (
                     <TagChip
                       key={tag}
                       isSelected={formData.tags.includes(tag)}
                       onClick={() => handleTagToggle(tag)}
                     >
+                      <Tag size={12} />
                       {tag}
                     </TagChip>
                   ))}
                 </TagsContainer>
-              </FormRow>
-              
-              <FormRow style={{ marginTop: theme.spacing[3] }}>
-                <Label>Etiquetas Seleccionadas</Label>
-                <TagsContainer>
-                  {formData.tags.map(tag => (
-                    <TagChip key={tag} isSelected={true}>
-                      {tag}
-                      <RemoveTagButton onClick={() => handleRemoveTag(tag)}>
-                        <X size={12} />
-                      </RemoveTagButton>
-                    </TagChip>
-                  ))}
-                </TagsContainer>
-              </FormRow>
+              )}
+
+              {/* Tag Creation Section */}
+              <div style={{ marginTop: theme.spacing[4] }}>
+                <FormLabel>Crear Nueva Etiqueta</FormLabel>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing[3] }}>
+                  <div style={{ display: 'flex', gap: theme.spacing[2] }}>
+                    <Input
+                      placeholder="Nombre de la etiqueta"
+                      value={newTagName}
+                      onChange={(e) => setNewTagName(e.target.value)}
+                      leftIcon={<Tag size={16} />}
+                    />
+                    <div style={{ display: 'flex', gap: theme.spacing[1] }}>
+                      {['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'].map(color => (
+                        <button
+                          key={color}
+                          type="button"
+                          onClick={() => setNewTagColor(color)}
+                          style={{
+                            width: '32px',
+                            height: '32px',
+                            backgroundColor: color,
+                            border: newTagColor === color ? '3px solid white' : '2px solid #e2e8f0',
+                            borderRadius: '50%',
+                            cursor: 'pointer',
+                            boxShadow: newTagColor === color ? '0 0 0 2px #3b82f6' : 'none'
+                          }}
+                          title={`Color: ${color}`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <Input
+                    placeholder="Descripción (opcional)"
+                    value={newTagDescription}
+                    onChange={(e) => setNewTagDescription(e.target.value)}
+                    leftIcon={<Tag size={16} />}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="small"
+                    onClick={handleCreateTag}
+                    disabled={!newTagName.trim() || tagsLoading}
+                    isLoading={tagsLoading}
+                  >
+                    <Plus size={16} />
+                    Crear Etiqueta
+                  </Button>
+                </div>
+              </div>
             </FormSection>
 
-            {/* Images */}
+            {/* Imágenes */}
             <FormSection>
               <SectionTitle>
                 <ImageIcon size={20} />
-                Imágenes
+                Imágenes del Producto
               </SectionTitle>
-              <ImageUploadSection>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => handleImageUpload('https://via.placeholder.com/300x300')}
-                  disabled={isSubmitting}
-                >
-                  <Upload size={16} />
-                  Agregar Imagen
-                </Button>
-                
-                <ImagePreviewGrid>
-                  {formData.images.map((image, index) => (
-                    <ImagePreview key={index}>
-                      <img src={image} alt={`Producto ${index + 1}`} />
-                      <RemoveImageButton onClick={() => handleRemoveImage(image)}>
-                        <X size={12} />
-                      </RemoveImageButton>
-                    </ImagePreview>
-                  ))}
-                </ImagePreviewGrid>
-              </ImageUploadSection>
+              
+              {/* Mostrar imágenes existentes del producto */}
+              {formData.images.length > 0 && (
+                <div style={{ marginBottom: theme.spacing[4] }}>
+                  <FormLabel>Imágenes Actuales del Producto</FormLabel>
+                  <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
+                    gap: theme.spacing[3],
+                    marginTop: theme.spacing[2]
+                  }}>
+                    {formData.images.map((image, index) => (
+                      <div key={index} style={{ position: 'relative' }}>
+                        <img 
+                          src={image} 
+                          alt={`Imagen ${index + 1}`}
+                          style={{
+                            width: '100%',
+                            height: '120px',
+                            objectFit: 'cover',
+                            borderRadius: theme.borderRadius.md,
+                            border: '2px solid ' + theme.colors.border.light
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          style={{
+                            position: 'absolute',
+                            top: '4px',
+                            right: '4px',
+                            background: theme.colors.error,
+                            color: theme.colors.white,
+                            border: 'none',
+                            borderRadius: '50%',
+                            width: '24px',
+                            height: '24px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '12px',
+                            transition: 'all 0.2s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = theme.colors.error + 'dd';
+                            e.currentTarget.style.transform = 'scale(1.1)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = theme.colors.error;
+                            e.currentTarget.style.transform = 'scale(1)';
+                          }}
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              <ImageUpload
+                onUpload={handleImageUploadSuccess}
+                maxFiles={5}
+                maxSize={5 * 1024 * 1024} // 5MB
+                allowedTypes={['image/jpeg', 'image/jpg', 'image/png', 'image/webp']}
+                entityId={sessionId}
+                entityType="product-edit"
+                disabled={isUpdating}
+              />
+
+              {/* Preview de imágenes se maneja internamente en ImageUpload */}
+              {formData.images.length > 0 && (
+                <div style={{ 
+                  marginTop: '12px', 
+                  padding: '12px', 
+                  background: 'rgba(34, 197, 94, 0.1)', 
+                  borderRadius: '8px',
+                  border: '1px solid rgba(34, 197, 94, 0.2)'
+                }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '8px',
+                    color: 'rgba(34, 197, 94, 0.8)',
+                    fontSize: '14px',
+                    fontWeight: '500'
+                  }}>
+                    <div style={{ 
+                      width: '8px', 
+                      height: '8px', 
+                      background: 'rgba(34, 197, 94, 0.8)', 
+                      borderRadius: '50%' 
+                    }} />
+                    {formData.images.length} imagen{formData.images.length !== 1 ? 'es' : ''} lista{formData.images.length !== 1 ? 's' : ''} para el producto
+                  </div>
+                </div>
+              )}
             </FormSection>
 
-            {/* Status */}
+            {/* Atributos Personalizados */}
             <FormSection>
               <SectionTitle>
                 <Settings size={20} />
-                Estado
+                Atributos Personalizados
               </SectionTitle>
-              <FormRow>
-                <label style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[2] }}>
-                  <input
-                    type="checkbox"
-                    checked={formData.isActive}
-                    onChange={(e) => handleInputChange('isActive', e.target.checked)}
-                    disabled={isSubmitting}
+              
+              <AttributesContainer>
+                {Object.entries(formData.attributes).map(([key, value]) => (
+                  <AttributeRow key={key}>
+                    <Input
+                      placeholder="Nombre del atributo"
+                      value={key}
+                      disabled
+                    />
+                    <Input
+                      placeholder="Valor del atributo"
+                      value={value}
+                      disabled
+                    />
+                    <RemoveAttributeButton onClick={() => removeAttribute(key)}>
+                      Eliminar
+                    </RemoveAttributeButton>
+                  </AttributeRow>
+                ))}
+
+                <AttributeRow>
+                  <Input
+                    placeholder="Nuevo atributo (ej: Material)"
+                    value={newAttributeKey}
+                    onChange={(e) => setNewAttributeKey(e.target.value)}
                   />
-                  <span>Producto Activo</span>
-                </label>
-              </FormRow>
+                  <Input
+                    placeholder="Valor (ej: Algodón 100%)"
+                    value={newAttributeValue}
+                    onChange={(e) => setNewAttributeValue(e.target.value)}
+                  />
+                  <AddAttributeButton
+                    variant="outline"
+                    size="small"
+                    onClick={addAttribute}
+                    disabled={!newAttributeKey.trim() || !newAttributeValue.trim()}
+                  >
+                    <Plus size={14} />
+                    Agregar
+                  </AddAttributeButton>
+                </AttributeRow>
+              </AttributesContainer>
             </FormSection>
           </ModalBody>
 
           <ModalFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClose}
-              disabled={isSubmitting}
-            >
+            <Button variant="ghost" onClick={onClose} disabled={isUpdating}>
               Cancelar
             </Button>
             <Button
               type="submit"
               variant="primary"
-              disabled={isSubmitting || updateLoading}
-              isLoading={isSubmitting || updateLoading}
+              disabled={isUpdating}
+              isLoading={isUpdating}
             >
               <Save size={16} />
               Guardar Cambios

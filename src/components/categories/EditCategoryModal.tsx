@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { useUpdateCategory } from '@/hooks/useUpdateCategory';
 import { UpdateCategoryInput } from '@/generated/graphql';
+import { SVGUpload } from './SVGUpload/SVGUpload';
 import { 
   X,
   Edit3,
@@ -17,7 +18,8 @@ import {
   AlertTriangle,
   SortAsc,
   Calendar,
-  Clock
+  Clock,
+  Upload
 } from 'lucide-react';
 
 interface Category {
@@ -290,6 +292,144 @@ const InfoRow = styled.div`
   }
 `;
 
+// Preview Components - Similar to Product ImageUpload
+const CurrentImagePreview = styled.div`
+  margin-bottom: ${theme.spacing[4]};
+`;
+
+const PreviewTitle = styled.h4`
+  font-family: ${theme.fonts.heading};
+  font-size: ${theme.fontSizes.sm};
+  font-weight: ${theme.fontWeights.medium};
+  color: ${theme.colors.text.secondary};
+  margin: 0 0 ${theme.spacing[3]} 0;
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[2]};
+`;
+
+const PreviewContainer = styled.div`
+  display: flex;
+  gap: ${theme.spacing[3]};
+  flex-wrap: wrap;
+  align-items: flex-start;
+`;
+
+const ImagePreview = styled.div`
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: ${theme.borderRadius.md};
+  overflow: hidden;
+  background: ${theme.colors.background.light};
+  border: 2px solid ${theme.colors.border.light};
+  transition: all ${theme.transitions.base};
+  flex-shrink: 0;
+  
+  &:hover {
+    border-color: ${theme.colors.primary};
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+`;
+
+const ImagePreviewImg = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  background: ${theme.colors.background.light};
+`;
+
+const ImagePreviewOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity ${theme.transitions.base};
+  
+  ${ImagePreview}:hover & {
+    opacity: 1;
+  }
+`;
+
+const ImagePreviewActions = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: ${theme.spacing[2]};
+`;
+
+const NoImagePreview = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  background: ${theme.colors.background.light};
+  border: 2px dashed ${theme.colors.border.medium};
+  border-radius: ${theme.borderRadius.md};
+  color: ${theme.colors.text.secondary};
+  font-size: ${theme.fontSizes.sm};
+  text-align: center;
+`;
+
+const SuccessIndicator = styled.div`
+  margin-top: ${theme.spacing[3]};
+  padding: ${theme.spacing[3]};
+  background: rgba(34, 197, 94, 0.1);
+  border-radius: ${theme.borderRadius.md};
+  border: 1px solid rgba(34, 197, 94, 0.2);
+`;
+
+const SuccessText = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[2]};
+  color: rgba(34, 197, 94, 0.8);
+  font-size: ${theme.fontSizes.sm};
+  font-weight: ${theme.fontWeights.medium};
+`;
+
+const SuccessDot = styled.div`
+  width: 8px;
+  height: 8px;
+  background: rgba(34, 197, 94, 0.8);
+  border-radius: 50%;
+`;
+
+const ReplaceButton = styled.button`
+  background: ${theme.colors.primary};
+  color: white;
+  border: none;
+  border-radius: ${theme.borderRadius.md};
+  padding: ${theme.spacing[2]} ${theme.spacing[3]};
+  font-size: ${theme.fontSizes.sm};
+  font-weight: ${theme.fontWeights.medium};
+  cursor: pointer;
+  transition: all ${theme.transitions?.base || '0.2s ease'};
+  
+  &:hover {
+    background: ${theme.colors.primary};
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+  
+  &:disabled {
+    background: ${theme.colors.border.light};
+    color: ${theme.colors.text.secondary};
+    cursor: not-allowed;
+    transform: none;
+  }
+`;
+
 export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
   isOpen,
   onClose,
@@ -307,6 +447,7 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [successMessage, setSuccessMessage] = useState('');
+  const [showUploadComponent, setShowUploadComponent] = useState(false);
 
   const { update, loading } = useUpdateCategory();
 
@@ -323,6 +464,7 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
       });
       setErrors({});
       setSuccessMessage('');
+      setShowUploadComponent(false);
     }
   }, [isOpen, category]);
 
@@ -376,6 +518,29 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
     }
   }, [errors]);
 
+  // Handle SVG upload success - store in image field
+  const handleSVGUploadComplete = useCallback((svgUrl: string) => {
+    setFormData(prev => ({ ...prev, image: svgUrl }));
+    setErrors(prev => ({ ...prev, image: '' }));
+    setShowUploadComponent(false); // Hide upload component after successful upload
+  }, []);
+
+  // Handle SVG upload error
+  const handleSVGUploadError = useCallback((error: string) => {
+    setErrors(prev => ({ ...prev, image: error }));
+  }, []);
+
+  // Handle showing upload component
+  const handleShowUpload = useCallback(() => {
+    setShowUploadComponent(true);
+  }, []);
+
+  // Handle canceling upload
+  const handleCancelUpload = useCallback(() => {
+    setShowUploadComponent(false);
+    setErrors(prev => ({ ...prev, image: '' }));
+  }, []);
+
   const handleSubmit = useCallback(async (event: React.FormEvent) => {
     event.preventDefault();
     
@@ -386,11 +551,19 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
     setErrors({});
 
     try {
+      // Convert absolute URL to relative path for image field
+      const imageUrl = formData['image'].trim();
+      const relativeImagePath = imageUrl ? 
+        (imageUrl.startsWith('http') ? 
+          new URL(imageUrl).pathname : 
+          imageUrl
+        ) : null;
+
       const categoryData: UpdateCategoryInput = {
         name: formData['name'].trim(),
         description: formData['description'].trim() || null,
         slug: formData['slug'].trim(),
-        image: formData['image'].trim() || null,
+        image: relativeImagePath,
         isActive: formData['isActive'] === 'true',
         sortOrder: formData['sortOrder'] ? parseInt(formData['sortOrder']) : null
       };
@@ -558,15 +731,106 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
               </FormField>
 
               <FormField>
-                <Label htmlFor="image">URL de Imagen</Label>
-                <Input
-                  id="image"
-                  type="url"
-                  placeholder="https://ejemplo.com/imagen.jpg"
-                  value={formData['image']}
-                  onChange={(e) => handleInputChange('image', e.target.value)}
-                  disabled={loading}
-                />
+                <Label>Icono SVG de la Categoría</Label>
+                
+                {!showUploadComponent ? (
+                  <CurrentImagePreview>
+                    <PreviewTitle>
+                      <ImageIcon size={16} />
+                      Vista previa
+                    </PreviewTitle>
+                    
+                    <PreviewContainer>
+                      {formData['image'] ? (
+                        <ImagePreview>
+                          <ImagePreviewImg 
+                            src={formData['image']} 
+                            alt="Imagen actual de la categoría"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                            }}
+                          />
+                          <ImagePreviewOverlay>
+                            <ImagePreviewActions>
+                              <ReplaceButton 
+                                onClick={handleShowUpload}
+                                disabled={loading}
+                                style={{ 
+                                  background: 'rgba(255, 255, 255, 0.9)', 
+                                  color: theme.colors.text.primary,
+                                  fontSize: '12px',
+                                  padding: '6px 12px'
+                                }}
+                              >
+                                <Edit3 size={14} />
+                                Cambiar
+                              </ReplaceButton>
+                            </ImagePreviewActions>
+                          </ImagePreviewOverlay>
+                        </ImagePreview>
+                      ) : (
+                        <NoImagePreview>
+                          <ImageIcon size={24} />
+                          <span>Sin imagen</span>
+                        </NoImagePreview>
+                      )}
+                    </PreviewContainer>
+                    
+                    {/* Success indicator similar to products */}
+                    {formData['image'] && (
+                      <SuccessIndicator>
+                        <SuccessText>
+                          <SuccessDot />
+                          <span>Imagen SVG configurada correctamente</span>
+                        </SuccessText>
+                      </SuccessIndicator>
+                    )}
+                    
+                    {/* Action button */}
+                    <div style={{ marginTop: theme.spacing[3] }}>
+                      <ReplaceButton 
+                        onClick={handleShowUpload}
+                        disabled={loading}
+                      >
+                        {formData['image'] ? 'Cambiar Imagen SVG' : 'Agregar Imagen SVG'}
+                      </ReplaceButton>
+                    </div>
+                  </CurrentImagePreview>
+                ) : (
+                  <div>
+                    <SVGUpload
+                      onUploadComplete={handleSVGUploadComplete}
+                      onUploadError={handleSVGUploadError}
+                      entityType="category"
+                      categoryId={category.id}
+                      disabled={loading}
+                      placeholder="Arrastra un archivo SVG aquí o haz clic para seleccionar"
+                      showPreview={true}
+                    />
+                    <div style={{ 
+                      marginTop: theme.spacing[3], 
+                      display: 'flex', 
+                      gap: theme.spacing[2], 
+                      justifyContent: 'center' 
+                    }}>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleCancelUpload}
+                        disabled={loading}
+                      >
+                        Cancelar
+                      </Button>
+                    </div>
+                  </div>
+                )}
+                
+                {errors['image'] && (
+                  <small style={{ color: theme.colors.error, marginTop: theme.spacing[2], display: 'block' }}>
+                    {errors['image']}
+                  </small>
+                )}
               </FormField>
 
               <SwitchContainer>

@@ -98,6 +98,9 @@ export const useProductActions = (): UseProductActionsReturn => {
         return null;
       }
 
+      // Note: input.images should contain relative paths (not absolute URLs)
+      // The conversion from absolute URLs to relative paths is handled in the modal components
+
       const result = await createProductMutation(input);
       
       // 🔍 Log para debugging - verificar respuesta del servidor
@@ -166,6 +169,9 @@ export const useProductActions = (): UseProductActionsReturn => {
         toast.error('Error de validación: ' + validationErrors.join(', '));
         return null;
       }
+
+      // Note: input.images should contain relative paths (not absolute URLs)
+      // The conversion from absolute URLs to relative paths is handled in the modal components
 
       const result = await updateProductMutation(id, input);
       

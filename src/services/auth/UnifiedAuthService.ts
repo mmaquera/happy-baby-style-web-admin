@@ -113,7 +113,7 @@ export class UnifiedAuthService {
     }
   }
 
-  // Login user
+  // Login user - Following Clean Architecture and SOLID principles
   async login(credentials: { email: string; password: string }): Promise<IAuthResponse> {
     try {
       const { data } = await this.client.mutate({
@@ -124,26 +124,44 @@ export class UnifiedAuthService {
         }
       });
 
+      // Handle GraphQL errors first
+      if (data?.loginUser?.errors) {
+        const errorMessage = data.loginUser.errors[0]?.message || 'Login failed';
+        throw new AuthError('LOGIN_FAILED', errorMessage);
+      }
+
+      // Check if login was successful according to backend response
       if (!data?.loginUser?.success) {
-        throw new AuthError('LOGIN_FAILED', data?.loginUser?.message || 'Login failed');
+        const errorMessage = data?.loginUser?.message || 'Invalid email or password';
+        throw new AuthError('LOGIN_FAILED', errorMessage);
       }
 
       const response = data.loginUser;
-      const user = this.mapGraphQLUserToAuthUser(response.data?.user);
+      
+      // Validate that we have the required data
+      if (!response.data?.user || !response.data?.accessToken) {
+        throw new AuthError('LOGIN_FAILED', 'Invalid response from server');
+      }
+
+      // Map GraphQL user to internal user format
+      const user = this.mapGraphQLUserToAuthUser(response.data.user);
+      
+      // Create token object with proper structure
       const tokens: IAuthToken = {
-        accessToken: response.data?.accessToken || '',
-        ...(response.data?.refreshToken && { refreshToken: response.data.refreshToken }),  // Solo incluir si existe
+        accessToken: response.data.accessToken,
+        ...(response.data.refreshToken && { refreshToken: response.data.refreshToken }),
         expiresAt: new Date(Date.now() + 3600000) // 1 hour
       };
 
+      // Store tokens securely
       await this.tokenStorage.storeTokens(tokens);
 
+      // Return structured response following backend schema
       return {
         success: true,
         user,
         tokens,
         message: response.message,
-        // New fields from backend schema
         code: response.code,
         timestamp: response.timestamp,
         metadata: response.metadata ? {
@@ -154,7 +172,27 @@ export class UnifiedAuthService {
         } : undefined
       };
     } catch (error: any) {
-      throw new AuthError('LOGIN_FAILED', error.message || 'Login failed');
+      // Enhanced error handling following SOLID principles
+      if (error instanceof AuthError) {
+        throw error; // Re-throw AuthError instances
+      }
+      
+      // Handle GraphQL errors
+      if (error?.graphQLErrors?.length > 0) {
+        const graphQLError = error.graphQLErrors[0];
+        const errorMessage = graphQLError.message || 'Login failed';
+        const errorCode = graphQLError.extensions?.code || 'LOGIN_FAILED';
+        throw new AuthError(errorCode, errorMessage);
+      }
+      
+      // Handle network errors
+      if (error?.networkError) {
+        throw new AuthError('NETWORK_ERROR', 'Unable to connect to server. Please check your internet connection.');
+      }
+      
+      // Handle generic errors
+      const errorMessage = error?.message || 'An unexpected error occurred during login';
+      throw new AuthError('LOGIN_FAILED', errorMessage);
     }
   }
 

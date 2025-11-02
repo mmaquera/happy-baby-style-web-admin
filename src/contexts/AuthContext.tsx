@@ -7,6 +7,7 @@
 
 import React, { createContext, useContext, useReducer, useCallback, useMemo, useEffect } from 'react';
 import { useApolloClient } from '@apollo/client';
+import { toast } from 'react-hot-toast';
 import { 
   UnifiedAuthService, 
   AuthError,
@@ -194,32 +195,105 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initializeAuth();
   }, [authService]);
 
+  // ✅ Función para procesar errores del servidor siguiendo estándares
+  const processLoginError = useCallback((errorMessage: string): string => {
+    const errorLower = errorMessage.toLowerCase();
+    
+    if (errorLower.includes('invalid email') || errorLower.includes('invalid password')) {
+      return 'Credenciales incorrectas. Verifica tu email y contraseña.';
+    }
+    
+    if (errorLower.includes('network') || errorLower.includes('connection')) {
+      return 'Error de conexión. Verifica tu internet e intenta nuevamente.';
+    }
+    
+    if (errorLower.includes('server') || errorLower.includes('internal')) {
+      return 'Error del servidor. Intenta nuevamente en unos momentos.';
+    }
+    
+    if (errorLower.includes('timeout')) {
+      return 'La solicitud tardó demasiado. Intenta nuevamente.';
+    }
+    
+    if (errorLower.includes('unauthorized') || errorLower.includes('unauthenticated')) {
+      return 'Sesión expirada. Por favor, inicia sesión nuevamente.';
+    }
+    
+    return 'Error al iniciar sesión. Intenta nuevamente.';
+  }, []);
 
-
-  // Login function
+  // ✅ Login function mejorado siguiendo estándares de ERROR_HANDLING_STANDARDS.md
   const login = useCallback(async (credentials: { email: string; password: string }): Promise<boolean> => {
     try {
       dispatch({ type: 'LOGIN_START' });
       
       const response = await authService.login(credentials);
       
+      // ✅ PASO 4: Validar respuesta del servidor
+      if (!response.success || !response.user) {
+        const errorMessage = response.message || 'Login failed - invalid response';
+        dispatch({ 
+          type: 'LOGIN_FAILURE', 
+          payload: errorMessage 
+        });
+        // ✅ Toast de error para feedback inmediato
+        toast.error(errorMessage, {
+          duration: 5000,
+          position: 'top-right',
+        });
+        return false;
+      }
+      
+      // ✅ PASO 5: Éxito
       dispatch({
         type: 'LOGIN_SUCCESS',
         payload: { user: response.user }
       });
       
+      // ✅ Toast de éxito para feedback inmediato
+      toast.success('¡Bienvenido! Sesión iniciada correctamente', {
+        duration: 3000,
+        position: 'top-right',
+      });
+      
       return true;
     } catch (error) {
-      const errorMessage = error instanceof AuthError 
-        ? error.message 
-        : error instanceof Error 
-          ? error.message 
-          : 'Login failed';
+      // ✅ PASO 6: Manejo de errores mejorado
+      let errorMessage = 'An unexpected error occurred during login';
+      let errorCode = 'LOGIN_FAILED';
       
-      dispatch({ type: 'LOGIN_FAILURE', payload: errorMessage });
+      if (error instanceof AuthError) {
+        errorMessage = error.message;
+        errorCode = error.code;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      
+      // ✅ Procesar errores del servidor para mensajes más descriptivos
+      const processedError = processLoginError(errorMessage);
+      
+      // Log error for debugging (following development standards)
+      console.error('Login error:', {
+        code: errorCode,
+        message: errorMessage,
+        processedError,
+        error: error instanceof Error ? error.stack : error
+      });
+      
+      dispatch({ 
+        type: 'LOGIN_FAILURE', 
+        payload: processedError 
+      });
+      
+      // ✅ Toast de error para feedback inmediato
+      toast.error(processedError, {
+        duration: 5000,
+        position: 'top-right',
+      });
+      
       return false;
     }
-  }, [authService]);
+  }, [authService, processLoginError]);
 
   // Logout function
   const logout = useCallback(async () => {

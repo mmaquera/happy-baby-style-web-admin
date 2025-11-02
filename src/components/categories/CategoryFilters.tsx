@@ -1,33 +1,36 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Card } from '@/components/ui/Card';
 import { 
   Search, 
   Filter, 
   X, 
   RefreshCw,
   CheckCircle,
-  XCircle
+  XCircle,
+  Image as ImageIcon,
+  FileText,
+  Package,
+  Calendar,
+  SortAsc,
+  SortDesc,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
+import { CategoryFilters as CategoryFiltersType } from './types';
 
 interface CategoryFiltersProps {
-  filters: {
-    isActive?: boolean;
-    search?: string;
-  };
-  onFiltersChange: (filters: any) => void;
+  filters: CategoryFiltersType;
+  onFiltersChange: (filters: CategoryFiltersType) => void;
   onClearFilters: () => void;
   loading?: boolean;
 }
 
-const FiltersContainer = styled.div`
-  background: ${theme.colors.white};
-  border-radius: ${theme.borderRadius.lg};
-  border: 1px solid ${theme.colors.border.light};
-  padding: ${theme.spacing[4]};
-  margin-bottom: ${theme.spacing[4]};
+const FiltersContainer = styled(Card)`
+  margin-bottom: ${theme.spacing[6]};
 `;
 
 const FiltersHeader = styled.div`
@@ -56,7 +59,7 @@ const FiltersActions = styled.div`
 
 const FiltersForm = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: ${theme.spacing[4]};
   align-items: end;
 `;
@@ -123,6 +126,95 @@ const StatusToggleButton = styled.button<{ isActive: boolean; isSelected: boolea
   }
 `;
 
+const CheckboxContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[2]};
+  cursor: pointer;
+`;
+
+const Checkbox = styled.input`
+  width: 18px;
+  height: 18px;
+  accent-color: ${theme.colors.primaryPurple};
+  cursor: pointer;
+`;
+
+const CheckboxLabel = styled.label`
+  font-size: ${theme.fontSizes.sm};
+  color: ${theme.colors.text.secondary};
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[1]};
+`;
+
+const DateRangeContainer = styled.div`
+  display: flex;
+  gap: ${theme.spacing[2]};
+  align-items: center;
+`;
+
+const DateInput = styled(Input)`
+  flex: 1;
+`;
+
+const DateSeparator = styled.span`
+  color: ${theme.colors.text.secondary};
+  font-size: ${theme.fontSizes.sm};
+`;
+
+const ProductsRangeContainer = styled.div`
+  display: flex;
+  gap: ${theme.spacing[2]};
+  align-items: center;
+`;
+
+const NumberInput = styled(Input)`
+  flex: 1;
+`;
+
+const RangeSeparator = styled.span`
+  color: ${theme.colors.text.secondary};
+  font-size: ${theme.fontSizes.sm};
+`;
+
+const CollapsibleSection = styled.div`
+  margin-top: ${theme.spacing[4]};
+`;
+
+const CollapsibleHeader = styled.button`
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[2]};
+  padding: ${theme.spacing[2]} 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: ${theme.fontSizes.sm};
+  font-weight: ${theme.fontWeights.medium};
+  color: ${theme.colors.text.secondary};
+  transition: color ${theme.transitions.base};
+
+  &:hover {
+    color: ${theme.colors.text.primary};
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+`;
+
+const CollapsibleContent = styled.div<{ isOpen: boolean }>`
+  display: ${({ isOpen }) => isOpen ? 'grid' : 'none'};
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: ${theme.spacing[4]};
+  margin-top: ${theme.spacing[4]};
+  padding-top: ${theme.spacing[4]};
+  border-top: 1px solid ${theme.colors.border.light};
+`;
+
 const ActiveFilters = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -172,45 +264,53 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
   onClearFilters,
   loading = false
 }) => {
-  const [localFilters, setLocalFilters] = useState(filters);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [searchValue, setSearchValue] = useState(filters.search || '');
 
-  // Update local filters when props change
-  React.useEffect(() => {
-    setLocalFilters(filters);
-  }, [filters]);
+  // Debounced search effect
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchValue !== filters.search) {
+        handleInputChange('search', searchValue);
+      }
+    }, 300);
 
-  // Handle input changes
-  const handleInputChange = useCallback((key: string, value: any) => {
-    setLocalFilters(prev => ({ ...prev, [key]: value }));
+    return () => clearTimeout(timeoutId);
+  }, [searchValue]);
+
+  // Update search value when filters change externally
+  useEffect(() => {
+    setSearchValue(filters.search || '');
+  }, [filters.search]);
+
+  // Handle input changes with immediate application
+  const handleInputChange = useCallback((key: keyof CategoryFiltersType, value: any) => {
+    const newFilters = { ...filters, [key]: value };
+    onFiltersChange(newFilters);
+  }, [filters, onFiltersChange]);
+
+  // Handle search input changes (with debouncing)
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchValue(value);
   }, []);
-
-  // Apply filters
-  const handleApplyFilters = useCallback(() => {
-    onFiltersChange(localFilters);
-  }, [localFilters, onFiltersChange]);
 
   // Clear all filters
   const handleClearAll = useCallback(() => {
-    setLocalFilters({});
     onClearFilters();
   }, [onClearFilters]);
 
   // Remove specific filter
-  const handleRemoveFilter = useCallback((key: string) => {
-    const newFilters = { ...localFilters };
+  const handleRemoveFilter = useCallback((key: keyof CategoryFiltersType) => {
+    const newFilters = { ...filters };
     delete (newFilters as any)[key];
-    setLocalFilters(newFilters);
     onFiltersChange(newFilters);
-  }, [localFilters, onFiltersChange]);
+  }, [filters, onFiltersChange]);
 
   // Get active filters count
-  const activeFiltersCount = Object.keys(filters).filter(key => 
-    filters[key as keyof typeof filters] !== undefined && 
-    filters[key as keyof typeof filters] !== ''
-  ).length;
-
-  // Check if filters have changed
-  const hasChanges = JSON.stringify(localFilters) !== JSON.stringify(filters);
+  const activeFiltersCount = Object.keys(filters).filter(key => {
+    const value = filters[key as keyof CategoryFiltersType];
+    return value !== undefined && value !== '' && value !== null;
+  }).length;
 
   return (
     <FiltersContainer>
@@ -253,8 +353,8 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
             id="search"
             type="text"
             placeholder="Buscar por nombre, descripción o slug..."
-            value={localFilters.search || ''}
-            onChange={(e) => handleInputChange('search', e.target.value)}
+            value={searchValue}
+            onChange={(e) => handleSearchChange(e.target.value)}
             disabled={loading}
             icon={<Search size={16} />}
           />
@@ -266,9 +366,9 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
           <StatusToggleContainer>
             <StatusToggleButton
               isActive={true}
-              isSelected={localFilters.isActive === true}
+              isSelected={filters.isActive === true}
               onClick={() => handleInputChange('isActive', 
-                localFilters.isActive === true ? undefined : true
+                filters.isActive === true ? undefined : true
               )}
               disabled={loading}
             >
@@ -278,9 +378,9 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
             
             <StatusToggleButton
               isActive={false}
-              isSelected={localFilters.isActive === false}
+              isSelected={filters.isActive === false}
               onClick={() => handleInputChange('isActive', 
-                localFilters.isActive === false ? undefined : false
+                filters.isActive === false ? undefined : false
               )}
               disabled={loading}
             >
@@ -290,17 +390,133 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
           </StatusToggleContainer>
         </FilterField>
 
-        {/* Apply Button */}
+        {/* Content Filters */}
         <FilterField>
-          <Button
-            onClick={handleApplyFilters}
-            disabled={loading || !hasChanges}
-            style={{ height: '40px' }}
-          >
-            Aplicar Filtros
-          </Button>
+          <FilterLabel>Contenido</FilterLabel>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing[2] }}>
+            <CheckboxContainer>
+              <Checkbox
+                type="checkbox"
+                id="hasImage"
+                checked={filters.hasImage === true}
+                onChange={(e) => handleInputChange('hasImage', e.target.checked ? true : undefined)}
+              />
+              <CheckboxLabel htmlFor="hasImage">
+                <ImageIcon size={14} />
+                Con imagen
+              </CheckboxLabel>
+            </CheckboxContainer>
+            
+            <CheckboxContainer>
+              <Checkbox
+                type="checkbox"
+                id="hasDescription"
+                checked={filters.hasDescription === true}
+                onChange={(e) => handleInputChange('hasDescription', e.target.checked ? true : undefined)}
+              />
+              <CheckboxLabel htmlFor="hasDescription">
+                <FileText size={14} />
+                Con descripción
+              </CheckboxLabel>
+            </CheckboxContainer>
+          </div>
         </FilterField>
+
       </FiltersForm>
+
+      {/* Advanced Filters Section */}
+      <CollapsibleSection>
+        <CollapsibleHeader onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}>
+          {showAdvancedFilters ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          Filtros Avanzados
+        </CollapsibleHeader>
+        
+        <CollapsibleContent isOpen={showAdvancedFilters}>
+          {/* Products Filter */}
+          <FilterField>
+            <FilterLabel>Productos</FilterLabel>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing[2] }}>
+              <CheckboxContainer>
+                <Checkbox
+                  type="checkbox"
+                  id="hasProducts"
+                  checked={filters.hasProducts === true}
+                  onChange={(e) => handleInputChange('hasProducts', e.target.checked ? true : undefined)}
+                />
+                <CheckboxLabel htmlFor="hasProducts">
+                  <Package size={14} />
+                  Con productos
+                </CheckboxLabel>
+              </CheckboxContainer>
+              
+              <ProductsRangeContainer>
+                <NumberInput
+                  type="number"
+                  placeholder="Mín. productos"
+                  value={filters.minProducts || ''}
+                  onChange={(e) => handleInputChange('minProducts', e.target.value ? Number(e.target.value) : undefined)}
+                  min="0"
+                />
+                <RangeSeparator>-</RangeSeparator>
+                <NumberInput
+                  type="number"
+                  placeholder="Máx. productos"
+                  value={filters.maxProducts || ''}
+                  onChange={(e) => handleInputChange('maxProducts', e.target.value ? Number(e.target.value) : undefined)}
+                  min="0"
+                />
+              </ProductsRangeContainer>
+            </div>
+          </FilterField>
+
+          {/* Date Filters */}
+          <FilterField>
+            <FilterLabel>Fecha de Creación</FilterLabel>
+            <DateRangeContainer>
+              <DateInput
+                type="date"
+                value={filters.createdAfter || ''}
+                onChange={(e) => handleInputChange('createdAfter', e.target.value || undefined)}
+              />
+              <DateSeparator>-</DateSeparator>
+              <DateInput
+                type="date"
+                value={filters.createdBefore || ''}
+                onChange={(e) => handleInputChange('createdBefore', e.target.value || undefined)}
+              />
+            </DateRangeContainer>
+          </FilterField>
+
+          <FilterField>
+            <FilterLabel>Fecha de Actualización</FilterLabel>
+            <DateRangeContainer>
+              <DateInput
+                type="date"
+                value={filters.updatedAfter || ''}
+                onChange={(e) => handleInputChange('updatedAfter', e.target.value || undefined)}
+              />
+              <DateSeparator>-</DateSeparator>
+              <DateInput
+                type="date"
+                value={filters.updatedBefore || ''}
+                onChange={(e) => handleInputChange('updatedBefore', e.target.value || undefined)}
+              />
+            </DateRangeContainer>
+          </FilterField>
+
+          {/* Sort Order Filter */}
+          <FilterField>
+            <FilterLabel>Orden de Clasificación</FilterLabel>
+            <Input
+              type="number"
+              placeholder="Orden específico"
+              value={filters.sortOrder || ''}
+              onChange={(e) => handleInputChange('sortOrder', e.target.value ? Number(e.target.value) : undefined)}
+              min="0"
+            />
+          </FilterField>
+        </CollapsibleContent>
+      </CollapsibleSection>
 
       {/* Active Filters Display */}
       {activeFiltersCount > 0 && (
@@ -327,6 +543,78 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
             <ActiveFilterTag>
               Solo inactivas
               <RemoveFilterButton onClick={() => handleRemoveFilter('isActive')}>
+                <X size={14} />
+              </RemoveFilterButton>
+            </ActiveFilterTag>
+          )}
+
+          {filters.hasImage && (
+            <ActiveFilterTag>
+              Con imagen
+              <RemoveFilterButton onClick={() => handleRemoveFilter('hasImage')}>
+                <X size={14} />
+              </RemoveFilterButton>
+            </ActiveFilterTag>
+          )}
+
+          {filters.hasDescription && (
+            <ActiveFilterTag>
+              Con descripción
+              <RemoveFilterButton onClick={() => handleRemoveFilter('hasDescription')}>
+                <X size={14} />
+              </RemoveFilterButton>
+            </ActiveFilterTag>
+          )}
+
+          {filters.hasProducts && (
+            <ActiveFilterTag>
+              Con productos
+              <RemoveFilterButton onClick={() => handleRemoveFilter('hasProducts')}>
+                <X size={14} />
+              </RemoveFilterButton>
+            </ActiveFilterTag>
+          )}
+
+          {filters.minProducts && (
+            <ActiveFilterTag>
+              Min. productos: {filters.minProducts}
+              <RemoveFilterButton onClick={() => handleRemoveFilter('minProducts')}>
+                <X size={14} />
+              </RemoveFilterButton>
+            </ActiveFilterTag>
+          )}
+
+          {filters.maxProducts && (
+            <ActiveFilterTag>
+              Max. productos: {filters.maxProducts}
+              <RemoveFilterButton onClick={() => handleRemoveFilter('maxProducts')}>
+                <X size={14} />
+              </RemoveFilterButton>
+            </ActiveFilterTag>
+          )}
+
+          {filters.createdAfter && (
+            <ActiveFilterTag>
+              Creado después: {filters.createdAfter}
+              <RemoveFilterButton onClick={() => handleRemoveFilter('createdAfter')}>
+                <X size={14} />
+              </RemoveFilterButton>
+            </ActiveFilterTag>
+          )}
+
+          {filters.createdBefore && (
+            <ActiveFilterTag>
+              Creado antes: {filters.createdBefore}
+              <RemoveFilterButton onClick={() => handleRemoveFilter('createdBefore')}>
+                <X size={14} />
+              </RemoveFilterButton>
+            </ActiveFilterTag>
+          )}
+
+          {filters.sortOrder && (
+            <ActiveFilterTag>
+              Orden: {filters.sortOrder}
+              <RemoveFilterButton onClick={() => handleRemoveFilter('sortOrder')}>
                 <X size={14} />
               </RemoveFilterButton>
             </ActiveFilterTag>

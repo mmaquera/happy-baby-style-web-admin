@@ -2,7 +2,8 @@ import { useCallback, useEffect } from 'react';
 import { useCategoriesGraphQL } from './useCategoriesGraphQL';
 import { useCategoryActions } from './useCategoryActions';
 import { useCategoryFilters } from './useCategoryFilters';
-import { CategoryFilterInput, PaginationInput } from '@/generated/graphql';
+import { PaginationInput } from '@/generated/graphql';
+import { CategoryFilters, CategoryFilterInput } from '@/components/categories/types';
 
 export interface UseCategoriesReturn {
   // Data
@@ -22,10 +23,7 @@ export interface UseCategoriesReturn {
   };
   
   // Filters and sorting
-  filters: {
-    isActive?: boolean;
-    search?: string;
-  };
+  filters: CategoryFilters;
   sortConfig: {
     field: string;
     direction: 'asc' | 'desc';
@@ -40,7 +38,7 @@ export interface UseCategoriesReturn {
   bulkToggleStatus: (categoryIds: string[], isActive: boolean) => Promise<boolean>;
   
   // Filter actions
-  setFilters: (filters: CategoryFilterInput) => void;
+  setFilters: (filters: CategoryFilters) => void;
   updateFilter: (key: string, value: any) => void;
   clearFilters: () => void;
   
@@ -67,8 +65,8 @@ export interface UseCategoriesReturn {
 
 export const useCategories = (): UseCategoriesReturn => {
   // Helper function to map GraphQL filters to local filters
-  const mapGraphQLFiltersToLocal = useCallback((graphqlFilters: CategoryFilterInput) => {
-    const localFilters: any = {};
+  const mapGraphQLFiltersToLocal = useCallback((graphqlFilters: CategoryFilterInput): CategoryFilters => {
+    const localFilters: CategoryFilters = {};
     
     // Only add properties that are not null or undefined
     if (graphqlFilters.isActive !== null && graphqlFilters.isActive !== undefined) {
@@ -77,6 +75,46 @@ export const useCategories = (): UseCategoriesReturn => {
     
     if (graphqlFilters.search !== null && graphqlFilters.search !== undefined) {
       localFilters.search = graphqlFilters.search;
+    }
+
+    if (graphqlFilters.hasImage !== null && graphqlFilters.hasImage !== undefined) {
+      localFilters.hasImage = graphqlFilters.hasImage;
+    }
+
+    if (graphqlFilters.hasDescription !== null && graphqlFilters.hasDescription !== undefined) {
+      localFilters.hasDescription = graphqlFilters.hasDescription;
+    }
+
+    if (graphqlFilters.hasProducts !== null && graphqlFilters.hasProducts !== undefined) {
+      localFilters.hasProducts = graphqlFilters.hasProducts;
+    }
+
+    if (graphqlFilters.minProducts !== null && graphqlFilters.minProducts !== undefined) {
+      localFilters.minProducts = graphqlFilters.minProducts;
+    }
+
+    if (graphqlFilters.maxProducts !== null && graphqlFilters.maxProducts !== undefined) {
+      localFilters.maxProducts = graphqlFilters.maxProducts;
+    }
+
+    if (graphqlFilters.createdAfter !== null && graphqlFilters.createdAfter !== undefined) {
+      localFilters.createdAfter = graphqlFilters.createdAfter;
+    }
+
+    if (graphqlFilters.createdBefore !== null && graphqlFilters.createdBefore !== undefined) {
+      localFilters.createdBefore = graphqlFilters.createdBefore;
+    }
+
+    if (graphqlFilters.updatedAfter !== null && graphqlFilters.updatedAfter !== undefined) {
+      localFilters.updatedAfter = graphqlFilters.updatedAfter;
+    }
+
+    if (graphqlFilters.updatedBefore !== null && graphqlFilters.updatedBefore !== undefined) {
+      localFilters.updatedBefore = graphqlFilters.updatedBefore;
+    }
+
+    if (graphqlFilters.sortOrder !== null && graphqlFilters.sortOrder !== undefined) {
+      localFilters.sortOrder = graphqlFilters.sortOrder;
     }
     
     return localFilters;
@@ -123,89 +161,100 @@ export const useCategories = (): UseCategoriesReturn => {
     goToPage,
     nextPage,
     prevPage,
-    resetToDefaults
+    resetToDefaults,
+    mapFiltersToGraphQL
   } = useCategoryFilters(pagination.total);
 
   // Load categories on mount and when filters/pagination change
   useEffect(() => {
     const loadCategories = async () => {
-      await fetchCategories(filters, localPagination);
+      // Convert local filters to GraphQL format
+      const graphqlFilters = mapFiltersToGraphQL(filters);
+      await fetchCategories(graphqlFilters, localPagination);
     };
     
     loadCategories();
-  }, [fetchCategories, filters, localPagination]);
+  }, [fetchCategories, filters, localPagination, mapFiltersToGraphQL]);
 
   // Wrapper for create category
   const createCategory = useCallback(async (input: any) => {
     try {
-      const result = await createCategoryGraphQL(input);
-      await refetchCategories();
+      // Convert local filters to GraphQL format
+      const graphqlFilters = mapFiltersToGraphQL(filters);
+      const result = await createCategoryGraphQL(input, graphqlFilters, localPagination);
       return result;
     } catch (error) {
       throw error;
     }
-  }, [createCategoryGraphQL, refetchCategories]);
+  }, [createCategoryGraphQL, mapFiltersToGraphQL, filters, localPagination]);
 
   // Wrapper for update category
   const updateCategory = useCallback(async (id: string, input: any) => {
     try {
-      const result = await updateCategoryGraphQL(id, input);
-      await refetchCategories();
+      // Convert local filters to GraphQL format
+      const graphqlFilters = mapFiltersToGraphQL(filters);
+      const result = await updateCategoryGraphQL(id, input, graphqlFilters, localPagination);
       return result;
     } catch (error) {
       throw error;
     }
-  }, [updateCategoryGraphQL, refetchCategories]);
+  }, [updateCategoryGraphQL, mapFiltersToGraphQL, filters, localPagination]);
 
   // Wrapper for delete category
   const deleteCategory = useCallback(async (id: string) => {
     try {
-      const result = await handleDeleteCategory(id);
-      await refetchCategories();
+      // Convert local filters to GraphQL format
+      const graphqlFilters = mapFiltersToGraphQL(filters);
+      const result = await deleteCategoryGraphQL(id, graphqlFilters, localPagination);
       return result;
     } catch (error) {
       throw error;
     }
-  }, [handleDeleteCategory, refetchCategories]);
+  }, [deleteCategoryGraphQL, mapFiltersToGraphQL, filters, localPagination]);
 
   // Wrapper for toggle status
   const toggleStatus = useCallback(async (categoryId: string, isActive: boolean) => {
     try {
       const result = await handleToggleStatus(categoryId, isActive);
-      await refetchCategories();
+      // Convert local filters to GraphQL format and refetch
+      const graphqlFilters = mapFiltersToGraphQL(filters);
+      await fetchCategories(graphqlFilters, localPagination);
       return result;
     } catch (error) {
       throw error;
     }
-  }, [handleToggleStatus, refetchCategories]);
+  }, [handleToggleStatus, fetchCategories, mapFiltersToGraphQL, filters, localPagination]);
 
   // Wrapper for bulk delete
   const bulkDelete = useCallback(async (categoryIds: string[]) => {
     try {
       const result = await handleBulkDelete(categoryIds);
-      await refetchCategories();
+      // Convert local filters to GraphQL format and refetch
+      const graphqlFilters = mapFiltersToGraphQL(filters);
+      await fetchCategories(graphqlFilters, localPagination);
       return result;
     } catch (error) {
       throw error;
     }
-  }, [handleBulkDelete, refetchCategories]);
+  }, [handleBulkDelete, fetchCategories, mapFiltersToGraphQL, filters, localPagination]);
 
   // Wrapper for bulk toggle status
   const bulkToggleStatus = useCallback(async (categoryIds: string[], isActive: boolean) => {
     try {
       const result = await handleBulkToggleStatus(categoryIds, isActive);
-      await refetchCategories();
+      // Convert local filters to GraphQL format and refetch
+      const graphqlFilters = mapFiltersToGraphQL(filters);
+      await fetchCategories(graphqlFilters, localPagination);
       return result;
     } catch (error) {
       throw error;
     }
-  }, [handleBulkToggleStatus, refetchCategories]);
+  }, [handleBulkToggleStatus, fetchCategories, mapFiltersToGraphQL, filters, localPagination]);
 
   // Wrapper for set filters
-  const setFilters = useCallback((newFilters: CategoryFilterInput) => {
-    const localFilters = mapGraphQLFiltersToLocal(newFilters);
-    setFiltersLocal(localFilters);
-  }, [setFiltersLocal, mapGraphQLFiltersToLocal]);
+  const setFilters = useCallback((newFilters: CategoryFilters) => {
+    setFiltersLocal(newFilters);
+  }, [setFiltersLocal]);
 
   // Wrapper for update filter
   const updateFilter = useCallback((key: string, value: any) => {

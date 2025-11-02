@@ -6,12 +6,15 @@ import {
   ProductFilters, 
   ProductGrid,
   ProductListView,
-  CreateProductModal
+  CreateProductModal,
+  EditProductModal,
+  ProductDetailModal
 } from '@/components/products';
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from '@/hooks/useProductsGraphQL';
 import { useProductActions } from '@/hooks/useProductActions';
 import { useCategories } from '@/hooks/useCategories';
-import type { Category, Product, ProductFilterInput } from '@/components/products/types';
+import type { Category, ProductFilterInput } from '@/components/products/types';
+import type { Product } from '@/components/products/types';
 import { 
   Package,
   Search,
@@ -106,9 +109,12 @@ export const Products: React.FC = () => {
   // UI State - Local component state only
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortField, setSortField] = useState<string>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   // Filter State - Mapped to GraphQL filters
   const [filters, setFilters] = useState<{
@@ -261,8 +267,23 @@ export const Products: React.FC = () => {
   }, []);
 
   const handleEditProduct = useCallback((productId: string) => {
-    // TODO: Implement edit product modal/form
-    console.log('Edit product:', productId);
+    const product = products.find(p => p.id === productId);
+    if (product) {
+      setEditingProduct(product as Product);
+      setIsEditModalOpen(true);
+    }
+  }, [products]);
+
+  const handleEditProductSuccess = useCallback((product: Product) => {
+    console.log('Producto editado exitosamente:', product);
+    refetchProducts(); // Refresh products list
+    setIsEditModalOpen(false);
+    setEditingProduct(null);
+  }, [refetchProducts]);
+
+  const handleCloseEditModal = useCallback(() => {
+    setIsEditModalOpen(false);
+    setEditingProduct(null);
   }, []);
 
   const handleDeleteProduct = useCallback(async (productId: string) => {
@@ -289,8 +310,14 @@ export const Products: React.FC = () => {
   }, [products, updateProduct]);
 
   const handleViewDetails = useCallback((productId: string) => {
-    // TODO: Implement view details modal/page
-    console.log('View details:', productId);
+    const product = products.find(p => p.id === productId);
+    if (product) {
+      setSelectedProduct(product as Product);
+    }
+  }, [products]);
+
+  const handleCloseProductDetailModal = useCallback(() => {
+    setSelectedProduct(null);
   }, []);
 
   const handlePageChange = useCallback((page: number) => {
@@ -503,6 +530,24 @@ export const Products: React.FC = () => {
         categories={availableCategories}
         availableTags={[]} // TODO: Implement tags from GraphQL
       />
+
+      {/* Edit Product Modal */}
+      <EditProductModal
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEditModal}
+        onSuccess={handleEditProductSuccess}
+        product={editingProduct}
+        categories={availableCategories}
+        availableTags={[]} // TODO: Implement tags from GraphQL
+      />
+
+             {/* Product Detail Modal */}
+       <ProductDetailModal
+         isOpen={!!selectedProduct}
+         onClose={handleCloseProductDetailModal}
+         product={selectedProduct}
+         onEdit={(product) => handleEditProduct(product.id)}
+       />
     </ProductsContainer>
   );
 };

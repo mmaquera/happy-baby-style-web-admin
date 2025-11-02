@@ -35,9 +35,9 @@ export interface UseCategoriesGraphQLReturn {
   fetchCategories: (filters?: CategoryFilterInput, pagination?: PaginationInput) => Promise<void>;
   fetchCategory: (id: string) => Promise<void>;
   fetchCategoryBySlug: (slug: string) => Promise<void>;
-  createCategory: (input: CreateCategoryInput) => Promise<any>;
-  updateCategory: (id: string, input: UpdateCategoryInput) => Promise<any>;
-  deleteCategory: (id: string) => Promise<boolean>;
+  createCategory: (input: CreateCategoryInput, currentFilters?: CategoryFilterInput, currentPagination?: PaginationInput) => Promise<any>;
+  updateCategory: (id: string, input: UpdateCategoryInput, currentFilters?: CategoryFilterInput, currentPagination?: PaginationInput) => Promise<any>;
+  deleteCategory: (id: string, currentFilters?: CategoryFilterInput, currentPagination?: PaginationInput) => Promise<boolean>;
   
   // Utilities
   refetchCategories: () => Promise<void>;
@@ -186,14 +186,14 @@ export const useCategoriesGraphQL = (): UseCategoriesGraphQLReturn => {
   }, [getCategoryBySlugQuery]);
 
   // Create category
-  const createCategory = useCallback(async (input: CreateCategoryInput) => {
+  const createCategory = useCallback(async (input: CreateCategoryInput, currentFilters?: CategoryFilterInput, currentPagination?: PaginationInput) => {
     try {
       setLoading(true);
       setError(null);
 
       const result = await createCategoryMutation({
-        variables: { input },
-        refetchQueries: ['GetCategories']
+        variables: { input }
+        // Removed refetchQueries to avoid duplicate refetch
       });
 
       if (result.errors && result.errors.length > 0) {
@@ -208,8 +208,8 @@ export const useCategoriesGraphQL = (): UseCategoriesGraphQLReturn => {
 
       toast.success('Categoría creada exitosamente');
       
-      // Refresh categories list
-      await fetchCategories();
+      // Refresh categories list preserving current filters and pagination
+      await fetchCategories(currentFilters, currentPagination);
       
       return response.data?.entity;
 
@@ -224,14 +224,14 @@ export const useCategoriesGraphQL = (): UseCategoriesGraphQLReturn => {
   }, [createCategoryMutation, fetchCategories]);
 
   // Update category
-  const updateCategory = useCallback(async (id: string, input: UpdateCategoryInput) => {
+  const updateCategory = useCallback(async (id: string, input: UpdateCategoryInput, currentFilters?: CategoryFilterInput, currentPagination?: PaginationInput) => {
     try {
       setLoading(true);
       setError(null);
 
       const result = await updateCategoryMutation({
-        variables: { id, input },
-        refetchQueries: ['GetCategories', 'GetCategory']
+        variables: { id, input }
+        // Removed refetchQueries to avoid duplicate refetch
       });
 
       if (result.errors && result.errors.length > 0) {
@@ -246,8 +246,8 @@ export const useCategoriesGraphQL = (): UseCategoriesGraphQLReturn => {
 
       toast.success('Categoría actualizada exitosamente');
       
-      // Refresh data
-      await fetchCategories();
+      // Refresh data preserving current filters and pagination
+      await fetchCategories(currentFilters, currentPagination);
       if (category?.id === id) {
         await fetchCategory(id);
       }
@@ -265,14 +265,14 @@ export const useCategoriesGraphQL = (): UseCategoriesGraphQLReturn => {
   }, [updateCategoryMutation, fetchCategories, fetchCategory, category]);
 
   // Delete category
-  const deleteCategory = useCallback(async (id: string) => {
+  const deleteCategory = useCallback(async (id: string, currentFilters?: CategoryFilterInput, currentPagination?: PaginationInput) => {
     try {
       setLoading(true);
       setError(null);
 
       const result = await deleteCategoryMutation({
-        variables: { id },
-        refetchQueries: ['GetCategories']
+        variables: { id }
+        // Removed refetchQueries to avoid duplicate refetch
       });
 
       if (result.errors && result.errors.length > 0) {
@@ -287,8 +287,8 @@ export const useCategoriesGraphQL = (): UseCategoriesGraphQLReturn => {
 
       toast.success('Categoría eliminada exitosamente');
       
-      // Refresh categories list
-      await fetchCategories();
+      // Refresh categories list preserving current filters and pagination
+      await fetchCategories(currentFilters, currentPagination);
       
       // Clear current category if it was deleted
       if (category?.id === id) {

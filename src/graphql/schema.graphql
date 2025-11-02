@@ -572,6 +572,24 @@ type Image {
   entityId: String
   createdAt: DateTime!
 }
+type Svg {
+  id: ID!
+  fileName: String!
+  originalName: String!
+  url: String!
+  path: String
+  entityType: String
+  entityId: String
+  dimensions: SvgDimensions
+  viewBox: String
+  optimized: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+type SvgDimensions {
+  width: Float
+  height: Float
+}
 type PaginatedProducts {
   products: [Product!]!
   total: Int!
@@ -613,6 +631,14 @@ type GetUsersByProviderResponse {
   code: String!
   timestamp: String!
   data: [User!]!
+  metadata: ResponseMetadata
+}
+type GetCurrentUserResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: User
   metadata: ResponseMetadata
 }
 type UserOrderHistoryResponse {
@@ -1016,6 +1042,65 @@ type AuthData {
   accessToken: String
   refreshToken: String
 }
+type PasswordResetRequestResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: PasswordResetRequestData
+  metadata: ResponseMetadata
+}
+type PasswordResetRequestData {
+  email: String!
+  timestamp: String!
+}
+type PasswordResetConfirmResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: PasswordResetConfirmData
+  metadata: ResponseMetadata
+}
+type PasswordResetConfirmData {
+  timestamp: String!
+  passwordUpdated: Boolean!
+}
+type SetUserPasswordResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: SetUserPasswordData
+  metadata: ResponseMetadata
+}
+type SetUserPasswordData {
+  userId: ID!
+  timestamp: String!
+  passwordUpdated: Boolean!
+}
+type GetUserAuditLogsResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: GetUserAuditLogsData
+  metadata: ResponseMetadata
+}
+type GetUserAuditLogsData {
+  items: [AuditLog!]!
+}
+type GetUserSecurityEventsResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: GetUserSecurityEventsData
+  metadata: ResponseMetadata
+}
+type GetUserSecurityEventsData {
+  items: [SecurityEvent!]!
+}
 type SuccessResponse {
   success: Boolean!
   message: String!
@@ -1032,6 +1117,22 @@ type UploadImageData {
   url: String!
   filename: String!
   imageId: ID!
+}
+type UploadSvgResponse {
+  success: Boolean!
+  message: String!
+  code: String!
+  timestamp: String!
+  data: UploadSvgData
+  metadata: ResponseMetadata
+}
+type UploadSvgData {
+  url: String!
+  filename: String!
+  svgId: ID!
+  dimensions: SvgDimensions
+  viewBox: String
+  optimized: Boolean!
 }
 type DashboardMetrics {
   totalUsers: Int!
@@ -1084,7 +1185,7 @@ type Query {
   userProfile(userId: ID!): UserProfile
   userAddresses(userId: ID!): GetUserAddressesResponse!
   userAddress(id: ID!): GetUserAddressResponse!
-  currentUser: User
+  currentUser: GetCurrentUserResponse!
   searchUsers(query: String!): [User!]!
   activeUsers: [User!]!
   usersByRole(role: UserRole!): [User!]!
@@ -1152,8 +1253,8 @@ type Query {
   isSubscribedToNewsletter(email: String!): Boolean!
   userAppEvents(userId: ID!): [AppEvent!]!
   productAppEvents(productId: ID!): [AppEvent!]!
-  userAuditLogs(userId: ID!): [AuditLog!]!
-  userSecurityEvents(userId: ID!): [SecurityEvent!]!
+  userAuditLogs(userId: ID!): GetUserAuditLogsResponse!
+  userSecurityEvents(userId: ID!): GetUserSecurityEventsResponse!
   storeSettings: [StoreSettings!]!
   storeSetting(key: String!): StoreSettings
   taxRates: [TaxRate!]!
@@ -1171,9 +1272,10 @@ type Mutation {
   deleteUser(id: ID!): SuccessResponse!
   activateUser(id: ID!): User!
   deactivateUser(id: ID!): User!
-  updateUserPassword(userId: ID!, currentPassword: String!, newPassword: String!): SuccessResponse!
-  requestPasswordReset(email: String!): SuccessResponse!
-  resetPassword(token: String!, newPassword: String!): SuccessResponse!
+  updateUserPassword(email: String!, currentPassword: String!, newPassword: String!): SuccessResponse!
+  requestPasswordReset(email: String!): PasswordResetRequestResponse!
+  resetPassword(token: String!, newPassword: String!): PasswordResetConfirmResponse!
+  setUserPassword(userId: ID!, newPassword: String!): SetUserPasswordResponse!
   revokeUserSession(sessionId: ID!, userId: ID!, reason: String): RevokeUserSessionResponse!
   revokeAllUserSessions(userId: ID!, requestingUserId: ID!, reason: String, excludeCurrentSession: Boolean): RevokeAllUserSessionsResponse!
   unlinkUserAccount(accountId: ID!): SuccessResponse!
@@ -1247,6 +1349,7 @@ type Mutation {
   updateUserSessionAnalytics(id: ID!, input: UpdateUserSessionAnalyticsInput!): UpdateUserSessionAnalyticsResponse!
   deleteUserSessionAnalytics(id: ID!): DeleteUserSessionAnalyticsResponse!
   uploadImage(file: Upload!, entityType: String!, entityId: String!): UploadImageResponse!
+  uploadSvg(file: Upload!, entityType: String!, entityId: String!, optimize: Boolean, sanitize: Boolean): UploadSvgResponse!
   bulkUpdateProducts(updates: [UpdateProductInput!]!): [Product!]!
   bulkUpdateOrderStatus(orders: [ID!]!, status: OrderStatus!): [Order!]!
 }

@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { useCreateCategory } from '@/hooks/useCreateCategory';
 import { CreateCategoryInput } from '@/generated/graphql';
+import { SVGUpload } from './SVGUpload/SVGUpload';
 import { 
   X,
   FolderPlus,
@@ -15,7 +16,8 @@ import {
   Settings,
   CheckCircle,
   AlertTriangle,
-  SortAsc
+  SortAsc,
+  Upload
 } from 'lucide-react';
 
 interface CreateCategoryModalProps {
@@ -348,6 +350,17 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
     }
   }, [errors]);
 
+  // Handle SVG upload success - store in image field
+  const handleSVGUploadComplete = useCallback((svgUrl: string) => {
+    setFormData(prev => ({ ...prev, image: svgUrl }));
+    setErrors(prev => ({ ...prev, image: '' }));
+  }, []);
+
+  // Handle SVG upload error
+  const handleSVGUploadError = useCallback((error: string) => {
+    setErrors(prev => ({ ...prev, image: error }));
+  }, []);
+
   const handleSubmit = useCallback(async (event: React.FormEvent) => {
     event.preventDefault();
     
@@ -493,15 +506,20 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
               </SectionTitle>
 
               <FormField>
-                <Label htmlFor="image">URL de Imagen</Label>
-                <Input
-                  id="image"
-                  type="url"
-                  placeholder="https://ejemplo.com/imagen.jpg"
-                  value={formData.image}
-                  onChange={(e) => handleInputChange('image', e.target.value)}
+                <Label>Icono SVG de la Categoría</Label>
+                <SVGUpload
+                  onUploadComplete={handleSVGUploadComplete}
+                  onUploadError={handleSVGUploadError}
+                  entityType="category"
                   disabled={loading}
+                  placeholder="Arrastra un archivo SVG aquí o haz clic para seleccionar"
+                  showPreview={true}
                 />
+                {errors['image'] && (
+                  <small style={{ color: theme.colors.error, marginTop: theme.spacing[2], display: 'block' }}>
+                    {errors['image']}
+                  </small>
+                )}
               </FormField>
 
               <SwitchContainer>

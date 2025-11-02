@@ -18,7 +18,8 @@ import {
   AlertTriangle,
   Settings,
   BadgeDollarSign,
-  Trash2
+  Trash2,
+  RefreshCw
 } from 'lucide-react';
 import type { Category, ProductFormData, Product, TagWithMetadata } from './types';
 import { useProductActions } from '@/hooks/useProductActions';
@@ -26,6 +27,7 @@ import { useCategories } from '@/hooks/useCategories';
 import { useTags } from '@/hooks/useTags';
 import type { UploadResult } from '@/types/upload';
 import { toast } from 'react-hot-toast';
+import { convertImageUrlsToRelativePaths, validateBackendImageUrls } from '@/utils/imageUtils';
 
 interface CreateProductModalProps {
   isOpen: boolean;
@@ -373,6 +375,20 @@ const AddAttributeButton = styled(Button)`
   align-self: flex-start;
 `;
 
+const SkuFieldContainer = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[2]};
+`;
+
+const GenerateSkuButton = styled(Button)`
+  min-width: auto;
+  padding: ${theme.spacing[2]} ${theme.spacing[3]};
+  font-size: ${theme.fontSizes.sm};
+  white-space: nowrap;
+`;
+
 const ModalFooter = styled.div`
   display: flex;
   justify-content: flex-end;
@@ -470,6 +486,11 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
   // Generar ID de sesión único para agrupar todas las imágenes del producto
   const [sessionId] = useState(() => `product-session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
 
+  // Función para generar SKU automáticamente
+  const generateShortSku = useCallback(() => {
+    return `SKU-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+  }, []);
+
   // Log para debugging - verificar que el sessionId se genera correctamente
   useEffect(() => {
     if (isOpen) {
@@ -485,7 +506,7 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
         description: '',
         price: '',
         salePrice: '',
-        sku: '',
+        sku: generateShortSku(), // Auto-generar SKU al abrir el modal
         categoryId: '',
         stockQuantity: '0',
         tags: [],
@@ -497,7 +518,7 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
       setSuccessMessage('');
       
     }
-  }, [isOpen]);
+  }, [isOpen, generateShortSku]);
 
   const validateForm = useCallback((): boolean => {
     const newErrors: Record<string, string> = {};
@@ -508,6 +529,10 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
 
     if (!formData.sku.trim()) {
       newErrors['sku'] = 'El SKU es requerido';
+    } else if (formData.sku.trim().length < 3) {
+      newErrors['sku'] = 'El SKU debe tener al menos 3 caracteres';
+    } else if (!/^[A-Z0-9-_]+$/i.test(formData.sku.trim())) {
+      newErrors['sku'] = 'El SKU solo puede contener letras, números, guiones y guiones bajos';
     }
 
     if (!formData.price || parseFloat(formData.price) <= 0) {
@@ -555,6 +580,11 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
         : [...prev.tags, tag]
     }));
   }, []);
+
+  const handleGenerateSku = useCallback(() => {
+    const newSku = generateShortSku();
+    handleInputChange('sku', newSku);
+  }, [generateShortSku, handleInputChange]);
 
 
 
@@ -608,14 +638,15 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
 
     try {
       // Validate that images are real URLs from backend
-      const hasValidImages = formData.images.every(img => 
-        img.startsWith('http') && !img.startsWith('blob:')
-      );
+      const hasValidImages = validateBackendImageUrls(formData.images);
       
       if (formData.images.length > 0 && !hasValidImages) {
         setErrors({ submit: 'Las imágenes deben ser subidas antes de crear el producto' });
         return;
       }
+
+      // Convert absolute URLs to relative paths for images field (same pattern as categories)
+      const relativeImages = convertImageUrlsToRelativePaths(formData.images);
 
       // Prepare product data for GraphQL mutation
       const productData = {
@@ -628,7 +659,7 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
         stockQuantity: parseInt(formData.stockQuantity),
         tags: formData.tags,
         isActive: formData.isActive,
-        images: formData.images,
+        images: relativeImages, // Store as relative paths
         attributes: formData.attributes
       };
 
@@ -770,13 +801,37 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
                   <FormLabel>
                     SKU <RequiredIndicator>*</RequiredIndicator>
                   </FormLabel>
-                  <Input
-                    placeholder="Ej: BODY-ORG-001"
-                    value={formData.sku}
-                    onChange={(e) => handleInputChange('sku', e.target.value)}
-                    error={errors['sku'] || ''}
-                    leftIcon={<Hash size={16} />}
-                  />
+                  <SkuFieldContainer>
+                    <Input
+                      placeholder="Ej: SKU-ABC123"
+                      value={formData.sku}
+                      onChange={(e) => handleInputChange('sku', e.target.value)}
+                      error={errors['sku'] || ''}
+                      leftIcon={<Hash size={16} />}
+                      style={{ flex: 1 }}
+                    />
+                    <GenerateSkuButton
+                      type="button"
+                      variant="outline"
+                      size="small"
+                      onClick={handleGenerateSku}
+                      title="Generar nuevo SKU automáticamente"
+                    >
+                      <RefreshCw size={14} />
+                      Generar
+                    </GenerateSkuButton>
+                  </SkuFieldContainer>
+                  <div style={{ 
+                    fontSize: theme.fontSizes.xs, 
+                    color: theme.colors.text.secondary,
+                    marginTop: theme.spacing[1],
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: theme.spacing[1]
+                  }}>
+                    <CheckCircle size={12} />
+                    SKU generado automáticamente. Puedes editarlo o generar uno nuevo.
+                  </div>
                 </FormRow>
 
                 <FormRow>

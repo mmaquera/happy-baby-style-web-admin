@@ -15,7 +15,8 @@ import {
   XCircle,
   Star,
   SortAsc,
-  SortDesc
+  SortDesc,
+  MoreHorizontal
 } from 'lucide-react';
 
 interface Product {
@@ -75,7 +76,7 @@ interface ProductListViewProps {
 }
 
 // =====================================================
-// STYLED COMPONENTS - Minimalist Design
+// STYLED COMPONENTS - Enhanced Minimalist Design
 // =====================================================
 
 const ListViewContainer = styled.div`
@@ -89,9 +90,10 @@ const ListViewHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: ${theme.spacing[4]};
-  background: ${theme.colors.background.light};
+  background: ${theme.colors.white};
   border-radius: ${theme.borderRadius.lg};
   border: 1px solid ${theme.colors.border.light};
+  box-shadow: ${theme.shadows.sm};
   
   @media (max-width: ${theme.breakpoints.md}) {
     flex-direction: column;
@@ -121,6 +123,7 @@ const ViewModeIndicator = styled.div`
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.fontSizes.sm};
   font-weight: ${theme.fontWeights.medium};
+  box-shadow: ${theme.shadows.sm};
 `;
 
 const ProductCount = styled.span`
@@ -134,6 +137,7 @@ const ProductTable = styled.div`
   border-radius: ${theme.borderRadius.lg};
   border: 1px solid ${theme.colors.border.light};
   overflow: hidden;
+  box-shadow: ${theme.shadows.sm};
 `;
 
 const TableHeader = styled.div`
@@ -146,6 +150,9 @@ const TableHeader = styled.div`
   font-weight: ${theme.fontWeights.medium};
   font-size: ${theme.fontSizes.sm};
   color: ${theme.colors.text.primary};
+  position: sticky;
+  top: 0;
+  z-index: 10;
   
   @media (max-width: ${theme.breakpoints.lg}) {
     grid-template-columns: 50px 150px 100px 80px 80px 80px 80px 80px;
@@ -161,31 +168,51 @@ const TableHeaderCell = styled.div<{ sortable?: boolean }>`
   gap: ${theme.spacing[1]};
   cursor: ${({ sortable }) => sortable ? 'pointer' : 'default'};
   user-select: none;
+  transition: all ${theme.transitions.fast};
+  padding: ${theme.spacing[1]};
+  border-radius: ${theme.borderRadius.sm};
   
   ${({ sortable }) => sortable && `
     &:hover {
       color: ${theme.colors.primaryPurple};
+      background: ${theme.colors.background.light};
+    }
+    
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px ${theme.colors.primaryPurple}40;
     }
   `}
 `;
 
 const SortIcon = styled.div`
-  color: ${theme.colors.text.secondary};
+  color: ${theme.colors.primaryPurple};
   display: flex;
   align-items: center;
+  opacity: 0.8;
 `;
 
-const ProductRow = styled.div`
+const ProductRow = styled.div<{ isEven: boolean }>`
   display: grid;
   grid-template-columns: 60px 200px 120px 100px 100px 120px 100px 120px 100px 80px;
   gap: ${theme.spacing[3]};
   padding: ${theme.spacing[4]};
   border-bottom: 1px solid ${theme.colors.border.light};
   align-items: center;
-  transition: background-color ${theme.transitions.base};
+  transition: all ${theme.transitions.base};
+  background: ${({ isEven }) => 
+    isEven ? theme.colors.white : theme.colors.background.light};
+  position: relative;
 
   &:hover {
     background: ${theme.colors.background.accent};
+    transform: translateY(-1px);
+    box-shadow: ${theme.shadows.sm};
+  }
+
+  &:focus-within {
+    background: ${theme.colors.background.accent};
+    box-shadow: 0 0 0 2px ${theme.colors.primaryPurple}20;
   }
 
   &:last-child {
@@ -208,6 +235,7 @@ const ProductImage = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid ${theme.colors.border.light};
   
   img {
     width: 100%;
@@ -266,6 +294,7 @@ const DiscountBadge = styled.div`
   border-radius: ${theme.borderRadius.full};
   text-align: center;
   font-weight: ${theme.fontWeights.medium};
+  box-shadow: ${theme.shadows.sm};
 `;
 
 const StockStatus = styled.div<{ isLowStock: boolean; isOutOfStock: boolean }>`
@@ -299,30 +328,147 @@ const StatusBadge = styled.div<{ isActive: boolean }>`
   font-size: ${theme.fontSizes.xs};
   font-weight: ${theme.fontWeights.medium};
   text-align: center;
-  background: ${({ isActive }) => isActive ? `${theme.colors.success}20` : `${theme.colors.warning}20`};
+  background: ${({ isActive }) => isActive ? `${theme.colors.success}15` : `${theme.colors.warning}15`};
   color: ${({ isActive }) => isActive ? theme.colors.success : theme.colors.warning};
+  border: 1px solid ${({ isActive }) => isActive ? `${theme.colors.success}30` : `${theme.colors.warning}30`};
 `;
 
+// Enhanced Action Buttons with Minimalist Design
 const ActionsContainer = styled.div`
   display: flex;
   gap: ${theme.spacing[1]};
+  position: relative;
 `;
 
-const ActionButton = styled.button`
-  background: none;
-  border: none;
-  color: ${theme.colors.text.secondary};
+const ActionButton = styled.button<{ 
+  variant: 'view' | 'edit' | 'toggle' | 'delete';
+  isActive?: boolean;
+}>`
+  background: ${({ variant, isActive }) => {
+    if (isActive) return theme.colors.primaryPurple;
+    switch (variant) {
+      case 'view': return theme.colors.background.light;
+      case 'edit': return theme.colors.background.light;
+      case 'toggle': return theme.colors.background.light;
+      case 'delete': return theme.colors.background.light;
+      default: return theme.colors.background.light;
+    }
+  }};
+  border: 1px solid ${({ variant, isActive }) => {
+    if (isActive) return theme.colors.primaryPurple;
+    switch (variant) {
+      case 'view': return theme.colors.border.light;
+      case 'edit': return theme.colors.border.light;
+      case 'toggle': return theme.colors.border.light;
+      case 'delete': return theme.colors.border.light;
+      default: return theme.colors.border.light;
+    }
+  }};
+  color: ${({ variant, isActive }) => {
+    if (isActive) return theme.colors.white;
+    switch (variant) {
+      case 'view': return theme.colors.info;
+      case 'edit': return theme.colors.primaryPurple;
+      case 'toggle': return theme.colors.warning;
+      case 'delete': return theme.colors.error;
+      default: return theme.colors.text.secondary;
+    }
+  }};
   cursor: pointer;
-  padding: ${theme.spacing[1]};
-  border-radius: ${theme.borderRadius.sm};
+  padding: ${theme.spacing[2]};
+  border-radius: ${theme.borderRadius.md};
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all ${theme.transitions.base};
+  min-width: 36px;
+  height: 36px;
+  position: relative;
+  font-size: ${theme.fontSizes.xs};
 
   &:hover {
-    background: ${theme.colors.background.accent};
-    color: ${theme.colors.text.primary};
+    background: ${({ variant, isActive }) => {
+      if (isActive) return theme.colors.primaryPurple;
+      switch (variant) {
+        case 'view': return `${theme.colors.info}15`;
+        case 'edit': return `${theme.colors.primaryPurple}15`;
+        case 'toggle': return `${theme.colors.warning}15`;
+        case 'delete': return `${theme.colors.error}15`;
+        default: return theme.colors.background.accent;
+      }
+    }};
+    border-color: ${({ variant, isActive }) => {
+      if (isActive) return theme.colors.primaryPurple;
+      switch (variant) {
+        case 'view': return theme.colors.info;
+        case 'edit': return theme.colors.primaryPurple;
+        case 'toggle': return theme.colors.warning;
+        case 'delete': return theme.colors.error;
+        default: return theme.colors.border.medium;
+      }
+    }};
+    transform: translateY(-1px);
+    box-shadow: ${theme.shadows.sm};
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: ${theme.shadows.sm};
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px ${theme.colors.primaryPurple}40;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  @media (max-width: ${theme.breakpoints.md}) {
+    padding: ${theme.spacing[1]};
+    min-width: 32px;
+    height: 32px;
+  }
+`;
+
+const ActionTooltip = styled.div`
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: ${theme.colors.darkGray};
+  color: ${theme.colors.white};
+  padding: ${theme.spacing[1]} ${theme.spacing[2]};
+  border-radius: ${theme.borderRadius.sm};
+  font-size: ${theme.fontSizes.xs};
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all ${theme.transitions.fast};
+  z-index: 1000;
+  margin-bottom: ${theme.spacing[1]};
+  pointer-events: none;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: ${theme.colors.darkGray};
+  }
+`;
+
+const ActionButtonWrapper = styled.div`
+  position: relative;
+
+  &:hover ${ActionTooltip} {
+    opacity: 1;
+    visibility: visible;
   }
 `;
 
@@ -335,6 +481,7 @@ const PaginationContainer = styled.div`
   background: ${theme.colors.white};
   border-radius: ${theme.borderRadius.lg};
   border: 1px solid ${theme.colors.border.light};
+  box-shadow: ${theme.shadows.sm};
   
   @media (max-width: ${theme.breakpoints.md}) {
     flex-wrap: wrap;
@@ -359,6 +506,13 @@ const PageButton = styled.button<{ isActive?: boolean }>`
     background: ${({ isActive }) => 
       isActive ? theme.colors.primaryPurple : theme.colors.softPurple};
     border-color: ${theme.colors.primaryPurple};
+    transform: translateY(-1px);
+    box-shadow: ${theme.shadows.sm};
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: ${theme.shadows.sm};
   }
 
   &:disabled {
@@ -371,6 +525,10 @@ const EmptyState = styled.div`
   text-align: center;
   padding: ${theme.spacing[12]};
   color: ${theme.colors.text.secondary};
+  background: ${theme.colors.white};
+  border-radius: ${theme.borderRadius.lg};
+  border: 1px solid ${theme.colors.border.light};
+  box-shadow: ${theme.shadows.sm};
 `;
 
 const EmptyIcon = styled.div`
@@ -379,7 +537,7 @@ const EmptyIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.5;
+  opacity: 0.6;
 `;
 
 const EmptyTitle = styled.h3`
@@ -391,6 +549,72 @@ const EmptyTitle = styled.h3`
 `;
 
 const EmptyMessage = styled.p`
+  font-size: ${theme.fontSizes.base};
+  color: ${theme.colors.text.secondary};
+  margin: 0;
+`;
+
+const LoadingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: ${theme.spacing[12]};
+  background: ${theme.colors.white};
+  border-radius: ${theme.borderRadius.lg};
+  border: 1px solid ${theme.colors.border.light};
+  box-shadow: ${theme.shadows.sm};
+`;
+
+const LoadingSpinner = styled.div`
+  width: 48px;
+  height: 48px;
+  border: 3px solid ${theme.colors.background.accent};
+  border-top: 3px solid ${theme.colors.primaryPurple};
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: ${theme.spacing[4]};
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+
+const LoadingText = styled.p`
+  font-size: ${theme.fontSizes.lg};
+  color: ${theme.colors.text.secondary};
+  margin: 0;
+  font-weight: ${theme.fontWeights.medium};
+`;
+
+const ErrorContainer = styled.div`
+  text-align: center;
+  padding: ${theme.spacing[8]};
+  background: ${theme.colors.white};
+  border-radius: ${theme.borderRadius.lg};
+  border: 1px solid ${theme.colors.error}30;
+  box-shadow: ${theme.shadows.sm};
+`;
+
+const ErrorIcon = styled.div`
+  color: ${theme.colors.error};
+  margin-bottom: ${theme.spacing[4]};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+`;
+
+const ErrorTitle = styled.h3`
+  font-family: ${theme.fonts.heading};
+  font-size: ${theme.fontSizes.xl};
+  font-weight: ${theme.fontWeights.semibold};
+  color: ${theme.colors.error};
+  margin: 0 0 ${theme.spacing[2]} 0;
+`;
+
+const ErrorMessage = styled.p`
   font-size: ${theme.fontSizes.base};
   color: ${theme.colors.text.secondary};
   margin: 0;
@@ -418,6 +642,7 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
 }) => {
   const [sortField, setSortField] = useState<string>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
 
   const handleSort = useCallback((field: string) => {
     const newDirection = sortField === field && sortDirection === 'asc' ? 'desc' : 'asc';
@@ -435,27 +660,29 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
     );
   };
 
+  const handleRowHover = useCallback((productId: string | null) => {
+    setHoveredProduct(productId);
+  }, []);
+
   if (loading) {
     return (
-      <EmptyState>
-        <EmptyIcon>
-          <Package size={48} />
-        </EmptyIcon>
-        <EmptyTitle>Cargando productos...</EmptyTitle>
+      <LoadingContainer>
+        <LoadingSpinner />
+        <LoadingText>Cargando productos...</LoadingText>
         <EmptyMessage>Por favor espera mientras se cargan los datos</EmptyMessage>
-      </EmptyState>
+      </LoadingContainer>
     );
   }
 
   if (error) {
     return (
-      <EmptyState>
-        <EmptyIcon>
+      <ErrorContainer>
+        <ErrorIcon>
           <AlertTriangle size={48} />
-        </EmptyIcon>
-        <EmptyTitle>Error al cargar productos</EmptyTitle>
-        <EmptyMessage>{error}</EmptyMessage>
-      </EmptyState>
+        </ErrorIcon>
+        <ErrorTitle>Error al cargar productos</ErrorTitle>
+        <ErrorMessage>{error}</ErrorMessage>
+      </ErrorContainer>
     );
   }
 
@@ -473,7 +700,7 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
 
   return (
     <ListViewContainer>
-      {/* Simplified Header - Only Context Information */}
+      {/* Enhanced Header with Better Visual Hierarchy */}
       <ListViewHeader>
         <HeaderLeft>
           <ViewModeIndicator>
@@ -486,7 +713,7 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
         </HeaderLeft>
       </ListViewHeader>
 
-      {/* Product Table - Clean and Focused */}
+      {/* Enhanced Product Table with Better UX */}
       <ProductTable>
         <TableHeader>
           <div>Imagen</div>
@@ -514,8 +741,14 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
           <div>Acciones</div>
         </TableHeader>
 
-        {products.map((product) => (
-          <ProductRow key={product.id}>
+        {products.map((product, index) => (
+          <ProductRow 
+            key={product.id} 
+            isEven={index % 2 === 0}
+            onMouseEnter={() => handleRowHover(product.id)}
+            onMouseLeave={() => handleRowHover(null)}
+            tabIndex={0}
+          >
             <ProductImage>
               {product.images.length > 0 ? (
                 <img src={product.images[0]} alt={product.name} />
@@ -572,29 +805,65 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
             </StatusBadge>
 
             <ActionsContainer>
-              <ActionButton onClick={() => onViewDetails(product.id)} title="Ver detalles">
-                <Eye size={16} />
-              </ActionButton>
-              <ActionButton onClick={() => onEdit(product.id)} title="Editar">
-                <Edit size={16} />
-              </ActionButton>
-              <ActionButton onClick={() => onToggleStatus(product.id, !product.isActive)} title="Cambiar estado">
-                {product.isActive ? <XCircle size={16} /> : <CheckCircle size={16} />}
-              </ActionButton>
-              <ActionButton onClick={() => onDelete(product.id)} title="Eliminar">
-                <Trash2 size={16} />
-              </ActionButton>
+              <ActionButtonWrapper>
+                <ActionButton 
+                  variant="view" 
+                  onClick={() => onViewDetails(product.id)} 
+                  title="Ver detalles"
+                  aria-label={`Ver detalles de ${product.name}`}
+                >
+                  <Eye size={16} />
+                </ActionButton>
+                <ActionTooltip>Ver detalles</ActionTooltip>
+              </ActionButtonWrapper>
+
+              <ActionButtonWrapper>
+                <ActionButton 
+                  variant="edit" 
+                  onClick={() => onEdit(product.id)} 
+                  title="Editar"
+                  aria-label={`Editar ${product.name}`}
+                >
+                  <Edit size={16} />
+                </ActionButton>
+                <ActionTooltip>Editar</ActionTooltip>
+              </ActionButtonWrapper>
+
+              <ActionButtonWrapper>
+                <ActionButton 
+                  variant="toggle" 
+                  onClick={() => onToggleStatus(product.id, !product.isActive)} 
+                  title={product.isActive ? "Desactivar" : "Activar"}
+                  aria-label={`${product.isActive ? 'Desactivar' : 'Activar'} ${product.name}`}
+                >
+                  {product.isActive ? <XCircle size={16} /> : <CheckCircle size={16} />}
+                </ActionButton>
+                <ActionTooltip>{product.isActive ? "Desactivar" : "Activar"}</ActionTooltip>
+              </ActionButtonWrapper>
+
+              <ActionButtonWrapper>
+                <ActionButton 
+                  variant="delete" 
+                  onClick={() => onDelete(product.id)} 
+                  title="Eliminar"
+                  aria-label={`Eliminar ${product.name}`}
+                >
+                  <Trash2 size={16} />
+                </ActionButton>
+                <ActionTooltip>Eliminar</ActionTooltip>
+              </ActionButtonWrapper>
             </ActionsContainer>
           </ProductRow>
         ))}
       </ProductTable>
 
-      {/* Pagination - Clean and Accessible */}
+      {/* Enhanced Pagination with Better Visual Feedback */}
       {totalPages > 1 && (
         <PaginationContainer>
           <PageButton
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
+            aria-label="Página anterior"
           >
             Anterior
           </PageButton>
@@ -604,6 +873,8 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
               key={page}
               isActive={page === currentPage}
               onClick={() => onPageChange(page)}
+              aria-label={`Página ${page}`}
+              aria-current={page === currentPage ? 'page' : undefined}
             >
               {page}
             </PageButton>
@@ -612,6 +883,7 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
           <PageButton
             onClick={() => onPageChange(currentPage + 1)}
             disabled={!hasMore}
+            aria-label="Página siguiente"
           >
             Siguiente
           </PageButton>

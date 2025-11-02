@@ -1,15 +1,11 @@
 import { useCallback, useState, useMemo } from 'react';
-import { CategoryFilterInput, PaginationInput } from '@/generated/graphql';
+import { PaginationInput } from '@/generated/graphql';
+import { CategoryFilters, CategoryFilterInput } from '@/components/categories/types';
 
 // Local types for internal state management
 export interface LocalPaginationInput {
   limit: number;
   offset: number;
-}
-
-export interface CategoryFilters {
-  isActive?: boolean;
-  search?: string;
 }
 
 export interface SortConfig {
@@ -46,6 +42,7 @@ export interface UseCategoryFiltersReturn {
   // Utilities
   resetToDefaults: () => void;
   getFilteredAndSortedCategories: (categories: any[]) => any[];
+  mapFiltersToGraphQL: (filters: CategoryFilters) => CategoryFilterInput;
 }
 
 const DEFAULT_FILTERS: CategoryFilters = {
@@ -69,6 +66,62 @@ export const useCategoryFilters = (totalItems: number = 0) => {
       limit: graphqlPagination.limit ?? 10,
       offset: graphqlPagination.offset ?? 0,
     };
+  }, []);
+
+  // Helper function to map local filters to GraphQL format
+  const mapFiltersToGraphQL = useCallback((localFilters: CategoryFilters): CategoryFilterInput => {
+    const graphqlFilters: CategoryFilterInput = {};
+    
+    // Only add properties that are not null or undefined
+    if (localFilters.isActive !== undefined) {
+      graphqlFilters.isActive = localFilters.isActive;
+    }
+    
+    if (localFilters.search) {
+      graphqlFilters.search = localFilters.search;
+    }
+
+    if (localFilters.hasImage !== undefined) {
+      graphqlFilters.hasImage = localFilters.hasImage;
+    }
+
+    if (localFilters.hasDescription !== undefined) {
+      graphqlFilters.hasDescription = localFilters.hasDescription;
+    }
+
+    if (localFilters.hasProducts !== undefined) {
+      graphqlFilters.hasProducts = localFilters.hasProducts;
+    }
+
+    if (localFilters.minProducts !== undefined) {
+      graphqlFilters.minProducts = localFilters.minProducts;
+    }
+
+    if (localFilters.maxProducts !== undefined) {
+      graphqlFilters.maxProducts = localFilters.maxProducts;
+    }
+
+    if (localFilters.createdAfter) {
+      graphqlFilters.createdAfter = localFilters.createdAfter;
+    }
+
+    if (localFilters.createdBefore) {
+      graphqlFilters.createdBefore = localFilters.createdBefore;
+    }
+
+    if (localFilters.updatedAfter) {
+      graphqlFilters.updatedAfter = localFilters.updatedAfter;
+    }
+
+    if (localFilters.updatedBefore) {
+      graphqlFilters.updatedBefore = localFilters.updatedBefore;
+    }
+
+    if (localFilters.sortOrder !== undefined) {
+      graphqlFilters.sortOrder = localFilters.sortOrder;
+    }
+    
+    return graphqlFilters;
   }, []);
 
   // Filters state
@@ -169,6 +222,66 @@ export const useCategoryFilters = (totalItems: number = 0) => {
       );
     }
 
+    if (filters.hasImage !== undefined) {
+      filtered = filtered.filter(cat => 
+        filters.hasImage ? !!cat.image : !cat.image
+      );
+    }
+
+    if (filters.hasDescription !== undefined) {
+      filtered = filtered.filter(cat => 
+        filters.hasDescription ? !!cat.description : !cat.description
+      );
+    }
+
+    if (filters.hasProducts !== undefined) {
+      filtered = filtered.filter(cat => 
+        filters.hasProducts ? (cat.productsCount || 0) > 0 : (cat.productsCount || 0) === 0
+      );
+    }
+
+    if (filters.minProducts !== undefined) {
+      filtered = filtered.filter(cat => 
+        (cat.productsCount || 0) >= filters.minProducts!
+      );
+    }
+
+    if (filters.maxProducts !== undefined) {
+      filtered = filtered.filter(cat => 
+        (cat.productsCount || 0) <= filters.maxProducts!
+      );
+    }
+
+    if (filters.createdAfter) {
+      filtered = filtered.filter(cat => 
+        new Date(cat.createdAt) >= new Date(filters.createdAfter!)
+      );
+    }
+
+    if (filters.createdBefore) {
+      filtered = filtered.filter(cat => 
+        new Date(cat.createdAt) <= new Date(filters.createdBefore!)
+      );
+    }
+
+    if (filters.updatedAfter) {
+      filtered = filtered.filter(cat => 
+        new Date(cat.updatedAt) >= new Date(filters.updatedAfter!)
+      );
+    }
+
+    if (filters.updatedBefore) {
+      filtered = filtered.filter(cat => 
+        new Date(cat.updatedAt) <= new Date(filters.updatedBefore!)
+      );
+    }
+
+    if (filters.sortOrder !== undefined) {
+      filtered = filtered.filter(cat => 
+        cat.sortOrder === filters.sortOrder
+      );
+    }
+
     // Apply sorting
     filtered.sort((a, b) => {
       const aValue = a[sortConfig.field];
@@ -221,6 +334,7 @@ export const useCategoryFilters = (totalItems: number = 0) => {
     
     // Utilities
     resetToDefaults,
-    getFilteredAndSortedCategories
+    getFilteredAndSortedCategories,
+    mapFiltersToGraphQL
   };
 };

@@ -139,19 +139,29 @@ mutation RefreshToken($refreshToken: String!) {
 # Returns User object directly
 query GetCurrentUser {
   currentUser {
-    id
-    email
-    role
-    isActive
-    emailVerified
-    lastLoginAt
-    profile {
+    success
+    message
+    code
+    timestamp
+    data {
       id
-      firstName
-      lastName
-      phone
-      dateOfBirth
-      avatar
+      email
+      role
+      isActive
+      emailVerified
+      lastLoginAt
+      profile {
+        id
+        firstName
+        lastName
+        phone
+        dateOfBirth
+        avatar
+      }
+    }
+    metadata {
+      requestId
+      timestamp
     }
   }
 }

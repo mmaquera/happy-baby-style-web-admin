@@ -124,7 +124,7 @@ export const theme = {
   },
   
   zIndex: {
-    modal: 1000,
+    modal: 9999,
     dropdown: 100,
     header: 50,
     overlay: 40,

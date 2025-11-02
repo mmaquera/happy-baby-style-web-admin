@@ -57,6 +57,49 @@ const LoadingText = styled.p`
   text-align: center;
 `;
 
+const UpdateIndicator = styled.div`
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: ${theme.colors.primaryPurple};
+  color: ${theme.colors.white};
+  padding: ${theme.spacing[3]} ${theme.spacing[4]};
+  border-radius: ${theme.borderRadius.lg};
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: ${theme.zIndex?.modal || 1000};
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[2]};
+  font-size: ${theme.fontSizes.sm};
+  font-weight: ${theme.fontWeights.medium};
+  animation: slideIn 0.3s ease-out;
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+`;
+
+const UpdateSpinner = styled.div`
+  width: 16px;
+  height: 16px;
+  border: 2px solid ${theme.colors.white}40;
+  border-top: 2px solid ${theme.colors.white};
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+
 const ErrorContainer = styled.div`
   background: ${theme.colors.error}15;
   border: 1px solid ${theme.colors.error}30;
@@ -83,7 +126,8 @@ export const Categories: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true); // Mostrar filtros por defecto
+  const [isUpdating, setIsUpdating] = useState(false); // Estado para indicar actualización
 
   // Use the main categories hook
   const {
@@ -126,8 +170,11 @@ export const Categories: React.FC = () => {
   }, []);
 
   const handleCreateCategorySuccess = useCallback((newCategory: any) => {
+    setIsUpdating(true);
     toast.success('Categoría creada exitosamente');
     setIsCreateModalOpen(false);
+    // La tabla se actualizará automáticamente via refetch con filtros preservados
+    setTimeout(() => setIsUpdating(false), 1000);
   }, []);
 
   const handleBulkActions = useCallback(() => {
@@ -159,16 +206,23 @@ export const Categories: React.FC = () => {
   }, []);
 
   const handleEditCategorySuccess = useCallback((updatedCategory: any) => {
+    setIsUpdating(true);
     toast.success('Categoría actualizada exitosamente');
     setIsEditModalOpen(false);
     setSelectedCategory(null);
+    // La tabla se actualizará automáticamente via refetch con filtros preservados
+    setTimeout(() => setIsUpdating(false), 1000);
   }, []);
 
   const handleDeleteCategory = useCallback(async (categoryId: string) => {
     if (window.confirm('¿Estás seguro de que quieres eliminar esta categoría?')) {
       try {
+        setIsUpdating(true);
         await deleteCategory(categoryId);
+        // La tabla se actualizará automáticamente via refetch con filtros preservados
+        setTimeout(() => setIsUpdating(false), 1000);
       } catch (error) {
+        setIsUpdating(false);
         console.error('Error deleting category:', error);
       }
     }
@@ -176,8 +230,12 @@ export const Categories: React.FC = () => {
 
   const handleToggleStatus = useCallback(async (categoryId: string, isActive: boolean) => {
     try {
+      setIsUpdating(true);
       await toggleStatus(categoryId, isActive);
+      // La tabla se actualizará automáticamente via refetch con filtros preservados
+      setTimeout(() => setIsUpdating(false), 1000);
     } catch (error) {
+      setIsUpdating(false);
       console.error('Error toggling status:', error);
     }
   }, [toggleStatus]);
@@ -240,6 +298,14 @@ export const Categories: React.FC = () => {
 
   return (
     <CategoriesContainer>
+      {/* Update Indicator */}
+      {isUpdating && (
+        <UpdateIndicator>
+          <UpdateSpinner />
+          Actualizando categorías...
+        </UpdateIndicator>
+      )}
+
       <CategoryHeader
         title="Categorías Happy Baby Style"
         stats={stats}

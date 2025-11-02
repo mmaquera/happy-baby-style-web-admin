@@ -7,7 +7,7 @@
 
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, AlertCircle, RefreshCw } from 'lucide-react';
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -61,15 +61,57 @@ const ForgotPasswordLink = styled.button`
   }
 `;
 
-const ErrorMessage = styled.div`
-  background: ${theme.colors.error}10;
+// ✅ Banner de error mejorado siguiendo estándares
+const EnhancedErrorMessage = styled.div`
+  background: ${theme.colors.error}15;
   border: 1px solid ${theme.colors.error}30;
   color: ${theme.colors.error};
-  padding: ${theme.spacing[3]};
+  padding: ${theme.spacing[4]};
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.fontSizes.sm};
   text-align: center;
+  margin-top: ${theme.spacing[3]};
+  animation: slideIn 0.3s ease-out;
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 `;
+
+const ErrorIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: ${theme.spacing[2]};
+  color: ${theme.colors.error};
+`;
+
+const ErrorTitle = styled.div`
+  font-weight: ${theme.fontWeights.medium};
+  margin-bottom: ${theme.spacing[1]};
+`;
+
+const ErrorDescription = styled.div`
+  font-size: ${theme.fontSizes.sm};
+  opacity: 0.9;
+  margin-bottom: ${theme.spacing[3]};
+`;
+
+// ✅ Acciones de error siguiendo estándares
+const ErrorActions = styled.div`
+  display: flex;
+  gap: ${theme.spacing[2]};
+  justify-content: center;
+  flex-wrap: wrap;
+`;
+
 
 // Component following Single Responsibility Principle
 export const LoginForm: React.FC = () => {
@@ -87,12 +129,17 @@ export const LoginForm: React.FC = () => {
 
   const { register, handleSubmit, formState: { errors } } = form;
 
-  // Clear error when component mounts or error changes
+  // Enhanced error handling following development standards
   useEffect(() => {
-    if (error) {
-      clearError();
+    // Clear error when user starts typing (better UX)
+    if (error && (form.watch('email') || form.watch('password'))) {
+      const timer = setTimeout(() => {
+        clearError();
+      }, 100);
+      return () => clearTimeout(timer);
     }
-  }, [error, clearError]);
+    return undefined; // ✅ Fix linting error
+  }, [error, clearError, form]);
 
   // Handle forgot password modal
   const handleForgotPassword = (e: React.MouseEvent) => {
@@ -156,20 +203,47 @@ export const LoginForm: React.FC = () => {
           ¿Olvidaste tu contraseña?
         </ForgotPasswordLink>
 
+        {/* ✅ Banner de error mejorado siguiendo estándares */}
         {error && (
-          <ErrorMessage>
-            {error}
-          </ErrorMessage>
+          <EnhancedErrorMessage role="alert" aria-live="polite">
+            <ErrorIcon>
+              <AlertCircle size={20} />
+            </ErrorIcon>
+            <ErrorTitle>Error de autenticación</ErrorTitle>
+            <ErrorDescription>{error}</ErrorDescription>
+            
+            <ErrorActions>
+              <Button
+                type="button"
+                variant="outline"
+                size="small"
+                onClick={clearError}
+              >
+                <RefreshCw size={14} />
+                Reintentar
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="small"
+                onClick={() => setIsForgotPasswordOpen(true)}
+              >
+                Recuperar contraseña
+              </Button>
+            </ErrorActions>
+          </EnhancedErrorMessage>
         )}
 
+        {/* ✅ Botón con estados mejorados siguiendo estándares */}
         <Button
           type="submit"
           variant="primary"
           size="large"
           fullWidth
           isLoading={isLoading}
+          disabled={isLoading || !form.formState.isValid}
         >
-          {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+          {isLoading ? 'Verificando credenciales...' : 'Iniciar Sesión'}
         </Button>
       </FormContainer>
 

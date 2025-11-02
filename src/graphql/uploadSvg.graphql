@@ -1,0 +1,26 @@
+# Upload SVG Mutation
+mutation UploadSvg($file: Upload!, $entityType: String!, $entityId: String!, $optimize: Boolean, $sanitize: Boolean) {
+  uploadSvg(file: $file, entityType: $entityType, entityId: $entityId, optimize: $optimize, sanitize: $sanitize) {
+    success
+    message
+    code
+    timestamp
+    data {
+      url
+      filename
+      svgId
+      dimensions {
+        width
+        height
+      }
+      viewBox
+      optimized
+    }
+    metadata {
+      requestId
+      traceId
+      duration
+      timestamp
+    }
+  }
+}

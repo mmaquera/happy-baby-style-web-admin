@@ -7,7 +7,7 @@
 # QUERIES
 # =====================================================
 
-# Get all categories with pagination and filters
+# Get all categories with pagination and enhanced filters
 query GetCategories($filters: CategoryFilterInput, $pagination: PaginationInput) {
   categories(filters: $filters, pagination: $pagination) {
     success

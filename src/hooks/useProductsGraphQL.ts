@@ -100,6 +100,8 @@ export const useCreateProduct = () => {
   });
 
   const create = (input: CreateProductInput) => {
+    // Note: The backend should handle both absolute URLs and relative paths for images
+    // The frontend components convert absolute URLs to relative paths before calling this function
     return createProduct({ variables: { input } });
   };
 
@@ -124,6 +126,8 @@ export const useUpdateProduct = () => {
   });
 
   const update = (id: string, input: UpdateProductInput) => {
+    // Note: The backend should handle both absolute URLs and relative paths for images
+    // The frontend components convert absolute URLs to relative paths before calling this function
     return updateProduct({ variables: { id, input } });
   };
 
