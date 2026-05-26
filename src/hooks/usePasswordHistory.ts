@@ -96,12 +96,14 @@ const transformSecurityEventToPasswordAction = (event: any): PasswordAction | nu
       ? JSON.parse(event.metadata) 
       : event.metadata || {};
 
+    const adminUser = extractAdminUser(metadata, event.user?.email);
+
     return {
       id: event.id,
       type: mapEventTypeToActionType(event.eventType),
       timestamp: new Date(event.createdAt),
       description: event.description || 'Evento de contraseña',
-      adminUser: extractAdminUser(metadata, event.user?.email),
+      ...(adminUser && { adminUser }),
       status: mapStatusFromMetadata(metadata)
     };
   } catch (error) {
