@@ -1,0 +1,5 @@
+# Whitespace / formatting commits — skip with: git blame --ignore-revs-file .git-blame-ignore-revs
+# Configure globally: git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# style: apply Prettier formatting + fix ESLint/Prettier rule conflicts (2026-05-28)
+a6caa9c

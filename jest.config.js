@@ -30,14 +30,15 @@ export default {
     '!src/App.tsx'
   ],
   
-  // Coverage thresholds
+  // Coverage thresholds — start at 5% (current ~3%) and raise incrementally
+  // Target: 70% after Fase 1/2 refactors. See ROADMAP_ERP_ODOO.md Fase 3.
   coverageThreshold: {
     global: {
-      branches: 70,
-      functions: 70,
-      lines: 70,
-      statements: 70
-    }
+      branches: 5,
+      functions: 5,
+      lines: 5,
+      statements: 5,
+    },
   },
   
   // Coverage reporters

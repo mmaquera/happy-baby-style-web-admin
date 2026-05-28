@@ -30,7 +30,7 @@ module.exports = {
     'complexity': ['warn', 10], // Single Responsibility: Limit cyclomatic complexity
     
     // Clean Code rules
-    'no-console': 'warn', // Use proper logging
+    'no-console': 'error', // Use logger from @/utils/logger instead
     'no-debugger': 'error',
     'no-alert': 'error',
     'no-eval': 'error',
