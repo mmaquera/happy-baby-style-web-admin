@@ -6,7 +6,7 @@ export { ProductDetail } from '../ProductDetail';
 export type { Product } from '../../components/products';
 
 // Export icon components for consistency
-export { 
+export {
   Package,
   CheckCircle,
   AlertTriangle,
@@ -26,5 +26,5 @@ export {
   Eye,
   Edit,
   Trash2,
-  ArrowLeft
+  ArrowLeft,
 } from 'lucide-react';

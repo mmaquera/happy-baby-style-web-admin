@@ -90,7 +90,7 @@ const ModalActions = styled.div`
 export const RegisterModal: React.FC<RegisterModalProps> = ({
   isOpen,
   onClose,
-  onSuccess
+  onSuccess,
 }) => {
   if (!isOpen) return null;
 
@@ -113,8 +113,8 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
             </div>
           </ModalHeaderLeft>
           <Button
-            variant="ghost"
-            size="small"
+            variant='ghost'
+            size='small'
             onClick={onClose}
             style={{ padding: theme.spacing[2] }}
           >
@@ -127,11 +127,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
         </ModalBody>
 
         <ModalActions>
-          <Button
-            variant="outline"
-            onClick={onClose}
-            size="large"
-          >
+          <Button variant='outline' onClick={onClose} size='large'>
             Cancelar
           </Button>
         </ModalActions>

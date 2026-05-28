@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { 
+import {
   Package,
   CheckCircle,
   AlertTriangle,
@@ -13,7 +13,7 @@ import {
   Download,
   Upload,
   Grid3X3,
-  List
+  List,
 } from 'lucide-react';
 
 interface ProductHeaderProps {
@@ -48,7 +48,7 @@ const MainHeader = styled.div`
   margin-bottom: ${theme.spacing[4]};
   flex-wrap: wrap;
   gap: ${theme.spacing[4]};
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     flex-direction: column;
     align-items: stretch;
@@ -60,7 +60,7 @@ const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[3]};
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     justify-content: center;
   }
@@ -90,7 +90,7 @@ const HeaderTitle = styled.h1`
   color: ${theme.colors.text.primary};
   margin: 0;
   line-height: 1.2;
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     font-size: ${theme.fontSizes['2xl']};
     text-align: center;
@@ -101,7 +101,7 @@ const HeaderSubtitle = styled.p`
   font-size: ${theme.fontSizes.base};
   color: ${theme.colors.text.secondary};
   margin: 0;
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     text-align: center;
   }
@@ -113,7 +113,7 @@ const HeaderActions = styled.div`
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     justify-content: center;
     gap: ${theme.spacing[2]};
@@ -131,9 +131,9 @@ const ViewToggleContainer = styled.div`
 
 const ViewToggleButton = styled.button<{ isActive: boolean }>`
   padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  background: ${({ isActive }) => 
+  background: ${({ isActive }) =>
     isActive ? theme.colors.primaryPurple : 'transparent'};
-  color: ${({ isActive }) => 
+  color: ${({ isActive }) =>
     isActive ? theme.colors.white : theme.colors.text.secondary};
   border: none;
   border-radius: ${theme.borderRadius.sm};
@@ -147,7 +147,7 @@ const ViewToggleButton = styled.button<{ isActive: boolean }>`
   justify-content: center;
 
   &:hover {
-    background: ${({ isActive }) => 
+    background: ${({ isActive }) =>
       isActive ? theme.colors.primaryPurple : theme.colors.background.accent};
   }
 `;
@@ -157,7 +157,7 @@ const StatsGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: ${theme.spacing[4]};
   margin-bottom: ${theme.spacing[4]};
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: ${theme.spacing[3]};
@@ -176,13 +176,19 @@ const StatCard = styled(Card)`
   }
 `;
 
-const StatIcon = styled.div<{ variant: 'primary' | 'success' | 'warning' | 'error' }>`
+const StatIcon = styled.div<{
+  variant: 'primary' | 'success' | 'warning' | 'error';
+}>`
   color: ${({ variant }) => {
     switch (variant) {
-      case 'success': return theme.colors.success;
-      case 'warning': return theme.colors.warning;
-      case 'error': return theme.colors.error;
-      default: return theme.colors.primaryPurple;
+      case 'success':
+        return theme.colors.success;
+      case 'warning':
+        return theme.colors.warning;
+      case 'error':
+        return theme.colors.error;
+      default:
+        return theme.colors.primaryPurple;
     }
   }};
   margin-bottom: ${theme.spacing[2]};
@@ -207,7 +213,8 @@ const StatLabel = styled.div`
 
 const StatChange = styled.div<{ isPositive: boolean }>`
   font-size: ${theme.fontSizes.xs};
-  color: ${({ isPositive }) => isPositive ? theme.colors.success : theme.colors.error};
+  color: ${({ isPositive }) =>
+    isPositive ? theme.colors.success : theme.colors.error};
   font-weight: ${theme.fontWeights.medium};
   margin-top: ${theme.spacing[1]};
 `;
@@ -217,7 +224,7 @@ const StatChange = styled.div<{ isPositive: boolean }>`
 // =====================================================
 
 export const ProductHeader: React.FC<ProductHeaderProps> = ({
-  title = "Productos Happy Baby Style",
+  title = 'Productos Happy Baby Style',
   stats,
   viewMode = 'list',
   onAddProduct,
@@ -225,9 +232,10 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
   onExport,
   onImport,
   showActions = true,
-  onViewModeChange
+  onViewModeChange,
 }) => {
-  const hasStats = stats && Object.values(stats).some(value => value !== undefined);
+  const hasStats =
+    stats && Object.values(stats).some(value => value !== undefined);
 
   return (
     <HeaderContainer>
@@ -238,7 +246,9 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
           </HeaderIcon>
           <HeaderContent>
             <HeaderTitle>{title}</HeaderTitle>
-            <HeaderSubtitle>Gestiona tu catálogo de productos para bebés</HeaderSubtitle>
+            <HeaderSubtitle>
+              Gestiona tu catálogo de productos para bebés
+            </HeaderSubtitle>
           </HeaderContent>
         </HeaderLeft>
 
@@ -247,18 +257,18 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
             {/* View Mode Toggle - Consolidated */}
             {onViewModeChange && (
               <ViewToggleContainer>
-                <ViewToggleButton 
+                <ViewToggleButton
                   isActive={viewMode === 'list'}
                   onClick={() => onViewModeChange('list')}
-                  title="Vista de lista"
+                  title='Vista de lista'
                 >
                   <List size={16} />
                   Lista
                 </ViewToggleButton>
-                <ViewToggleButton 
+                <ViewToggleButton
                   isActive={viewMode === 'grid'}
                   onClick={() => onViewModeChange('grid')}
-                  title="Vista de cuadrícula"
+                  title='Vista de cuadrícula'
                 >
                   <Grid3X3 size={16} />
                   Grid
@@ -269,46 +279,46 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
             {/* Primary Actions */}
             {onImport && (
               <Button
-                variant="ghost"
-                size="medium"
+                variant='ghost'
+                size='medium'
                 onClick={onImport}
-                title="Importar productos"
+                title='Importar productos'
               >
                 <Upload size={16} />
                 Importar
               </Button>
             )}
-            
+
             {onExport && (
               <Button
-                variant="ghost"
-                size="medium"
+                variant='ghost'
+                size='medium'
                 onClick={onExport}
-                title="Exportar productos"
+                title='Exportar productos'
               >
                 <Download size={16} />
                 Exportar
               </Button>
             )}
-            
+
             {onBulkActions && (
               <Button
-                variant="secondary"
-                size="medium"
+                variant='secondary'
+                size='medium'
                 onClick={onBulkActions}
-                title="Acciones masivas"
+                title='Acciones masivas'
               >
                 <Settings size={16} />
                 Acciones Masivas
               </Button>
             )}
-            
+
             {onAddProduct && (
               <Button
-                variant="primary"
-                size="medium"
+                variant='primary'
+                size='medium'
                 onClick={onAddProduct}
-                title="Agregar nuevo producto"
+                title='Agregar nuevo producto'
               >
                 <Plus size={16} />
                 Nuevo Producto
@@ -323,7 +333,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
         <StatsGrid>
           {stats.totalProducts !== undefined && (
             <StatCard>
-              <StatIcon variant="primary">
+              <StatIcon variant='primary'>
                 <Package size={24} />
               </StatIcon>
               <StatValue>{stats.totalProducts.toLocaleString()}</StatValue>
@@ -331,10 +341,10 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
               <StatChange isPositive={true}>+12% este mes</StatChange>
             </StatCard>
           )}
-          
+
           {stats.activeProducts !== undefined && (
             <StatCard>
-              <StatIcon variant="success">
+              <StatIcon variant='success'>
                 <CheckCircle size={24} />
               </StatIcon>
               <StatValue>{stats.activeProducts.toLocaleString()}</StatValue>
@@ -342,10 +352,10 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
               <StatChange isPositive={true}>+8% este mes</StatChange>
             </StatCard>
           )}
-          
+
           {stats.lowStockProducts !== undefined && (
             <StatCard>
-              <StatIcon variant="warning">
+              <StatIcon variant='warning'>
                 <AlertTriangle size={24} />
               </StatIcon>
               <StatValue>{stats.lowStockProducts.toLocaleString()}</StatValue>
@@ -353,10 +363,10 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
               <StatChange isPositive={false}>+3% este mes</StatChange>
             </StatCard>
           )}
-          
+
           {stats.outOfStockProducts !== undefined && (
             <StatCard>
-              <StatIcon variant="error">
+              <StatIcon variant='error'>
                 <XCircle size={24} />
               </StatIcon>
               <StatValue>{stats.outOfStockProducts.toLocaleString()}</StatValue>

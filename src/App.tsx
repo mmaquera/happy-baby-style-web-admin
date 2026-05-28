@@ -26,80 +26,107 @@ function App() {
         <AuthProvider>
           <SidebarProvider>
             <Router>
-            <Routes>
-              {/* Public routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/unauthorized" element={<Unauthorized />} />
-              
-              {/* Protected routes */}
-              <Route path="/" element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Dashboard />
-                  </Layout>
-                </ProtectedRoute>
-              } />
-              <Route path="/products" element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Products />
-                  </Layout>
-                </ProtectedRoute>
-              } />
-              <Route path="/categories" element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Categories />
-                  </Layout>
-                </ProtectedRoute>
-              } />
-              <Route path="/orders" element={
-                <ProtectedRoute>
-                  <Layout>
-                    <Orders />
-                  </Layout>
-                </ProtectedRoute>
-              } />
-              <Route path="/users" element={
-                <ProtectedRoute>
-                  <Layout>
-                    <UsersPage />
-                  </Layout>
-                </ProtectedRoute>
-              } />
-              <Route path="/images" element={
-                <ProtectedRoute>
-                  <Layout>
-                    <ComingSoon page="Imágenes" />
-                  </Layout>
-                </ProtectedRoute>
-              } />
-              <Route path="/analytics" element={
-                <ProtectedRoute>
-                  <Layout>
-                    <ComingSoon page="Estadísticas" />
-                  </Layout>
-                </ProtectedRoute>
-              } />
-              <Route path="/settings" element={
-                <ProtectedRoute>
-                  <Layout>
-                    <ComingSoon page="Configuración" />
-                  </Layout>
-                </ProtectedRoute>
-              } />
-              <Route path="*" element={
-                <ProtectedRoute>
-                  <Layout>
-                    <NotFound />
-                  </Layout>
-                </ProtectedRoute>
-              } />
-            </Routes>
-          </Router>
+              <Routes>
+                {/* Public routes */}
+                <Route path='/login' element={<Login />} />
+                <Route path='/unauthorized' element={<Unauthorized />} />
+
+                {/* Protected routes */}
+                <Route
+                  path='/'
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Dashboard />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path='/products'
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Products />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path='/categories'
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Categories />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path='/orders'
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <Orders />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path='/users'
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <UsersPage />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path='/images'
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <ComingSoon page='Imágenes' />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path='/analytics'
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <ComingSoon page='Estadísticas' />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path='/settings'
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <ComingSoon page='Configuración' />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path='*'
+                  element={
+                    <ProtectedRoute>
+                      <Layout>
+                        <NotFound />
+                      </Layout>
+                    </ProtectedRoute>
+                  }
+                />
+              </Routes>
+            </Router>
           </SidebarProvider>
           <Toaster
-            position="top-right"
+            position='top-right'
             toastOptions={{
               duration: 4000,
               style: {
@@ -131,23 +158,27 @@ function App() {
 
 // Temporary components for routes not implemented yet
 const ComingSoon: React.FC<{ page: string }> = ({ page }) => (
-  <div style={{
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '4rem',
-    textAlign: 'center',
-    color: theme.colors.text.secondary,
-  }}>
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '4rem',
+      textAlign: 'center',
+      color: theme.colors.text.secondary,
+    }}
+  >
     <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🚧</div>
-    <h2 style={{ 
-      fontFamily: theme.fonts.heading, 
-      fontSize: theme.fontSizes['3xl'],
-      fontWeight: theme.fontWeights.light,
-      color: theme.colors.text.primary,
-      marginBottom: '0.5rem'
-    }}>
+    <h2
+      style={{
+        fontFamily: theme.fonts.heading,
+        fontSize: theme.fontSizes['3xl'],
+        fontWeight: theme.fontWeights.light,
+        color: theme.colors.text.primary,
+        marginBottom: '0.5rem',
+      }}
+    >
       {page}
     </h2>
     <p style={{ fontSize: theme.fontSizes.lg }}>
@@ -157,23 +188,27 @@ const ComingSoon: React.FC<{ page: string }> = ({ page }) => (
 );
 
 const NotFound: React.FC = () => (
-  <div style={{
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '4rem',
-    textAlign: 'center',
-    color: theme.colors.text.secondary,
-  }}>
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '4rem',
+      textAlign: 'center',
+      color: theme.colors.text.secondary,
+    }}
+  >
     <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🤔</div>
-    <h2 style={{ 
-      fontFamily: theme.fonts.heading, 
-      fontSize: theme.fontSizes['3xl'],
-      fontWeight: theme.fontWeights.light,
-      color: theme.colors.text.primary,
-      marginBottom: '0.5rem'
-    }}>
+    <h2
+      style={{
+        fontFamily: theme.fonts.heading,
+        fontSize: theme.fontSizes['3xl'],
+        fontWeight: theme.fontWeights.light,
+        color: theme.colors.text.primary,
+        marginBottom: '0.5rem',
+      }}
+    >
       Página no encontrada
     </h2>
     <p style={{ fontSize: theme.fontSizes.lg }}>

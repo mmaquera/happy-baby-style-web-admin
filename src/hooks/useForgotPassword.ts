@@ -22,7 +22,8 @@ interface ForgotPasswordActions {
   clearError: () => void;
 }
 
-interface UseForgotPasswordReturn extends ForgotPasswordState, ForgotPasswordActions {}
+interface UseForgotPasswordReturn
+  extends ForgotPasswordState, ForgotPasswordActions {}
 
 // Hook following Single Responsibility Principle
 export const useForgotPassword = (): UseForgotPasswordReturn => {
@@ -57,9 +58,9 @@ export const useForgotPassword = (): UseForgotPasswordReturn => {
   const submitForm = useCallback(async (email: string) => {
     // Validation logic
     if (!email.trim()) {
-      setState(prev => ({ 
-        ...prev, 
-        error: 'Por favor ingresa tu correo electrónico' 
+      setState(prev => ({
+        ...prev,
+        error: 'Por favor ingresa tu correo electrónico',
       }));
       return;
     }
@@ -67,37 +68,38 @@ export const useForgotPassword = (): UseForgotPasswordReturn => {
     // Email format validation
     const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
     if (!emailRegex.test(email)) {
-      setState(prev => ({ 
-        ...prev, 
-        error: 'Por favor ingresa un correo electrónico válido' 
+      setState(prev => ({
+        ...prev,
+        error: 'Por favor ingresa un correo electrónico válido',
       }));
       return;
     }
 
     // Set loading state
-    setState(prev => ({ 
-      ...prev, 
-      isLoading: true, 
-      error: '' 
+    setState(prev => ({
+      ...prev,
+      isLoading: true,
+      error: '',
     }));
 
     try {
       // TODO: Replace with actual API call
       // This is a simulation - implement actual password reset logic
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
+
       // Simulate success
-      setState(prev => ({ 
-        ...prev, 
-        isSuccess: true, 
-        isLoading: false 
+      setState(prev => ({
+        ...prev,
+        isSuccess: true,
+        isLoading: false,
       }));
     } catch (error) {
       // Handle error
-      setState(prev => ({ 
-        ...prev, 
-        error: 'Ocurrió un error al enviar el correo. Por favor intenta nuevamente.',
-        isLoading: false 
+      setState(prev => ({
+        ...prev,
+        error:
+          'Ocurrió un error al enviar el correo. Por favor intenta nuevamente.',
+        isLoading: false,
       }));
     }
   }, []);
@@ -112,4 +114,3 @@ export const useForgotPassword = (): UseForgotPasswordReturn => {
 };
 
 export default useForgotPassword;
-

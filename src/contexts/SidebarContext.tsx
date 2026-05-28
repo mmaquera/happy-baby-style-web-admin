@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+} from 'react';
 
 interface SidebarContextValue {
   isCollapsed: boolean;
@@ -7,7 +13,9 @@ interface SidebarContextValue {
   expandSidebar: () => void;
 }
 
-const SidebarContext = createContext<SidebarContextValue | undefined>(undefined);
+const SidebarContext = createContext<SidebarContextValue | undefined>(
+  undefined
+);
 
 export const useSidebar = () => {
   const context = useContext(SidebarContext);
@@ -21,7 +29,9 @@ interface SidebarProviderProps {
   children: React.ReactNode;
 }
 
-export const SidebarProvider: React.FC<SidebarProviderProps> = ({ children }) => {
+export const SidebarProvider: React.FC<SidebarProviderProps> = ({
+  children,
+}) => {
   const [isCollapsed, setIsCollapsed] = useState(() => {
     // Recuperar preferencia del usuario desde localStorage
     const saved = localStorage.getItem('sidebar-collapsed');
@@ -53,8 +63,6 @@ export const SidebarProvider: React.FC<SidebarProviderProps> = ({ children }) =>
   };
 
   return (
-    <SidebarContext.Provider value={value}>
-      {children}
-    </SidebarContext.Provider>
+    <SidebarContext.Provider value={value}>{children}</SidebarContext.Provider>
   );
 };

@@ -19,7 +19,11 @@ const LoadingContainer = styled.div`
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, ${theme.colors.softPurple} 0%, ${theme.colors.background.secondary} 100%);
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.softPurple} 0%,
+    ${theme.colors.background.secondary} 100%
+  );
   gap: ${theme.spacing[4]};
 `;
 
@@ -61,11 +65,11 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // Check role requirements if specified
   if (requiredRoles.length > 0 && !hasAnyRole(requiredRoles as any)) {
-    return <Navigate to="/unauthorized" replace />;
+    return <Navigate to='/unauthorized' replace />;
   }
 
   // User is authenticated and has required role
   return <>{children}</>;
 };
 
-export default ProtectedRoute; 
+export default ProtectedRoute;

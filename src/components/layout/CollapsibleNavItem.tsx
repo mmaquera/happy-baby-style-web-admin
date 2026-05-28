@@ -16,15 +16,16 @@ interface CollapsibleNavItemProps {
 const StyledNavItem = styled(NavLink)<{ isCollapsed: boolean }>`
   display: flex;
   align-items: center;
-  gap: ${props => props.isCollapsed ? 0 : theme.spacing[3]};
-  padding: ${props => props.isCollapsed ? theme.spacing[4] : theme.spacing[3]} ${props => props.isCollapsed ? theme.spacing[2] : theme.spacing[6]};
+  gap: ${props => (props.isCollapsed ? 0 : theme.spacing[3])};
+  padding: ${props => (props.isCollapsed ? theme.spacing[4] : theme.spacing[3])}
+    ${props => (props.isCollapsed ? theme.spacing[2] : theme.spacing[6])};
   color: ${theme.colors.text.secondary};
   text-decoration: none;
   transition: all ${theme.transitions.base};
   font-size: ${theme.fontSizes.base};
   font-weight: ${theme.fontWeights.normal};
   border-right: 3px solid transparent;
-  justify-content: ${props => props.isCollapsed ? 'center' : 'flex-start'};
+  justify-content: ${props => (props.isCollapsed ? 'center' : 'flex-start')};
   position: relative;
   min-height: 48px;
 
@@ -47,11 +48,11 @@ const StyledNavItem = styled(NavLink)<{ isCollapsed: boolean }>`
   }
 
   span {
-    opacity: ${props => props.isCollapsed ? 0 : 1};
+    opacity: ${props => (props.isCollapsed ? 0 : 1)};
     transition: opacity ${theme.transitions.base};
     white-space: nowrap;
     overflow: hidden;
-    width: ${props => props.isCollapsed ? 0 : 'auto'};
+    width: ${props => (props.isCollapsed ? 0 : 'auto')};
   }
 `;
 
@@ -60,7 +61,7 @@ export const CollapsibleNavItem: React.FC<CollapsibleNavItemProps> = ({
   end,
   isCollapsed,
   icon,
-  children
+  children,
 }) => {
   const { isVisible, showTooltip, hideTooltip } = useSidebarTooltip(300);
 
@@ -75,7 +76,7 @@ export const CollapsibleNavItem: React.FC<CollapsibleNavItemProps> = ({
       {icon}
       <span>{children}</span>
       {isCollapsed && (
-        <Tooltip isVisible={isVisible} position="right">
+        <Tooltip isVisible={isVisible} position='right'>
           {children}
         </Tooltip>
       )}

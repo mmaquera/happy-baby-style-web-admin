@@ -7,6 +7,7 @@ Esta carpeta contiene todos los componentes relacionados con la gestión de usua
 ## 🏗️ Arquitectura de Componentes
 
 ### Estructura de Archivos
+
 ```
 users/
 ├── README.md                           # Este archivo
@@ -29,8 +30,10 @@ users/
 ## 🎯 Componentes Principales
 
 ### 1. **ImprovedCreateUserModal.tsx** ⭐
+
 **Descripción**: Modal mejorado para creación de usuarios con manejo robusto de errores
 **Características**:
+
 - ✅ Validación local completa de formularios
 - ✅ Manejo de errores del servidor
 - ✅ Formateo automático de datos para API
@@ -38,6 +41,7 @@ users/
 - ✅ Limpieza automática de errores
 
 **Props Requeridas**:
+
 ```typescript
 interface CreateUserModalProps {
   isOpen: boolean;
@@ -49,6 +53,7 @@ interface CreateUserModalProps {
 ```
 
 **Uso**:
+
 ```typescript
 <ImprovedCreateUserModal
   isOpen={showCreateModal}
@@ -60,24 +65,30 @@ interface CreateUserModalProps {
 ```
 
 ### 2. **UserCard.tsx**
+
 **Descripción**: Tarjeta individual de usuario con información básica
 **Características**:
+
 - ✅ Información resumida del usuario
 - ✅ Acciones rápidas
 - ✅ Estados visuales (activo/inactivo)
 - ✅ Responsive design
 
 ### 3. **UserDetailModal.tsx**
+
 **Descripción**: Modal para ver y editar detalles completos del usuario
 **Características**:
+
 - ✅ Vista completa de información del usuario
 - ✅ Edición inline de campos
 - ✅ Historial de cambios
 - ✅ Gestión de permisos
 
 ### 4. **UserActionsMenu.tsx**
+
 **Descripción**: Menú contextual con acciones disponibles para el usuario
 **Características**:
+
 - ✅ Acciones contextuales
 - ✅ Confirmaciones para acciones destructivas
 - ✅ Estados de permisos
@@ -86,18 +97,21 @@ interface CreateUserModalProps {
 ## 🔧 Estándares Implementados
 
 ### 1. **Manejo de Errores**
+
 - **Estados Separados**: Errores locales vs. errores del servidor
 - **Mapeo Inteligente**: Errores del servidor se mapean a campos específicos
 - **Limpieza Automática**: Errores se limpian cuando el usuario corrige
 - **Feedback Visual**: Banner de errores del servidor y errores en campos
 
 ### 2. **Validaciones**
+
 - **Validación Local**: Campos requeridos, formatos, rangos
 - **Validación del Servidor**: Respuestas de API con códigos de error
 - **Validación de Fechas**: Formato ISO, rangos válidos, prevención de fechas futuras
 - **Validación de Contraseñas**: Fortaleza, requisitos mínimos
 
 ### 3. **Estados del Formulario**
+
 - **Indicadores Visuales**: Pasos del formulario, botones deshabilitados
 - **Estados de Carga**: Loading states, disabled states
 - **Validación en Tiempo Real**: Feedback inmediato al usuario
@@ -105,32 +119,34 @@ interface CreateUserModalProps {
 ## 📊 Patrones de Implementación
 
 ### 1. **Hook Pattern**
+
 ```typescript
 // ✅ Patrón obligatorio para hooks de usuarios
 export const useUserAction = () => {
   const [action, { loading, error }] = useUserActionMutation();
-  
+
   const execute = async (input: UserActionInput) => {
     try {
       const result = await action({ variables: { input } });
-      
+
       // ✅ Validar respuesta del servidor
       if (!result.data?.userAction?.success) {
         throw new Error(result.data?.userAction?.message || 'Error en acción');
       }
-      
+
       return result.data.userAction;
     } catch (error) {
       // ✅ Propagar error para manejo en UI
       throw error;
     }
   };
-  
+
   return { execute, loading, error };
 };
 ```
 
 ### 2. **Modal Pattern**
+
 ```typescript
 // ✅ Patrón obligatorio para modales de usuario
 export const UserModal: React.FC<UserModalProps> = ({
@@ -143,7 +159,7 @@ export const UserModal: React.FC<UserModalProps> = ({
   // ✅ Estados separados para errores
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
-  
+
   // ✅ Procesar errores del servidor
   useEffect(() => {
     if (serverError) {
@@ -152,12 +168,12 @@ export const UserModal: React.FC<UserModalProps> = ({
       setServerErrors({});
     }
   }, [serverError]);
-  
+
   // ✅ Validación local
   const validateForm = (): boolean => {
     // implementación de validación
   };
-  
+
   // ✅ Envío con formateo de datos
   const handleSubmit = async () => {
     if (validateForm()) {
@@ -170,7 +186,7 @@ export const UserModal: React.FC<UserModalProps> = ({
       }
     }
   };
-  
+
   return (
     // JSX del modal
   );
@@ -178,11 +194,12 @@ export const UserModal: React.FC<UserModalProps> = ({
 ```
 
 ### 3. **Error Processing Pattern**
+
 ```typescript
 // ✅ Patrón obligatorio para procesar errores del servidor
 const processServerError = (errorMessage: string): void => {
   const newServerErrors: Record<string, string> = {};
-  
+
   // ✅ Mapeo inteligente de errores
   if (errorMessage.toLowerCase().includes('birth date')) {
     newServerErrors['dateOfBirth'] = 'Fecha de nacimiento inválida';
@@ -190,7 +207,7 @@ const processServerError = (errorMessage: string): void => {
     newServerErrors['email'] = 'Email inválido o ya existe';
   }
   // ... más mapeos
-  
+
   setServerErrors(newServerErrors);
 };
 ```
@@ -198,6 +215,7 @@ const processServerError = (errorMessage: string): void => {
 ## 🎨 Componentes de UI Requeridos
 
 ### 1. **ServerErrorBanner**
+
 ```typescript
 const ServerErrorBanner = styled.div`
   background: ${theme.colors.error}15;
@@ -215,6 +233,7 @@ const ServerErrorBanner = styled.div`
 ```
 
 ### 2. **Indicadores de Estado**
+
 ```typescript
 // ✅ Indicador de pasos con errores del servidor
 <Step active={true} completed={isFormValid() && Object.keys(serverErrors).length === 0}>
@@ -236,6 +255,7 @@ const ServerErrorBanner = styled.div`
 ## 🧪 Testing
 
 ### Casos de Prueba Obligatorios
+
 - ✅ Validación local de campos requeridos
 - ✅ Validación de formatos (email, fecha, contraseña)
 - ✅ Manejo de errores del servidor
@@ -245,11 +265,12 @@ const ServerErrorBanner = styled.div`
 - ✅ Formateo de datos para API
 
 ### Ejemplo de Test
+
 ```typescript
 describe('ImprovedCreateUserModal', () => {
   test('should handle server validation error', async () => {
     const mockServerError = 'Validation failed: Birth date is invalid';
-    
+
     render(
       <ImprovedCreateUserModal
         isOpen={true}
@@ -259,10 +280,10 @@ describe('ImprovedCreateUserModal', () => {
         serverError={mockServerError}
       />
     );
-    
+
     // Verificar que el error se mapea al campo correcto
     expect(screen.getByText('Fecha de nacimiento inválida')).toBeInTheDocument();
-    
+
     // Verificar que el botón está deshabilitado
     expect(screen.getByRole('button', { name: /crear usuario/i })).toBeDisabled();
   });
@@ -272,6 +293,7 @@ describe('ImprovedCreateUserModal', () => {
 ## 📝 Checklist de Implementación
 
 ### Para Nuevos Componentes de Usuario
+
 - [ ] Seguir patrones establecidos en `ERROR_HANDLING_STANDARDS.md`
 - [ ] Implementar estados separados para errores locales y del servidor
 - [ ] Agregar validación local completa
@@ -282,6 +304,7 @@ describe('ImprovedCreateUserModal', () => {
 - [ ] Documentar props y comportamiento
 
 ### Para Modificaciones de Componentes Existentes
+
 - [ ] Mantener compatibilidad con patrones establecidos
 - [ ] Actualizar manejo de errores si es necesario
 - [ ] Agregar tests para nuevas funcionalidades

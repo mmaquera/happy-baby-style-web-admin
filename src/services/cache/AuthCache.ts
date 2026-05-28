@@ -71,8 +71,10 @@ export class LocalStorageAuthCache implements IAuthCache {
   getUser(): any | null {
     try {
       const userData = localStorage.getItem(LocalStorageAuthCache.USER_KEY);
-      const expiry = localStorage.getItem(LocalStorageAuthCache.CACHE_EXPIRY_KEY);
-      
+      const expiry = localStorage.getItem(
+        LocalStorageAuthCache.CACHE_EXPIRY_KEY
+      );
+
       if (!userData || !expiry) {
         return null;
       }
@@ -93,8 +95,14 @@ export class LocalStorageAuthCache implements IAuthCache {
   setUser(user: any): void {
     try {
       const expiry = Date.now() + this.CACHE_DURATION;
-      localStorage.setItem(LocalStorageAuthCache.USER_KEY, JSON.stringify(user));
-      localStorage.setItem(LocalStorageAuthCache.CACHE_EXPIRY_KEY, expiry.toString());
+      localStorage.setItem(
+        LocalStorageAuthCache.USER_KEY,
+        JSON.stringify(user)
+      );
+      localStorage.setItem(
+        LocalStorageAuthCache.CACHE_EXPIRY_KEY,
+        expiry.toString()
+      );
     } catch (error) {
       console.error('Error setting user in cache:', error);
     }

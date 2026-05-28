@@ -2,7 +2,14 @@ import React from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Card } from '@/components/ui/Card';
-import { Package, ShoppingCart, Users, TrendingUp, DollarSign, AlertTriangle } from 'lucide-react';
+import {
+  Package,
+  ShoppingCart,
+  Users,
+  TrendingUp,
+  DollarSign,
+  AlertTriangle,
+} from 'lucide-react';
 import { SessionInfo } from '@/components/auth/SessionInfo';
 
 const DashboardContainer = styled.div`
@@ -66,7 +73,8 @@ const StatLabel = styled.div`
 
 const StatChange = styled.div<{ positive?: boolean }>`
   font-size: ${theme.fontSizes.xs};
-  color: ${({ positive }) => positive ? theme.colors.success : theme.colors.warning};
+  color: ${({ positive }) =>
+    positive ? theme.colors.success : theme.colors.warning};
   margin-top: ${theme.spacing[1]};
   font-weight: ${theme.fontWeights.medium};
 `;
@@ -210,7 +218,7 @@ export const Dashboard: React.FC = () => {
       change: '+8 este mes',
       positive: true,
       icon: Package,
-      color: theme.colors.primaryPurple
+      color: theme.colors.primaryPurple,
     },
     {
       label: 'Pedidos Activos',
@@ -218,7 +226,7 @@ export const Dashboard: React.FC = () => {
       change: '+5 hoy',
       positive: true,
       icon: ShoppingCart,
-      color: theme.colors.coralAccent
+      color: theme.colors.coralAccent,
     },
     {
       label: 'Clientes',
@@ -226,7 +234,7 @@ export const Dashboard: React.FC = () => {
       change: '+12% este mes',
       positive: true,
       icon: Users,
-      color: theme.colors.turquoise
+      color: theme.colors.turquoise,
     },
     {
       label: 'Ingresos',
@@ -234,15 +242,35 @@ export const Dashboard: React.FC = () => {
       change: '+15% este mes',
       positive: true,
       icon: DollarSign,
-      color: theme.colors.success
-    }
+      color: theme.colors.success,
+    },
   ];
 
   const recentOrders = [
-    { id: '#001', customer: 'María García', amount: '$89.99', status: 'Pendiente' },
-    { id: '#002', customer: 'Ana López', amount: '$124.50', status: 'Procesando' },
-    { id: '#003', customer: 'Carmen Silva', amount: '$67.20', status: 'Enviado' },
-    { id: '#004', customer: 'Sofia Ruiz', amount: '$156.80', status: 'Entregado' },
+    {
+      id: '#001',
+      customer: 'María García',
+      amount: '$89.99',
+      status: 'Pendiente',
+    },
+    {
+      id: '#002',
+      customer: 'Ana López',
+      amount: '$124.50',
+      status: 'Procesando',
+    },
+    {
+      id: '#003',
+      customer: 'Carmen Silva',
+      amount: '$67.20',
+      status: 'Enviado',
+    },
+    {
+      id: '#004',
+      customer: 'Sofia Ruiz',
+      amount: '$156.80',
+      status: 'Entregado',
+    },
   ];
 
   const recentProducts = [
@@ -260,7 +288,7 @@ export const Dashboard: React.FC = () => {
 
       <StatsGrid>
         {stats.map((stat, index) => (
-          <StatCard key={index} padding="medium" shadow="small" hover>
+          <StatCard key={index} padding='medium' shadow='small' hover>
             <StatContent>
               <StatInfo>
                 <StatValue>{stat.value}</StatValue>
@@ -278,16 +306,18 @@ export const Dashboard: React.FC = () => {
       <ContentGrid>
         <RecentSection>
           <SectionTitle>Actividad Reciente</SectionTitle>
-          
-          <Card padding="medium" shadow="small">
+
+          <Card padding='medium' shadow='small'>
             <Card.Header>
               <Card.Title>Pedidos Recientes</Card.Title>
             </Card.Header>
             <RecentList>
-              {recentOrders.map((order) => (
+              {recentOrders.map(order => (
                 <RecentItem key={order.id}>
                   <ItemInfo>
-                    <ItemTitle>{order.id} - {order.customer}</ItemTitle>
+                    <ItemTitle>
+                      {order.id} - {order.customer}
+                    </ItemTitle>
                     <ItemSubtitle>{order.status}</ItemSubtitle>
                   </ItemInfo>
                   <ItemValue>{order.amount}</ItemValue>
@@ -296,12 +326,12 @@ export const Dashboard: React.FC = () => {
             </RecentList>
           </Card>
 
-          <Card padding="medium" shadow="small">
+          <Card padding='medium' shadow='small'>
             <Card.Header>
               <Card.Title>Productos Recientes</Card.Title>
             </Card.Header>
             <RecentList>
-              {recentProducts.map((product) => (
+              {recentProducts.map(product => (
                 <RecentItem key={product.sku}>
                   <ItemInfo>
                     <ItemTitle>{product.name}</ItemTitle>
@@ -316,8 +346,8 @@ export const Dashboard: React.FC = () => {
 
         <QuickActions>
           <SectionTitle>Acciones Rápidas</SectionTitle>
-          
-          <Card padding="medium" shadow="small">
+
+          <Card padding='medium' shadow='small'>
             <ActionButton>
               <ActionIcon>
                 <Package size={20} />

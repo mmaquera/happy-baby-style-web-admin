@@ -2,7 +2,12 @@
 // Tests the authentication service functionality
 
 import { ApolloClient, InMemoryCache } from '@apollo/client';
-import { AuthServiceFactory, GraphQLAuthService, LoginCredentials, AuthError } from '../AuthService';
+import {
+  AuthServiceFactory,
+  GraphQLAuthService,
+  LoginCredentials,
+  AuthError,
+} from '../AuthService';
 import { UserRole } from '../../../types/unified';
 
 // Mock Apollo Client
@@ -78,8 +83,14 @@ describe('AuthService', () => {
         expect(result.tokens.accessToken).toBe('access-token');
         expect(result.tokens.refreshToken).toBe('refresh-token');
         expect(result.user).toEqual(mockResponse.data.login.user);
-        expect(localStorageMock.setItem).toHaveBeenCalledWith('accessToken', 'access-token');
-        expect(localStorageMock.setItem).toHaveBeenCalledWith('refreshToken', 'refresh-token');
+        expect(localStorageMock.setItem).toHaveBeenCalledWith(
+          'accessToken',
+          'access-token'
+        );
+        expect(localStorageMock.setItem).toHaveBeenCalledWith(
+          'refreshToken',
+          'refresh-token'
+        );
       });
 
       it('should throw AuthError when login fails', async () => {
@@ -88,9 +99,13 @@ describe('AuthService', () => {
           password: 'wrongpassword',
         };
 
-        (mockApolloClient.mutate as jest.Mock).mockRejectedValue(new Error('Invalid credentials'));
+        (mockApolloClient.mutate as jest.Mock).mockRejectedValue(
+          new Error('Invalid credentials')
+        );
 
-        await expect(authService.login(credentials)).rejects.toThrow('Invalid credentials');
+        await expect(authService.login(credentials)).rejects.toThrow(
+          'Invalid credentials'
+        );
       });
 
       it('should throw AuthError on network error', async () => {
@@ -99,31 +114,47 @@ describe('AuthService', () => {
           password: 'password123',
         };
 
-        (mockApolloClient.mutate as jest.Mock).mockRejectedValue(new Error('Network error'));
+        (mockApolloClient.mutate as jest.Mock).mockRejectedValue(
+          new Error('Network error')
+        );
 
-        await expect(authService.login(credentials)).rejects.toThrow('Network error');
+        await expect(authService.login(credentials)).rejects.toThrow(
+          'Network error'
+        );
       });
     });
 
     describe('logout', () => {
       it('should successfully logout', async () => {
-        (mockApolloClient.mutate as jest.Mock).mockResolvedValue({ data: { logout: true } });
+        (mockApolloClient.mutate as jest.Mock).mockResolvedValue({
+          data: { logout: true },
+        });
 
         await authService.logout();
 
         expect(localStorageMock.removeItem).toHaveBeenCalledWith('accessToken');
-        expect(localStorageMock.removeItem).toHaveBeenCalledWith('refreshToken');
-        expect(localStorageMock.removeItem).toHaveBeenCalledWith('tokenExpiresAt');
+        expect(localStorageMock.removeItem).toHaveBeenCalledWith(
+          'refreshToken'
+        );
+        expect(localStorageMock.removeItem).toHaveBeenCalledWith(
+          'tokenExpiresAt'
+        );
       });
 
       it('should clear tokens even if server logout fails', async () => {
-        (mockApolloClient.mutate as jest.Mock).mockRejectedValue(new Error('Server error'));
+        (mockApolloClient.mutate as jest.Mock).mockRejectedValue(
+          new Error('Server error')
+        );
 
         await authService.logout();
 
         expect(localStorageMock.removeItem).toHaveBeenCalledWith('accessToken');
-        expect(localStorageMock.removeItem).toHaveBeenCalledWith('refreshToken');
-        expect(localStorageMock.removeItem).toHaveBeenCalledWith('tokenExpiresAt');
+        expect(localStorageMock.removeItem).toHaveBeenCalledWith(
+          'refreshToken'
+        );
+        expect(localStorageMock.removeItem).toHaveBeenCalledWith(
+          'tokenExpiresAt'
+        );
       });
     });
 
@@ -145,8 +176,14 @@ describe('AuthService', () => {
 
         expect(result.accessToken).toBe('new-access-token');
         expect(result.refreshToken).toBe('new-refresh-token');
-        expect(localStorageMock.setItem).toHaveBeenCalledWith('accessToken', 'new-access-token');
-        expect(localStorageMock.setItem).toHaveBeenCalledWith('refreshToken', 'new-refresh-token');
+        expect(localStorageMock.setItem).toHaveBeenCalledWith(
+          'accessToken',
+          'new-access-token'
+        );
+        expect(localStorageMock.setItem).toHaveBeenCalledWith(
+          'refreshToken',
+          'new-refresh-token'
+        );
       });
 
       it('should throw AuthError when refresh fails', async () => {
@@ -155,7 +192,9 @@ describe('AuthService', () => {
           errors: [{ message: 'Invalid refresh token' }],
         });
 
-        await expect(authService.refreshToken('invalid-token')).rejects.toThrow('Invalid refresh token');
+        await expect(authService.refreshToken('invalid-token')).rejects.toThrow(
+          'Invalid refresh token'
+        );
       });
     });
 
@@ -194,7 +233,9 @@ describe('AuthService', () => {
         const expiredToken = 'expired-token';
         localStorageMock.getItem.mockReturnValue(expiredToken);
 
-        (mockApolloClient.query as jest.Mock).mockRejectedValue(new Error('Token expired'));
+        (mockApolloClient.query as jest.Mock).mockRejectedValue(
+          new Error('Token expired')
+        );
 
         const result = await authService.getCurrentUser();
 
@@ -204,7 +245,9 @@ describe('AuthService', () => {
       it('should return null when query fails', async () => {
         localStorageMock.getItem.mockReturnValue('valid-token');
 
-        (mockApolloClient.query as jest.Mock).mockRejectedValue(new Error('Query failed'));
+        (mockApolloClient.query as jest.Mock).mockRejectedValue(
+          new Error('Query failed')
+        );
 
         const result = await authService.getCurrentUser();
 
@@ -242,7 +285,9 @@ describe('AuthService', () => {
 
   describe('AuthError', () => {
     it('should create AuthError with correct properties', () => {
-      const error = new AuthError('TEST_ERROR', 'Test error message', { detail: 'test' });
+      const error = new AuthError('TEST_ERROR', 'Test error message', {
+        detail: 'test',
+      });
 
       expect(error.code).toBe('TEST_ERROR');
       expect(error.message).toBe('Test error message');
@@ -253,7 +298,8 @@ describe('AuthService', () => {
 
   describe('AuthServiceFactory', () => {
     it('should create GraphQLAuthService instance', () => {
-      const service = AuthServiceFactory.createGraphQLAuthService(mockApolloClient);
+      const service =
+        AuthServiceFactory.createGraphQLAuthService(mockApolloClient);
 
       expect(service).toBeInstanceOf(GraphQLAuthService);
     });

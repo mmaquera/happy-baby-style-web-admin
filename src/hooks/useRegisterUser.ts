@@ -49,54 +49,58 @@ export const useRegisterUser = (): UseRegisterUserReturn => {
   const [customError, setCustomError] = useState<string | null>(null);
 
   // Handle user registration
-  const register = useCallback(async (input: CreateUserProfileInput): Promise<boolean> => {
-    try {
-      // Clear previous errors
-      setCustomError(null);
+  const register = useCallback(
+    async (input: CreateUserProfileInput): Promise<boolean> => {
+      try {
+        // Clear previous errors
+        setCustomError(null);
 
-      // Validate input
-      const validationErrors = validateRegistrationInput(input);
-      if (validationErrors.length > 0) {
-        const errorMessage = validationErrors.join(', ');
+        // Validate input
+        const validationErrors = validateRegistrationInput(input);
+        if (validationErrors.length > 0) {
+          const errorMessage = validationErrors.join(', ');
+          setCustomError(errorMessage);
+          toast.error(errorMessage);
+          return false;
+        }
+
+        // Execute mutation
+        const result = await registerUserMutation({
+          variables: { input },
+        });
+
+        const response = result.data?.registerUser;
+
+        if (!response) {
+          const errorMessage = 'No se recibió respuesta del servidor';
+          setCustomError(errorMessage);
+          toast.error(errorMessage);
+          return false;
+        }
+
+        if (!response.success) {
+          // Handle server validation errors
+          const errorMessage = response.message || 'Error al registrar usuario';
+          const errorCode = response.code || 'UNKNOWN_ERROR';
+
+          setCustomError(`${errorMessage} (${errorCode})`);
+          toast.error(errorMessage);
+          return false;
+        }
+
+        // Success
+        toast.success('Usuario registrado exitosamente');
+        return true;
+      } catch (error: any) {
+        const errorMessage =
+          error instanceof Error ? error.message : 'Error al registrar usuario';
         setCustomError(errorMessage);
         toast.error(errorMessage);
         return false;
       }
-
-      // Execute mutation
-      const result = await registerUserMutation({
-        variables: { input }
-      });
-
-      const response = result.data?.registerUser;
-
-      if (!response) {
-        const errorMessage = 'No se recibió respuesta del servidor';
-        setCustomError(errorMessage);
-        toast.error(errorMessage);
-        return false;
-      }
-
-      if (!response.success) {
-        // Handle server validation errors
-        const errorMessage = response.message || 'Error al registrar usuario';
-        const errorCode = response.code || 'UNKNOWN_ERROR';
-        
-        setCustomError(`${errorMessage} (${errorCode})`);
-        toast.error(errorMessage);
-        return false;
-      }
-
-      // Success
-      toast.success('Usuario registrado exitosamente');
-      return true;
-    } catch (error: any) {
-      const errorMessage = error instanceof Error ? error.message : 'Error al registrar usuario';
-      setCustomError(errorMessage);
-      toast.error(errorMessage);
-      return false;
-    }
-  }, [registerUserMutation]);
+    },
+    [registerUserMutation]
+  );
 
   // Clear error function
   const clearError = useCallback(() => {
@@ -104,7 +108,7 @@ export const useRegisterUser = (): UseRegisterUserReturn => {
   }, []);
 
   // Combine GraphQL errors with custom validation errors
-  const combinedError = customError || (error?.message || null);
+  const combinedError = customError || error?.message || null;
 
   return {
     register,

@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/Card';
 import { useCreateCategory } from '@/hooks/useCreateCategory';
 import { CreateCategoryInput } from '@/generated/graphql';
 import { SVGUpload } from './SVGUpload/SVGUpload';
-import { 
+import {
   X,
   FolderPlus,
   Hash,
@@ -17,7 +17,7 @@ import {
   CheckCircle,
   AlertTriangle,
   SortAsc,
-  Upload
+  Upload,
 } from 'lucide-react';
 
 interface CreateCategoryModalProps {
@@ -44,7 +44,7 @@ const ModalOverlay = styled.div<{ isOpen: boolean }>`
   bottom: 0;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8px);
-  display: ${({ isOpen }) => isOpen ? 'flex' : 'none'};
+  display: ${({ isOpen }) => (isOpen ? 'flex' : 'none')};
   align-items: center;
   justify-content: center;
   z-index: ${theme.zIndex?.modal || 1000};
@@ -211,7 +211,7 @@ const Slider = styled.span`
 
   &:before {
     position: absolute;
-    content: "";
+    content: '';
     height: 18px;
     width: 18px;
     left: 3px;
@@ -260,15 +260,19 @@ const LoadingSpinner = styled.div`
   animation: spin 1s linear infinite;
 
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;
 
 export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
   isOpen,
   onClose,
-  onSuccess
+  onSuccess,
 }) => {
   const [formData, setFormData] = useState<CategoryFormData>({
     name: '',
@@ -276,7 +280,7 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
     slug: '',
     image: '',
     isActive: true,
-    sortOrder: '0'
+    sortOrder: '0',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -293,7 +297,7 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
         slug: '',
         image: '',
         isActive: true,
-        sortOrder: '0'
+        sortOrder: '0',
       });
       setErrors({});
       setSuccessMessage('');
@@ -315,7 +319,7 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
     if (formData.name && !formData.slug) {
       setFormData(prev => ({
         ...prev,
-        slug: generateSlug(formData.name)
+        slug: generateSlug(formData.name),
       }));
     }
   }, [formData.name, formData.slug, generateSlug]);
@@ -330,7 +334,8 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
     if (!formData.slug.trim()) {
       newErrors['slug'] = 'El slug es requerido';
     } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-      newErrors['slug'] = 'El slug solo puede contener letras minúsculas, números y guiones';
+      newErrors['slug'] =
+        'El slug solo puede contener letras minúsculas, números y guiones';
     }
 
     if (formData.sortOrder && parseInt(formData.sortOrder) < 0) {
@@ -341,14 +346,17 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
     return Object.keys(newErrors).length === 0;
   }, [formData]);
 
-  const handleInputChange = useCallback((field: keyof CategoryFormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
-    }
-  }, [errors]);
+  const handleInputChange = useCallback(
+    (field: keyof CategoryFormData, value: any) => {
+      setFormData(prev => ({ ...prev, [field]: value }));
+
+      // Clear error when user starts typing
+      if (errors[field]) {
+        setErrors(prev => ({ ...prev, [field]: '' }));
+      }
+    },
+    [errors]
+  );
 
   // Handle SVG upload success - store in image field
   const handleSVGUploadComplete = useCallback((svgUrl: string) => {
@@ -361,41 +369,45 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
     setErrors(prev => ({ ...prev, image: error }));
   }, []);
 
-  const handleSubmit = useCallback(async (event: React.FormEvent) => {
-    event.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
+  const handleSubmit = useCallback(
+    async (event: React.FormEvent) => {
+      event.preventDefault();
 
-    setErrors({});
-
-    try {
-      const categoryData: CreateCategoryInput = {
-        name: formData.name.trim(),
-        description: formData.description.trim() || null,
-        slug: formData.slug.trim(),
-        image: formData.image.trim() || null,
-        isActive: formData.isActive,
-        sortOrder: formData.sortOrder ? parseInt(formData.sortOrder) : null
-      };
-
-      const result = await create(categoryData);
-
-      if (result?.success) {
-        setSuccessMessage('Categoría creada exitosamente');
-        
-        // Wait a bit before closing to show success message
-        setTimeout(() => {
-          onSuccess(result.data?.entity || categoryData);
-          onClose();
-        }, 1500);
+      if (!validateForm()) {
+        return;
       }
 
-    } catch (error) {
-      setErrors({ submit: 'Error al crear la categoría. Intente nuevamente.' });
-    }
-  }, [formData, validateForm, create, onSuccess, onClose]);
+      setErrors({});
+
+      try {
+        const categoryData: CreateCategoryInput = {
+          name: formData.name.trim(),
+          description: formData.description.trim() || null,
+          slug: formData.slug.trim(),
+          image: formData.image.trim() || null,
+          isActive: formData.isActive,
+          sortOrder: formData.sortOrder ? parseInt(formData.sortOrder) : null,
+        };
+
+        const result = await create(categoryData);
+
+        if (result?.success) {
+          setSuccessMessage('Categoría creada exitosamente');
+
+          // Wait a bit before closing to show success message
+          setTimeout(() => {
+            onSuccess(result.data?.entity || categoryData);
+            onClose();
+          }, 1500);
+        }
+      } catch (error) {
+        setErrors({
+          submit: 'Error al crear la categoría. Intente nuevamente.',
+        });
+      }
+    },
+    [formData, validateForm, create, onSuccess, onClose]
+  );
 
   if (!isOpen) return null;
 
@@ -442,58 +454,74 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
               </SectionTitle>
 
               <FormField>
-                <Label htmlFor="name">Nombre de la Categoría *</Label>
+                <Label htmlFor='name'>Nombre de la Categoría *</Label>
                 <Input
-                  id="name"
-                  type="text"
-                  placeholder="Ej: Ropa para Bebés"
+                  id='name'
+                  type='text'
+                  placeholder='Ej: Ropa para Bebés'
                   value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  onChange={e => handleInputChange('name', e.target.value)}
                   error={!!errors['name'] ? errors['name'] : ''}
                   disabled={loading}
                 />
-                {errors['name'] && <small style={{ color: theme.colors.error }}>{errors['name']}</small>}
+                {errors['name'] && (
+                  <small style={{ color: theme.colors.error }}>
+                    {errors['name']}
+                  </small>
+                )}
               </FormField>
 
               <FormField>
-                <Label htmlFor="description">Descripción</Label>
+                <Label htmlFor='description'>Descripción</Label>
                 <Input
-                  id="description"
-                  type="text"
-                  placeholder="Descripción opcional de la categoría"
+                  id='description'
+                  type='text'
+                  placeholder='Descripción opcional de la categoría'
                   value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  onChange={e =>
+                    handleInputChange('description', e.target.value)
+                  }
                   disabled={loading}
                 />
               </FormField>
 
               <FormRow>
                 <FormField>
-                  <Label htmlFor="slug">Slug *</Label>
+                  <Label htmlFor='slug'>Slug *</Label>
                   <Input
-                    id="slug"
-                    type="text"
-                    placeholder="ejemplo-slug"
+                    id='slug'
+                    type='text'
+                    placeholder='ejemplo-slug'
                     value={formData.slug}
-                    onChange={(e) => handleInputChange('slug', e.target.value)}
+                    onChange={e => handleInputChange('slug', e.target.value)}
                     error={!!errors['slug'] ? errors['slug'] : ''}
                     disabled={loading}
                   />
-                  {errors['slug'] && <small style={{ color: theme.colors.error }}>{errors['slug']}</small>}
+                  {errors['slug'] && (
+                    <small style={{ color: theme.colors.error }}>
+                      {errors['slug']}
+                    </small>
+                  )}
                 </FormField>
 
                 <FormField>
-                  <Label htmlFor="sortOrder">Orden de Clasificación</Label>
+                  <Label htmlFor='sortOrder'>Orden de Clasificación</Label>
                   <Input
-                    id="sortOrder"
-                    type="number"
-                    placeholder="0"
+                    id='sortOrder'
+                    type='number'
+                    placeholder='0'
                     value={formData.sortOrder}
-                    onChange={(e) => handleInputChange('sortOrder', e.target.value)}
+                    onChange={e =>
+                      handleInputChange('sortOrder', e.target.value)
+                    }
                     error={!!errors['sortOrder'] ? errors['sortOrder'] : ''}
                     disabled={loading}
                   />
-                  {errors['sortOrder'] && <small style={{ color: theme.colors.error }}>{errors['sortOrder']}</small>}
+                  {errors['sortOrder'] && (
+                    <small style={{ color: theme.colors.error }}>
+                      {errors['sortOrder']}
+                    </small>
+                  )}
                 </FormField>
               </FormRow>
             </FormSection>
@@ -510,13 +538,19 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
                 <SVGUpload
                   onUploadComplete={handleSVGUploadComplete}
                   onUploadError={handleSVGUploadError}
-                  entityType="category"
+                  entityType='category'
                   disabled={loading}
-                  placeholder="Arrastra un archivo SVG aquí o haz clic para seleccionar"
+                  placeholder='Arrastra un archivo SVG aquí o haz clic para seleccionar'
                   showPreview={true}
                 />
                 {errors['image'] && (
-                  <small style={{ color: theme.colors.error, marginTop: theme.spacing[2], display: 'block' }}>
+                  <small
+                    style={{
+                      color: theme.colors.error,
+                      marginTop: theme.spacing[2],
+                      display: 'block',
+                    }}
+                  >
                     {errors['image']}
                   </small>
                 )}
@@ -525,9 +559,11 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
               <SwitchContainer>
                 <Switch>
                   <SwitchInput
-                    type="checkbox"
+                    type='checkbox'
                     checked={formData.isActive}
-                    onChange={(e) => handleInputChange('isActive', e.target.checked)}
+                    onChange={e =>
+                      handleInputChange('isActive', e.target.checked)
+                    }
                     disabled={loading}
                   />
                   <Slider />
@@ -539,16 +575,18 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
 
           <ModalFooter>
             <Button
-              type="button"
-              variant="outline"
+              type='button'
+              variant='outline'
               onClick={onClose}
               disabled={loading}
             >
               Cancelar
             </Button>
             <Button
-              type="submit"
-              disabled={loading || !formData.name.trim() || !formData.slug.trim()}
+              type='submit'
+              disabled={
+                loading || !formData.name.trim() || !formData.slug.trim()
+              }
             >
               {loading ? 'Creando...' : 'Crear Categoría'}
             </Button>

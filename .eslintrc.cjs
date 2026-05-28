@@ -70,10 +70,9 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'warn',
     '@typescript-eslint/prefer-const': 'error',
     '@typescript-eslint/no-var-requires': 'error',
-    '@typescript-eslint/consistent-type-imports': [
-      'error',
-      { prefer: 'type-imports' }
-    ],
+    // Disabled: autofix converts value imports to `import type`, breaking enums/runtime values.
+    // Re-enable manually once God components are refactored and all imports are audited.
+    '@typescript-eslint/consistent-type-imports': 'off',
     
     // React specific rules
     'react/prop-types': 'off', // Using TypeScript instead
@@ -115,23 +114,16 @@ module.exports = {
     'object-shorthand': 'error',
     'prefer-template': 'error',
     'prefer-arrow-callback': 'error',
-    'arrow-spacing': 'error',
     'no-duplicate-imports': 'error',
-    'sort-imports': 'off', // Conflicts with prettier
-    
+    'sort-imports': 'off',
+
     // Error handling
     'no-throw-literal': 'error',
     'prefer-promise-reject-errors': 'error',
-    
-    // Code organization
-    'no-multiple-empty-lines': ['error', { max: 2, maxEOF: 1 }],
-    'eol-last': 'error',
-    'no-trailing-spaces': 'error',
-    'comma-dangle': ['error', 'always-multiline'],
-    'semi': ['error', 'always'],
-    'quotes': ['error', 'single', { avoidEscape: true }],
-    
-    // Prettier integration
+
+    // Prettier owns all formatting — these rules are intentionally absent:
+    // arrow-spacing, no-multiple-empty-lines, eol-last, no-trailing-spaces,
+    // comma-dangle, semi, quotes — plugin:prettier/recommended disables them.
     'prettier/prettier': 'error'
   },
   overrides: [

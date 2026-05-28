@@ -9,7 +9,7 @@ import { useSetUserPassword } from '@/hooks/useSetUserPassword';
 import { usePasswordHistory } from '@/hooks/usePasswordHistory';
 import { PasswordHistoryCard } from './PasswordHistoryCard';
 import { theme } from '@/styles/theme';
-import { 
+import {
   X,
   Key,
   Eye,
@@ -21,7 +21,7 @@ import {
   AlertTriangle,
   Clock,
   Lock,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -52,21 +52,21 @@ const ModalContent = styled(Card)`
   overflow-y: auto;
   position: relative;
   padding: ${theme.spacing[6]};
-  
+
   /* Mejorar scrollbar */
   &::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: ${theme.colors.background.light};
     border-radius: 3px;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: ${theme.colors.border.medium};
     border-radius: 3px;
-    
+
     &:hover {
       background: ${theme.colors.border.accent};
     }
@@ -154,7 +154,7 @@ const ActionCard = styled.div`
     border-color: ${theme.colors.primaryPurple}40;
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(162, 133, 209, 0.15);
-    
+
     &::before {
       opacity: 1;
     }
@@ -177,16 +177,22 @@ const ActionIcon = styled.div<{ variant?: 'primary' | 'warning' | 'danger' }>`
   justify-content: center;
   background: ${props => {
     switch (props.variant) {
-      case 'warning': return `${theme.colors.warning}20`;
-      case 'danger': return `${theme.colors.error}20`;
-      default: return `${theme.colors.primaryPurple}15`;
+      case 'warning':
+        return `${theme.colors.warning}20`;
+      case 'danger':
+        return `${theme.colors.error}20`;
+      default:
+        return `${theme.colors.primaryPurple}15`;
     }
   }};
   color: ${props => {
     switch (props.variant) {
-      case 'warning': return theme.colors.warning;
-      case 'danger': return theme.colors.error;
-      default: return theme.colors.primaryPurple;
+      case 'warning':
+        return theme.colors.warning;
+      case 'danger':
+        return theme.colors.error;
+      default:
+        return theme.colors.primaryPurple;
     }
   }};
 `;
@@ -205,7 +211,7 @@ const ActionDescription = styled.div`
 
 const ActionContent = styled.div`
   margin: ${theme.spacing[4]} 0;
-  
+
   /* Mejorar espaciado de inputs */
   .input-group {
     margin-bottom: ${theme.spacing[3]};
@@ -219,14 +225,18 @@ const ActionButtons = styled.div`
 `;
 
 const TempPasswordCard = styled.div`
-  background: linear-gradient(135deg, ${theme.colors.background.accent}, ${theme.colors.white});
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.background.accent},
+    ${theme.colors.white}
+  );
   border: 2px solid ${theme.colors.primaryPurple}30;
   border-radius: ${theme.borderRadius.lg};
   padding: ${theme.spacing[5]};
   margin: ${theme.spacing[4]} 0;
   position: relative;
   animation: slideIn 0.3s ease-out;
-  
+
   @keyframes slideIn {
     from {
       opacity: 0;
@@ -237,7 +247,7 @@ const TempPasswordCard = styled.div`
       transform: translateY(0);
     }
   }
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -245,7 +255,11 @@ const TempPasswordCard = styled.div`
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, ${theme.colors.primaryPurple}, ${theme.colors.turquoise});
+    background: linear-gradient(
+      90deg,
+      ${theme.colors.primaryPurple},
+      ${theme.colors.turquoise}
+    );
     border-radius: ${theme.borderRadius.lg} ${theme.borderRadius.lg} 0 0;
   }
 `;
@@ -269,7 +283,7 @@ const PasswordDisplay = styled.div`
   border: 2px solid ${theme.colors.primaryPurple}20;
   margin-top: ${theme.spacing[3]};
   transition: all 0.2s ease;
-  
+
   &:hover {
     border-color: ${theme.colors.primaryPurple}40;
     box-shadow: 0 2px 8px rgba(162, 133, 209, 0.1);
@@ -299,16 +313,22 @@ const StatusBadge = styled.div<{ variant: 'success' | 'warning' | 'info' }>`
   margin-top: ${theme.spacing[2]};
   background: ${props => {
     switch (props.variant) {
-      case 'success': return `${theme.colors.success}20`;
-      case 'warning': return `${theme.colors.warning}20`;
-      default: return `${theme.colors.info}20`;
+      case 'success':
+        return `${theme.colors.success}20`;
+      case 'warning':
+        return `${theme.colors.warning}20`;
+      default:
+        return `${theme.colors.info}20`;
     }
   }};
   color: ${props => {
     switch (props.variant) {
-      case 'success': return theme.colors.success;
-      case 'warning': return theme.colors.warning;
-      default: return theme.colors.info;
+      case 'success':
+        return theme.colors.success;
+      case 'warning':
+        return theme.colors.warning;
+      default:
+        return theme.colors.info;
     }
   }};
 `;
@@ -326,7 +346,7 @@ const ServerErrorBanner = styled.div`
   align-items: center;
   gap: ${theme.spacing[2]};
   animation: slideIn 0.3s ease-out;
-  
+
   @keyframes slideIn {
     from {
       opacity: 0;
@@ -340,11 +360,9 @@ const ServerErrorBanner = styled.div`
 `;
 
 // Component
-export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = ({
-  user,
-  isOpen,
-  onClose
-}) => {
+export const PasswordManagementModal: React.FC<
+  PasswordManagementModalProps
+> = ({ user, isOpen, onClose }) => {
   const [showTempPassword, setShowTempPassword] = useState(false);
   const [tempPassword, setTempPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -355,19 +373,24 @@ export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = (
   const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
 
   const { forcePasswordReset } = useAccountManagement();
-  const { setUserPassword, loading: isSetting, error: setPasswordError, clearError: clearSetPasswordError } = useSetUserPassword();
-  
+  const {
+    setUserPassword,
+    loading: isSetting,
+    error: setPasswordError,
+    clearError: clearSetPasswordError,
+  } = useSetUserPassword();
+
   // ✅ Fetch password history from backend
-  const { 
-    passwordHistory, 
-    loading: historyLoading, 
+  const {
+    passwordHistory,
+    loading: historyLoading,
     error: historyError,
-    refetch: refetchHistory 
+    refetch: refetchHistory,
   } = usePasswordHistory(user.id);
 
   const generateTempPassword = () => {
     setIsGenerating(true);
-    
+
     // Simular generación de contraseña temporal más segura
     setTimeout(() => {
       // Generar contraseña más robusta
@@ -375,29 +398,32 @@ export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = (
       const lowercase = 'abcdefghijklmnopqrstuvwxyz';
       const numbers = '0123456789';
       const symbols = '!@#$%&*';
-      
+
       let result = '';
       // Asegurar al menos un carácter de cada tipo
       result += uppercase[Math.floor(Math.random() * uppercase.length)];
       result += lowercase[Math.floor(Math.random() * lowercase.length)];
       result += numbers[Math.floor(Math.random() * numbers.length)];
       result += symbols[Math.floor(Math.random() * symbols.length)];
-      
+
       // Completar hasta 12 caracteres
       const allChars = uppercase + lowercase + numbers + symbols;
       for (let i = 4; i < 12; i++) {
         result += allChars[Math.floor(Math.random() * allChars.length)];
       }
-      
+
       // Mezclar los caracteres
-      result = result.split('').sort(() => Math.random() - 0.5).join('');
-      
+      result = result
+        .split('')
+        .sort(() => Math.random() - 0.5)
+        .join('');
+
       setTempPassword(result);
       setShowTempPassword(true);
       setIsGenerating(false);
       toast.success('Contraseña temporal generada exitosamente', {
         duration: 4000,
-        icon: '🔑'
+        icon: '🔑',
       });
     }, 800);
   };
@@ -425,18 +451,24 @@ export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = (
   // ✅ Función para procesar errores del servidor
   const processServerError = useCallback((errorMessage: string): void => {
     const newServerErrors: Record<string, string> = {};
-    
+
     // ✅ Mapeo inteligente de errores
-    if (errorMessage.toLowerCase().includes('password') || 
-        errorMessage.toLowerCase().includes('contraseña')) {
-      newServerErrors['password'] = 'Error con la contraseña. Verifica que cumpla con los requisitos.';
-    } else if (errorMessage.toLowerCase().includes('user') || 
-               errorMessage.toLowerCase().includes('usuario')) {
-      newServerErrors['password'] = 'Error al procesar la solicitud. Usuario no encontrado.';
+    if (
+      errorMessage.toLowerCase().includes('password') ||
+      errorMessage.toLowerCase().includes('contraseña')
+    ) {
+      newServerErrors['password'] =
+        'Error con la contraseña. Verifica que cumpla con los requisitos.';
+    } else if (
+      errorMessage.toLowerCase().includes('user') ||
+      errorMessage.toLowerCase().includes('usuario')
+    ) {
+      newServerErrors['password'] =
+        'Error al procesar la solicitud. Usuario no encontrado.';
     } else {
       newServerErrors['password'] = errorMessage;
     }
-    
+
     setServerErrors(newServerErrors);
   }, []);
 
@@ -464,31 +496,34 @@ export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = (
 
     // ✅ Ejecutar mutación usando el hook
     const success = await setUserPassword(user.id, newPassword);
-    
+
     if (success) {
       // ✅ Limpiar el campo en caso de éxito
       setNewPassword('');
       setLocalErrors({});
       setServerErrors({});
-      
+
       // ✅ Refrescar historial de contraseñas después de establecer nueva contraseña
       refetchHistory();
     }
   };
 
   // ✅ Limpieza automática de errores cuando el usuario modifica el campo
-  const handlePasswordChange = useCallback((value: string) => {
-    setNewPassword(value);
-    
-    // Limpiar errores locales y del servidor
-    if (localErrors['password']) {
-      setLocalErrors(prev => ({ ...prev, password: '' }));
-    }
-    if (serverErrors['password']) {
-      setServerErrors(prev => ({ ...prev, password: '' }));
-      clearSetPasswordError();
-    }
-  }, [localErrors, serverErrors, clearSetPasswordError]);
+  const handlePasswordChange = useCallback(
+    (value: string) => {
+      setNewPassword(value);
+
+      // Limpiar errores locales y del servidor
+      if (localErrors['password']) {
+        setLocalErrors(prev => ({ ...prev, password: '' }));
+      }
+      if (serverErrors['password']) {
+        setServerErrors(prev => ({ ...prev, password: '' }));
+        clearSetPasswordError();
+      }
+    },
+    [localErrors, serverErrors, clearSetPasswordError]
+  );
 
   if (!isOpen) return null;
 
@@ -501,15 +536,15 @@ export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = (
             Gestión de Contraseñas
           </ModalTitle>
           <Button
-            variant="ghost"
-            size="small"
+            variant='ghost'
+            size='small'
             onClick={onClose}
             style={{
               borderRadius: '50%',
               width: '40px',
               height: '40px',
               padding: '0',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
             }}
           >
             <X size={18} />
@@ -531,7 +566,7 @@ export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = (
 
           <ActionCard>
             <ActionHeader>
-              <ActionIcon variant="warning">
+              <ActionIcon variant='warning'>
                 <RefreshCw size={20} />
               </ActionIcon>
               <div>
@@ -542,16 +577,13 @@ export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = (
               </div>
             </ActionHeader>
             <ActionContent>
-              <StatusBadge variant="info">
+              <StatusBadge variant='info'>
                 <Clock size={12} />
                 Email automático
               </StatusBadge>
             </ActionContent>
             <ActionButtons>
-              <Button
-                variant="outline"
-                onClick={handleForceReset}
-              >
+              <Button variant='outline' onClick={handleForceReset}>
                 <RefreshCw size={16} />
                 Enviar Reset
               </Button>
@@ -571,7 +603,7 @@ export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = (
               </div>
             </ActionHeader>
             <ActionContent>
-              <StatusBadge variant="warning">
+              <StatusBadge variant='warning'>
                 <AlertTriangle size={12} />
                 Cambio requerido en primer login
               </StatusBadge>
@@ -585,8 +617,8 @@ export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = (
                 <PasswordDisplay>
                   <PasswordText>{tempPassword}</PasswordText>
                   <Button
-                    variant="ghost"
-                    size="small"
+                    variant='ghost'
+                    size='small'
                     onClick={() => copyToClipboard(tempPassword)}
                   >
                     <Copy size={16} />
@@ -596,7 +628,7 @@ export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = (
             )}
             <ActionButtons>
               <Button
-                variant="primary"
+                variant='primary'
                 onClick={generateTempPassword}
                 isLoading={isGenerating}
               >
@@ -607,7 +639,7 @@ export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = (
 
           <ActionCard>
             <ActionHeader>
-              <ActionIcon variant="danger">
+              <ActionIcon variant='danger'>
                 <Lock size={20} />
               </ActionIcon>
               <div>
@@ -625,29 +657,39 @@ export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = (
                   {setPasswordError}
                 </ServerErrorBanner>
               )}
-              
-              <div className="input-group">
+
+              <div className='input-group'>
                 <Input
-                  label="Nueva Contraseña"
+                  label='Nueva Contraseña'
                   type={showNewPassword ? 'text' : 'password'}
                   value={newPassword}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handlePasswordChange(e.target.value)}
-                  placeholder="Ingrese nueva contraseña segura"
-                  error={localErrors['password'] || serverErrors['password'] || ''}
-                  rightIcon={showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    handlePasswordChange(e.target.value)
+                  }
+                  placeholder='Ingrese nueva contraseña segura'
+                  error={
+                    localErrors['password'] || serverErrors['password'] || ''
+                  }
+                  rightIcon={
+                    showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />
+                  }
                   onRightIconClick={() => setShowNewPassword(!showNewPassword)}
                   rightIconClickable={true}
-                  rightIconAriaLabel={showNewPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  rightIconAriaLabel={
+                    showNewPassword
+                      ? 'Ocultar contraseña'
+                      : 'Mostrar contraseña'
+                  }
                 />
               </div>
-              <StatusBadge variant="warning">
+              <StatusBadge variant='warning'>
                 <AlertTriangle size={12} />
                 Acción administrativa
               </StatusBadge>
             </ActionContent>
             <ActionButtons>
               <Button
-                variant="outline"
+                variant='outline'
                 onClick={() => {
                   setNewPassword('');
                   setLocalErrors({});
@@ -659,10 +701,14 @@ export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = (
                 Limpiar
               </Button>
               <Button
-                variant="primary"
+                variant='primary'
                 onClick={handleSetNewPassword}
                 isLoading={isSetting}
-                disabled={!newPassword.trim() || isSetting || Object.keys(localErrors).length > 0}
+                disabled={
+                  !newPassword.trim() ||
+                  isSetting ||
+                  Object.keys(localErrors).length > 0
+                }
               >
                 <Lock size={16} />
                 Establecer Contraseña
@@ -674,30 +720,40 @@ export const PasswordManagementModal: React.FC<PasswordManagementModalProps> = (
         <Section>
           {/* ✅ Display loading state */}
           {historyLoading && passwordHistory.length === 0 && (
-            <div style={{ 
-              padding: theme.spacing[4], 
-              textAlign: 'center',
-              color: theme.colors.text.secondary 
-            }}>
+            <div
+              style={{
+                padding: theme.spacing[4],
+                textAlign: 'center',
+                color: theme.colors.text.secondary,
+              }}
+            >
               Cargando historial de contraseñas...
             </div>
           )}
-          
+
           {/* ✅ Display error state */}
           {historyError && !historyLoading && (
-            <div style={{ 
-              padding: theme.spacing[4], 
-              background: `${theme.colors.error}15`,
-              border: `1px solid ${theme.colors.error}30`,
-              borderRadius: theme.borderRadius.md,
-              color: theme.colors.error,
-              marginBottom: theme.spacing[4]
-            }}>
-              <AlertCircle size={16} style={{ marginRight: theme.spacing[2], display: 'inline-block' }} />
+            <div
+              style={{
+                padding: theme.spacing[4],
+                background: `${theme.colors.error}15`,
+                border: `1px solid ${theme.colors.error}30`,
+                borderRadius: theme.borderRadius.md,
+                color: theme.colors.error,
+                marginBottom: theme.spacing[4],
+              }}
+            >
+              <AlertCircle
+                size={16}
+                style={{
+                  marginRight: theme.spacing[2],
+                  display: 'inline-block',
+                }}
+              />
               Error al cargar historial: {historyError}
             </div>
           )}
-          
+
           {/* ✅ Display password history */}
           <PasswordHistoryCard actions={passwordHistory} />
         </Section>

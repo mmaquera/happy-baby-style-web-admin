@@ -7,6 +7,7 @@ Este módulo implementa la funcionalidad específica para la subida de archivos 
 ## 🎯 Características Implementadas
 
 ### **Componente SVGUpload**
+
 - **Drag & Drop**: Interfaz intuitiva para arrastrar y soltar archivos SVG
 - **Validación Específica**: Validaciones específicas para archivos SVG
 - **Preview**: Vista previa del SVG subido
@@ -15,6 +16,7 @@ Este módulo implementa la funcionalidad específica para la subida de archivos 
 - **Progress Tracking**: Seguimiento del progreso de subida
 
 ### **Hook useSVGUpload**
+
 - **Validación**: Validación específica para archivos SVG
 - **Optimización**: Optimización del contenido SVG
 - **Upload Management**: Gestión completa del proceso de subida
@@ -24,12 +26,14 @@ Este módulo implementa la funcionalidad específica para la subida de archivos 
 ## 🏗️ Arquitectura
 
 ### **Principios de Diseño**
+
 - **Single Responsibility**: Cada componente tiene una responsabilidad específica
 - **Open/Closed**: Extensible sin modificar código existente
 - **Dependency Inversion**: Dependencias inyectadas y testables
 - **Clean Architecture**: Separación clara de responsabilidades
 
 ### **Estructura de Archivos**
+
 ```
 src/components/categories/SVGUpload/
 ├── SVGUpload.tsx           # Componente principal
@@ -44,6 +48,7 @@ src/hooks/
 ## 🎨 Características del Componente
 
 ### **Props Interface**
+
 ```typescript
 interface SVGUploadProps {
   onUploadComplete: (svgUrl: string) => void;
@@ -60,6 +65,7 @@ interface SVGUploadProps {
 ```
 
 ### **Validaciones Específicas**
+
 - **Tipo de archivo**: Solo archivos SVG
 - **Tamaño máximo**: 500KB (optimizado para SVG)
 - **Tamaño mínimo**: 100 bytes
@@ -67,6 +73,7 @@ interface SVGUploadProps {
 - **Dimensiones**: Máximo 2000px, mínimo 16px
 
 ### **Optimizaciones**
+
 - **Eliminación de comentarios**: Remueve comentarios innecesarios
 - **Compresión de espacios**: Optimiza espacios en blanco
 - **Eliminación de líneas vacías**: Limpia líneas vacías
@@ -75,6 +82,7 @@ interface SVGUploadProps {
 ## 🚀 Uso y Implementación
 
 ### **Uso Básico**
+
 ```typescript
 import { SVGUpload } from '@/components/categories/SVGUpload';
 
@@ -99,6 +107,7 @@ const MyComponent = () => {
 ```
 
 ### **Uso Avanzado**
+
 ```typescript
 import { SVGUpload } from '@/components/categories/SVGUpload';
 
@@ -128,6 +137,7 @@ const AdvancedComponent = () => {
 ```
 
 ### **Hook Personalizado**
+
 ```typescript
 import { useSVGUpload } from '@/hooks/useSVGUpload';
 
@@ -165,11 +175,13 @@ const MyComponent = () => {
 ## 🎨 Estilos y Temas
 
 ### **Tema Consistente**
+
 - Utiliza el sistema de temas centralizado (`@/styles/theme`)
 - Colores consistentes con la identidad de Happy Baby Style
 - Paleta de colores semánticos (success, warning, error, info)
 
 ### **Componentes Estilizados**
+
 - **SVGUploadZone**: Zona de drag & drop con estados visuales
 - **SVGPreview**: Vista previa del SVG con overlay de acciones
 - **SVGProgressBar**: Barra de progreso animada
@@ -178,6 +190,7 @@ const MyComponent = () => {
 ## 🔧 Configuración
 
 ### **Constantes de Configuración**
+
 ```typescript
 export const SVG_UPLOAD_DEFAULTS = {
   maxSize: 500000, // 500KB
@@ -198,12 +211,14 @@ export const SVG_VALIDATION_RULES = {
 ## 📊 Métricas y Performance
 
 ### **Indicadores de Calidad**
+
 - **Tiempo de Validación**: < 100ms para archivos SVG
 - **Tiempo de Optimización**: < 50ms para contenido SVG
 - **Tamaño de Bundle**: Mínimo impacto en el bundle principal
 - **Accesibilidad**: WCAG 2.1 AA compliance
 
 ### **Optimizaciones Implementadas**
+
 - **Lazy Loading**: Carga bajo demanda del componente
 - **Debouncing**: Validación optimizada
 - **Memory Management**: Limpieza automática de recursos
@@ -212,12 +227,14 @@ export const SVG_VALIDATION_RULES = {
 ## 🧪 Testing
 
 ### **Cobertura de Tests**
+
 - **Unit Tests**: Componente SVGUpload
 - **Integration Tests**: Hook useSVGUpload
 - **E2E Tests**: Flujo completo de subida
 - **Visual Tests**: Estados visuales del componente
 
 ### **Casos de Prueba**
+
 - ✅ Subida exitosa de archivo SVG válido
 - ✅ Validación de archivos no SVG
 - ✅ Manejo de archivos demasiado grandes
@@ -229,6 +246,7 @@ export const SVG_VALIDATION_RULES = {
 ## 🔮 Roadmap y Mejoras Futuras
 
 ### **Próximas Funcionalidades**
+
 - [ ] Compresión avanzada de SVG
 - [ ] Validación de accesibilidad en SVG
 - [ ] Soporte para múltiples archivos
@@ -236,6 +254,7 @@ export const SVG_VALIDATION_RULES = {
 - [ ] Cache inteligente de archivos
 
 ### **Mejoras Técnicas**
+
 - [ ] Web Workers para optimización
 - [ ] Service Worker para cache offline
 - [ ] Métricas de performance avanzadas
@@ -244,11 +263,13 @@ export const SVG_VALIDATION_RULES = {
 ## 📚 Recursos y Referencias
 
 ### **Documentación del Proyecto**
+
 - **Estándares de Desarrollo**: [DEVELOPMENT_STANDARDS.md](../../DEVELOPMENT_STANDARDS.md)
 - **Módulo de Categorías**: [README.md](../README.md)
 - **Módulo de Productos**: [../products/README.md](../products/README.md)
 
 ### **Tecnologías Utilizadas**
+
 - **React 18+**: Biblioteca principal de UI
 - **TypeScript**: Tipado estático
 - **Styled Components**: CSS-in-JS

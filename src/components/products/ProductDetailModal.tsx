@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { 
+import {
   X,
   Eye,
   Edit3,
@@ -33,7 +33,7 @@ import {
   ThumbsUp,
   ImageIcon,
   Database,
-  ShoppingBag
+  ShoppingBag,
 } from 'lucide-react';
 import type { Product, Category } from './types';
 
@@ -52,7 +52,7 @@ const ModalOverlay = styled.div<{ isOpen: boolean }>`
   bottom: 0;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8px);
-  display: ${({ isOpen }) => isOpen ? 'flex' : 'none'};
+  display: ${({ isOpen }) => (isOpen ? 'flex' : 'none')};
   align-items: center;
   justify-content: center;
   z-index: ${theme.zIndex.modal};
@@ -157,8 +157,9 @@ const ImageThumbnail = styled.div<{ isActive: boolean }>`
   height: 60px;
   border-radius: ${theme.borderRadius.md};
   overflow: hidden;
-  border: 2px solid ${({ isActive }) => 
-    isActive ? theme.colors.primary : theme.colors.border.light};
+  border: 2px solid
+    ${({ isActive }) =>
+      isActive ? theme.colors.primary : theme.colors.border.light};
   cursor: pointer;
   transition: all ${theme.transitions.base};
 
@@ -226,7 +227,7 @@ const DiscountBadge = styled.span`
 `;
 
 const StatusBadge = styled.span<{ isActive: boolean }>`
-  background: ${({ isActive }) => 
+  background: ${({ isActive }) =>
     isActive ? theme.colors.success : theme.colors.error};
   color: ${theme.colors.white};
   padding: ${theme.spacing[1]} ${theme.spacing[2]};
@@ -270,10 +271,9 @@ const Stars = styled.div`
 `;
 
 const StarIcon = styled(Star)<{ filled: boolean }>`
-  color: ${({ filled }) => 
+  color: ${({ filled }) =>
     filled ? theme.colors.warning : theme.colors.border.light};
-  fill: ${({ filled }) => 
-    filled ? theme.colors.warning : 'none'};
+  fill: ${({ filled }) => (filled ? theme.colors.warning : 'none')};
 `;
 
 const ContentGrid = styled.div`
@@ -347,11 +347,12 @@ const VariantsGrid = styled.div`
 
 const VariantCard = styled.div<{ isActive: boolean }>`
   background: ${theme.colors.white};
-  border: 1px solid ${({ isActive }) => 
-    isActive ? theme.colors.primary : theme.colors.border.light};
+  border: 1px solid
+    ${({ isActive }) =>
+      isActive ? theme.colors.primary : theme.colors.border.light};
   border-radius: ${theme.borderRadius.md};
   padding: ${theme.spacing[3]};
-  opacity: ${({ isActive }) => isActive ? 1 : 0.7};
+  opacity: ${({ isActive }) => (isActive ? 1 : 0.7)};
 `;
 
 const VariantName = styled.div`
@@ -421,7 +422,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   isOpen,
   onClose,
   product,
-  onEdit
+  onEdit,
 }) => {
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
 
@@ -441,13 +442,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   const renderStars = (rating: number) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
-      stars.push(
-        <StarIcon 
-          key={i} 
-          size={16} 
-          filled={i <= rating} 
-        />
-      );
+      stars.push(<StarIcon key={i} size={16} filled={i <= rating} />);
     }
     return stars;
   };
@@ -469,9 +464,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           <ProductHeader>
             <ImageSection>
               <MainImage>
-                <img 
-                  src={product.images[selectedImageIndex] || 'https://via.placeholder.com/300x300'} 
-                  alt={product.name} 
+                <img
+                  src={
+                    product.images[selectedImageIndex] ||
+                    'https://via.placeholder.com/300x300'
+                  }
+                  alt={product.name}
                 />
               </MainImage>
               {product.images.length > 1 && (
@@ -499,17 +497,11 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               </div>
 
               <PriceSection>
-                <CurrentPrice>
-                  S/ {currentPrice.toFixed(2)}
-                </CurrentPrice>
+                <CurrentPrice>S/ {currentPrice.toFixed(2)}</CurrentPrice>
                 {hasDiscount && (
                   <>
-                    <OriginalPrice>
-                      S/ {originalPrice.toFixed(2)}
-                    </OriginalPrice>
-                    <DiscountBadge>
-                      -{discountPercentage}%
-                    </DiscountBadge>
+                    <OriginalPrice>S/ {originalPrice.toFixed(2)}</OriginalPrice>
+                    <DiscountBadge>-{discountPercentage}%</DiscountBadge>
                   </>
                 )}
               </PriceSection>
@@ -518,8 +510,15 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 <StatusBadge isActive={product.isActive}>
                   {product.isActive ? 'Activo' : 'Inactivo'}
                 </StatusBadge>
-                <StockBadge isInStock={product.isInStock} isLowStock={isLowStock}>
-                  {!product.isInStock ? 'Sin Stock' : isLowStock ? 'Stock Bajo' : 'En Stock'}
+                <StockBadge
+                  isInStock={product.isInStock}
+                  isLowStock={isLowStock}
+                >
+                  {!product.isInStock
+                    ? 'Sin Stock'
+                    : isLowStock
+                      ? 'Stock Bajo'
+                      : 'En Stock'}
                 </StockBadge>
               </div>
 
@@ -531,7 +530,9 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               {product.rating && (
                 <RatingSection>
                   <Stars>
-                    {renderStars(Math.round(parseFloat(product.rating.toString())))}
+                    {renderStars(
+                      Math.round(parseFloat(product.rating.toString()))
+                    )}
                   </Stars>
                   <span style={{ color: theme.colors.text.secondary }}>
                     ({product.reviewCount} reseñas)
@@ -550,7 +551,8 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   Descripción
                 </SectionTitle>
                 <Description>
-                  {product.description || 'No hay descripción disponible para este producto.'}
+                  {product.description ||
+                    'No hay descripción disponible para este producto.'}
                 </Description>
               </Section>
 
@@ -580,8 +582,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     {product.variants.map(variant => (
                       <VariantCard key={variant.id} isActive={variant.isActive}>
                         <VariantName>{variant.name}</VariantName>
-                        <VariantPrice>S/ {parseFloat(variant.price.toString()).toFixed(2)}</VariantPrice>
-                        <VariantStock>Stock: {variant.stockQuantity}</VariantStock>
+                        <VariantPrice>
+                          S/ {parseFloat(variant.price.toString()).toFixed(2)}
+                        </VariantPrice>
+                        <VariantStock>
+                          Stock: {variant.stockQuantity}
+                        </VariantStock>
                       </VariantCard>
                     ))}
                   </VariantsGrid>
@@ -589,21 +595,38 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               )}
 
               {/* Attributes */}
-              {product.attributes && Object.keys(product.attributes).length > 0 && (
-                <Section>
-                  <SectionTitle>
-                    <Settings size={20} />
-                    Atributos
-                  </SectionTitle>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: theme.spacing[3] }}>
-                    {Object.entries(product.attributes).map(([key, value]) => (
-                      <div key={key} style={{ padding: theme.spacing[2], background: theme.colors.white, borderRadius: theme.borderRadius.md }}>
-                        <strong>{key}:</strong> {String(value)}
-                      </div>
-                    ))}
-                  </div>
-                </Section>
-              )}
+              {product.attributes &&
+                Object.keys(product.attributes).length > 0 && (
+                  <Section>
+                    <SectionTitle>
+                      <Settings size={20} />
+                      Atributos
+                    </SectionTitle>
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns:
+                          'repeat(auto-fill, minmax(200px, 1fr))',
+                        gap: theme.spacing[3],
+                      }}
+                    >
+                      {Object.entries(product.attributes).map(
+                        ([key, value]) => (
+                          <div
+                            key={key}
+                            style={{
+                              padding: theme.spacing[2],
+                              background: theme.colors.white,
+                              borderRadius: theme.borderRadius.md,
+                            }}
+                          >
+                            <strong>{key}:</strong> {String(value)}
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </Section>
+                )}
 
               {/* Reviews Section */}
               {product.reviews && product.reviews.length > 0 && (
@@ -612,53 +635,114 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     <MessageSquare size={20} />
                     Reseñas ({product.reviews.length})
                   </SectionTitle>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing[3] }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: theme.spacing[3],
+                    }}
+                  >
                     {product.reviews.slice(0, 5).map((review: any) => (
-                      <div key={review.id} style={{ 
-                        padding: theme.spacing[3], 
-                        background: theme.colors.white, 
-                        borderRadius: theme.borderRadius.md,
-                        border: '1px solid ' + theme.colors.border.light
-                      }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: theme.spacing[2] }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[2] }}>
+                      <div
+                        key={review.id}
+                        style={{
+                          padding: theme.spacing[3],
+                          background: theme.colors.white,
+                          borderRadius: theme.borderRadius.md,
+                          border: '1px solid ' + theme.colors.border.light,
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: theme.spacing[2],
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: theme.spacing[2],
+                            }}
+                          >
                             <User size={16} />
-                            <span style={{ fontWeight: theme.fontWeights.medium }}>
-                              {review.user?.firstName || 'Usuario'} {review.user?.lastName || ''}
+                            <span
+                              style={{ fontWeight: theme.fontWeights.medium }}
+                            >
+                              {review.user?.firstName || 'Usuario'}{' '}
+                              {review.user?.lastName || ''}
                             </span>
                           </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[1] }}>
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: theme.spacing[1],
+                            }}
+                          >
                             {renderStars(review.rating)}
-                            <span style={{ fontSize: theme.fontSizes.sm, color: theme.colors.text.secondary }}>
+                            <span
+                              style={{
+                                fontSize: theme.fontSizes.sm,
+                                color: theme.colors.text.secondary,
+                              }}
+                            >
                               {new Date(review.createdAt).toLocaleDateString()}
                             </span>
                           </div>
                         </div>
                         {review.title && (
-                          <div style={{ fontWeight: theme.fontWeights.medium, marginBottom: theme.spacing[1] }}>
+                          <div
+                            style={{
+                              fontWeight: theme.fontWeights.medium,
+                              marginBottom: theme.spacing[1],
+                            }}
+                          >
                             {review.title}
                           </div>
                         )}
                         {review.comment && (
-                          <div style={{ color: theme.colors.text.secondary, lineHeight: 1.5 }}>
+                          <div
+                            style={{
+                              color: theme.colors.text.secondary,
+                              lineHeight: 1.5,
+                            }}
+                          >
                             {review.comment}
                           </div>
                         )}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[2], marginTop: theme.spacing[2] }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[1] }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: theme.spacing[2],
+                            marginTop: theme.spacing[2],
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: theme.spacing[1],
+                            }}
+                          >
                             <ThumbsUp size={14} />
                             <span style={{ fontSize: theme.fontSizes.sm }}>
                               {review.helpfulCount} útil
                             </span>
                           </div>
                           {review.isVerified && (
-                            <div style={{ 
-                              display: 'flex', 
-                              alignItems: 'center', 
-                              gap: theme.spacing[1],
-                              color: theme.colors.success,
-                              fontSize: theme.fontSizes.sm
-                            }}>
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: theme.spacing[1],
+                                color: theme.colors.success,
+                                fontSize: theme.fontSizes.sm,
+                              }}
+                            >
                               <CheckCircle size={14} />
                               Verificado
                             </div>
@@ -667,7 +751,13 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                       </div>
                     ))}
                     {product.reviews.length > 5 && (
-                      <div style={{ textAlign: 'center', padding: theme.spacing[2], color: theme.colors.text.secondary }}>
+                      <div
+                        style={{
+                          textAlign: 'center',
+                          padding: theme.spacing[2],
+                          color: theme.colors.text.secondary,
+                        }}
+                      >
                         Mostrando 5 de {product.reviews.length} reseñas
                       </div>
                     )}
@@ -676,54 +766,101 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               )}
 
               {/* Inventory Transactions */}
-              {product.inventoryTransactions && product.inventoryTransactions.length > 0 && (
-                <Section>
-                  <SectionTitle>
-                    <Activity size={20} />
-                    Transacciones de Inventario ({product.inventoryTransactions.length})
-                  </SectionTitle>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing[2] }}>
-                    {product.inventoryTransactions.slice(0, 10).map((transaction: any) => (
-                      <div key={transaction.id} style={{ 
-                        padding: theme.spacing[2], 
-                        background: theme.colors.white, 
-                        borderRadius: theme.borderRadius.md,
-                        border: '1px solid ' + theme.colors.border.light,
+              {product.inventoryTransactions &&
+                product.inventoryTransactions.length > 0 && (
+                  <Section>
+                    <SectionTitle>
+                      <Activity size={20} />
+                      Transacciones de Inventario (
+                      {product.inventoryTransactions.length})
+                    </SectionTitle>
+                    <div
+                      style={{
                         display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
-                      }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[2] }}>
-                          <Database size={16} />
-                          <div>
-                            <div style={{ fontWeight: theme.fontWeights.medium }}>
-                              {transaction.type}
+                        flexDirection: 'column',
+                        gap: theme.spacing[2],
+                      }}
+                    >
+                      {product.inventoryTransactions
+                        .slice(0, 10)
+                        .map((transaction: any) => (
+                          <div
+                            key={transaction.id}
+                            style={{
+                              padding: theme.spacing[2],
+                              background: theme.colors.white,
+                              borderRadius: theme.borderRadius.md,
+                              border: '1px solid ' + theme.colors.border.light,
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: theme.spacing[2],
+                              }}
+                            >
+                              <Database size={16} />
+                              <div>
+                                <div
+                                  style={{
+                                    fontWeight: theme.fontWeights.medium,
+                                  }}
+                                >
+                                  {transaction.type}
+                                </div>
+                                <div
+                                  style={{
+                                    fontSize: theme.fontSizes.sm,
+                                    color: theme.colors.text.secondary,
+                                  }}
+                                >
+                                  {transaction.quantity} unidades
+                                </div>
+                              </div>
                             </div>
-                            <div style={{ fontSize: theme.fontSizes.sm, color: theme.colors.text.secondary }}>
-                              {transaction.quantity} unidades
+                            <div style={{ textAlign: 'right' }}>
+                              <div
+                                style={{
+                                  fontSize: theme.fontSizes.sm,
+                                  color: theme.colors.text.secondary,
+                                }}
+                              >
+                                {new Date(
+                                  transaction.createdAt
+                                ).toLocaleDateString()}
+                              </div>
+                              {transaction.reference && (
+                                <div
+                                  style={{
+                                    fontSize: theme.fontSizes.xs,
+                                    color: theme.colors.text.secondary,
+                                  }}
+                                >
+                                  Ref: {transaction.reference}
+                                </div>
+                              )}
                             </div>
                           </div>
+                        ))}
+                      {product.inventoryTransactions.length > 10 && (
+                        <div
+                          style={{
+                            textAlign: 'center',
+                            padding: theme.spacing[2],
+                            color: theme.colors.text.secondary,
+                          }}
+                        >
+                          Mostrando 10 de {product.inventoryTransactions.length}{' '}
+                          transacciones
                         </div>
-                        <div style={{ textAlign: 'right' }}>
-                          <div style={{ fontSize: theme.fontSizes.sm, color: theme.colors.text.secondary }}>
-                            {new Date(transaction.createdAt).toLocaleDateString()}
-                          </div>
-                          {transaction.reference && (
-                            <div style={{ fontSize: theme.fontSizes.xs, color: theme.colors.text.secondary }}>
-                              Ref: {transaction.reference}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                    {product.inventoryTransactions.length > 10 && (
-                      <div style={{ textAlign: 'center', padding: theme.spacing[2], color: theme.colors.text.secondary }}>
-                        Mostrando 10 de {product.inventoryTransactions.length} transacciones
-                      </div>
-                    )}
-                  </div>
-                </Section>
-              )}
+                      )}
+                    </div>
+                  </Section>
+                )}
 
               {/* Stock Alerts */}
               {product.stockAlerts && product.stockAlerts.length > 0 && (
@@ -732,35 +869,85 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     <AlertCircle size={20} />
                     Alertas de Stock ({product.stockAlerts.length})
                   </SectionTitle>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing[2] }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: theme.spacing[2],
+                    }}
+                  >
                     {product.stockAlerts.map((alert: any) => (
-                      <div key={alert.id} style={{ 
-                        padding: theme.spacing[3], 
-                        background: alert.isActive ? theme.colors.warning + '20' : theme.colors.background.light, 
-                        borderRadius: theme.borderRadius.md,
-                        border: '1px solid ' + (alert.isActive ? theme.colors.warning + '40' : theme.colors.border.light)
-                      }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: theme.spacing[1] }}>
-                          <div style={{ fontWeight: theme.fontWeights.medium, color: theme.colors.warning }}>
-                            {alert.type === 'low_stock' ? 'Stock Bajo' : 
-                             alert.type === 'out_of_stock' ? 'Sin Stock' : 
-                             alert.type === 'overstock' ? 'Sobre Stock' : alert.type}
+                      <div
+                        key={alert.id}
+                        style={{
+                          padding: theme.spacing[3],
+                          background: alert.isActive
+                            ? theme.colors.warning + '20'
+                            : theme.colors.background.light,
+                          borderRadius: theme.borderRadius.md,
+                          border:
+                            '1px solid ' +
+                            (alert.isActive
+                              ? theme.colors.warning + '40'
+                              : theme.colors.border.light),
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: theme.spacing[1],
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontWeight: theme.fontWeights.medium,
+                              color: theme.colors.warning,
+                            }}
+                          >
+                            {alert.type === 'low_stock'
+                              ? 'Stock Bajo'
+                              : alert.type === 'out_of_stock'
+                                ? 'Sin Stock'
+                                : alert.type === 'overstock'
+                                  ? 'Sobre Stock'
+                                  : alert.type}
                           </div>
-                          <div style={{ 
-                            padding: theme.spacing[1], 
-                            background: alert.isActive ? theme.colors.warning : theme.colors.background.accent,
-                            color: alert.isActive ? theme.colors.white : theme.colors.text.secondary,
-                            borderRadius: theme.borderRadius.sm,
-                            fontSize: theme.fontSizes.xs
-                          }}>
+                          <div
+                            style={{
+                              padding: theme.spacing[1],
+                              background: alert.isActive
+                                ? theme.colors.warning
+                                : theme.colors.background.accent,
+                              color: alert.isActive
+                                ? theme.colors.white
+                                : theme.colors.text.secondary,
+                              borderRadius: theme.borderRadius.sm,
+                              fontSize: theme.fontSizes.xs,
+                            }}
+                          >
                             {alert.isActive ? 'Activa' : 'Inactiva'}
                           </div>
                         </div>
-                        <div style={{ fontSize: theme.fontSizes.sm, color: theme.colors.text.secondary }}>
-                          Umbral: {alert.threshold} | Stock actual: {alert.currentStock}
+                        <div
+                          style={{
+                            fontSize: theme.fontSizes.sm,
+                            color: theme.colors.text.secondary,
+                          }}
+                        >
+                          Umbral: {alert.threshold} | Stock actual:{' '}
+                          {alert.currentStock}
                         </div>
-                        <div style={{ fontSize: theme.fontSizes.xs, color: theme.colors.text.secondary, marginTop: theme.spacing[1] }}>
-                          Creada: {new Date(alert.createdAt).toLocaleDateString()}
+                        <div
+                          style={{
+                            fontSize: theme.fontSizes.xs,
+                            color: theme.colors.text.secondary,
+                            marginTop: theme.spacing[1],
+                          }}
+                        >
+                          Creada:{' '}
+                          {new Date(alert.createdAt).toLocaleDateString()}
                         </div>
                       </div>
                     ))}
@@ -775,34 +962,74 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     <TrendingUp size={20} />
                     Actividad Reciente ({product.appEvents.length})
                   </SectionTitle>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing[2] }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: theme.spacing[2],
+                    }}
+                  >
                     {product.appEvents.slice(0, 5).map((event: any) => (
-                      <div key={event.id} style={{ 
-                        padding: theme.spacing[2], 
-                        background: theme.colors.white, 
-                        borderRadius: theme.borderRadius.md,
-                        border: '1px solid ' + theme.colors.border.light
-                      }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[2] }}>
+                      <div
+                        key={event.id}
+                        style={{
+                          padding: theme.spacing[2],
+                          background: theme.colors.white,
+                          borderRadius: theme.borderRadius.md,
+                          border: '1px solid ' + theme.colors.border.light,
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: theme.spacing[2],
+                            }}
+                          >
                             <Activity size={16} />
-                            <span style={{ fontWeight: theme.fontWeights.medium }}>
+                            <span
+                              style={{ fontWeight: theme.fontWeights.medium }}
+                            >
                               {event.eventType}
                             </span>
                           </div>
-                          <div style={{ fontSize: theme.fontSizes.sm, color: theme.colors.text.secondary }}>
+                          <div
+                            style={{
+                              fontSize: theme.fontSizes.sm,
+                              color: theme.colors.text.secondary,
+                            }}
+                          >
                             {new Date(event.createdAt).toLocaleDateString()}
                           </div>
                         </div>
                         {event.eventData && (
-                          <div style={{ fontSize: theme.fontSizes.sm, color: theme.colors.text.secondary, marginTop: theme.spacing[1] }}>
+                          <div
+                            style={{
+                              fontSize: theme.fontSizes.sm,
+                              color: theme.colors.text.secondary,
+                              marginTop: theme.spacing[1],
+                            }}
+                          >
                             {JSON.stringify(event.eventData)}
                           </div>
                         )}
                       </div>
                     ))}
                     {product.appEvents.length > 5 && (
-                      <div style={{ textAlign: 'center', padding: theme.spacing[2], color: theme.colors.text.secondary }}>
+                      <div
+                        style={{
+                          textAlign: 'center',
+                          padding: theme.spacing[2],
+                          color: theme.colors.text.secondary,
+                        }}
+                      >
                         Mostrando 5 de {product.appEvents.length} eventos
                       </div>
                     )}
@@ -819,7 +1046,13 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     <MapPin size={20} />
                     Categoría
                   </SectionTitle>
-                  <div style={{ padding: theme.spacing[2], background: theme.colors.white, borderRadius: theme.borderRadius.md }}>
+                  <div
+                    style={{
+                      padding: theme.spacing[2],
+                      background: theme.colors.white,
+                      borderRadius: theme.borderRadius.md,
+                    }}
+                  >
                     {product.category.name}
                   </div>
                 </Section>
@@ -865,24 +1098,60 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   <ShoppingBag size={20} />
                   Resumen de Inventario
                 </SectionTitle>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing[2] }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: theme.spacing[2], background: theme.colors.white, borderRadius: theme.borderRadius.md }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: theme.spacing[2],
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      padding: theme.spacing[2],
+                      background: theme.colors.white,
+                      borderRadius: theme.borderRadius.md,
+                    }}
+                  >
                     <span>Stock Principal:</span>
                     <strong>{product.stockQuantity}</strong>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: theme.spacing[2], background: theme.colors.white, borderRadius: theme.borderRadius.md }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      padding: theme.spacing[2],
+                      background: theme.colors.white,
+                      borderRadius: theme.borderRadius.md,
+                    }}
+                  >
                     <span>Stock Total:</span>
                     <strong>{product.totalStock}</strong>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: theme.spacing[2], background: theme.colors.white, borderRadius: theme.borderRadius.md }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      padding: theme.spacing[2],
+                      background: theme.colors.white,
+                      borderRadius: theme.borderRadius.md,
+                    }}
+                  >
                     <span>Estado:</span>
-                    <div style={{ 
-                      padding: theme.spacing[1], 
-                      background: product.isInStock ? theme.colors.success + '20' : theme.colors.error + '20',
-                      color: product.isInStock ? theme.colors.success : theme.colors.error,
-                      borderRadius: theme.borderRadius.sm,
-                      fontSize: theme.fontSizes.xs
-                    }}>
+                    <div
+                      style={{
+                        padding: theme.spacing[1],
+                        background: product.isInStock
+                          ? theme.colors.success + '20'
+                          : theme.colors.error + '20',
+                        color: product.isInStock
+                          ? theme.colors.success
+                          : theme.colors.error,
+                        borderRadius: theme.borderRadius.sm,
+                        fontSize: theme.fontSizes.xs,
+                      }}
+                    >
                       {product.isInStock ? 'Disponible' : 'Agotado'}
                     </div>
                   </div>
@@ -895,12 +1164,20 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   <Calendar size={20} />
                   Fechas
                 </SectionTitle>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing[2] }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: theme.spacing[2],
+                  }}
+                >
                   <div style={{ fontSize: theme.fontSizes.sm }}>
-                    <strong>Creado:</strong> {new Date(product.createdAt).toLocaleDateString()}
+                    <strong>Creado:</strong>{' '}
+                    {new Date(product.createdAt).toLocaleDateString()}
                   </div>
                   <div style={{ fontSize: theme.fontSizes.sm }}>
-                    <strong>Actualizado:</strong> {new Date(product.updatedAt).toLocaleDateString()}
+                    <strong>Actualizado:</strong>{' '}
+                    {new Date(product.updatedAt).toLocaleDateString()}
                   </div>
                 </div>
               </Section>
@@ -909,18 +1186,10 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         </ModalBody>
 
         <ModalFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onClose}
-          >
+          <Button type='button' variant='outline' onClick={onClose}>
             Cerrar
           </Button>
-          <Button
-            type="button"
-            variant="primary"
-            onClick={handleEdit}
-          >
+          <Button type='button' variant='primary' onClick={handleEdit}>
             <Edit3 size={16} />
             Editar Producto
           </Button>

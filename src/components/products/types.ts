@@ -166,7 +166,13 @@ export interface ProductFilterInput {
 }
 
 export interface ProductSortInput {
-  field: 'name' | 'price' | 'createdAt' | 'stockQuantity' | 'rating' | 'reviewCount';
+  field:
+    | 'name'
+    | 'price'
+    | 'createdAt'
+    | 'stockQuantity'
+    | 'rating'
+    | 'reviewCount';
   direction: 'asc' | 'desc';
 }
 
@@ -228,7 +234,12 @@ export interface ProductValidationErrors {
 // Bulk operation types
 export interface BulkProductOperation {
   ids: string[];
-  operation: 'activate' | 'deactivate' | 'delete' | 'updateCategory' | 'updateStock';
+  operation:
+    | 'activate'
+    | 'deactivate'
+    | 'delete'
+    | 'updateCategory'
+    | 'updateStock';
   data?: Record<string, any>;
 }
 

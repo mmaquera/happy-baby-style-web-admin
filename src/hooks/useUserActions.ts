@@ -32,7 +32,11 @@ export const useUserActions = () => {
   };
 
   const deleteUser = async (user: User) => {
-    if (!window.confirm(`¿Estás seguro de que quieres eliminar al usuario ${user.email}?`)) {
+    if (
+      !window.confirm(
+        `¿Estás seguro de que quieres eliminar al usuario ${user.email}?`
+      )
+    ) {
       return;
     }
 
@@ -49,7 +53,11 @@ export const useUserActions = () => {
   };
 
   const resetPassword = async (user: User) => {
-    if (!window.confirm(`¿Enviar email de restablecimiento de contraseña a ${user.email}?`)) {
+    if (
+      !window.confirm(
+        `¿Enviar email de restablecimiento de contraseña a ${user.email}?`
+      )
+    ) {
       return;
     }
 
@@ -72,7 +80,7 @@ export const useUserActions = () => {
 
     setLoading(true);
     try {
-              await updateUserMutation.update(user.id, { role: UserRole.admin as any });
+      await updateUserMutation.update(user.id, { role: UserRole.admin as any });
       toast.success(`${user.email} promovido a administrador exitosamente`);
     } catch (error) {
       toast.error('Error al promover usuario');
@@ -82,13 +90,17 @@ export const useUserActions = () => {
   };
 
   const demoteFromAdmin = async (user: User) => {
-    if (!window.confirm(`¿Remover permisos de administrador de ${user.email}?`)) {
+    if (
+      !window.confirm(`¿Remover permisos de administrador de ${user.email}?`)
+    ) {
       return;
     }
 
     setLoading(true);
     try {
-      await updateUserMutation.update(user.id, { role: UserRole.customer as any });
+      await updateUserMutation.update(user.id, {
+        role: UserRole.customer as any,
+      });
       toast.success(`Permisos de administrador removidos de ${user.email}`);
     } catch (error) {
       toast.error('Error al actualizar permisos');

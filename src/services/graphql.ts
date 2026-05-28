@@ -5,7 +5,8 @@ import { createApolloClientWithUnifiedMiddleware } from './graphql/UnifiedGraphQ
 import { defaultGraphQLConfig } from '../config/auth';
 
 // Create Apollo Client with unified middleware
-export const client = createApolloClientWithUnifiedMiddleware(defaultGraphQLConfig);
+export const client =
+  createApolloClientWithUnifiedMiddleware(defaultGraphQLConfig);
 
 // Export the main client (preferred)
 export default client;

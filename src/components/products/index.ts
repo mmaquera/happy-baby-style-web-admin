@@ -34,9 +34,17 @@ export type {
   ProductValidationErrors,
   BulkProductOperation,
   ProductExportOptions,
-  ProductImportResult
+  ProductImportResult,
 } from './types';
 
 // Hooks
 export { useProductActions } from '@/hooks/useProductActions';
-export { useProducts, useProduct, useCreateProduct, useUpdateProduct, useDeleteProduct, useUploadProductImage, useProductSearch } from '@/hooks/useProductsGraphQL';
+export {
+  useProducts,
+  useProduct,
+  useCreateProduct,
+  useUpdateProduct,
+  useDeleteProduct,
+  useUploadProductImage,
+  useProductSearch,
+} from '@/hooks/useProductsGraphQL';

@@ -37,7 +37,7 @@ const ModalContainer = styled.div`
   max-height: 90vh;
   overflow: hidden;
   animation: slideIn 0.3s ease-out;
-  
+
   @keyframes slideIn {
     from {
       opacity: 0;
@@ -54,7 +54,8 @@ const ModalHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: ${theme.spacing[6]} ${theme.spacing[6]} ${theme.spacing[4]} ${theme.spacing[6]};
+  padding: ${theme.spacing[6]} ${theme.spacing[6]} ${theme.spacing[4]}
+    ${theme.spacing[6]};
   border-bottom: 1px solid ${theme.colors.border.light};
 `;
 
@@ -77,12 +78,12 @@ const CloseButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   &:hover {
     background: ${theme.colors.background.accent};
     color: ${theme.colors.primaryPurple};
   }
-  
+
   &:active {
     transform: scale(0.95);
   }
@@ -93,7 +94,8 @@ const ModalBody = styled.div`
 `;
 
 const ModalFooter = styled.div`
-  padding: ${theme.spacing[4]} ${theme.spacing[6]} ${theme.spacing[6]} ${theme.spacing[6]};
+  padding: ${theme.spacing[4]} ${theme.spacing[6]} ${theme.spacing[6]}
+    ${theme.spacing[6]};
   border-top: 1px solid ${theme.colors.border.light};
   display: flex;
   gap: ${theme.spacing[3]};
@@ -204,10 +206,10 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
 
   return (
     <ModalOverlay onClick={handleClose}>
-      <ModalContainer onClick={(e) => e.stopPropagation()}>
+      <ModalContainer onClick={e => e.stopPropagation()}>
         <ModalHeader>
           <ModalTitle>Recuperar Contraseña</ModalTitle>
-          <CloseButton onClick={handleClose} aria-label="Cerrar modal">
+          <CloseButton onClick={handleClose} aria-label='Cerrar modal'>
             <X size={20} />
           </CloseButton>
         </ModalHeader>
@@ -217,25 +219,28 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
             <SuccessMessage>
               <CheckCircle size={24} />
               <div>
-                <strong>¡Correo enviado!</strong><br />
-                Hemos enviado las instrucciones para recuperar tu contraseña a tu correo electrónico.
+                <strong>¡Correo enviado!</strong>
+                <br />
+                Hemos enviado las instrucciones para recuperar tu contraseña a
+                tu correo electrónico.
               </div>
             </SuccessMessage>
           ) : (
             <>
               <FormDescription>
-                Ingresa tu correo electrónico y te enviaremos las instrucciones para recuperar tu contraseña.
+                Ingresa tu correo electrónico y te enviaremos las instrucciones
+                para recuperar tu contraseña.
               </FormDescription>
 
               <FormContainer onSubmit={handleSubmit}>
                 <Input
-                  label="Correo Electrónico"
-                  type="email"
-                  placeholder="admin@happybabystyle.com"
+                  label='Correo Electrónico'
+                  type='email'
+                  placeholder='admin@happybabystyle.com'
                   leftIcon={<Mail size={18} />}
                   fullWidth
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={e => setEmail(e.target.value)}
                   disabled={isLoading}
                 />
 
@@ -247,9 +252,9 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                 )}
 
                 <Button
-                  type="submit"
-                  variant="primary"
-                  size="large"
+                  type='submit'
+                  variant='primary'
+                  size='large'
                   fullWidth
                   isLoading={isLoading}
                   disabled={isLoading}
@@ -264,8 +269,8 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
         {isSuccess && (
           <ModalFooter>
             <Button
-              variant="outline"
-              size="medium"
+              variant='outline'
+              size='medium'
               fullWidth
               onClick={handleClose}
             >

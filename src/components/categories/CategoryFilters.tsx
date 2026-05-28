@@ -4,10 +4,10 @@ import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
-import { 
-  Search, 
-  Filter, 
-  X, 
+import {
+  Search,
+  Filter,
+  X,
   RefreshCw,
   CheckCircle,
   XCircle,
@@ -18,7 +18,7 @@ import {
   SortAsc,
   SortDesc,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
 } from 'lucide-react';
 import { CategoryFilters as CategoryFiltersType } from './types';
 
@@ -83,26 +83,33 @@ const StatusToggleContainer = styled.div`
   align-items: center;
 `;
 
-const StatusToggleButton = styled.button<{ isActive: boolean; isSelected: boolean }>`
+const StatusToggleButton = styled.button<{
+  isActive: boolean;
+  isSelected: boolean;
+}>`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[2]};
   padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  border: 1px solid ${({ isSelected, isActive }) => 
-    isSelected 
-      ? (isActive ? theme.colors.success : theme.colors.warning)
-      : theme.colors.border.light
-  };
-  background: ${({ isSelected, isActive }) => 
-    isSelected 
-      ? (isActive ? theme.colors.success + '15' : theme.colors.warning + '15')
-      : theme.colors.white
-  };
-  color: ${({ isSelected, isActive }) => 
-    isSelected 
-      ? (isActive ? theme.colors.success : theme.colors.warning)
-      : theme.colors.text.secondary
-  };
+  border: 1px solid
+    ${({ isSelected, isActive }) =>
+      isSelected
+        ? isActive
+          ? theme.colors.success
+          : theme.colors.warning
+        : theme.colors.border.light};
+  background: ${({ isSelected, isActive }) =>
+    isSelected
+      ? isActive
+        ? theme.colors.success + '15'
+        : theme.colors.warning + '15'
+      : theme.colors.white};
+  color: ${({ isSelected, isActive }) =>
+    isSelected
+      ? isActive
+        ? theme.colors.success
+        : theme.colors.warning
+      : theme.colors.text.secondary};
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.fontSizes.sm};
   font-weight: ${theme.fontWeights.medium};
@@ -110,14 +117,14 @@ const StatusToggleButton = styled.button<{ isActive: boolean; isSelected: boolea
   transition: all ${theme.transitions.base};
 
   &:hover {
-    background: ${({ isSelected, isActive }) => 
-      isSelected 
-        ? (isActive ? theme.colors.success + '25' : theme.colors.warning + '25')
-        : theme.colors.background.accent
-    };
-    border-color: ${({ isActive }) => 
-      isActive ? theme.colors.success : theme.colors.warning
-    };
+    background: ${({ isSelected, isActive }) =>
+      isSelected
+        ? isActive
+          ? theme.colors.success + '25'
+          : theme.colors.warning + '25'
+        : theme.colors.background.accent};
+    border-color: ${({ isActive }) =>
+      isActive ? theme.colors.success : theme.colors.warning};
   }
 
   svg {
@@ -207,7 +214,7 @@ const CollapsibleHeader = styled.button`
 `;
 
 const CollapsibleContent = styled.div<{ isOpen: boolean }>`
-  display: ${({ isOpen }) => isOpen ? 'grid' : 'none'};
+  display: ${({ isOpen }) => (isOpen ? 'grid' : 'none')};
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: ${theme.spacing[4]};
   margin-top: ${theme.spacing[4]};
@@ -262,7 +269,7 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
   filters,
   onFiltersChange,
   onClearFilters,
-  loading = false
+  loading = false,
 }) => {
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [searchValue, setSearchValue] = useState(filters.search || '');
@@ -284,10 +291,13 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
   }, [filters.search]);
 
   // Handle input changes with immediate application
-  const handleInputChange = useCallback((key: keyof CategoryFiltersType, value: any) => {
-    const newFilters = { ...filters, [key]: value };
-    onFiltersChange(newFilters);
-  }, [filters, onFiltersChange]);
+  const handleInputChange = useCallback(
+    (key: keyof CategoryFiltersType, value: any) => {
+      const newFilters = { ...filters, [key]: value };
+      onFiltersChange(newFilters);
+    },
+    [filters, onFiltersChange]
+  );
 
   // Handle search input changes (with debouncing)
   const handleSearchChange = useCallback((value: string) => {
@@ -300,11 +310,14 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
   }, [onClearFilters]);
 
   // Remove specific filter
-  const handleRemoveFilter = useCallback((key: keyof CategoryFiltersType) => {
-    const newFilters = { ...filters };
-    delete (newFilters as any)[key];
-    onFiltersChange(newFilters);
-  }, [filters, onFiltersChange]);
+  const handleRemoveFilter = useCallback(
+    (key: keyof CategoryFiltersType) => {
+      const newFilters = { ...filters };
+      delete (newFilters as any)[key];
+      onFiltersChange(newFilters);
+    },
+    [filters, onFiltersChange]
+  );
 
   // Get active filters count
   const activeFiltersCount = Object.keys(filters).filter(key => {
@@ -319,12 +332,12 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
           <Filter size={20} />
           Filtros de Categorías
         </FiltersTitle>
-        
+
         <FiltersActions>
           {activeFiltersCount > 0 && (
             <Button
-              variant="ghost"
-              size="small"
+              variant='ghost'
+              size='small'
               onClick={handleClearAll}
               disabled={loading}
             >
@@ -332,10 +345,10 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
               Limpiar Todo
             </Button>
           )}
-          
+
           <Button
-            variant="outline"
-            size="small"
+            variant='outline'
+            size='small'
             onClick={handleClearAll}
             disabled={loading}
           >
@@ -348,13 +361,13 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
       <FiltersForm>
         {/* Search Filter */}
         <FilterField>
-          <FilterLabel htmlFor="search">Buscar categorías</FilterLabel>
+          <FilterLabel htmlFor='search'>Buscar categorías</FilterLabel>
           <Input
-            id="search"
-            type="text"
-            placeholder="Buscar por nombre, descripción o slug..."
+            id='search'
+            type='text'
+            placeholder='Buscar por nombre, descripción o slug...'
             value={searchValue}
-            onChange={(e) => handleSearchChange(e.target.value)}
+            onChange={e => handleSearchChange(e.target.value)}
             disabled={loading}
             icon={<Search size={16} />}
           />
@@ -367,21 +380,27 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
             <StatusToggleButton
               isActive={true}
               isSelected={filters.isActive === true}
-              onClick={() => handleInputChange('isActive', 
-                filters.isActive === true ? undefined : true
-              )}
+              onClick={() =>
+                handleInputChange(
+                  'isActive',
+                  filters.isActive === true ? undefined : true
+                )
+              }
               disabled={loading}
             >
               <CheckCircle size={16} />
               Activas
             </StatusToggleButton>
-            
+
             <StatusToggleButton
               isActive={false}
               isSelected={filters.isActive === false}
-              onClick={() => handleInputChange('isActive', 
-                filters.isActive === false ? undefined : false
-              )}
+              onClick={() =>
+                handleInputChange(
+                  'isActive',
+                  filters.isActive === false ? undefined : false
+                )
+              }
               disabled={loading}
             >
               <XCircle size={16} />
@@ -393,77 +412,119 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
         {/* Content Filters */}
         <FilterField>
           <FilterLabel>Contenido</FilterLabel>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing[2] }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: theme.spacing[2],
+            }}
+          >
             <CheckboxContainer>
               <Checkbox
-                type="checkbox"
-                id="hasImage"
+                type='checkbox'
+                id='hasImage'
                 checked={filters.hasImage === true}
-                onChange={(e) => handleInputChange('hasImage', e.target.checked ? true : undefined)}
+                onChange={e =>
+                  handleInputChange(
+                    'hasImage',
+                    e.target.checked ? true : undefined
+                  )
+                }
               />
-              <CheckboxLabel htmlFor="hasImage">
+              <CheckboxLabel htmlFor='hasImage'>
                 <ImageIcon size={14} />
                 Con imagen
               </CheckboxLabel>
             </CheckboxContainer>
-            
+
             <CheckboxContainer>
               <Checkbox
-                type="checkbox"
-                id="hasDescription"
+                type='checkbox'
+                id='hasDescription'
                 checked={filters.hasDescription === true}
-                onChange={(e) => handleInputChange('hasDescription', e.target.checked ? true : undefined)}
+                onChange={e =>
+                  handleInputChange(
+                    'hasDescription',
+                    e.target.checked ? true : undefined
+                  )
+                }
               />
-              <CheckboxLabel htmlFor="hasDescription">
+              <CheckboxLabel htmlFor='hasDescription'>
                 <FileText size={14} />
                 Con descripción
               </CheckboxLabel>
             </CheckboxContainer>
           </div>
         </FilterField>
-
       </FiltersForm>
 
       {/* Advanced Filters Section */}
       <CollapsibleSection>
-        <CollapsibleHeader onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}>
-          {showAdvancedFilters ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        <CollapsibleHeader
+          onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+        >
+          {showAdvancedFilters ? (
+            <ChevronUp size={16} />
+          ) : (
+            <ChevronDown size={16} />
+          )}
           Filtros Avanzados
         </CollapsibleHeader>
-        
+
         <CollapsibleContent isOpen={showAdvancedFilters}>
           {/* Products Filter */}
           <FilterField>
             <FilterLabel>Productos</FilterLabel>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing[2] }}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: theme.spacing[2],
+              }}
+            >
               <CheckboxContainer>
                 <Checkbox
-                  type="checkbox"
-                  id="hasProducts"
+                  type='checkbox'
+                  id='hasProducts'
                   checked={filters.hasProducts === true}
-                  onChange={(e) => handleInputChange('hasProducts', e.target.checked ? true : undefined)}
+                  onChange={e =>
+                    handleInputChange(
+                      'hasProducts',
+                      e.target.checked ? true : undefined
+                    )
+                  }
                 />
-                <CheckboxLabel htmlFor="hasProducts">
+                <CheckboxLabel htmlFor='hasProducts'>
                   <Package size={14} />
                   Con productos
                 </CheckboxLabel>
               </CheckboxContainer>
-              
+
               <ProductsRangeContainer>
                 <NumberInput
-                  type="number"
-                  placeholder="Mín. productos"
+                  type='number'
+                  placeholder='Mín. productos'
                   value={filters.minProducts || ''}
-                  onChange={(e) => handleInputChange('minProducts', e.target.value ? Number(e.target.value) : undefined)}
-                  min="0"
+                  onChange={e =>
+                    handleInputChange(
+                      'minProducts',
+                      e.target.value ? Number(e.target.value) : undefined
+                    )
+                  }
+                  min='0'
                 />
                 <RangeSeparator>-</RangeSeparator>
                 <NumberInput
-                  type="number"
-                  placeholder="Máx. productos"
+                  type='number'
+                  placeholder='Máx. productos'
                   value={filters.maxProducts || ''}
-                  onChange={(e) => handleInputChange('maxProducts', e.target.value ? Number(e.target.value) : undefined)}
-                  min="0"
+                  onChange={e =>
+                    handleInputChange(
+                      'maxProducts',
+                      e.target.value ? Number(e.target.value) : undefined
+                    )
+                  }
+                  min='0'
                 />
               </ProductsRangeContainer>
             </div>
@@ -474,15 +535,22 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
             <FilterLabel>Fecha de Creación</FilterLabel>
             <DateRangeContainer>
               <DateInput
-                type="date"
+                type='date'
                 value={filters.createdAfter || ''}
-                onChange={(e) => handleInputChange('createdAfter', e.target.value || undefined)}
+                onChange={e =>
+                  handleInputChange('createdAfter', e.target.value || undefined)
+                }
               />
               <DateSeparator>-</DateSeparator>
               <DateInput
-                type="date"
+                type='date'
                 value={filters.createdBefore || ''}
-                onChange={(e) => handleInputChange('createdBefore', e.target.value || undefined)}
+                onChange={e =>
+                  handleInputChange(
+                    'createdBefore',
+                    e.target.value || undefined
+                  )
+                }
               />
             </DateRangeContainer>
           </FilterField>
@@ -491,15 +559,22 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
             <FilterLabel>Fecha de Actualización</FilterLabel>
             <DateRangeContainer>
               <DateInput
-                type="date"
+                type='date'
                 value={filters.updatedAfter || ''}
-                onChange={(e) => handleInputChange('updatedAfter', e.target.value || undefined)}
+                onChange={e =>
+                  handleInputChange('updatedAfter', e.target.value || undefined)
+                }
               />
               <DateSeparator>-</DateSeparator>
               <DateInput
-                type="date"
+                type='date'
                 value={filters.updatedBefore || ''}
-                onChange={(e) => handleInputChange('updatedBefore', e.target.value || undefined)}
+                onChange={e =>
+                  handleInputChange(
+                    'updatedBefore',
+                    e.target.value || undefined
+                  )
+                }
               />
             </DateRangeContainer>
           </FilterField>
@@ -508,11 +583,16 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
           <FilterField>
             <FilterLabel>Orden de Clasificación</FilterLabel>
             <Input
-              type="number"
-              placeholder="Orden específico"
+              type='number'
+              placeholder='Orden específico'
               value={filters.sortOrder || ''}
-              onChange={(e) => handleInputChange('sortOrder', e.target.value ? Number(e.target.value) : undefined)}
-              min="0"
+              onChange={e =>
+                handleInputChange(
+                  'sortOrder',
+                  e.target.value ? Number(e.target.value) : undefined
+                )
+              }
+              min='0'
             />
           </FilterField>
         </CollapsibleContent>
@@ -529,20 +609,24 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
               </RemoveFilterButton>
             </ActiveFilterTag>
           )}
-          
+
           {filters.isActive === true && (
             <ActiveFilterTag>
               Solo activas
-              <RemoveFilterButton onClick={() => handleRemoveFilter('isActive')}>
+              <RemoveFilterButton
+                onClick={() => handleRemoveFilter('isActive')}
+              >
                 <X size={14} />
               </RemoveFilterButton>
             </ActiveFilterTag>
           )}
-          
+
           {filters.isActive === false && (
             <ActiveFilterTag>
               Solo inactivas
-              <RemoveFilterButton onClick={() => handleRemoveFilter('isActive')}>
+              <RemoveFilterButton
+                onClick={() => handleRemoveFilter('isActive')}
+              >
                 <X size={14} />
               </RemoveFilterButton>
             </ActiveFilterTag>
@@ -551,7 +635,9 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
           {filters.hasImage && (
             <ActiveFilterTag>
               Con imagen
-              <RemoveFilterButton onClick={() => handleRemoveFilter('hasImage')}>
+              <RemoveFilterButton
+                onClick={() => handleRemoveFilter('hasImage')}
+              >
                 <X size={14} />
               </RemoveFilterButton>
             </ActiveFilterTag>
@@ -560,7 +646,9 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
           {filters.hasDescription && (
             <ActiveFilterTag>
               Con descripción
-              <RemoveFilterButton onClick={() => handleRemoveFilter('hasDescription')}>
+              <RemoveFilterButton
+                onClick={() => handleRemoveFilter('hasDescription')}
+              >
                 <X size={14} />
               </RemoveFilterButton>
             </ActiveFilterTag>
@@ -569,7 +657,9 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
           {filters.hasProducts && (
             <ActiveFilterTag>
               Con productos
-              <RemoveFilterButton onClick={() => handleRemoveFilter('hasProducts')}>
+              <RemoveFilterButton
+                onClick={() => handleRemoveFilter('hasProducts')}
+              >
                 <X size={14} />
               </RemoveFilterButton>
             </ActiveFilterTag>
@@ -578,7 +668,9 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
           {filters.minProducts && (
             <ActiveFilterTag>
               Min. productos: {filters.minProducts}
-              <RemoveFilterButton onClick={() => handleRemoveFilter('minProducts')}>
+              <RemoveFilterButton
+                onClick={() => handleRemoveFilter('minProducts')}
+              >
                 <X size={14} />
               </RemoveFilterButton>
             </ActiveFilterTag>
@@ -587,7 +679,9 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
           {filters.maxProducts && (
             <ActiveFilterTag>
               Max. productos: {filters.maxProducts}
-              <RemoveFilterButton onClick={() => handleRemoveFilter('maxProducts')}>
+              <RemoveFilterButton
+                onClick={() => handleRemoveFilter('maxProducts')}
+              >
                 <X size={14} />
               </RemoveFilterButton>
             </ActiveFilterTag>
@@ -596,7 +690,9 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
           {filters.createdAfter && (
             <ActiveFilterTag>
               Creado después: {filters.createdAfter}
-              <RemoveFilterButton onClick={() => handleRemoveFilter('createdAfter')}>
+              <RemoveFilterButton
+                onClick={() => handleRemoveFilter('createdAfter')}
+              >
                 <X size={14} />
               </RemoveFilterButton>
             </ActiveFilterTag>
@@ -605,7 +701,9 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
           {filters.createdBefore && (
             <ActiveFilterTag>
               Creado antes: {filters.createdBefore}
-              <RemoveFilterButton onClick={() => handleRemoveFilter('createdBefore')}>
+              <RemoveFilterButton
+                onClick={() => handleRemoveFilter('createdBefore')}
+              >
                 <X size={14} />
               </RemoveFilterButton>
             </ActiveFilterTag>
@@ -614,7 +712,9 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
           {filters.sortOrder && (
             <ActiveFilterTag>
               Orden: {filters.sortOrder}
-              <RemoveFilterButton onClick={() => handleRemoveFilter('sortOrder')}>
+              <RemoveFilterButton
+                onClick={() => handleRemoveFilter('sortOrder')}
+              >
                 <X size={14} />
               </RemoveFilterButton>
             </ActiveFilterTag>

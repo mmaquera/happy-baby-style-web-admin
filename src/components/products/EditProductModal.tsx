@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { ImageUpload } from './ImageUpload';
-import { 
+import {
   X,
   Plus,
   Upload,
@@ -21,15 +21,23 @@ import {
   Trash2,
   Edit3,
   Save,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
-import type { Category, ProductFormData, Product, TagWithMetadata } from './types';
+import type {
+  Category,
+  ProductFormData,
+  Product,
+  TagWithMetadata,
+} from './types';
 import { useProductActions } from '@/hooks/useProductActions';
 import { useCategories } from '@/hooks/useCategories';
 import { useTags } from '@/hooks/useTags';
 import type { UploadResult } from '@/types/upload';
 import { toast } from 'react-hot-toast';
-import { convertImageUrlsToRelativePaths, validateBackendImageUrls } from '@/utils/imageUtils';
+import {
+  convertImageUrlsToRelativePaths,
+  validateBackendImageUrls,
+} from '@/utils/imageUtils';
 
 interface EditProductModalProps {
   isOpen: boolean;
@@ -48,7 +56,7 @@ const ModalOverlay = styled.div<{ isOpen: boolean }>`
   bottom: 0;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8px);
-  display: ${({ isOpen }) => isOpen ? 'flex' : 'none'};
+  display: ${({ isOpen }) => (isOpen ? 'flex' : 'none')};
   align-items: center;
   justify-content: center;
   z-index: ${theme.zIndex.modal};
@@ -224,29 +232,30 @@ const TagsContainer = styled.div`
 
 const TagChip = styled.div<{ isSelected: boolean; color?: string }>`
   padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  background: ${({ isSelected, color }) => 
-    isSelected 
-      ? (color || theme.colors.primaryPurple)
+  background: ${({ isSelected, color }) =>
+    isSelected
+      ? color || theme.colors.primaryPurple
       : theme.colors.background.accent};
-  color: ${({ isSelected }) => 
+  color: ${({ isSelected }) =>
     isSelected ? theme.colors.white : theme.colors.text.secondary};
   border-radius: ${theme.borderRadius.full};
   font-size: ${theme.fontSizes.xs};
   cursor: pointer;
   transition: all ${theme.transitions.base};
-  border: 1px solid ${({ isSelected, color }) => 
-    isSelected 
-      ? (color || theme.colors.primaryPurple)
-      : theme.colors.border.light};
+  border: 1px solid
+    ${({ isSelected, color }) =>
+      isSelected
+        ? color || theme.colors.primaryPurple
+        : theme.colors.border.light};
   display: flex;
   align-items: center;
   gap: ${theme.spacing[1]};
   position: relative;
 
   &:hover {
-    background: ${({ isSelected, color }) => 
-      isSelected 
-        ? (color || theme.colors.primaryPurple)
+    background: ${({ isSelected, color }) =>
+      isSelected
+        ? color || theme.colors.primaryPurple
         : theme.colors.softPurple};
     transform: translateY(-1px);
   }
@@ -373,8 +382,12 @@ const LoadingSpinner = styled.div`
   animation: spin 1s linear infinite;
 
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -389,7 +402,7 @@ const initialFormData: ProductFormData = {
   tags: [],
   isActive: true,
   images: [],
-  attributes: {}
+  attributes: {},
 };
 
 export const EditProductModal: React.FC<EditProductModalProps> = ({
@@ -398,10 +411,15 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
   onSuccess,
   product,
   categories: propCategories, // Renamed to avoid conflict
-  availableTags
+  availableTags,
 }) => {
-  const { updateProduct, loading: isUpdating, error: updateError, uploadProductImage } = useProductActions();
-  
+  const {
+    updateProduct,
+    loading: isUpdating,
+    error: updateError,
+    uploadProductImage,
+  } = useProductActions();
+
   const [formData, setFormData] = useState<ProductFormData>({
     name: '',
     description: '',
@@ -413,7 +431,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
     tags: [],
     isActive: true,
     images: [],
-    attributes: {}
+    attributes: {},
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -425,7 +443,10 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
   const [newTagDescription, setNewTagDescription] = useState('');
 
   // Generar ID de sesión único para agrupar todas las imágenes del producto
-  const [sessionId] = useState(() => `product-edit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
+  const [sessionId] = useState(
+    () =>
+      `product-edit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+  );
 
   // Función para generar SKU automáticamente
   const generateShortSku = useCallback(() => {
@@ -446,11 +467,11 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
         tags: product.tags || [],
         isActive: product.isActive ?? true,
         images: product.images || [],
-        attributes: product.attributes || {}
+        attributes: product.attributes || {},
       });
       setErrors({});
       setSuccessMessage('');
-      
+
       console.log('🔗 EditProductModal - Product loaded:', product);
     }
   }, [product, isOpen]);
@@ -469,7 +490,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
         tags: [],
         isActive: true,
         images: [],
-        attributes: {}
+        attributes: {},
       });
       setErrors({});
       setSuccessMessage('');
@@ -493,15 +514,20 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
     } else if (formData.sku.trim().length < 3) {
       newErrors['sku'] = 'El SKU debe tener al menos 3 caracteres';
     } else if (!/^[A-Z0-9-_]+$/i.test(formData.sku.trim())) {
-      newErrors['sku'] = 'El SKU solo puede contener letras, números, guiones y guiones bajos';
+      newErrors['sku'] =
+        'El SKU solo puede contener letras, números, guiones y guiones bajos';
     }
 
     if (!formData.price || parseFloat(formData.price) <= 0) {
       newErrors['price'] = 'El precio debe ser mayor a 0';
     }
 
-    if (formData.salePrice && parseFloat(formData.salePrice) >= parseFloat(formData.price)) {
-      newErrors['salePrice'] = 'El precio de oferta debe ser menor al precio regular';
+    if (
+      formData.salePrice &&
+      parseFloat(formData.salePrice) >= parseFloat(formData.price)
+    ) {
+      newErrors['salePrice'] =
+        'El precio de oferta debe ser menor al precio regular';
     }
 
     if (!formData.categoryId) {
@@ -514,9 +540,12 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
 
     // Validate that all images are real URLs (not blob URLs)
     if (formData.images.length > 0) {
-      const hasInvalidImages = formData.images.some(img => img.startsWith('blob:'));
+      const hasInvalidImages = formData.images.some(img =>
+        img.startsWith('blob:')
+      );
       if (hasInvalidImages) {
-        newErrors['images'] = 'Todas las imágenes deben ser subidas antes de actualizar el producto';
+        newErrors['images'] =
+          'Todas las imágenes deben ser subidas antes de actualizar el producto';
       }
     }
 
@@ -524,21 +553,24 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
     return Object.keys(newErrors).length === 0;
   }, [formData]);
 
-  const handleInputChange = useCallback((field: keyof ProductFormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
-    }
-  }, [errors]);
+  const handleInputChange = useCallback(
+    (field: keyof ProductFormData, value: any) => {
+      setFormData(prev => ({ ...prev, [field]: value }));
+
+      // Clear error when user starts typing
+      if (errors[field]) {
+        setErrors(prev => ({ ...prev, [field]: '' }));
+      }
+    },
+    [errors]
+  );
 
   const handleTagToggle = useCallback((tag: string) => {
     setFormData(prev => ({
       ...prev,
       tags: prev.tags.includes(tag)
         ? prev.tags.filter(t => t !== tag)
-        : [...prev.tags, tag]
+        : [...prev.tags, tag],
     }));
   }, []);
 
@@ -552,7 +584,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
       // Agregar la imagen subida al formulario
       setFormData(prev => ({
         ...prev,
-        images: [...prev.images, result.url!]
+        images: [...prev.images, result.url!],
       }));
     }
   }, []);
@@ -560,7 +592,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
   const removeImage = useCallback((index: number) => {
     setFormData(prev => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index)
+      images: prev.images.filter((_, i) => i !== index),
     }));
   }, []);
 
@@ -570,8 +602,8 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
         ...prev,
         attributes: {
           ...prev.attributes,
-          [newAttributeKey.trim()]: newAttributeValue.trim()
-        }
+          [newAttributeKey.trim()]: newAttributeValue.trim(),
+        },
       }));
       setNewAttributeKey('');
       setNewAttributeValue('');
@@ -586,77 +618,87 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
     });
   }, []);
 
-  const handleSubmit = useCallback(async (event: React.FormEvent) => {
-    event.preventDefault();
-    
-    if (!product || !validateForm()) {
-      return;
-    }
+  const handleSubmit = useCallback(
+    async (event: React.FormEvent) => {
+      event.preventDefault();
 
-    setErrors({});
-
-    try {
-      // Validate that images are real URLs from backend
-      const hasValidImages = validateBackendImageUrls(formData.images);
-      
-      if (formData.images.length > 0 && !hasValidImages) {
-        setErrors({ submit: 'Las imágenes deben ser subidas antes de actualizar el producto' });
+      if (!product || !validateForm()) {
         return;
       }
 
-      // Convert absolute URLs to relative paths for images field (same pattern as categories)
-      const relativeImages = convertImageUrlsToRelativePaths(formData.images);
+      setErrors({});
 
-      // Prepare product data for GraphQL mutation
-      const updateData = {
-        name: formData.name.trim(),
-        description: formData.description.trim() || null,
-        price: parseFloat(formData.price),
-        salePrice: formData.salePrice ? parseFloat(formData.salePrice) : null,
-        sku: formData.sku.trim(),
-        categoryId: formData.categoryId,
-        stockQuantity: parseInt(formData.stockQuantity),
-        tags: formData.tags,
-        isActive: formData.isActive,
-        images: relativeImages, // Store as relative paths
-        attributes: formData.attributes
-      };
+      try {
+        // Validate that images are real URLs from backend
+        const hasValidImages = validateBackendImageUrls(formData.images);
 
-      // Call GraphQL mutation
-      const result = await updateProduct(product.id, updateData);
-      
-      if (result) {
-        setSuccessMessage('Producto actualizado exitosamente');
-        
-        // Close modal after success
-        setTimeout(() => {
-          onSuccess(result);
-          onClose();
-        }, 1500);
-      } else {
-        setErrors({ submit: 'No se pudo actualizar el producto. Verifique los datos e intente nuevamente.' });
+        if (formData.images.length > 0 && !hasValidImages) {
+          setErrors({
+            submit:
+              'Las imágenes deben ser subidas antes de actualizar el producto',
+          });
+          return;
+        }
+
+        // Convert absolute URLs to relative paths for images field (same pattern as categories)
+        const relativeImages = convertImageUrlsToRelativePaths(formData.images);
+
+        // Prepare product data for GraphQL mutation
+        const updateData = {
+          name: formData.name.trim(),
+          description: formData.description.trim() || null,
+          price: parseFloat(formData.price),
+          salePrice: formData.salePrice ? parseFloat(formData.salePrice) : null,
+          sku: formData.sku.trim(),
+          categoryId: formData.categoryId,
+          stockQuantity: parseInt(formData.stockQuantity),
+          tags: formData.tags,
+          isActive: formData.isActive,
+          images: relativeImages, // Store as relative paths
+          attributes: formData.attributes,
+        };
+
+        // Call GraphQL mutation
+        const result = await updateProduct(product.id, updateData);
+
+        if (result) {
+          setSuccessMessage('Producto actualizado exitosamente');
+
+          // Close modal after success
+          setTimeout(() => {
+            onSuccess(result);
+            onClose();
+          }, 1500);
+        } else {
+          setErrors({
+            submit:
+              'No se pudo actualizar el producto. Verifique los datos e intente nuevamente.',
+          });
+        }
+      } catch (error: any) {
+        const errorMessage =
+          error.message ||
+          'Error al actualizar el producto. Intente nuevamente.';
+        setErrors({ submit: errorMessage });
+        toast.error(errorMessage);
       }
-
-    } catch (error: any) {
-      const errorMessage = error.message || 'Error al actualizar el producto. Intente nuevamente.';
-      setErrors({ submit: errorMessage });
-      toast.error(errorMessage);
-    }
-  }, [formData, validateForm, product, updateProduct, onSuccess, onClose]);
+    },
+    [formData, validateForm, product, updateProduct, onSuccess, onClose]
+  );
 
   // GraphQL integration for categories
-  const { 
-    categories: graphqlCategories, 
-    loading: categoriesLoading, 
-    error: categoriesError 
+  const {
+    categories: graphqlCategories,
+    loading: categoriesLoading,
+    error: categoriesError,
   } = useCategories();
 
   // Enhanced tags management with metadata
-  const { 
-    activeTags, 
-    createTag, 
-    isLoading: tagsLoading, 
-    error: tagsError 
+  const {
+    activeTags,
+    createTag,
+    isLoading: tagsLoading,
+    error: tagsError,
   } = useTags();
 
   // Handle creating new custom tags
@@ -668,21 +710,21 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
         color: newTagColor,
         description: newTagDescription.trim() || newTagName.trim(),
         category: 'personalizado',
-        isActive: true
+        isActive: true,
       });
 
       if (result.success) {
         // Add the new tag to the form
         setFormData(prev => ({
           ...prev,
-          tags: [...prev.tags, newTagName.trim()]
+          tags: [...prev.tags, newTagName.trim()],
         }));
 
         // Reset form
         setNewTagName('');
         setNewTagColor('#ff6b6b');
         setNewTagDescription('');
-        
+
         toast.success('Etiqueta creada exitosamente');
       } else {
         toast.error(result.error || 'Error al crear la etiqueta');
@@ -693,9 +735,12 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
   }, [newTagName, newTagColor, newTagDescription, createTag]);
 
   // Use GraphQL categories if available, fallback to prop categories
-  const availableCategories = graphqlCategories.length > 0 
-    ? graphqlCategories.filter(cat => cat.isActive).sort((a, b) => a.sortOrder - b.sortOrder)
-    : propCategories || [];
+  const availableCategories =
+    graphqlCategories.length > 0
+      ? graphqlCategories
+          .filter(cat => cat.isActive)
+          .sort((a, b) => a.sortOrder - b.sortOrder)
+      : propCategories || [];
 
   if (!isOpen || !product) return null;
 
@@ -740,16 +785,16 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 <FileText size={20} />
                 Información Básica
               </SectionTitle>
-              
+
               <FormGrid>
                 <FormRow>
                   <FormLabel>
                     Nombre del Producto <RequiredIndicator>*</RequiredIndicator>
                   </FormLabel>
                   <Input
-                    placeholder="Ej: Body Orgánico para Bebé"
+                    placeholder='Ej: Body Orgánico para Bebé'
                     value={formData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    onChange={e => handleInputChange('name', e.target.value)}
                     error={errors['name'] || ''}
                     leftIcon={<Package size={16} />}
                   />
@@ -761,32 +806,34 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                   </FormLabel>
                   <SkuFieldContainer>
                     <Input
-                      placeholder="Ej: SKU-ABC123"
+                      placeholder='Ej: SKU-ABC123'
                       value={formData.sku}
-                      onChange={(e) => handleInputChange('sku', e.target.value)}
+                      onChange={e => handleInputChange('sku', e.target.value)}
                       error={errors['sku'] || ''}
                       leftIcon={<Hash size={16} />}
                       style={{ flex: 1 }}
                     />
                     <GenerateSkuButton
-                      type="button"
-                      variant="outline"
-                      size="small"
+                      type='button'
+                      variant='outline'
+                      size='small'
                       onClick={handleGenerateSku}
-                      title="Generar nuevo SKU automáticamente"
+                      title='Generar nuevo SKU automáticamente'
                     >
                       <RefreshCw size={14} />
                       Generar
                     </GenerateSkuButton>
                   </SkuFieldContainer>
-                  <div style={{ 
-                    fontSize: theme.fontSizes.xs, 
-                    color: theme.colors.text.secondary,
-                    marginTop: theme.spacing[1],
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: theme.spacing[1]
-                  }}>
+                  <div
+                    style={{
+                      fontSize: theme.fontSizes.xs,
+                      color: theme.colors.text.secondary,
+                      marginTop: theme.spacing[1],
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: theme.spacing[1],
+                    }}
+                  >
                     <CheckCircle size={12} />
                     Puedes editar el SKU existente o generar uno nuevo.
                   </div>
@@ -798,16 +845,19 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                   </FormLabel>
                   <Select
                     value={formData.categoryId}
-                    onChange={(e) => handleInputChange('categoryId', e.target.value)}
-                    disabled={categoriesLoading && availableCategories.length === 0}
+                    onChange={e =>
+                      handleInputChange('categoryId', e.target.value)
+                    }
+                    disabled={
+                      categoriesLoading && availableCategories.length === 0
+                    }
                   >
-                    <option value="">
+                    <option value=''>
                       {categoriesLoading && availableCategories.length === 0
-                        ? 'Cargando categorías...' 
+                        ? 'Cargando categorías...'
                         : categoriesError && availableCategories.length === 0
-                          ? 'Error al cargar categorías' 
-                          : 'Seleccionar categoría'
-                      }
+                          ? 'Error al cargar categorías'
+                          : 'Seleccionar categoría'}
                     </option>
                     {availableCategories.map(category => (
                       <option key={category.id} value={category.id}>
@@ -817,33 +867,51 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                   </Select>
                   {/* Only show loading indicator when no categories are available */}
                   {categoriesLoading && availableCategories.length === 0 && (
-                    <div style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: theme.spacing[2], 
-                      marginTop: theme.spacing[1],
-                      fontSize: theme.fontSizes.sm,
-                      color: theme.colors.text.secondary
-                    }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: theme.spacing[2],
+                        marginTop: theme.spacing[1],
+                        fontSize: theme.fontSizes.sm,
+                        color: theme.colors.text.secondary,
+                      }}
+                    >
                       <LoadingSpinner />
                       Cargando categorías...
                     </div>
                   )}
                   {/* Only show error when no categories are available */}
                   {categoriesError && availableCategories.length === 0 && (
-                    <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>
+                    <span
+                      style={{
+                        color: theme.colors.error,
+                        fontSize: theme.fontSizes.sm,
+                      }}
+                    >
                       Error: {categoriesError}
                     </span>
                   )}
-                  {errors['categoryId'] && <span style={{ color: theme.colors.error, fontSize: theme.fontSizes.sm }}>{errors['categoryId']}</span>}
+                  {errors['categoryId'] && (
+                    <span
+                      style={{
+                        color: theme.colors.error,
+                        fontSize: theme.fontSizes.sm,
+                      }}
+                    >
+                      {errors['categoryId']}
+                    </span>
+                  )}
                 </FormRow>
 
                 <FormRow>
                   <FormLabel>Descripción</FormLabel>
                   <Textarea
-                    placeholder="Describe las características y beneficios del producto..."
+                    placeholder='Describe las características y beneficios del producto...'
                     value={formData.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
+                    onChange={e =>
+                      handleInputChange('description', e.target.value)
+                    }
                     rows={3}
                   />
                 </FormRow>
@@ -856,19 +924,19 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 <BadgeDollarSign size={20} />
                 Precios y Stock
               </SectionTitle>
-              
+
               <FormGrid>
                 <FormRow>
                   <FormLabel>
                     Precio Regular <RequiredIndicator>*</RequiredIndicator>
                   </FormLabel>
                   <Input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="S/ 0.00"
+                    type='number'
+                    step='0.01'
+                    min='0'
+                    placeholder='S/ 0.00'
                     value={formData.price}
-                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    onChange={e => handleInputChange('price', e.target.value)}
                     error={errors['price'] || ''}
                     leftIcon={<BadgeDollarSign size={16} />}
                   />
@@ -877,12 +945,14 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 <FormRow>
                   <FormLabel>Precio de Oferta</FormLabel>
                   <Input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="S/ 0.00 (opcional)"
+                    type='number'
+                    step='0.01'
+                    min='0'
+                    placeholder='S/ 0.00 (opcional)'
                     value={formData.salePrice}
-                    onChange={(e) => handleInputChange('salePrice', e.target.value)}
+                    onChange={e =>
+                      handleInputChange('salePrice', e.target.value)
+                    }
                     error={errors['salePrice'] || ''}
                     leftIcon={<BadgeDollarSign size={16} />}
                   />
@@ -893,11 +963,13 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                     Stock Inicial <RequiredIndicator>*</RequiredIndicator>
                   </FormLabel>
                   <Input
-                    type="number"
-                    min="0"
-                    placeholder="0"
+                    type='number'
+                    min='0'
+                    placeholder='0'
                     value={formData.stockQuantity}
-                    onChange={(e) => handleInputChange('stockQuantity', e.target.value)}
+                    onChange={e =>
+                      handleInputChange('stockQuantity', e.target.value)
+                    }
                     error={errors['stockQuantity'] || ''}
                     leftIcon={<Package size={16} />}
                   />
@@ -907,12 +979,14 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                   <FormLabel>Estado del Producto</FormLabel>
                   <CheckboxContainer>
                     <Checkbox
-                      type="checkbox"
-                      id="isActive"
+                      type='checkbox'
+                      id='isActive'
                       checked={formData.isActive}
-                      onChange={(e) => handleInputChange('isActive', e.target.checked)}
+                      onChange={e =>
+                        handleInputChange('isActive', e.target.checked)
+                      }
                     />
-                    <label htmlFor="isActive">
+                    <label htmlFor='isActive'>
                       <CheckboxLabel>
                         Producto activo en el catálogo
                       </CheckboxLabel>
@@ -928,26 +1002,27 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 <Tag size={20} />
                 Etiquetas y Categorización
               </SectionTitle>
-              
+
               <FormLabel>Seleccionar Etiquetas</FormLabel>
-              
+
               {/* Show all available tags including product's existing ones */}
               <TagsContainer>
                 {/* Get all unique tags: activeTags + product's existing tags */}
-                {Array.from(new Set([
-                  ...Object.keys(activeTags),
-                  ...formData.tags
-                ])).map(tag => {
+                {Array.from(
+                  new Set([...Object.keys(activeTags), ...formData.tags])
+                ).map(tag => {
                   const isSelected = formData.tags.includes(tag);
                   const hasMetadata = activeTags[tag];
-                  
+
                   return (
                     <TagChip
                       key={tag}
                       isSelected={isSelected}
                       onClick={() => handleTagToggle(tag)}
                       {...(hasMetadata?.color && { color: hasMetadata.color })}
-                      title={hasMetadata?.description || "Etiqueta del producto"}
+                      title={
+                        hasMetadata?.description || 'Etiqueta del producto'
+                      }
                     >
                       <Tag size={12} />
                       {tag}
@@ -957,46 +1032,65 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
               </TagsContainer>
 
               {/* Fallback to prop tags if no enhanced tags available */}
-              {Object.keys(activeTags).length === 0 && (availableTags || []).length > 0 && (
-                <TagsContainer>
-                  {(availableTags || []).map(tag => (
-                    <TagChip
-                      key={tag}
-                      isSelected={formData.tags.includes(tag)}
-                      onClick={() => handleTagToggle(tag)}
-                    >
-                      <Tag size={12} />
-                      {tag}
-                    </TagChip>
-                  ))}
-                </TagsContainer>
-              )}
+              {Object.keys(activeTags).length === 0 &&
+                (availableTags || []).length > 0 && (
+                  <TagsContainer>
+                    {(availableTags || []).map(tag => (
+                      <TagChip
+                        key={tag}
+                        isSelected={formData.tags.includes(tag)}
+                        onClick={() => handleTagToggle(tag)}
+                      >
+                        <Tag size={12} />
+                        {tag}
+                      </TagChip>
+                    ))}
+                  </TagsContainer>
+                )}
 
               {/* Tag Creation Section */}
               <div style={{ marginTop: theme.spacing[4] }}>
                 <FormLabel>Crear Nueva Etiqueta</FormLabel>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing[3] }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: theme.spacing[3],
+                  }}
+                >
                   <div style={{ display: 'flex', gap: theme.spacing[2] }}>
                     <Input
-                      placeholder="Nombre de la etiqueta"
+                      placeholder='Nombre de la etiqueta'
                       value={newTagName}
-                      onChange={(e) => setNewTagName(e.target.value)}
+                      onChange={e => setNewTagName(e.target.value)}
                       leftIcon={<Tag size={16} />}
                     />
                     <div style={{ display: 'flex', gap: theme.spacing[1] }}>
-                      {['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'].map(color => (
+                      {[
+                        '#ff6b6b',
+                        '#4ecdc4',
+                        '#45b7d1',
+                        '#96ceb4',
+                        '#feca57',
+                      ].map(color => (
                         <button
                           key={color}
-                          type="button"
+                          type='button'
                           onClick={() => setNewTagColor(color)}
                           style={{
                             width: '32px',
                             height: '32px',
                             backgroundColor: color,
-                            border: newTagColor === color ? '3px solid white' : '2px solid #e2e8f0',
+                            border:
+                              newTagColor === color
+                                ? '3px solid white'
+                                : '2px solid #e2e8f0',
                             borderRadius: '50%',
                             cursor: 'pointer',
-                            boxShadow: newTagColor === color ? '0 0 0 2px #3b82f6' : 'none'
+                            boxShadow:
+                              newTagColor === color
+                                ? '0 0 0 2px #3b82f6'
+                                : 'none',
                           }}
                           title={`Color: ${color}`}
                         />
@@ -1004,15 +1098,15 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                     </div>
                   </div>
                   <Input
-                    placeholder="Descripción (opcional)"
+                    placeholder='Descripción (opcional)'
                     value={newTagDescription}
-                    onChange={(e) => setNewTagDescription(e.target.value)}
+                    onChange={e => setNewTagDescription(e.target.value)}
                     leftIcon={<Tag size={16} />}
                   />
                   <Button
-                    type="button"
-                    variant="outline"
-                    size="small"
+                    type='button'
+                    variant='outline'
+                    size='small'
                     onClick={handleCreateTag}
                     disabled={!newTagName.trim() || tagsLoading}
                     isLoading={tagsLoading}
@@ -1030,32 +1124,35 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 <ImageIcon size={20} />
                 Imágenes del Producto
               </SectionTitle>
-              
+
               {/* Mostrar imágenes existentes del producto */}
               {formData.images.length > 0 && (
                 <div style={{ marginBottom: theme.spacing[4] }}>
                   <FormLabel>Imágenes Actuales del Producto</FormLabel>
-                  <div style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
-                    gap: theme.spacing[3],
-                    marginTop: theme.spacing[2]
-                  }}>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns:
+                        'repeat(auto-fill, minmax(120px, 1fr))',
+                      gap: theme.spacing[3],
+                      marginTop: theme.spacing[2],
+                    }}
+                  >
                     {formData.images.map((image, index) => (
                       <div key={index} style={{ position: 'relative' }}>
-                        <img 
-                          src={image} 
+                        <img
+                          src={image}
                           alt={`Imagen ${index + 1}`}
                           style={{
                             width: '100%',
                             height: '120px',
                             objectFit: 'cover',
                             borderRadius: theme.borderRadius.md,
-                            border: '2px solid ' + theme.colors.border.light
+                            border: '2px solid ' + theme.colors.border.light,
                           }}
                         />
                         <button
-                          type="button"
+                          type='button'
                           onClick={() => removeImage(index)}
                           style={{
                             position: 'absolute',
@@ -1072,14 +1169,16 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                             alignItems: 'center',
                             justifyContent: 'center',
                             fontSize: '12px',
-                            transition: 'all 0.2s ease'
+                            transition: 'all 0.2s ease',
                           }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = theme.colors.error + 'dd';
+                          onMouseEnter={e => {
+                            e.currentTarget.style.background =
+                              theme.colors.error + 'dd';
                             e.currentTarget.style.transform = 'scale(1.1)';
                           }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = theme.colors.error;
+                          onMouseLeave={e => {
+                            e.currentTarget.style.background =
+                              theme.colors.error;
                             e.currentTarget.style.transform = 'scale(1)';
                           }}
                         >
@@ -1090,41 +1189,54 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                   </div>
                 </div>
               )}
-              
+
               <ImageUpload
                 onUpload={handleImageUploadSuccess}
                 maxFiles={5}
                 maxSize={5 * 1024 * 1024} // 5MB
-                allowedTypes={['image/jpeg', 'image/jpg', 'image/png', 'image/webp']}
+                allowedTypes={[
+                  'image/jpeg',
+                  'image/jpg',
+                  'image/png',
+                  'image/webp',
+                ]}
                 entityId={sessionId}
-                entityType="product-edit"
+                entityType='product-edit'
                 disabled={isUpdating}
               />
 
               {/* Preview de imágenes se maneja internamente en ImageUpload */}
               {formData.images.length > 0 && (
-                <div style={{ 
-                  marginTop: '12px', 
-                  padding: '12px', 
-                  background: 'rgba(34, 197, 94, 0.1)', 
-                  borderRadius: '8px',
-                  border: '1px solid rgba(34, 197, 94, 0.2)'
-                }}>
-                  <div style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '8px',
-                    color: 'rgba(34, 197, 94, 0.8)',
-                    fontSize: '14px',
-                    fontWeight: '500'
-                  }}>
-                    <div style={{ 
-                      width: '8px', 
-                      height: '8px', 
-                      background: 'rgba(34, 197, 94, 0.8)', 
-                      borderRadius: '50%' 
-                    }} />
-                    {formData.images.length} imagen{formData.images.length !== 1 ? 'es' : ''} lista{formData.images.length !== 1 ? 's' : ''} para el producto
+                <div
+                  style={{
+                    marginTop: '12px',
+                    padding: '12px',
+                    background: 'rgba(34, 197, 94, 0.1)',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(34, 197, 94, 0.2)',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      color: 'rgba(34, 197, 94, 0.8)',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '8px',
+                        height: '8px',
+                        background: 'rgba(34, 197, 94, 0.8)',
+                        borderRadius: '50%',
+                      }}
+                    />
+                    {formData.images.length} imagen
+                    {formData.images.length !== 1 ? 'es' : ''} lista
+                    {formData.images.length !== 1 ? 's' : ''} para el producto
                   </div>
                 </div>
               )}
@@ -1136,17 +1248,17 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 <Settings size={20} />
                 Atributos Personalizados
               </SectionTitle>
-              
+
               <AttributesContainer>
                 {Object.entries(formData.attributes).map(([key, value]) => (
                   <AttributeRow key={key}>
                     <Input
-                      placeholder="Nombre del atributo"
+                      placeholder='Nombre del atributo'
                       value={key}
                       disabled
                     />
                     <Input
-                      placeholder="Valor del atributo"
+                      placeholder='Valor del atributo'
                       value={value}
                       disabled
                     />
@@ -1158,20 +1270,22 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
 
                 <AttributeRow>
                   <Input
-                    placeholder="Nuevo atributo (ej: Material)"
+                    placeholder='Nuevo atributo (ej: Material)'
                     value={newAttributeKey}
-                    onChange={(e) => setNewAttributeKey(e.target.value)}
+                    onChange={e => setNewAttributeKey(e.target.value)}
                   />
                   <Input
-                    placeholder="Valor (ej: Algodón 100%)"
+                    placeholder='Valor (ej: Algodón 100%)'
                     value={newAttributeValue}
-                    onChange={(e) => setNewAttributeValue(e.target.value)}
+                    onChange={e => setNewAttributeValue(e.target.value)}
                   />
                   <AddAttributeButton
-                    variant="outline"
-                    size="small"
+                    variant='outline'
+                    size='small'
                     onClick={addAttribute}
-                    disabled={!newAttributeKey.trim() || !newAttributeValue.trim()}
+                    disabled={
+                      !newAttributeKey.trim() || !newAttributeValue.trim()
+                    }
                   >
                     <Plus size={14} />
                     Agregar
@@ -1182,12 +1296,12 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
           </ModalBody>
 
           <ModalFooter>
-            <Button variant="ghost" onClick={onClose} disabled={isUpdating}>
+            <Button variant='ghost' onClick={onClose} disabled={isUpdating}>
               Cancelar
             </Button>
             <Button
-              type="submit"
-              variant="primary"
+              type='submit'
+              variant='primary'
               disabled={isUpdating}
               isLoading={isUpdating}
             >

@@ -65,9 +65,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <SidebarToggle />
       <Header />
       <MainContainer sidebarWidth={sidebarWidth}>
-        <Content>
-          {children}
-        </Content>
+        <Content>{children}</Content>
       </MainContainer>
     </LayoutContainer>
   );

@@ -9,14 +9,16 @@
  * @param url - The URL to convert (can be absolute or already relative)
  * @returns The relative path or null if the URL is invalid
  */
-export const convertToRelativePath = (url: string | null | undefined): string | null => {
+export const convertToRelativePath = (
+  url: string | null | undefined
+): string | null => {
   if (!url) return null;
-  
+
   // If it's already a relative path, return as is
   if (!url.startsWith('http')) {
     return url;
   }
-  
+
   try {
     // Convert absolute URL to relative path
     return new URL(url).pathname;

@@ -10,21 +10,21 @@ export interface IEnvironmentConfig {
   // GraphQL Configuration
   graphqlUrl: string;
   graphqlPlaygroundEnabled: boolean;
-  
+
   // Application Configuration
   appName: string;
   mode: string;
-  
+
   // Feature Flags
   enableDebugMode: boolean;
   enablePerformanceMonitoring: boolean;
   enableSourceMaps: boolean;
   enableHotReload: boolean;
-  
+
   // Authentication Configuration
   authTokenExpiry: number;
   refreshTokenExpiry: number;
-  
+
   // Logging Configuration
   logLevel: string;
 }
@@ -79,7 +79,10 @@ class DevelopmentConfig implements IEnvironmentConfig {
 // Production environment configuration
 class ProductionConfig implements IEnvironmentConfig {
   get graphqlUrl(): string {
-    return import.meta.env.VITE_GRAPHQL_URL || 'https://api.happybabystyle.com/graphql';
+    return (
+      import.meta.env.VITE_GRAPHQL_URL ||
+      'https://api.happybabystyle.com/graphql'
+    );
   }
 
   get graphqlPlaygroundEnabled(): boolean {
@@ -126,7 +129,10 @@ class ProductionConfig implements IEnvironmentConfig {
 // Staging environment configuration
 class StagingConfig implements IEnvironmentConfig {
   get graphqlUrl(): string {
-    return import.meta.env.VITE_GRAPHQL_URL || 'https://staging-api.happybabystyle.com/graphql';
+    return (
+      import.meta.env.VITE_GRAPHQL_URL ||
+      'https://staging-api.happybabystyle.com/graphql'
+    );
   }
 
   get graphqlPlaygroundEnabled(): boolean {
@@ -221,7 +227,7 @@ class TestConfig implements IEnvironmentConfig {
 export class EnvironmentFactory {
   static createConfig(): IEnvironmentConfig {
     const mode = import.meta.env.VITE_MODE || 'development';
-    
+
     switch (mode) {
       case 'production':
         return new ProductionConfig();
@@ -247,18 +253,17 @@ export const isTest = (): boolean => environment.mode === 'test';
 
 // Validation function to ensure required environment variables are set
 export const validateEnvironment = (): void => {
-  const requiredVars = [
-    'VITE_GRAPHQL_URL',
-    'VITE_APP_NAME',
-  ];
+  const requiredVars = ['VITE_GRAPHQL_URL', 'VITE_APP_NAME'];
 
   const missingVars = requiredVars.filter(varName => !import.meta.env[varName]);
 
   if (missingVars.length > 0) {
     console.warn('⚠️  Missing environment variables:', missingVars);
-    
+
     if (isProduction()) {
-      throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
+      throw new Error(
+        `Missing required environment variables: ${missingVars.join(', ')}`
+      );
     }
   }
 };

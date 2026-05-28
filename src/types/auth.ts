@@ -17,14 +17,16 @@ export interface IAuthUser {
   isActive: boolean;
   emailVerified: boolean;
   lastLoginAt?: string | undefined;
-  profile?: {
-    id: string;
-    firstName?: string | undefined;
-    lastName?: string | undefined;
-    phone?: string | undefined;
-    birthDate?: string | undefined;
-    avatar?: string | undefined;
-  } | undefined;
+  profile?:
+    | {
+        id: string;
+        firstName?: string | undefined;
+        lastName?: string | undefined;
+        phone?: string | undefined;
+        birthDate?: string | undefined;
+        avatar?: string | undefined;
+      }
+    | undefined;
 }
 
 // Response metadata interface following Single Responsibility Principle

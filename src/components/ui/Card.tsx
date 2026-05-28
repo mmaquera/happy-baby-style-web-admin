@@ -11,7 +11,8 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const StyledCard = styled.div.withConfig({
-  shouldForwardProp: (prop) => !['padding', 'shadow', 'hover', 'clickable'].includes(prop),
+  shouldForwardProp: prop =>
+    !['padding', 'shadow', 'hover', 'clickable'].includes(prop),
 })<Pick<CardProps, 'padding' | 'shadow' | 'hover' | 'clickable'>>`
   background: ${theme.colors.white};
   border-radius: ${theme.borderRadius.xl};
@@ -58,19 +59,21 @@ const StyledCard = styled.div.withConfig({
     }
   }}
 
-  ${({ hover, clickable }) => (hover || clickable) && css`
-    cursor: ${clickable ? 'pointer' : 'default'};
+  ${({ hover, clickable }) =>
+    (hover || clickable) &&
+    css`
+      cursor: ${clickable ? 'pointer' : 'default'};
 
-    &:hover {
-      transform: translateY(-4px);
-      box-shadow: ${theme.shadows.card};
-      border-color: ${theme.colors.primaryPurple}20;
-    }
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: ${theme.shadows.card};
+        border-color: ${theme.colors.primaryPurple}20;
+      }
 
-    &:active {
-      transform: translateY(-2px);
-    }
-  `}
+      &:active {
+        transform: translateY(-2px);
+      }
+    `}
 `;
 
 const CardHeader = styled.div`
@@ -119,9 +122,10 @@ const CardActions = styled.div`
 `;
 
 const CardImage = styled.div`
-  margin: -${theme.spacing[6]} -${theme.spacing[6]} ${theme.spacing[4]} -${theme.spacing[6]};
+  margin: -${theme.spacing[6]} -${theme.spacing[6]}
+    ${theme.spacing[4]} -${theme.spacing[6]};
   overflow: hidden;
-  
+
   img {
     width: 100%;
     height: 200px;

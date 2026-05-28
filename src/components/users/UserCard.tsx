@@ -21,9 +21,5 @@ interface UserCardProps {
 }
 
 export const UserCard: React.FC<UserCardProps> = ({ children, onClick }) => {
-  return (
-    <StyledCard onClick={onClick}>
-      {children}
-    </StyledCard>
-  );
+  return <StyledCard onClick={onClick}>{children}</StyledCard>;
 };

@@ -2,14 +2,14 @@ import React from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { PasswordAction } from '@/hooks/usePasswordHistory';
-import { 
+import {
   Key,
   RefreshCw,
   Lock,
   Clock,
   CheckCircle,
   AlertTriangle,
-  Shield
+  Shield,
 } from 'lucide-react';
 
 interface PasswordHistoryCardProps {
@@ -63,20 +63,30 @@ const ActionIcon = styled.div<{ type: PasswordAction['type'] }>`
   justify-content: center;
   background: ${props => {
     switch (props.type) {
-      case 'reset': return `${theme.colors.warning}20`;
-      case 'temporary': return `${theme.colors.info}20`;
-      case 'admin_set': return `${theme.colors.error}20`;
-      case 'user_change': return `${theme.colors.success}20`;
-      default: return `${theme.colors.primaryPurple}20`;
+      case 'reset':
+        return `${theme.colors.warning}20`;
+      case 'temporary':
+        return `${theme.colors.info}20`;
+      case 'admin_set':
+        return `${theme.colors.error}20`;
+      case 'user_change':
+        return `${theme.colors.success}20`;
+      default:
+        return `${theme.colors.primaryPurple}20`;
     }
   }};
   color: ${props => {
     switch (props.type) {
-      case 'reset': return theme.colors.warning;
-      case 'temporary': return theme.colors.info;
-      case 'admin_set': return theme.colors.error;
-      case 'user_change': return theme.colors.success;
-      default: return theme.colors.primaryPurple;
+      case 'reset':
+        return theme.colors.warning;
+      case 'temporary':
+        return theme.colors.info;
+      case 'admin_set':
+        return theme.colors.error;
+      case 'user_change':
+        return theme.colors.success;
+      default:
+        return theme.colors.primaryPurple;
     }
   }};
 `;
@@ -109,18 +119,26 @@ const StatusBadge = styled.div<{ status: 'completed' | 'pending' | 'failed' }>`
   font-weight: ${theme.fontWeights.medium};
   background: ${props => {
     switch (props.status) {
-      case 'completed': return `${theme.colors.success}20`;
-      case 'pending': return `${theme.colors.warning}20`;
-      case 'failed': return `${theme.colors.error}20`;
-      default: return theme.colors.background.light;
+      case 'completed':
+        return `${theme.colors.success}20`;
+      case 'pending':
+        return `${theme.colors.warning}20`;
+      case 'failed':
+        return `${theme.colors.error}20`;
+      default:
+        return theme.colors.background.light;
     }
   }};
   color: ${props => {
     switch (props.status) {
-      case 'completed': return theme.colors.success;
-      case 'pending': return theme.colors.warning;
-      case 'failed': return theme.colors.error;
-      default: return theme.colors.text.secondary;
+      case 'completed':
+        return theme.colors.success;
+      case 'pending':
+        return theme.colors.warning;
+      case 'failed':
+        return theme.colors.error;
+      default:
+        return theme.colors.text.secondary;
     }
   }};
 `;
@@ -167,13 +185,13 @@ const formatTimestamp = (date: Date) => {
     month: '2-digit',
     year: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   }).format(date);
 };
 
 // Component
 export const PasswordHistoryCard: React.FC<PasswordHistoryCardProps> = ({
-  actions
+  actions,
 }) => {
   return (
     <Card>
@@ -184,31 +202,28 @@ export const PasswordHistoryCard: React.FC<PasswordHistoryCardProps> = ({
 
       {actions.length > 0 ? (
         <ActionsList>
-          {actions.map((action) => (
+          {actions.map(action => (
             <ActionItem key={action.id}>
               <ActionIcon type={action.type}>
                 {getActionIcon(action.type)}
               </ActionIcon>
-              
+
               <ActionContent>
-                <ActionDescription>
-                  {action.description}
-                </ActionDescription>
+                <ActionDescription>{action.description}</ActionDescription>
                 <ActionMeta>
                   <Clock size={12} />
                   {formatTimestamp(action.timestamp)}
-                  {action.adminUser && (
-                    <>
-                      • Administrador: {action.adminUser}
-                    </>
-                  )}
+                  {action.adminUser && <>• Administrador: {action.adminUser}</>}
                 </ActionMeta>
               </ActionContent>
 
               <StatusBadge status={action.status}>
                 {getStatusIcon(action.status)}
-                {action.status === 'completed' ? 'Completado' :
-                 action.status === 'pending' ? 'Pendiente' : 'Fallido'}
+                {action.status === 'completed'
+                  ? 'Completado'
+                  : action.status === 'pending'
+                    ? 'Pendiente'
+                    : 'Fallido'}
               </StatusBadge>
             </ActionItem>
           ))}

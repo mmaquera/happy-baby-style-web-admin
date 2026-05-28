@@ -1,13 +1,13 @@
 // Product Types - Using GraphQL generated types as base
-import { 
-  Product as GraphQLProduct, 
-  ProductVariant as GraphQLProductVariant, 
+import {
+  Product as GraphQLProduct,
+  ProductVariant as GraphQLProductVariant,
   Category as GraphQLCategory,
   Order as GraphQLOrder,
   OrderItem as GraphQLOrderItem,
   User as GraphQLUser,
   UserProfile as GraphQLUserProfile,
-  UserAddress as GraphQLUserAddress
+  UserAddress as GraphQLUserAddress,
 } from '../generated/graphql';
 
 // Re-export GraphQL types for direct use
@@ -19,7 +19,7 @@ export type {
   GraphQLOrderItem as OrderItem,
   GraphQLUser as User,
   GraphQLUserProfile as UserProfile,
-  GraphQLUserAddress as UserAddress
+  GraphQLUserAddress as UserAddress,
 };
 
 // Additional local interfaces that extend or complement GraphQL types
@@ -173,7 +173,7 @@ export const PRODUCT_CATEGORIES = [
   { value: '6e2d110a-8664-4126-a6ed-a0bf0e6596c5', label: 'Conjuntos' },
   { value: '76dbe908-c937-4b5c-90fb-a900adef0cdc', label: 'Gorros' },
   { value: 'dbaab418-c029-43fd-b280-97afd31459c7', label: 'Calcetines' },
-  { value: '8758b479-4e2f-46f5-8e9a-354dcb185cc3', label: 'Accesorios' }
+  { value: '8758b479-4e2f-46f5-8e9a-354dcb185cc3', label: 'Accesorios' },
 ];
 
 export const PRODUCT_SIZES = [
@@ -183,7 +183,7 @@ export const PRODUCT_SIZES = [
   { value: '9_meses', label: '9 Meses' },
   { value: '12_meses', label: '12 Meses' },
   { value: '18_meses', label: '18 Meses' },
-  { value: '24_meses', label: '24 Meses' }
+  { value: '24_meses', label: '24 Meses' },
 ];
 
 export const PRODUCT_COLORS = [
@@ -192,7 +192,7 @@ export const PRODUCT_COLORS = [
   { value: 'azul_cielo', label: 'Azul Cielo', hex: '#87CEEB' },
   { value: 'amarillo_pastel', label: 'Amarillo Pastel', hex: '#FDFD96' },
   { value: 'verde_menta', label: 'Verde Menta', hex: '#98FB98' },
-  { value: 'gris_perla', label: 'Gris Perla', hex: '#E5E4E2' }
+  { value: 'gris_perla', label: 'Gris Perla', hex: '#E5E4E2' },
 ];
 
 // Re-export GraphQL enums
@@ -205,7 +205,7 @@ export const ORDER_STATUS_LABELS = {
   shipped: 'Enviado',
   delivered: 'Entregado',
   cancelled: 'Cancelado',
-  refunded: 'Reembolsado'
+  refunded: 'Reembolsado',
 };
 
 export const ORDER_STATUS_COLORS = {
@@ -215,5 +215,5 @@ export const ORDER_STATUS_COLORS = {
   shipped: '#9C27B0',
   delivered: '#4CAF50',
   cancelled: '#F44336',
-  refunded: '#FF9800'
+  refunded: '#FF9800',
 };

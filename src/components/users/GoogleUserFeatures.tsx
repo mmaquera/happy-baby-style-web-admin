@@ -4,8 +4,11 @@ import { User, AuthProvider } from '@/types/unified';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { theme } from '@/styles/theme';
-import { useAccountManagement, useUserImpersonation } from '@/hooks/useAuthManagement';
-import { 
+import {
+  useAccountManagement,
+  useUserImpersonation,
+} from '@/hooks/useAuthManagement';
+import {
   AlertTriangle,
   CheckCircle,
   Shield,
@@ -15,7 +18,7 @@ import {
   Eye,
   Lock,
   Unlock,
-  Users
+  Users,
 } from 'lucide-react';
 
 interface GoogleUserFeaturesProps {
@@ -90,7 +93,7 @@ const StatusBadge = styled.span<{ status: 'success' | 'warning' | 'error' }>`
   font-weight: ${theme.fontWeights.medium};
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  
+
   ${({ status }) => {
     switch (status) {
       case 'success':
@@ -164,15 +167,17 @@ const PrivacyItem = styled.li`
   color: ${theme.colors.text.secondary};
 `;
 
-export const GoogleUserFeatures: React.FC<GoogleUserFeaturesProps> = ({ 
-  user
+export const GoogleUserFeatures: React.FC<GoogleUserFeaturesProps> = ({
+  user,
 }) => {
   const { forcePasswordReset } = useAccountManagement();
   const { impersonateUser } = useUserImpersonation();
 
   // Encontrar cuenta de Google del usuario
-  const googleAccount = user.accounts?.find(account => account.provider === AuthProvider.google);
-  
+  const googleAccount = user.accounts?.find(
+    account => account.provider === AuthProvider.google
+  );
+
   if (!googleAccount) {
     return (
       <FeaturesContainer>
@@ -203,7 +208,7 @@ export const GoogleUserFeatures: React.FC<GoogleUserFeaturesProps> = ({
       month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
@@ -214,19 +219,38 @@ export const GoogleUserFeatures: React.FC<GoogleUserFeaturesProps> = ({
 
   const getGoogleSyncStatus = () => {
     if (!googleAccount.expiresAt) {
-      return { status: 'success' as const, text: 'Sin expiración', icon: <CheckCircle size={12} /> };
+      return {
+        status: 'success' as const,
+        text: 'Sin expiración',
+        icon: <CheckCircle size={12} />,
+      };
     }
-    
+
     if (isTokenExpired(googleAccount.expiresAt)) {
-      return { status: 'error' as const, text: 'Token expirado', icon: <XCircle size={12} /> };
+      return {
+        status: 'error' as const,
+        text: 'Token expirado',
+        icon: <XCircle size={12} />,
+      };
     }
-    
-    const hoursUntilExpiry = Math.floor((new Date(googleAccount.expiresAt).getTime() - new Date().getTime()) / (1000 * 60 * 60));
+
+    const hoursUntilExpiry = Math.floor(
+      (new Date(googleAccount.expiresAt).getTime() - new Date().getTime()) /
+        (1000 * 60 * 60)
+    );
     if (hoursUntilExpiry < 24) {
-      return { status: 'warning' as const, text: `Expira en ${hoursUntilExpiry}h`, icon: <AlertTriangle size={12} /> };
+      return {
+        status: 'warning' as const,
+        text: `Expira en ${hoursUntilExpiry}h`,
+        icon: <AlertTriangle size={12} />,
+      };
     }
-    
-    return { status: 'success' as const, text: 'Sincronizado', icon: <CheckCircle size={12} /> };
+
+    return {
+      status: 'success' as const,
+      text: 'Sincronizado',
+      icon: <CheckCircle size={12} />,
+    };
   };
 
   const syncStatus = getGoogleSyncStatus();
@@ -256,12 +280,12 @@ export const GoogleUserFeatures: React.FC<GoogleUserFeaturesProps> = ({
             <InfoLabel>Email Verificado</InfoLabel>
             <InfoValue>
               {user.emailVerified ? (
-                <StatusBadge status="success">
+                <StatusBadge status='success'>
                   <CheckCircle size={12} />
                   Verificado por Google
                 </StatusBadge>
               ) : (
-                <StatusBadge status="error">
+                <StatusBadge status='error'>
                   <XCircle size={12} />
                   No verificado
                 </StatusBadge>
@@ -307,17 +331,17 @@ export const GoogleUserFeatures: React.FC<GoogleUserFeaturesProps> = ({
         {/* Acciones Específicas para Usuarios Google */}
         <ActionsList>
           <Button
-            variant="outline"
-            size="small"
+            variant='outline'
+            size='small'
             onClick={handleImpersonateUser}
             icon={<Eye size={14} />}
           >
             Impersonar Usuario
           </Button>
-          
+
           <Button
-            variant="outline"
-            size="small"
+            variant='outline'
+            size='small'
             onClick={handleForcePasswordReset}
             icon={<Lock size={14} />}
           >
@@ -390,12 +414,14 @@ export const GoogleUserFeatures: React.FC<GoogleUserFeaturesProps> = ({
               <Lock size={16} />
               Permisos Otorgados
             </PrivacyTitle>
-            <div style={{ 
-              display: 'flex', 
-              flexWrap: 'wrap', 
-              gap: theme.spacing[1],
-              marginTop: theme.spacing[2]
-            }}>
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: theme.spacing[1],
+                marginTop: theme.spacing[2],
+              }}
+            >
               {googleAccount.scope.split(' ').map((scope, index) => (
                 <span
                   key={index}
@@ -405,7 +431,7 @@ export const GoogleUserFeatures: React.FC<GoogleUserFeaturesProps> = ({
                     padding: `${theme.spacing[1]} ${theme.spacing[2]}`,
                     borderRadius: theme.borderRadius.sm,
                     fontSize: theme.fontSizes.xs,
-                    fontWeight: theme.fontWeights.medium
+                    fontWeight: theme.fontWeights.medium,
                   }}
                 >
                   {scope}
@@ -423,27 +449,34 @@ export const GoogleUserFeatures: React.FC<GoogleUserFeaturesProps> = ({
             <AlertTriangle size={20} color={theme.colors.warning} />
             Acción Requerida
           </FeatureTitle>
-          <div style={{ 
-            background: theme.colors.warning + '20',
-            padding: theme.spacing[3],
-            borderRadius: theme.borderRadius.md,
-            marginBottom: theme.spacing[3]
-          }}>
-            <p style={{ 
-              margin: 0, 
-              color: theme.colors.warning,
-              fontWeight: theme.fontWeights.medium 
-            }}>
-              El token de acceso de Google ha expirado. El usuario necesitará re-autenticarse.
+          <div
+            style={{
+              background: theme.colors.warning + '20',
+              padding: theme.spacing[3],
+              borderRadius: theme.borderRadius.md,
+              marginBottom: theme.spacing[3],
+            }}
+          >
+            <p
+              style={{
+                margin: 0,
+                color: theme.colors.warning,
+                fontWeight: theme.fontWeights.medium,
+              }}
+            >
+              El token de acceso de Google ha expirado. El usuario necesitará
+              re-autenticarse.
             </p>
           </div>
           <ActionsList>
             <Button
-              variant="primary"
-              size="small"
+              variant='primary'
+              size='small'
               onClick={() => {
                 // En una implementación real, esto redirigiría al usuario al flujo de OAuth
-                alert('Redirigir al usuario al flujo de autenticación de Google');
+                alert(
+                  'Redirigir al usuario al flujo de autenticación de Google'
+                );
               }}
               icon={<Unlock size={14} />}
             >

@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { theme } from '@/styles/theme';
 import { useSessionManagement } from '@/hooks/useAuthManagement';
-import { 
+import {
   Monitor,
   Smartphone,
   Tablet,
@@ -19,7 +19,7 @@ import {
   Globe,
   Activity,
   AlertTriangle,
-  Info
+  Info,
 } from 'lucide-react';
 
 interface UserSessionsManagerProps {
@@ -54,15 +54,18 @@ const HeaderTitle = styled.h3`
 
 const SessionCard = styled(Card)<{ isActive: boolean }>`
   padding: ${theme.spacing[5]};
-  border-left: 3px solid ${props => props.isActive ? theme.colors.success : theme.colors.text.secondary};
-  opacity: ${props => props.isActive ? 1 : 0.8};
+  border-left: 3px solid
+    ${props =>
+      props.isActive ? theme.colors.success : theme.colors.text.secondary};
+  opacity: ${props => (props.isActive ? 1 : 0.8)};
   transition: ${theme.transitions.base};
   margin-bottom: ${theme.spacing[3]};
 
   &:hover {
     transform: translateY(-2px);
     box-shadow: ${theme.shadows.md};
-    border-left-color: ${props => props.isActive ? theme.colors.success : theme.colors.primaryPurple};
+    border-left-color: ${props =>
+      props.isActive ? theme.colors.success : theme.colors.primaryPurple};
   }
 `;
 
@@ -83,12 +86,18 @@ const DeviceIcon = styled.div<{ isActive: boolean }>`
   width: 48px;
   height: 48px;
   border-radius: ${theme.borderRadius.lg};
-  background-color: ${props => props.isActive ? theme.colors.background.accent : theme.colors.background.secondary};
+  background-color: ${props =>
+    props.isActive
+      ? theme.colors.background.accent
+      : theme.colors.background.secondary};
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${props => props.isActive ? theme.colors.primaryPurple : theme.colors.text.secondary};
-  border: 2px solid ${props => props.isActive ? theme.colors.primaryPurple : theme.colors.border.light};
+  color: ${props =>
+    props.isActive ? theme.colors.primaryPurple : theme.colors.text.secondary};
+  border: 2px solid
+    ${props =>
+      props.isActive ? theme.colors.primaryPurple : theme.colors.border.light};
   transition: ${theme.transitions.base};
 
   &:hover {
@@ -136,7 +145,7 @@ const StatusBadge = styled.span<{ isActive: boolean; isExpired?: boolean }>`
   font-size: ${theme.fontSizes.sm};
   font-weight: ${theme.fontWeights.medium};
   border: 1px solid;
-  
+
   ${({ isActive, isExpired }) => {
     if (isExpired) {
       return `
@@ -240,7 +249,7 @@ const SecurityAlert = styled.div<{ type: 'warning' | 'info' | 'success' }>`
   margin-top: ${theme.spacing[4]};
   font-size: ${theme.fontSizes.sm};
   border: 1px solid;
-  
+
   ${({ type }) => {
     switch (type) {
       case 'warning':
@@ -265,10 +274,10 @@ const SecurityAlert = styled.div<{ type: 'warning' | 'info' | 'success' }>`
   }}
 `;
 
-export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({ 
-  userId, 
-  sessions, 
-  onSessionRevoked 
+export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
+  userId,
+  sessions,
+  onSessionRevoked,
 }) => {
   const { loading, revokeSession, revokeAllSessions } = useSessionManagement();
 
@@ -282,23 +291,30 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
   const securityAnalysis = useMemo(() => {
     const activeSessions = sessions.filter(session => session.isActive);
     const inactiveSessions = sessions.filter(session => !session.isActive);
-    const expiredSessions = sessions.filter(session => 
+    const expiredSessions = sessions.filter(session =>
       session.expiresAt ? isSessionExpired(session.expiresAt) : false
     );
-    
+
     // Detectar sesiones sospechosas
     const suspiciousSessions = activeSessions.filter(session => {
       // Sesiones con IPs diferentes o user agents inusuales
-      const hasUnusualIP = session.ipAddress && 
-        !session.ipAddress.match(/^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/);
-      const hasUnusualUserAgent = session.userAgent && 
-        (session.userAgent.includes('bot') || session.userAgent.includes('crawler'));
-      
+      const hasUnusualIP =
+        session.ipAddress &&
+        !session.ipAddress.match(
+          /^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/
+        );
+      const hasUnusualUserAgent =
+        session.userAgent &&
+        (session.userAgent.includes('bot') ||
+          session.userAgent.includes('crawler'));
+
       return hasUnusualIP || hasUnusualUserAgent;
     });
 
     // Análisis de ubicaciones
-    const uniqueIPs = new Set(activeSessions.map(s => s.ipAddress).filter(Boolean));
+    const uniqueIPs = new Set(
+      activeSessions.map(s => s.ipAddress).filter(Boolean)
+    );
     const multipleLocations = uniqueIPs.size > 1;
 
     return {
@@ -309,7 +325,7 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
       suspiciousSessions: suspiciousSessions.length,
       multipleLocations,
       uniqueIPs: uniqueIPs.size,
-      hasSecurityIssues: suspiciousSessions.length > 0 || multipleLocations
+      hasSecurityIssues: suspiciousSessions.length > 0 || multipleLocations,
     };
   }, [sessions]);
 
@@ -329,9 +345,13 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
 
   const getDeviceIcon = (userAgent?: string) => {
     if (!userAgent) return <Monitor size={20} />;
-    
+
     const ua = userAgent.toLowerCase();
-    if (ua.includes('mobile') || ua.includes('android') || ua.includes('iphone')) {
+    if (
+      ua.includes('mobile') ||
+      ua.includes('android') ||
+      ua.includes('iphone')
+    ) {
       return <Smartphone size={20} />;
     } else if (ua.includes('tablet') || ua.includes('ipad')) {
       return <Tablet size={20} />;
@@ -342,18 +362,22 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
 
   const getDeviceInfo = (userAgent?: string) => {
     if (!userAgent) return 'Dispositivo desconocido';
-    
+
     const ua = userAgent.toLowerCase();
     let device = 'Escritorio';
     let browser = 'Desconocido';
-    
+
     // Detectar dispositivo
-    if (ua.includes('mobile') || ua.includes('android') || ua.includes('iphone')) {
+    if (
+      ua.includes('mobile') ||
+      ua.includes('android') ||
+      ua.includes('iphone')
+    ) {
       device = 'Móvil';
     } else if (ua.includes('tablet') || ua.includes('ipad')) {
       device = 'Tablet';
     }
-    
+
     // Detectar navegador
     if (ua.includes('chrome')) {
       browser = 'Chrome';
@@ -364,7 +388,7 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
     } else if (ua.includes('edge')) {
       browser = 'Edge';
     }
-    
+
     return `${device} • ${browser}`;
   };
 
@@ -376,7 +400,7 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
       month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
@@ -387,19 +411,23 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
     return (
       <EmptyState>
         <Shield size={64} color={theme.colors.text.secondary} />
-        <h3 style={{ 
-          margin: `${theme.spacing[4]} 0 ${theme.spacing[2]} 0`,
-          color: theme.colors.text.primary,
-          fontFamily: theme.fonts.heading,
-          fontSize: theme.fontSizes.xl
-        }}>
+        <h3
+          style={{
+            margin: `${theme.spacing[4]} 0 ${theme.spacing[2]} 0`,
+            color: theme.colors.text.primary,
+            fontFamily: theme.fonts.heading,
+            fontSize: theme.fontSizes.xl,
+          }}
+        >
           Sin sesiones activas
         </h3>
-        <p style={{ 
-          margin: 0,
-          fontSize: theme.fontSizes.base,
-          color: theme.colors.text.secondary
-        }}>
+        <p
+          style={{
+            margin: 0,
+            fontSize: theme.fontSizes.base,
+            color: theme.colors.text.secondary,
+          }}
+        >
           Este usuario no tiene sesiones registradas
         </p>
       </EmptyState>
@@ -414,7 +442,7 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
           <Shield size={24} color={theme.colors.primaryPurple} />
           <SecurityTitle>Resumen de Seguridad</SecurityTitle>
         </SecurityHeader>
-        
+
         <SecurityGrid>
           <SecurityItem>
             <SecurityValue>{securityAnalysis.totalSessions}</SecurityValue>
@@ -442,40 +470,41 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
 
         {/* Alertas de Seguridad */}
         {securityAnalysis.hasSecurityIssues && (
-          <SecurityAlert type="warning">
+          <SecurityAlert type='warning'>
             <AlertTriangle size={16} />
             <div>
               <strong>⚠️ Alertas de Seguridad:</strong>
-              {securityAnalysis.suspiciousSessions > 0 && 
-                ` ${securityAnalysis.suspiciousSessions} sesión(es) sospechosa(s) detectada(s)`
-              }
-              {securityAnalysis.multipleLocations && 
-                ` • Múltiples ubicaciones detectadas (${securityAnalysis.uniqueIPs} IPs únicas)`
-              }
+              {securityAnalysis.suspiciousSessions > 0 &&
+                ` ${securityAnalysis.suspiciousSessions} sesión(es) sospechosa(s) detectada(s)`}
+              {securityAnalysis.multipleLocations &&
+                ` • Múltiples ubicaciones detectadas (${securityAnalysis.uniqueIPs} IPs únicas)`}
             </div>
           </SecurityAlert>
         )}
 
         {securityAnalysis.multipleLocations && (
-          <SecurityAlert type="info">
+          <SecurityAlert type='info'>
             <Globe size={16} />
             <div>
               <strong>🌍 Múltiples Ubicaciones:</strong>
-              El usuario tiene sesiones activas desde {securityAnalysis.uniqueIPs} ubicación(es) diferente(s).
-              {securityAnalysis.uniqueIPs > 3 && ' Esto podría indicar un uso compartido de la cuenta.'}
+              El usuario tiene sesiones activas desde{' '}
+              {securityAnalysis.uniqueIPs} ubicación(es) diferente(s).
+              {securityAnalysis.uniqueIPs > 3 &&
+                ' Esto podría indicar un uso compartido de la cuenta.'}
             </div>
           </SecurityAlert>
         )}
 
-        {!securityAnalysis.hasSecurityIssues && securityAnalysis.activeSessions > 0 && (
-          <SecurityAlert type="success">
-            <CheckCircle size={16} />
-            <div>
-              <strong>✅ Estado de Seguridad Óptimo:</strong>
-              Todas las sesiones activas parecen ser legítimas y seguras.
-            </div>
-          </SecurityAlert>
-        )}
+        {!securityAnalysis.hasSecurityIssues &&
+          securityAnalysis.activeSessions > 0 && (
+            <SecurityAlert type='success'>
+              <CheckCircle size={16} />
+              <div>
+                <strong>✅ Estado de Seguridad Óptimo:</strong>
+                Todas las sesiones activas parecen ser legítimas y seguras.
+              </div>
+            </SecurityAlert>
+          )}
       </SecuritySummary>
 
       <SessionsHeader>
@@ -484,8 +513,8 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
         </HeaderTitle>
         {activeSessions.length > 0 && (
           <Button
-            variant="outline"
-            size="small"
+            variant='outline'
+            size='small'
             onClick={handleRevokeAllSessions}
             disabled={loading}
             icon={<LogOut size={14} />}
@@ -498,16 +527,18 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
       {/* Sesiones Activas */}
       {activeSessions.length > 0 && (
         <div>
-          <h4 style={{ 
-            margin: `0 0 ${theme.spacing[4]} 0`,
-            color: theme.colors.success,
-            fontSize: theme.fontSizes.lg,
-            fontWeight: theme.fontWeights.medium,
-            fontFamily: theme.fonts.heading
-          }}>
+          <h4
+            style={{
+              margin: `0 0 ${theme.spacing[4]} 0`,
+              color: theme.colors.success,
+              fontSize: theme.fontSizes.lg,
+              fontWeight: theme.fontWeights.medium,
+              fontFamily: theme.fonts.heading,
+            }}
+          >
             Sesiones Activas ({activeSessions.length})
           </h4>
-          {activeSessions.map((session) => (
+          {activeSessions.map(session => (
             <SessionCard key={session.id} isActive={true}>
               <SessionHeader>
                 <SessionInfo>
@@ -515,57 +546,79 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
                     {getDeviceIcon(session.userAgent || '')}
                   </DeviceIcon>
                   <div>
-                    <div style={{ 
-                      fontWeight: theme.fontWeights.semibold,
-                      color: theme.colors.text.primary 
-                    }}>
+                    <div
+                      style={{
+                        fontWeight: theme.fontWeights.semibold,
+                        color: theme.colors.text.primary,
+                      }}
+                    >
                       {getDeviceInfo(session.userAgent || '')}
                     </div>
-                    <div style={{ 
-                      fontSize: theme.fontSizes.sm,
-                      color: theme.colors.text.secondary 
-                    }}>
+                    <div
+                      style={{
+                        fontSize: theme.fontSizes.sm,
+                        color: theme.colors.text.secondary,
+                      }}
+                    >
                       Sesión activa
-                      {securityAnalysis.suspiciousSessions > 0 && 
-                        sessions.find(s => s.id === session.id) && 
-                        (sessions.find(s => s.id === session.id)?.ipAddress && 
-                         !sessions.find(s => s.id === session.id)?.ipAddress?.match(/^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/) ||
-                         sessions.find(s => s.id === session.id)?.userAgent?.includes('bot') ||
-                         sessions.find(s => s.id === session.id)?.userAgent?.includes('crawler')) && (
-                        <span style={{ 
-                          color: theme.colors.warning, 
-                          marginLeft: theme.spacing[1],
-                          fontWeight: theme.fontWeights.medium
-                        }}>
-                          ⚠️ Sospechosa
-                        </span>
-                      )}
+                      {securityAnalysis.suspiciousSessions > 0 &&
+                        sessions.find(s => s.id === session.id) &&
+                        ((sessions.find(s => s.id === session.id)?.ipAddress &&
+                          !sessions
+                            .find(s => s.id === session.id)
+                            ?.ipAddress?.match(
+                              /^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/
+                            )) ||
+                          sessions
+                            .find(s => s.id === session.id)
+                            ?.userAgent?.includes('bot') ||
+                          sessions
+                            .find(s => s.id === session.id)
+                            ?.userAgent?.includes('crawler')) && (
+                          <span
+                            style={{
+                              color: theme.colors.warning,
+                              marginLeft: theme.spacing[1],
+                              fontWeight: theme.fontWeights.medium,
+                            }}
+                          >
+                            ⚠️ Sospechosa
+                          </span>
+                        )}
                     </div>
                   </div>
                 </SessionInfo>
-                
+
                 <SessionActions>
-                  {securityAnalysis.suspiciousSessions > 0 && 
-                    sessions.find(s => s.id === session.id) && 
-                    (sessions.find(s => s.id === session.id)?.ipAddress && 
-                     !sessions.find(s => s.id === session.id)?.ipAddress?.match(/^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/) ||
-                     sessions.find(s => s.id === session.id)?.userAgent?.includes('bot') ||
-                     sessions.find(s => s.id === session.id)?.userAgent?.includes('crawler')) && (
-                    <Button
-                      variant="ghost"
-                      size="small"
-                      icon={<Info size={14} />}
-                      style={{ 
-                        color: theme.colors.warning,
-                        border: `1px solid ${theme.colors.warning}40`
-                      }}
-                    >
-                      Info
-                    </Button>
-                  )}
+                  {securityAnalysis.suspiciousSessions > 0 &&
+                    sessions.find(s => s.id === session.id) &&
+                    ((sessions.find(s => s.id === session.id)?.ipAddress &&
+                      !sessions
+                        .find(s => s.id === session.id)
+                        ?.ipAddress?.match(
+                          /^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/
+                        )) ||
+                      sessions
+                        .find(s => s.id === session.id)
+                        ?.userAgent?.includes('bot') ||
+                      sessions
+                        .find(s => s.id === session.id)
+                        ?.userAgent?.includes('crawler')) && (
+                      <Button
+                        variant='ghost'
+                        size='small'
+                        icon={<Info size={14} />}
+                        style={{
+                          color: theme.colors.warning,
+                          border: `1px solid ${theme.colors.warning}40`,
+                        }}
+                      >
+                        Info
+                      </Button>
+                    )}
                   <Button
-                    variant="outline"
-                    size="small"
+                    variant='outline'
+                    size='small'
                     onClick={() => handleRevokeSession(session)}
                     disabled={loading}
                     icon={<X size={14} />}
@@ -591,15 +644,20 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
                   <DetailValue>
                     <MapPin size={12} />
                     {session.ipAddress || 'No disponible'}
-                    {session.ipAddress && !session.ipAddress.match(/^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/) && (
-                      <span style={{ 
-                        color: theme.colors.warning, 
-                        fontSize: theme.fontSizes.xs,
-                        marginLeft: theme.spacing[1]
-                      }}>
-                        (Externa)
-                      </span>
-                    )}
+                    {session.ipAddress &&
+                      !session.ipAddress.match(
+                        /^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/
+                      ) && (
+                        <span
+                          style={{
+                            color: theme.colors.warning,
+                            fontSize: theme.fontSizes.xs,
+                            marginLeft: theme.spacing[1],
+                          }}
+                        >
+                          (Externa)
+                        </span>
+                      )}
                   </DetailValue>
                 </DetailItem>
 
@@ -623,7 +681,9 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
                   <DetailLabel>Expira</DetailLabel>
                   <DetailValue>
                     <Clock size={12} />
-                    {session.expiresAt ? formatDate(session.expiresAt as string) : 'N/A'}
+                    {session.expiresAt
+                      ? formatDate(session.expiresAt as string)
+                      : 'N/A'}
                   </DetailValue>
                 </DetailItem>
 
@@ -631,10 +691,9 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
                   <DetailLabel>Duración</DetailLabel>
                   <DetailValue>
                     <Activity size={12} />
-                    {session.createdAt && session.expiresAt ? 
-                      `${Math.ceil((new Date(session.expiresAt).getTime() - new Date(session.createdAt).getTime()) / (1000 * 60 * 60))}h` : 
-                      'N/A'
-                    }
+                    {session.createdAt && session.expiresAt
+                      ? `${Math.ceil((new Date(session.expiresAt).getTime() - new Date(session.createdAt).getTime()) / (1000 * 60 * 60))}h`
+                      : 'N/A'}
                   </DetailValue>
                 </DetailItem>
               </SessionDetails>
@@ -646,17 +705,21 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
       {/* Sesiones Inactivas/Expiradas */}
       {inactiveSessions.length > 0 && (
         <div style={{ marginTop: theme.spacing[6] }}>
-          <h4 style={{ 
-            margin: `0 0 ${theme.spacing[4]} 0`,
-            color: theme.colors.text.secondary,
-            fontSize: theme.fontSizes.lg,
-            fontWeight: theme.fontWeights.medium,
-            fontFamily: theme.fonts.heading
-          }}>
+          <h4
+            style={{
+              margin: `0 0 ${theme.spacing[4]} 0`,
+              color: theme.colors.text.secondary,
+              fontSize: theme.fontSizes.lg,
+              fontWeight: theme.fontWeights.medium,
+              fontFamily: theme.fonts.heading,
+            }}
+          >
             Sesiones Cerradas/Expiradas ({inactiveSessions.length})
           </h4>
-          {inactiveSessions.map((session) => {
-            const expired = session.expiresAt ? isSessionExpired(session.expiresAt) : false;
+          {inactiveSessions.map(session => {
+            const expired = session.expiresAt
+              ? isSessionExpired(session.expiresAt)
+              : false;
             return (
               <SessionCard key={session.id} isActive={false}>
                 <SessionHeader>
@@ -665,16 +728,20 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
                       {getDeviceIcon(session.userAgent || '')}
                     </DeviceIcon>
                     <div>
-                      <div style={{ 
-                        fontWeight: theme.fontWeights.semibold,
-                        color: theme.colors.text.primary 
-                      }}>
+                      <div
+                        style={{
+                          fontWeight: theme.fontWeights.semibold,
+                          color: theme.colors.text.primary,
+                        }}
+                      >
                         {getDeviceInfo(session.userAgent || '')}
                       </div>
-                      <div style={{ 
-                        fontSize: theme.fontSizes.sm,
-                        color: theme.colors.text.secondary 
-                      }}>
+                      <div
+                        style={{
+                          fontSize: theme.fontSizes.sm,
+                          color: theme.colors.text.secondary,
+                        }}
+                      >
                         {expired ? 'Sesión expirada' : 'Sesión cerrada'}
                       </div>
                     </div>
@@ -692,30 +759,35 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
                     </DetailValue>
                   </DetailItem>
 
-                                  <DetailItem>
-                  <DetailLabel>Dirección IP</DetailLabel>
-                  <DetailValue>
-                    <MapPin size={12} />
-                    {session.ipAddress || 'No disponible'}
-                    {session.ipAddress && !session.ipAddress.match(/^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/) && (
-                      <span style={{ 
-                        color: theme.colors.warning, 
-                        fontSize: theme.fontSizes.xs,
-                        marginLeft: theme.spacing[1]
-                      }}>
-                        (Externa)
-                      </span>
-                    )}
-                  </DetailValue>
-                </DetailItem>
+                  <DetailItem>
+                    <DetailLabel>Dirección IP</DetailLabel>
+                    <DetailValue>
+                      <MapPin size={12} />
+                      {session.ipAddress || 'No disponible'}
+                      {session.ipAddress &&
+                        !session.ipAddress.match(
+                          /^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/
+                        ) && (
+                          <span
+                            style={{
+                              color: theme.colors.warning,
+                              fontSize: theme.fontSizes.xs,
+                              marginLeft: theme.spacing[1],
+                            }}
+                          >
+                            (Externa)
+                          </span>
+                        )}
+                    </DetailValue>
+                  </DetailItem>
 
-                <DetailItem>
-                  <DetailLabel>Dispositivo</DetailLabel>
-                  <DetailValue>
-                    {getDeviceIcon(session.userAgent || '')}
-                    {getDeviceInfo(session.userAgent || '')}
-                  </DetailValue>
-                </DetailItem>
+                  <DetailItem>
+                    <DetailLabel>Dispositivo</DetailLabel>
+                    <DetailValue>
+                      {getDeviceIcon(session.userAgent || '')}
+                      {getDeviceInfo(session.userAgent || '')}
+                    </DetailValue>
+                  </DetailItem>
 
                   <DetailItem>
                     <DetailLabel>Iniciada</DetailLabel>
@@ -737,10 +809,9 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
                     <DetailLabel>Duración</DetailLabel>
                     <DetailValue>
                       <Activity size={12} />
-                      {session.createdAt && session.updatedAt ? 
-                        `${Math.ceil((new Date(session.updatedAt).getTime() - new Date(session.createdAt).getTime()) / (1000 * 60 * 60))}h` : 
-                        'N/A'
-                      }
+                      {session.createdAt && session.updatedAt
+                        ? `${Math.ceil((new Date(session.updatedAt).getTime() - new Date(session.createdAt).getTime()) / (1000 * 60 * 60))}h`
+                        : 'N/A'}
                     </DetailValue>
                   </DetailItem>
                 </SessionDetails>

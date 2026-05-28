@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { 
-  Package, 
-  Clock, 
-  CheckCircle, 
-  Truck, 
-  XCircle, 
+import {
+  Package,
+  Clock,
+  CheckCircle,
+  Truck,
+  XCircle,
   Eye,
   Filter,
   Search,
-  Calendar
+  Calendar,
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -26,38 +26,38 @@ const statusConfig = {
     label: 'Pendiente',
     color: theme.colors.warning,
     icon: Clock,
-    bgColor: theme.colors.warning + '20'
+    bgColor: theme.colors.warning + '20',
   },
   confirmed: {
     label: 'Confirmado',
     color: theme.colors.info,
     icon: CheckCircle,
-    bgColor: theme.colors.info + '20'
+    bgColor: theme.colors.info + '20',
   },
   processing: {
     label: 'En Proceso',
     color: theme.colors.primary,
     icon: Package,
-    bgColor: theme.colors.primary + '20'
+    bgColor: theme.colors.primary + '20',
   },
   shipped: {
     label: 'Enviado',
     color: theme.colors.secondary,
     icon: Truck,
-    bgColor: theme.colors.secondary + '20'
+    bgColor: theme.colors.secondary + '20',
   },
   delivered: {
     label: 'Entregado',
     color: theme.colors.success,
     icon: CheckCircle,
-    bgColor: theme.colors.success + '20'
+    bgColor: theme.colors.success + '20',
   },
   cancelled: {
     label: 'Cancelado',
     color: theme.colors.error,
     icon: XCircle,
-    bgColor: theme.colors.error + '20'
-  }
+    bgColor: theme.colors.error + '20',
+  },
 };
 
 export const Orders: React.FC = () => {
@@ -66,26 +66,35 @@ export const Orders: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
 
   // Use custom hook for orders
-  const { 
-    orders, 
-    loading: isLoading, 
-    error, 
-    refetch
-  } = useOrders(statusFilter ? { 
-    filter: { status: statusFilter } 
-  } : {});
+  const {
+    orders,
+    loading: isLoading,
+    error,
+    refetch,
+  } = useOrders(
+    statusFilter
+      ? {
+          filter: { status: statusFilter },
+        }
+      : {}
+  );
 
   // Filter orders based on search term
-  const filteredOrders = orders.filter(order =>
-    (order.user?.firstName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (order.user?.lastName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    order.id.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredOrders = orders.filter(
+    order =>
+      (order.user?.firstName || '')
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      (order.user?.lastName || '')
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      order.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
-      currency: 'COP'
+      currency: 'COP',
     }).format(amount);
   };
 
@@ -95,7 +104,9 @@ export const Orders: React.FC = () => {
   };
 
   const getStatusConfig = (status: string) => {
-    return statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+    return (
+      statusConfig[status as keyof typeof statusConfig] || statusConfig.pending
+    );
   };
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
@@ -115,29 +126,34 @@ export const Orders: React.FC = () => {
       status: order.status as OrderStatus,
       totalAmount: order.totalAmount,
       shippingAddress: order.shippingAddress,
-      items: order.orderItems?.map((item: any) => ({
-        id: item.id,
-        orderId: item.orderId || undefined,
-        productId: item.productId || undefined,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        totalPrice: item.totalPrice,
-        product: item.product,
-        createdAt: new Date(item.createdAt)
-      })) || [],
-      user: order.user ? {
-        id: order.user.id,
-        userId: order.user.userId || order.user.id,
-        firstName: order.user.firstName || undefined,
-        lastName: order.user.lastName || undefined,
-        phone: order.user.phone || undefined,
-        birthDate: order.user.birthDate ? new Date(order.user.birthDate) : undefined,
-        avatarUrl: order.user.avatarUrl || undefined,
-        createdAt: new Date(order.user.createdAt),
-        updatedAt: new Date(order.user.updatedAt)
-      } : undefined,
+      items:
+        order.orderItems?.map((item: any) => ({
+          id: item.id,
+          orderId: item.orderId || undefined,
+          productId: item.productId || undefined,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          totalPrice: item.totalPrice,
+          product: item.product,
+          createdAt: new Date(item.createdAt),
+        })) || [],
+      user: order.user
+        ? {
+            id: order.user.id,
+            userId: order.user.userId || order.user.id,
+            firstName: order.user.firstName || undefined,
+            lastName: order.user.lastName || undefined,
+            phone: order.user.phone || undefined,
+            birthDate: order.user.birthDate
+              ? new Date(order.user.birthDate)
+              : undefined,
+            avatarUrl: order.user.avatarUrl || undefined,
+            createdAt: new Date(order.user.createdAt),
+            updatedAt: new Date(order.user.updatedAt),
+          }
+        : undefined,
       createdAt: new Date(order.createdAt),
-      updatedAt: new Date(order.updatedAt)
+      updatedAt: new Date(order.updatedAt),
     };
     setSelectedOrder(unifiedOrder);
   };
@@ -166,32 +182,38 @@ export const Orders: React.FC = () => {
   return (
     <div style={{ padding: '2rem' }}>
       {/* Header */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        marginBottom: '2rem'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '2rem',
+        }}
+      >
         <div>
-          <h1 style={{ 
-            fontFamily: theme.fonts.heading,
-            fontSize: theme.fontSizes['3xl'],
-            fontWeight: theme.fontWeights.light,
-            color: theme.colors.text.primary,
-            marginBottom: '0.5rem'
-          }}>
+          <h1
+            style={{
+              fontFamily: theme.fonts.heading,
+              fontSize: theme.fontSizes['3xl'],
+              fontWeight: theme.fontWeights.light,
+              color: theme.colors.text.primary,
+              marginBottom: '0.5rem',
+            }}
+          >
             Pedidos
           </h1>
-          <p style={{ 
-            color: theme.colors.text.secondary,
-            fontSize: theme.fontSizes.lg
-          }}>
+          <p
+            style={{
+              color: theme.colors.text.secondary,
+              fontSize: theme.fontSizes.lg,
+            }}
+          >
             Gestiona todos los pedidos de Happy Baby Style
           </p>
         </div>
-        
+
         <div style={{ display: 'flex', gap: '1rem' }}>
-          <Button variant="outline">
+          <Button variant='outline'>
             <Calendar size={16} style={{ marginRight: '0.5rem' }} />
             Exportar
           </Button>
@@ -204,24 +226,26 @@ export const Orders: React.FC = () => {
 
       {/* Filters */}
       <Card style={{ marginBottom: '2rem', padding: '1.5rem' }}>
-        <div style={{ 
-          display: 'flex', 
-          gap: '1rem', 
-          alignItems: 'center',
-          flexWrap: 'wrap'
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: '1rem',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+          }}
+        >
           <div style={{ flex: 1, minWidth: '300px' }}>
             <Input
-              placeholder="Buscar por cliente, email o ID..."
+              placeholder='Buscar por cliente, email o ID...'
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
               icon={<Search size={16} />}
             />
           </div>
-          
+
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as OrderStatus | '')}
+            onChange={e => setStatusFilter(e.target.value as OrderStatus | '')}
             style={{
               padding: '0.75rem 1rem',
               border: `1px solid ${theme.colors.border.light}`,
@@ -229,18 +253,24 @@ export const Orders: React.FC = () => {
               backgroundColor: theme.colors.white,
               color: theme.colors.text.primary,
               fontSize: theme.fontSizes.sm,
-              minWidth: '150px'
+              minWidth: '150px',
             }}
           >
-            <option value="">Todos los estados</option>
+            <option value=''>Todos los estados</option>
             {Object.entries(statusConfig).map(([key, config]) => (
               <option key={key} value={key}>
                 {config.label}
               </option>
             ))}
           </select>
-          
-          <Button variant="outline" onClick={() => { setSearchTerm(''); setStatusFilter(''); }}>
+
+          <Button
+            variant='outline'
+            onClick={() => {
+              setSearchTerm('');
+              setStatusFilter('');
+            }}
+          >
             <Filter size={16} style={{ marginRight: '0.5rem' }} />
             Limpiar
           </Button>
@@ -250,149 +280,178 @@ export const Orders: React.FC = () => {
       {/* Orders List */}
       <div style={{ display: 'grid', gap: '1rem' }}>
         {filteredOrders.length === 0 ? (
-          <Card style={{ 
-            padding: '3rem', 
-            textAlign: 'center',
-            color: theme.colors.text.secondary
-          }}>
+          <Card
+            style={{
+              padding: '3rem',
+              textAlign: 'center',
+              color: theme.colors.text.secondary,
+            }}
+          >
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📦</div>
-            <h3 style={{ 
-              fontFamily: theme.fonts.heading,
-              fontSize: theme.fontSizes.xl,
-              marginBottom: '0.5rem',
-              color: theme.colors.text.primary
-            }}>
+            <h3
+              style={{
+                fontFamily: theme.fonts.heading,
+                fontSize: theme.fontSizes.xl,
+                marginBottom: '0.5rem',
+                color: theme.colors.text.primary,
+              }}
+            >
               No se encontraron pedidos
             </h3>
             <p>No hay pedidos que coincidan con los filtros aplicados</p>
           </Card>
         ) : (
-          filteredOrders.map((order) => {
+          filteredOrders.map(order => {
             const status = getStatusConfig(order.status);
             const StatusIcon = status.icon;
-            
+
             return (
               <Card key={order.id} style={{ padding: '1.5rem' }}>
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                  gap: '1rem'
-                }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    gap: '1rem',
+                  }}
+                >
                   {/* Order Info */}
                   <div style={{ flex: 1 }}>
-                    <div style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: '1rem',
-                      marginBottom: '1rem'
-                    }}>
-                      <div style={{
+                    <div
+                      style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '0.5rem',
-                        padding: '0.5rem 1rem',
-                        borderRadius: theme.borderRadius.full,
-                        backgroundColor: status.bgColor,
-                        color: status.color,
-                        fontSize: theme.fontSizes.sm,
-                        fontWeight: theme.fontWeights.medium
-                      }}>
+                        gap: '1rem',
+                        marginBottom: '1rem',
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          padding: '0.5rem 1rem',
+                          borderRadius: theme.borderRadius.full,
+                          backgroundColor: status.bgColor,
+                          color: status.color,
+                          fontSize: theme.fontSizes.sm,
+                          fontWeight: theme.fontWeights.medium,
+                        }}
+                      >
                         <StatusIcon size={16} />
                         {status.label}
                       </div>
-                      
-                      <span style={{ 
-                        color: theme.colors.text.secondary,
-                        fontSize: theme.fontSizes.sm
-                      }}>
+
+                      <span
+                        style={{
+                          color: theme.colors.text.secondary,
+                          fontSize: theme.fontSizes.sm,
+                        }}
+                      >
                         #{order.id.slice(0, 8)}
                       </span>
                     </div>
-                    
-                    <h3 style={{ 
-                      fontFamily: theme.fonts.heading,
-                      fontSize: theme.fontSizes.lg,
-                      fontWeight: theme.fontWeights.medium,
-                      marginBottom: '0.5rem',
-                      color: theme.colors.text.primary
-                    }}>
+
+                    <h3
+                      style={{
+                        fontFamily: theme.fonts.heading,
+                        fontSize: theme.fontSizes.lg,
+                        fontWeight: theme.fontWeights.medium,
+                        marginBottom: '0.5rem',
+                        color: theme.colors.text.primary,
+                      }}
+                    >
                       {order.user?.firstName} {order.user?.lastName}
                     </h3>
-                    
-                    <p style={{ 
-                      color: theme.colors.text.secondary,
-                      marginBottom: '0.5rem'
-                    }}>
+
+                    <p
+                      style={{
+                        color: theme.colors.text.secondary,
+                        marginBottom: '0.5rem',
+                      }}
+                    >
                       {order.user?.firstName} {order.user?.lastName}
                     </p>
-                    
+
                     {/* Phone is not available in the GraphQL UserProfile type for orders */}
-                    
-                    <p style={{ 
-                      color: theme.colors.text.secondary,
-                      fontSize: theme.fontSizes.sm
-                    }}>
+
+                    <p
+                      style={{
+                        color: theme.colors.text.secondary,
+                        fontSize: theme.fontSizes.sm,
+                      }}
+                    >
                       📅 {formatDate(order.createdAt)}
                     </p>
                   </div>
-                  
+
                   {/* Order Actions */}
-                  <div style={{ 
-                    display: 'flex', 
-                    flexDirection: 'column',
-                    alignItems: 'flex-end',
-                    gap: '1rem'
-                  }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'flex-end',
+                      gap: '1rem',
+                    }}
+                  >
                     <div style={{ textAlign: 'right' }}>
-                      <p style={{ 
-                        fontSize: theme.fontSizes.xl,
-                        fontWeight: theme.fontWeights.bold,
-                        color: theme.colors.text.primary,
-                        marginBottom: '0.25rem'
-                      }}>
+                      <p
+                        style={{
+                          fontSize: theme.fontSizes.xl,
+                          fontWeight: theme.fontWeights.bold,
+                          color: theme.colors.text.primary,
+                          marginBottom: '0.25rem',
+                        }}
+                      >
                         {formatCurrency(order.totalAmount)}
                       </p>
-                      <p style={{ 
-                        color: theme.colors.text.secondary,
-                        fontSize: theme.fontSizes.sm
-                      }}>
+                      <p
+                        style={{
+                          color: theme.colors.text.secondary,
+                          fontSize: theme.fontSizes.sm,
+                        }}
+                      >
                         {/* TODO: orderItems no está disponible en GraphQL actualmente */}
                         0 productos
                       </p>
                     </div>
-                    
+
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                       <Button
-                        variant="outline"
-                        size="sm"
+                        variant='outline'
+                        size='sm'
                         onClick={() => handleOrderSelect(order)}
                       >
                         <Eye size={16} style={{ marginRight: '0.25rem' }} />
                         Ver
                       </Button>
-                      
-                      {order.status !== 'delivered' && order.status !== 'cancelled' && (
-                        <select
-                          value={order.status}
-                          onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                          style={{
-                            padding: '0.5rem 0.75rem',
-                            border: `1px solid ${theme.colors.border.light}`,
-                            borderRadius: theme.borderRadius.md,
-                            backgroundColor: theme.colors.white,
-                            color: theme.colors.text.primary,
-                            fontSize: theme.fontSizes.sm,
-                            cursor: 'pointer'
-                          }}
-                        >
-                          {Object.entries(statusConfig).map(([key, config]) => (
-                            <option key={key} value={key}>
-                              {config.label}
-                            </option>
-                          ))}
-                        </select>
-                      )}
+
+                      {order.status !== 'delivered' &&
+                        order.status !== 'cancelled' && (
+                          <select
+                            value={order.status}
+                            onChange={e =>
+                              handleStatusChange(order.id, e.target.value)
+                            }
+                            style={{
+                              padding: '0.5rem 0.75rem',
+                              border: `1px solid ${theme.colors.border.light}`,
+                              borderRadius: theme.borderRadius.md,
+                              backgroundColor: theme.colors.white,
+                              color: theme.colors.text.primary,
+                              fontSize: theme.fontSizes.sm,
+                              cursor: 'pointer',
+                            }}
+                          >
+                            {Object.entries(statusConfig).map(
+                              ([key, config]) => (
+                                <option key={key} value={key}>
+                                  {config.label}
+                                </option>
+                              )
+                            )}
+                          </select>
+                        )}
                     </div>
                   </div>
                 </div>
@@ -404,106 +463,137 @@ export const Orders: React.FC = () => {
 
       {/* Order Details Modal */}
       {selectedOrder && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-          padding: '2rem'
-        }}>
-          <Card style={{ 
-            maxWidth: '600px', 
-            width: '100%',
-            maxHeight: '80vh',
-            overflow: 'auto'
-          }}>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '1.5rem',
-              paddingBottom: '1rem',
-              borderBottom: `1px solid ${theme.colors.border.light}`
-            }}>
-              <h2 style={{ 
-                fontFamily: theme.fonts.heading,
-                fontSize: theme.fontSizes.xl,
-                fontWeight: theme.fontWeights.medium
-              }}>
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '2rem',
+          }}
+        >
+          <Card
+            style={{
+              maxWidth: '600px',
+              width: '100%',
+              maxHeight: '80vh',
+              overflow: 'auto',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '1.5rem',
+                paddingBottom: '1rem',
+                borderBottom: `1px solid ${theme.colors.border.light}`,
+              }}
+            >
+              <h2
+                style={{
+                  fontFamily: theme.fonts.heading,
+                  fontSize: theme.fontSizes.xl,
+                  fontWeight: theme.fontWeights.medium,
+                }}
+              >
                 Detalles del Pedido
               </h2>
               <Button
-                variant="outline"
-                size="sm"
+                variant='outline'
+                size='sm'
                 onClick={() => setSelectedOrder(null)}
               >
                 ✕
               </Button>
             </div>
-            
+
             <div style={{ marginBottom: '1.5rem' }}>
-              <h3 style={{ 
-                fontFamily: theme.fonts.heading,
-                fontSize: theme.fontSizes.lg,
-                marginBottom: '1rem'
-              }}>
-                Información del Cliente
-              </h3>
-              <p><strong>Nombre:</strong> {selectedOrder.user?.firstName} {selectedOrder.user?.lastName}</p>
-              {/* Email is not available in the UserProfile type for orders */}
-              {selectedOrder.user?.phone && (
-                <p><strong>Teléfono:</strong> {selectedOrder.user.phone}</p>
-              )}
-            </div>
-            
-            {selectedOrder.shippingAddress && (
-              <div style={{ marginBottom: '1.5rem' }}>
-                <h3 style={{ 
+              <h3
+                style={{
                   fontFamily: theme.fonts.heading,
                   fontSize: theme.fontSizes.lg,
-                  marginBottom: '1rem'
-                }}>
+                  marginBottom: '1rem',
+                }}
+              >
+                Información del Cliente
+              </h3>
+              <p>
+                <strong>Nombre:</strong> {selectedOrder.user?.firstName}{' '}
+                {selectedOrder.user?.lastName}
+              </p>
+              {/* Email is not available in the UserProfile type for orders */}
+              {selectedOrder.user?.phone && (
+                <p>
+                  <strong>Teléfono:</strong> {selectedOrder.user.phone}
+                </p>
+              )}
+            </div>
+
+            {selectedOrder.shippingAddress && (
+              <div style={{ marginBottom: '1.5rem' }}>
+                <h3
+                  style={{
+                    fontFamily: theme.fonts.heading,
+                    fontSize: theme.fontSizes.lg,
+                    marginBottom: '1rem',
+                  }}
+                >
                   Dirección de Envío
                 </h3>
                 <p>{selectedOrder.shippingAddress?.street}</p>
-                <p>{selectedOrder.shippingAddress?.city}, {selectedOrder.shippingAddress?.state}</p>
-                <p>{selectedOrder.shippingAddress?.zipCode}, {selectedOrder.shippingAddress?.country}</p>
+                <p>
+                  {selectedOrder.shippingAddress?.city},{' '}
+                  {selectedOrder.shippingAddress?.state}
+                </p>
+                <p>
+                  {selectedOrder.shippingAddress?.zipCode},{' '}
+                  {selectedOrder.shippingAddress?.country}
+                </p>
               </div>
             )}
-            
+
             {selectedOrder.items && selectedOrder.items.length > 0 && (
               <div style={{ marginBottom: '1.5rem' }}>
-                <h3 style={{ 
-                  fontFamily: theme.fonts.heading,
-                  fontSize: theme.fontSizes.lg,
-                  marginBottom: '1rem'
-                }}>
+                <h3
+                  style={{
+                    fontFamily: theme.fonts.heading,
+                    fontSize: theme.fontSizes.lg,
+                    marginBottom: '1rem',
+                  }}
+                >
                   Productos
                 </h3>
                 <div style={{ display: 'grid', gap: '0.5rem' }}>
                   {selectedOrder.items.map((item: any) => (
-                    <div key={item.id} style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      padding: '0.75rem',
-                      backgroundColor: theme.colors.background.light,
-                      borderRadius: theme.borderRadius.md
-                    }}>
+                    <div
+                      key={item.id}
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        padding: '0.75rem',
+                        backgroundColor: theme.colors.background.light,
+                        borderRadius: theme.borderRadius.md,
+                      }}
+                    >
                       <div>
                         <p style={{ fontWeight: theme.fontWeights.medium }}>
                           Producto ID: {item.productId}
                         </p>
-                        <p style={{ 
-                          color: theme.colors.text.secondary,
-                          fontSize: theme.fontSizes.sm
-                        }}>
-                          Cantidad: {item.quantity} | Precio: {formatCurrency(item.unitPrice)}
+                        <p
+                          style={{
+                            color: theme.colors.text.secondary,
+                            fontSize: theme.fontSizes.sm,
+                          }}
+                        >
+                          Cantidad: {item.quantity} | Precio:{' '}
+                          {formatCurrency(item.unitPrice)}
                         </p>
                       </div>
                       <p style={{ fontWeight: theme.fontWeights.medium }}>
@@ -514,36 +604,40 @@ export const Orders: React.FC = () => {
                 </div>
               </div>
             )}
-            
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              paddingTop: '1rem',
-              borderTop: `1px solid ${theme.colors.border.light}`
-            }}>
+
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                paddingTop: '1rem',
+                borderTop: `1px solid ${theme.colors.border.light}`,
+              }}
+            >
               <div>
-                <p style={{ 
-                  fontSize: theme.fontSizes.lg,
-                  fontWeight: theme.fontWeights.bold
-                }}>
+                <p
+                  style={{
+                    fontSize: theme.fontSizes.lg,
+                    fontWeight: theme.fontWeights.bold,
+                  }}
+                >
                   Total: {formatCurrency(selectedOrder.totalAmount)}
                 </p>
-                <p style={{ 
-                  color: theme.colors.text.secondary,
-                  fontSize: theme.fontSizes.sm
-                }}>
+                <p
+                  style={{
+                    color: theme.colors.text.secondary,
+                    fontSize: theme.fontSizes.sm,
+                  }}
+                >
                   Creado: {formatDate(selectedOrder.createdAt)}
                 </p>
               </div>
-              
-              <Button onClick={() => setSelectedOrder(null)}>
-                Cerrar
-              </Button>
+
+              <Button onClick={() => setSelectedOrder(null)}>Cerrar</Button>
             </div>
           </Card>
         </div>
       )}
     </div>
   );
-}; 
+};

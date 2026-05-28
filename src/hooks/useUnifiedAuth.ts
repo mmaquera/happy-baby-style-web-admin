@@ -4,16 +4,13 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useApolloClient } from '@apollo/client';
-import { 
-  UnifiedAuthService, 
+import {
+  UnifiedAuthService,
   AuthServiceFactory,
-  AuthError
+  AuthError,
 } from '../services/auth/UnifiedAuthService';
 import { UserRole } from '../types/unified';
-import {
-  IAuthUser,
-  IAuthError
-} from '../types/auth';
+import { IAuthUser, IAuthError } from '../types/auth';
 
 // Hook state interface
 interface AuthState {
@@ -27,7 +24,15 @@ interface AuthState {
 // Hook actions interface
 interface AuthActions {
   login: (credentials: { email: string; password: string }) => Promise<boolean>;
-  register: (input: { email: string; password: string; role?: UserRole; firstName?: string; lastName?: string; phone?: string; dateOfBirth?: string | null }) => Promise<boolean>;
+  register: (input: {
+    email: string;
+    password: string;
+    role?: UserRole;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    dateOfBirth?: string | null;
+  }) => Promise<boolean>;
   logout: () => Promise<void>;
   refreshToken: () => Promise<void>;
   clearError: () => void;
@@ -59,7 +64,7 @@ export const useUnifiedAuth = (): UseUnifiedAuthReturn => {
     const initializeAuth = async () => {
       try {
         setState(prev => ({ ...prev, isLoading: true }));
-        
+
         if (authService.isAuthenticated()) {
           const user = await authService.getCurrentUser();
           setState({
@@ -84,7 +89,8 @@ export const useUnifiedAuth = (): UseUnifiedAuthReturn => {
           user: null,
           isAuthenticated: false,
           isLoading: false,
-          error: error instanceof Error ? error.message : 'Authentication failed',
+          error:
+            error instanceof Error ? error.message : 'Authentication failed',
           isInitialized: true,
         });
       }
@@ -94,78 +100,97 @@ export const useUnifiedAuth = (): UseUnifiedAuthReturn => {
   }, [authService]);
 
   // Register function
-  const register = useCallback(async (input: { email: string; password: string; role?: UserRole; firstName?: string; lastName?: string; phone?: string; dateOfBirth?: string | null }): Promise<boolean> => {
-    try {
-      setState(prev => ({ ...prev, isLoading: true, error: null }));
-      
-      const response = await authService.register(input);
-      
-      setState({
-        user: response.user,
-        isAuthenticated: true,
-        isLoading: false,
-        error: null,
-        isInitialized: true,
-      });
-      
-      return true;
-    } catch (error) {
-      const errorMessage = error instanceof AuthError 
-        ? error.message 
-        : error instanceof Error 
-          ? error.message 
-          : 'Registration failed';
-      
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: errorMessage,
-      }));
-      
-      return false;
-    }
-  }, [authService]);
+  const register = useCallback(
+    async (input: {
+      email: string;
+      password: string;
+      role?: UserRole;
+      firstName?: string;
+      lastName?: string;
+      phone?: string;
+      dateOfBirth?: string | null;
+    }): Promise<boolean> => {
+      try {
+        setState(prev => ({ ...prev, isLoading: true, error: null }));
+
+        const response = await authService.register(input);
+
+        setState({
+          user: response.user,
+          isAuthenticated: true,
+          isLoading: false,
+          error: null,
+          isInitialized: true,
+        });
+
+        return true;
+      } catch (error) {
+        const errorMessage =
+          error instanceof AuthError
+            ? error.message
+            : error instanceof Error
+              ? error.message
+              : 'Registration failed';
+
+        setState(prev => ({
+          ...prev,
+          isLoading: false,
+          error: errorMessage,
+        }));
+
+        return false;
+      }
+    },
+    [authService]
+  );
 
   // Login function
-  const login = useCallback(async (credentials: { email: string; password: string }): Promise<boolean> => {
-    try {
-      setState(prev => ({ ...prev, isLoading: true, error: null }));
-      
-      const response = await authService.login(credentials);
-      
-      setState({
-        user: response.user,
-        isAuthenticated: true,
-        isLoading: false,
-        error: null,
-        isInitialized: true,
-      });
-      
-      return true;
-    } catch (error) {
-      const errorMessage = error instanceof AuthError 
-        ? error.message 
-        : error instanceof Error 
-          ? error.message 
-          : 'Login failed';
-      
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: errorMessage,
-      }));
-      
-      return false;
-    }
-  }, [authService]);
+  const login = useCallback(
+    async (credentials: {
+      email: string;
+      password: string;
+    }): Promise<boolean> => {
+      try {
+        setState(prev => ({ ...prev, isLoading: true, error: null }));
+
+        const response = await authService.login(credentials);
+
+        setState({
+          user: response.user,
+          isAuthenticated: true,
+          isLoading: false,
+          error: null,
+          isInitialized: true,
+        });
+
+        return true;
+      } catch (error) {
+        const errorMessage =
+          error instanceof AuthError
+            ? error.message
+            : error instanceof Error
+              ? error.message
+              : 'Login failed';
+
+        setState(prev => ({
+          ...prev,
+          isLoading: false,
+          error: errorMessage,
+        }));
+
+        return false;
+      }
+    },
+    [authService]
+  );
 
   // Logout function
   const logout = useCallback(async () => {
     try {
       setState(prev => ({ ...prev, isLoading: true }));
-      
+
       await authService.logout();
-      
+
       setState({
         user: null,
         isAuthenticated: false,
@@ -193,9 +218,9 @@ export const useUnifiedAuth = (): UseUnifiedAuthReturn => {
       if (!tokens?.refreshToken) {
         throw new Error('No refresh token available');
       }
-      
+
       await authService.refreshToken(tokens.refreshToken);
-      
+
       // Re-fetch current user
       const user = await authService.getCurrentUser();
       setState(prev => ({
@@ -216,13 +241,19 @@ export const useUnifiedAuth = (): UseUnifiedAuthReturn => {
   }, []);
 
   // Role checking utilities
-  const hasRole = useCallback((role: UserRole): boolean => {
-    return state.user?.role === role;
-  }, [state.user]);
+  const hasRole = useCallback(
+    (role: UserRole): boolean => {
+      return state.user?.role === role;
+    },
+    [state.user]
+  );
 
-  const hasAnyRole = useCallback((roles: UserRole[]): boolean => {
-    return state.user ? roles.includes(state.user.role) : false;
-  }, [state.user]);
+  const hasAnyRole = useCallback(
+    (roles: UserRole[]): boolean => {
+      return state.user ? roles.includes(state.user.role) : false;
+    },
+    [state.user]
+  );
 
   return {
     ...state,
@@ -239,16 +270,16 @@ export const useUnifiedAuth = (): UseUnifiedAuthReturn => {
 // Custom hook for role-based access control
 export const useRoleAccess = (requiredRoles: UserRole[]) => {
   const { user, isAuthenticated, hasAnyRole } = useUnifiedAuth();
-  
+
   const hasAccess = useMemo(() => {
     if (!isAuthenticated || !user) return false;
     return hasAnyRole(requiredRoles);
   }, [isAuthenticated, user, hasAnyRole, requiredRoles]);
-  
+
   return {
     hasAccess,
     user,
-    isAuthenticated
+    isAuthenticated,
   };
 };
 

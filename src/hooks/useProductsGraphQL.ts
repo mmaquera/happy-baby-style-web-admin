@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { 
-  useGetProductsQuery, 
+import {
+  useGetProductsQuery,
   useGetProductQuery,
   useCreateProductMutation,
   useUpdateProductMutation,
@@ -10,16 +10,21 @@ import {
   ProductFilterInput,
   CreateProductInput,
   UpdateProductInput,
-  PaginationInput
+  PaginationInput,
 } from '../generated/graphql';
 import toast from 'react-hot-toast';
 
 // Helper functions to map TypeScript types to GraphQL types
-const mapToGraphQLFilter = (filter: ProductFilterInput | undefined): ProductFilterInput | null => {
+const mapToGraphQLFilter = (
+  filter: ProductFilterInput | undefined
+): ProductFilterInput | null => {
   return filter || null;
 };
 
-const mapToGraphQLPagination = (limit: number, offset: number = 0): PaginationInput => {
+const mapToGraphQLPagination = (
+  limit: number,
+  offset: number = 0
+): PaginationInput => {
   return { limit, offset };
 };
 
@@ -31,27 +36,27 @@ interface UseProductsOptions {
 
 export const useProducts = (options: UseProductsOptions = {}) => {
   const { filter, limit = 20, skip = false } = options;
-  
+
   const { data, loading, error, fetchMore, refetch } = useGetProductsQuery({
     variables: {
       filter: mapToGraphQLFilter(filter),
-      pagination: mapToGraphQLPagination(limit, 0)
+      pagination: mapToGraphQLPagination(limit, 0),
     },
     skip,
     notifyOnNetworkStatusChange: true,
-    errorPolicy: 'all'
+    errorPolicy: 'all',
   });
 
   const loadMore = () => {
     if (!data?.products?.data?.pagination?.hasMore) return;
-    
+
     return fetchMore({
       variables: {
         pagination: {
           limit,
-          offset: data.products?.data?.items?.length || 0
-        }
-      }
+          offset: data.products?.data?.items?.length || 0,
+        },
+      },
     });
   };
 
@@ -62,7 +67,7 @@ export const useProducts = (options: UseProductsOptions = {}) => {
     loading,
     error,
     loadMore,
-    refetch
+    refetch,
   };
 };
 
@@ -70,14 +75,14 @@ export const useProduct = (id: string, skip = false) => {
   const { data, loading, error, refetch } = useGetProductQuery({
     variables: { id },
     skip: skip || !id,
-    errorPolicy: 'all'
+    errorPolicy: 'all',
   });
 
   return {
     product: data?.product?.data?.entity,
     loading,
     error,
-    refetch
+    refetch,
   };
 };
 
@@ -85,18 +90,18 @@ export const useCreateProduct = () => {
   const [createProduct, { loading, error }] = useCreateProductMutation({
     refetchQueries: [GetProductsDocument],
     // ✅ Restaurado onCompleted con lógica condicional para evitar toasts duplicados
-    onCompleted: (data) => {
+    onCompleted: data => {
       // Solo mostrar toast si realmente fue exitoso según el servidor
       if (data?.createProduct?.success === true) {
         toast.success('Producto creado exitosamente');
       }
       // Si success: false, no mostrar toast - useProductActions maneja el error
     },
-    onError: (error) => {
+    onError: error => {
       // ❌ Solo se ejecuta en caso de error de red/GraphQL, no errores de negocio
       console.log('🚨 useCreateProduct - Error de GraphQL/Red:', error.message);
       // No mostrar toast aquí - useProductActions maneja todos los casos
-    }
+    },
   });
 
   const create = (input: CreateProductInput) => {
@@ -111,18 +116,18 @@ export const useCreateProduct = () => {
 export const useUpdateProduct = () => {
   const [updateProduct, { loading, error }] = useUpdateProductMutation({
     // ✅ Restaurado onCompleted con lógica condicional para evitar toasts duplicados
-    onCompleted: (data) => {
+    onCompleted: data => {
       // Solo mostrar toast si realmente fue exitoso según el servidor
       if (data?.updateProduct?.success === true) {
         toast.success('Producto actualizado exitosamente');
       }
       // Si success: false, no mostrar toast - useProductActions maneja el error
     },
-    onError: (error) => {
+    onError: error => {
       // ❌ Solo se ejecuta en caso de error de red/GraphQL, no errores de negocio
       console.log('🚨 useUpdateProduct - Error de GraphQL/Red:', error.message);
       // No mostrar toast aquí - useProductActions maneja todos los casos
-    }
+    },
   });
 
   const update = (id: string, input: UpdateProductInput) => {
@@ -138,18 +143,18 @@ export const useDeleteProduct = () => {
   const [deleteProduct, { loading, error }] = useDeleteProductMutation({
     refetchQueries: [GetProductsDocument],
     // ✅ Restaurado onCompleted con lógica condicional para evitar toasts duplicados
-    onCompleted: (data) => {
+    onCompleted: data => {
       // Solo mostrar toast si realmente fue exitoso según el servidor
       if (data?.deleteProduct?.success === true) {
         toast.success('Producto eliminado exitosamente');
       }
       // Si success: false, no mostrar toast - useProductActions maneja el error
     },
-    onError: (error) => {
+    onError: error => {
       // ❌ Solo se ejecuta en caso de error de red/GraphQL, no errores de negocio
       console.log('🚨 useDeleteProduct - Error de GraphQL/Red:', error.message);
       // No mostrar toast aquí - useProductActions maneja todos los casos
-    }
+    },
   });
 
   const remove = (id: string) => {
@@ -169,18 +174,18 @@ export const useUploadProductImage = () => {
     // ✅ VERIFICACIÓN: Logs para diagnosticar el problema
     console.log('📁 useUploadProductImage - Archivo recibido:', file);
     console.log('📁 useUploadProductImage - ProductId recibido:', productId);
-    console.log('📁 useUploadProductImage - Variables a enviar:', { 
+    console.log('📁 useUploadProductImage - Variables a enviar:', {
       file,
-      entityId: productId, 
-      entityType: 'product' 
+      entityId: productId,
+      entityType: 'product',
     });
-    
-    return uploadImage({ 
-      variables: { 
+
+    return uploadImage({
+      variables: {
         file,
-        entityId: productId, 
-        entityType: 'product' 
-      } 
+        entityId: productId,
+        entityType: 'product',
+      },
     });
   };
 
@@ -215,6 +220,6 @@ export const useProductSearch = () => {
     searchQuery,
     searchResults,
     searchLoading,
-    search
+    search,
   };
 };

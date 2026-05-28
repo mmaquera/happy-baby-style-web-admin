@@ -4,15 +4,7 @@ import { UserProfile } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { theme } from '@/styles/theme';
-import { 
-  Save, 
-  X, 
-  User, 
-  Mail, 
-  Phone, 
-  Calendar,
-  Shield
-} from 'lucide-react';
+import { Save, X, User, Mail, Phone, Calendar, Shield } from 'lucide-react';
 
 interface UserProfileEditFormProps {
   profile: UserProfile;
@@ -83,7 +75,7 @@ const Select = styled.select`
   background: ${theme.colors.white};
   color: ${theme.colors.text.primary};
   transition: border-color ${theme.transitions.fast};
-  
+
   &:focus {
     outline: none;
     border-color: ${theme.colors.primary};
@@ -94,7 +86,7 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
   profile,
   onSave,
   onCancel,
-  loading = false
+  loading = false,
 }) => {
   // Helper function to get error message or empty string
   const getErrorMessage = (fieldName: keyof FormErrors): string => {
@@ -117,7 +109,7 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
     lastName: profile.lastName || '',
     phone: profile.phone || '',
     dateOfBirth: formatDateOfBirth(profile.dateOfBirth),
-    role: profile.role || 'customer'
+    role: profile.role || 'customer',
   });
 
   const [errors, setErrors] = useState<Partial<FormErrors>>({});
@@ -130,7 +122,7 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
       lastName: profile.lastName || '',
       phone: profile.phone || '',
       dateOfBirth: formatDateOfBirth(profile.dateOfBirth),
-      role: profile.role || 'customer'
+      role: profile.role || 'customer',
     });
     setErrors({});
     setTouched({});
@@ -140,29 +132,32 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
     switch (name) {
       case 'firstName':
         if (!value.trim()) return 'El nombre es requerido';
-        if (value.trim().length < 2) return 'El nombre debe tener al menos 2 caracteres';
+        if (value.trim().length < 2)
+          return 'El nombre debe tener al menos 2 caracteres';
         return '';
-      
+
       case 'lastName':
         if (!value.trim()) return 'El apellido es requerido';
-        if (value.trim().length < 2) return 'El apellido debe tener al menos 2 caracteres';
+        if (value.trim().length < 2)
+          return 'El apellido debe tener al menos 2 caracteres';
         return '';
-      
+
       case 'phone':
         if (value && !/^[\+]?[1-9][\d]{0,15}$/.test(value.replace(/\s/g, ''))) {
           return 'El teléfono debe tener un formato válido';
         }
         return '';
-      
+
       case 'dateOfBirth':
         if (value) {
           const birthDate = new Date(value);
           const today = new Date();
           const age = today.getFullYear() - birthDate.getFullYear();
-          if (age < 13 || age > 120) return 'La fecha de nacimiento debe ser válida';
+          if (age < 13 || age > 120)
+            return 'La fecha de nacimiento debe ser válida';
         }
         return '';
-      
+
       default:
         return '';
     }
@@ -170,7 +165,7 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
 
   const handleChange = (name: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
-    
+
     // Validate field on change if it has been touched
     if (touched[name]) {
       const error = validateField(name, value);
@@ -186,8 +181,8 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
 
   const validateForm = (): boolean => {
     const newErrors: Partial<FormData> = {};
-    
-    Object.keys(formData).forEach((key) => {
+
+    Object.keys(formData).forEach(key => {
       const fieldName = key as keyof FormData;
       const error = validateField(fieldName, formData[fieldName]);
       if (error) {
@@ -201,7 +196,7 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -211,8 +206,10 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
         phone: formData.phone.trim() || undefined,
-        dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth).toISOString() : undefined,
-        role: formData.role as any
+        dateOfBirth: formData.dateOfBirth
+          ? new Date(formData.dateOfBirth).toISOString()
+          : undefined,
+        role: formData.role as any,
       };
 
       await onSave(input);
@@ -223,10 +220,14 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
 
   const getRoleLabel = (role: string) => {
     switch (role) {
-      case 'admin': return 'Administrador';
-      case 'staff': return 'Personal';
-      case 'customer': return 'Cliente';
-      default: return role;
+      case 'admin':
+        return 'Administrador';
+      case 'staff':
+        return 'Personal';
+      case 'customer':
+        return 'Cliente';
+      default:
+        return role;
     }
   };
 
@@ -234,26 +235,30 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
     <Form onSubmit={handleSubmit}>
       <FormRow>
         <FormGroup>
-          <Label>Nombre <Required>*</Required></Label>
+          <Label>
+            Nombre <Required>*</Required>
+          </Label>
           <Input
-            type="text"
+            type='text'
             value={formData.firstName}
-            onChange={(e) => handleChange('firstName', e.target.value)}
+            onChange={e => handleChange('firstName', e.target.value)}
             onBlur={() => handleBlur('firstName')}
-            placeholder="Nombre"
+            placeholder='Nombre'
             error={getErrorMessage('firstName')}
           />
           {errors.firstName && <ErrorMessage>{errors.firstName}</ErrorMessage>}
         </FormGroup>
 
         <FormGroup>
-          <Label>Apellido <Required>*</Required></Label>
+          <Label>
+            Apellido <Required>*</Required>
+          </Label>
           <Input
-            type="text"
+            type='text'
             value={formData.lastName}
-            onChange={(e) => handleChange('lastName', e.target.value)}
+            onChange={e => handleChange('lastName', e.target.value)}
             onBlur={() => handleBlur('lastName')}
-            placeholder="Apellido"
+            placeholder='Apellido'
             error={getErrorMessage('lastName')}
           />
           {errors.lastName && <ErrorMessage>{errors.lastName}</ErrorMessage>}
@@ -264,11 +269,11 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
         <FormGroup>
           <Label>Teléfono</Label>
           <Input
-            type="tel"
+            type='tel'
             value={formData.phone}
-            onChange={(e) => handleChange('phone', e.target.value)}
+            onChange={e => handleChange('phone', e.target.value)}
             onBlur={() => handleBlur('phone')}
-            placeholder="+1 234 567 890"
+            placeholder='+1 234 567 890'
             error={getErrorMessage('phone')}
           />
           {errors.phone && <ErrorMessage>{errors.phone}</ErrorMessage>}
@@ -277,13 +282,15 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
         <FormGroup>
           <Label>Fecha de Nacimiento</Label>
           <Input
-            type="date"
+            type='date'
             value={formData.dateOfBirth}
-            onChange={(e) => handleChange('dateOfBirth', e.target.value)}
+            onChange={e => handleChange('dateOfBirth', e.target.value)}
             onBlur={() => handleBlur('dateOfBirth')}
             error={getErrorMessage('dateOfBirth')}
           />
-          {errors.dateOfBirth && <ErrorMessage>{errors.dateOfBirth}</ErrorMessage>}
+          {errors.dateOfBirth && (
+            <ErrorMessage>{errors.dateOfBirth}</ErrorMessage>
+          )}
         </FormGroup>
       </FormRow>
 
@@ -291,27 +298,27 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
         <Label>Rol</Label>
         <Select
           value={formData.role}
-          onChange={(e) => handleChange('role', e.target.value)}
+          onChange={e => handleChange('role', e.target.value)}
         >
-          <option value="customer">Cliente</option>
-          <option value="staff">Staff</option>
-          <option value="admin">Administrador</option>
+          <option value='customer'>Cliente</option>
+          <option value='staff'>Staff</option>
+          <option value='admin'>Administrador</option>
         </Select>
       </FormGroup>
 
       <ButtonGroup>
         <Button
-          type="button"
-          variant="ghost"
+          type='button'
+          variant='ghost'
           onClick={onCancel}
           disabled={loading}
         >
           Cancelar
         </Button>
-        
+
         <Button
-          type="submit"
-          variant="primary"
+          type='submit'
+          variant='primary'
           disabled={loading}
           isLoading={loading}
         >

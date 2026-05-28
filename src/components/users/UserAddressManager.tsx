@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/Button';
 import { UserAddressEditForm } from './UserAddressEditForm';
 import { theme } from '@/styles/theme';
 
-
 interface UserAddressManagerProps {
   addresses: UserAddress[];
   userId: string;
@@ -49,7 +48,7 @@ const AddressCard = styled.div`
   border-radius: ${theme.borderRadius.base};
   padding: ${theme.spacing[4]};
   transition: border-color ${theme.transitions.fast};
-  
+
   &:hover {
     border-color: ${theme.colors.border.medium};
   }
@@ -171,10 +170,12 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
   onUpdateAddress,
   onDeleteAddress,
   onSetDefaultAddress,
-  loading = false
+  loading = false,
 }) => {
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [editingAddress, setEditingAddress] = useState<UserAddress | null>(null);
+  const [editingAddress, setEditingAddress] = useState<UserAddress | null>(
+    null
+  );
 
   const handleCreateAddress = async (input: any) => {
     try {
@@ -187,7 +188,7 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
 
   const handleUpdateAddress = async (input: any) => {
     if (!editingAddress) return;
-    
+
     try {
       await onUpdateAddress(editingAddress.id, input);
       setEditingAddress(null);
@@ -216,11 +217,16 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
 
   const getTypeLabel = (type: string) => {
     switch (type) {
-      case 'home': return 'Casa';
-      case 'work': return 'Trabajo';
-      case 'billing': return 'Facturación';
-      case 'shipping': return 'Envío';
-      default: return type;
+      case 'home':
+        return 'Casa';
+      case 'work':
+        return 'Trabajo';
+      case 'billing':
+        return 'Facturación';
+      case 'shipping':
+        return 'Envío';
+      default:
+        return type;
     }
   };
 
@@ -228,7 +234,7 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
     return new Date(date).toLocaleDateString('es-ES', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric'
+      year: 'numeric',
     });
   };
 
@@ -237,8 +243,8 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
       <Header>
         <Title>Direcciones ({addresses.length})</Title>
         <Button
-          variant="primary"
-          size="small"
+          variant='primary'
+          size='small'
           onClick={() => setShowCreateForm(true)}
         >
           Agregar
@@ -251,7 +257,7 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
         </EmptyState>
       ) : (
         <AddressList>
-          {addresses.map((address) => (
+          {addresses.map(address => (
             <AddressCard key={address.id}>
               <AddressHeader>
                 <AddressInfo>
@@ -261,11 +267,18 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
                       {getTypeLabel(address.type)}
                     </AddressType>
                   </AddressTitle>
-                  
+
                   <AddressText>
-                    {address.address1}<br />
-                    {address.address2 && <>{address.address2}<br /></>}
-                    {address.city}, {address.state} {address.postalCode}<br />
+                    {address.address1}
+                    <br />
+                    {address.address2 && (
+                      <>
+                        {address.address2}
+                        <br />
+                      </>
+                    )}
+                    {address.city}, {address.state} {address.postalCode}
+                    <br />
                     {address.country}
                   </AddressText>
 
@@ -275,37 +288,35 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
                   </AddressMeta>
 
                   {address.isDefault && (
-                    <DefaultBadge>
-                      Predeterminada
-                    </DefaultBadge>
+                    <DefaultBadge>Predeterminada</DefaultBadge>
                   )}
                 </AddressInfo>
 
                 <ActionButtons>
                   <Button
-                    variant="ghost"
-                    size="small"
+                    variant='ghost'
+                    size='small'
                     onClick={() => setEditingAddress(address)}
-                    title="Editar"
+                    title='Editar'
                   >
                     Editar
                   </Button>
-                  
+
                   <Button
-                    variant="ghost"
-                    size="small"
+                    variant='ghost'
+                    size='small'
                     onClick={() => handleDeleteAddress(address.id)}
-                    title="Eliminar"
+                    title='Eliminar'
                   >
                     Eliminar
                   </Button>
-                  
+
                   {!address.isDefault && (
                     <Button
-                      variant="ghost"
-                      size="small"
+                      variant='ghost'
+                      size='small'
                       onClick={() => handleSetDefault(address.id)}
-                      title="Establecer como predeterminada"
+                      title='Establecer como predeterminada'
                     >
                       Predeterminar
                     </Button>
@@ -320,18 +331,18 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
       {/* Create Address Modal */}
       {showCreateForm && (
         <Modal onClick={() => setShowCreateForm(false)}>
-          <ModalContent onClick={(e) => e.stopPropagation()}>
+          <ModalContent onClick={e => e.stopPropagation()}>
             <ModalHeader>
               <ModalTitle>Nueva Dirección</ModalTitle>
               <Button
-                variant="ghost"
-                size="small"
+                variant='ghost'
+                size='small'
                 onClick={() => setShowCreateForm(false)}
               >
                 Cerrar
               </Button>
             </ModalHeader>
-            
+
             <UserAddressEditForm
               userId={userId}
               onSave={handleCreateAddress}
@@ -345,18 +356,18 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
       {/* Edit Address Modal */}
       {editingAddress && (
         <Modal onClick={() => setEditingAddress(null)}>
-          <ModalContent onClick={(e) => e.stopPropagation()}>
+          <ModalContent onClick={e => e.stopPropagation()}>
             <ModalHeader>
               <ModalTitle>Editar Dirección</ModalTitle>
               <Button
-                variant="ghost"
-                size="small"
+                variant='ghost'
+                size='small'
                 onClick={() => setEditingAddress(null)}
               >
                 Cerrar
               </Button>
             </ModalHeader>
-            
+
             <UserAddressEditForm
               address={editingAddress}
               userId={userId}

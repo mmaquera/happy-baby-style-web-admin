@@ -2,14 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Card } from '@/components/ui/Card';
-import { 
-  Folder,
-  Edit,
-  Trash2,
-  Eye,
-  CheckCircle,
-  XCircle
-} from 'lucide-react';
+import { Folder, Edit, Trash2, Eye, CheckCircle, XCircle } from 'lucide-react';
 
 import { Category } from './types';
 
@@ -25,7 +18,9 @@ const CategoryCardContainer = styled(Card)`
   display: flex;
   flex-direction: column;
   height: 100%;
-  transition: transform ${theme.transitions.base}, box-shadow ${theme.transitions.base};
+  transition:
+    transform ${theme.transitions.base},
+    box-shadow ${theme.transitions.base};
 
   &:hover {
     transform: translateY(-4px);
@@ -97,7 +92,8 @@ const CategoryStatus = styled.div<{ isActive: boolean }>`
   gap: ${theme.spacing[1]};
   font-size: ${theme.fontSizes.xs};
   font-weight: ${theme.fontWeights.medium};
-  color: ${({ isActive }) => isActive ? theme.colors.success : theme.colors.warning};
+  color: ${({ isActive }) =>
+    isActive ? theme.colors.success : theme.colors.warning};
 `;
 
 const CategoryActions = styled.div`
@@ -131,7 +127,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
   onEdit,
   onDelete,
   onViewDetails,
-  onToggleStatus
+  onToggleStatus,
 }) => {
   return (
     <CategoryCardContainer>
@@ -145,7 +141,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
 
       <CategoryContent>
         <CategoryName>{category.name}</CategoryName>
-        
+
         {category.description && (
           <CategoryDescription>{category.description}</CategoryDescription>
         )}
@@ -163,16 +159,26 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
         </CategoryMeta>
 
         <CategoryActions>
-          <ActionButton onClick={() => onViewDetails(category.id)} title="Ver detalles">
+          <ActionButton
+            onClick={() => onViewDetails(category.id)}
+            title='Ver detalles'
+          >
             <Eye size={16} />
           </ActionButton>
-          <ActionButton onClick={() => onEdit(category.id)} title="Editar">
+          <ActionButton onClick={() => onEdit(category.id)} title='Editar'>
             <Edit size={16} />
           </ActionButton>
-          <ActionButton onClick={() => onToggleStatus(category.id, !category.isActive)} title="Cambiar estado">
-            {category.isActive ? <XCircle size={16} /> : <CheckCircle size={16} />}
+          <ActionButton
+            onClick={() => onToggleStatus(category.id, !category.isActive)}
+            title='Cambiar estado'
+          >
+            {category.isActive ? (
+              <XCircle size={16} />
+            ) : (
+              <CheckCircle size={16} />
+            )}
           </ActionButton>
-          <ActionButton onClick={() => onDelete(category.id)} title="Eliminar">
+          <ActionButton onClick={() => onDelete(category.id)} title='Eliminar'>
             <Trash2 size={16} />
           </ActionButton>
         </CategoryActions>

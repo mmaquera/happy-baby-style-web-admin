@@ -4,15 +4,19 @@ import { AuthProvider } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { theme } from '@/styles/theme';
-import { useAuthProviderStats, useProviderUtils, AuthProviderStats } from '@/hooks/useAuthManagement';
-import { 
+import {
+  useAuthProviderStats,
+  useProviderUtils,
+  AuthProviderStats,
+} from '@/hooks/useAuthManagement';
+import {
   TrendingUp,
   Users,
   Activity,
   Globe,
   Clock,
   MapPin,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
 
 // Styled Components
@@ -29,12 +33,12 @@ const StatsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: ${theme.spacing[6]};
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     grid-template-columns: repeat(2, 1fr);
     gap: ${theme.spacing[4]};
   }
-  
+
   @media (max-width: ${theme.breakpoints.sm}) {
     grid-template-columns: 1fr;
   }
@@ -50,7 +54,7 @@ const StatsCard = styled(Card)`
   border: 1px solid ${theme.colors.border.light};
   box-shadow: ${theme.shadows.sm};
   transition: all ${theme.transitions.base};
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: ${theme.shadows.md};
@@ -62,17 +66,25 @@ const StatsIcon = styled.div<{ color: string }>`
   width: 56px;
   height: 56px;
   border-radius: ${theme.borderRadius.xl};
-  background: linear-gradient(135deg, ${props => props.color}15, ${props => props.color}25);
+  background: linear-gradient(
+    135deg,
+    ${props => props.color}15,
+    ${props => props.color}25
+  );
   display: flex;
   align-items: center;
   justify-content: center;
   color: ${props => props.color};
   margin-bottom: ${theme.spacing[4]};
   transition: all ${theme.transitions.base};
-  
+
   ${StatsCard}:hover & {
     transform: scale(1.05);
-    background: linear-gradient(135deg, ${props => props.color}20, ${props => props.color}30);
+    background: linear-gradient(
+      135deg,
+      ${props => props.color}20,
+      ${props => props.color}30
+    );
   }
 `;
 
@@ -97,7 +109,7 @@ const ProvidersSection = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: ${theme.spacing[8]};
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     grid-template-columns: 1fr;
     gap: ${theme.spacing[6]};
@@ -111,7 +123,7 @@ const SectionTitle = styled.h3`
   color: ${theme.colors.text.primary};
   margin-bottom: ${theme.spacing[6]};
   position: relative;
-  
+
   &::after {
     content: '';
     position: absolute;
@@ -119,7 +131,11 @@ const SectionTitle = styled.h3`
     left: 0;
     width: 40px;
     height: 3px;
-    background: linear-gradient(90deg, ${theme.colors.primaryPurple}, ${theme.colors.turquoise});
+    background: linear-gradient(
+      90deg,
+      ${theme.colors.primaryPurple},
+      ${theme.colors.turquoise}
+    );
     border-radius: ${theme.borderRadius.full};
   }
 `;
@@ -156,14 +172,18 @@ const ProviderIcon = styled.div<{ color: string }>`
   width: 48px;
   height: 48px;
   border-radius: ${theme.borderRadius.full};
-  background: linear-gradient(135deg, ${props => props.color}15, ${props => props.color}25);
+  background: linear-gradient(
+    135deg,
+    ${props => props.color}15,
+    ${props => props.color}25
+  );
   display: flex;
   align-items: center;
   justify-content: center;
   color: ${props => props.color};
   font-size: ${theme.fontSizes.xl};
   transition: all ${theme.transitions.base};
-  
+
   ${ProviderCard}:hover & {
     transform: scale(1.1);
   }
@@ -211,7 +231,11 @@ const PercentageBar = styled.div<{ percentage: number; color: string }>`
     left: 0;
     height: 100%;
     width: ${props => props.percentage}%;
-    background: linear-gradient(90deg, ${props => props.color}, ${props => props.color}80);
+    background: linear-gradient(
+      90deg,
+      ${props => props.color},
+      ${props => props.color}80
+    );
     transition: width ${theme.transitions.base};
     border-radius: ${theme.borderRadius.full};
   }
@@ -248,14 +272,18 @@ const ActivityIcon = styled.div<{ color: string }>`
   width: 36px;
   height: 36px;
   border-radius: ${theme.borderRadius.full};
-  background: linear-gradient(135deg, ${props => props.color}15, ${props => props.color}25);
+  background: linear-gradient(
+    135deg,
+    ${props => props.color}15,
+    ${props => props.color}25
+  );
   display: flex;
   align-items: center;
   justify-content: center;
   color: ${props => props.color};
   font-size: ${theme.fontSizes.base};
   transition: all ${theme.transitions.base};
-  
+
   ${ActivityItem}:hover & {
     transform: scale(1.1);
   }
@@ -305,7 +333,8 @@ const ErrorState = styled.div`
 
 export const AuthProviderDashboard: React.FC = () => {
   const { stats, loading, error, refetch } = useAuthProviderStats();
-  const { getProviderLabel, getProviderIcon, getProviderColor } = useProviderUtils();
+  const { getProviderLabel, getProviderIcon, getProviderColor } =
+    useProviderUtils();
 
   const handleRefresh = async () => {
     try {
@@ -320,14 +349,14 @@ export const AuthProviderDashboard: React.FC = () => {
       day: '2-digit',
       month: '2-digit',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
   if (loading) {
     return (
       <LoadingState>
-        <RefreshCw className="animate-spin" size={32} />
+        <RefreshCw className='animate-spin' size={32} />
         <p>Cargando estadísticas de autenticación...</p>
       </LoadingState>
     );
@@ -337,7 +366,7 @@ export const AuthProviderDashboard: React.FC = () => {
     return (
       <ErrorState>
         <p>Error al cargar estadísticas</p>
-        <Button variant="outline" onClick={() => refetch()}>
+        <Button variant='outline' onClick={() => refetch()}>
           Reintentar
         </Button>
       </ErrorState>
@@ -353,30 +382,35 @@ export const AuthProviderDashboard: React.FC = () => {
   }
 
   // Verificar si estamos usando datos de fallback (todos en 0)
-  const isUsingFallbackData = stats.totalUsers === 0 && 
-                              stats.activeSessionsCount === 0 && 
-                              stats.usersByProvider.every(p => p.count === 0) && 
-                              stats.recentLogins.length === 0;
+  const isUsingFallbackData =
+    stats.totalUsers === 0 &&
+    stats.activeSessionsCount === 0 &&
+    stats.usersByProvider.every(p => p.count === 0) &&
+    stats.recentLogins.length === 0;
 
   return (
     <DashboardContainer>
       {/* Header con botón de refresh */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        marginBottom: theme.spacing[4]
-      }}>
-        <h2 style={{ 
-          fontSize: theme.fontSizes.xl,
-          fontWeight: theme.fontWeights.semibold,
-          color: theme.colors.text.primary
-        }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: theme.spacing[4],
+        }}
+      >
+        <h2
+          style={{
+            fontSize: theme.fontSizes.xl,
+            fontWeight: theme.fontWeights.semibold,
+            color: theme.colors.text.primary,
+          }}
+        >
           Dashboard de Autenticación
         </h2>
         <Button
-          variant="outline"
-          size="small"
+          variant='outline'
+          size='small'
           onClick={handleRefresh}
           disabled={loading}
           icon={<RefreshCw size={16} />}
@@ -387,45 +421,53 @@ export const AuthProviderDashboard: React.FC = () => {
 
       {/* Banner informativo minimalista cuando se usan datos de fallback */}
       {isUsingFallbackData && (
-        <div style={{
-          backgroundColor: theme.colors.background.accent,
-          border: `1px solid ${theme.colors.border.accent}`,
-          borderRadius: theme.borderRadius.lg,
-          padding: theme.spacing[5],
-          marginBottom: theme.spacing[6],
-          display: 'flex',
-          alignItems: 'center',
-          gap: theme.spacing[4]
-        }}>
-          <div style={{
-            width: 20,
-            height: 20,
-            borderRadius: '50%',
-            background: `linear-gradient(135deg, ${theme.colors.primaryPurple}, ${theme.colors.turquoise})`,
+        <div
+          style={{
+            backgroundColor: theme.colors.background.accent,
+            border: `1px solid ${theme.colors.border.accent}`,
+            borderRadius: theme.borderRadius.lg,
+            padding: theme.spacing[5],
+            marginBottom: theme.spacing[6],
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            fontSize: '12px',
-            fontWeight: theme.fontWeights.bold
-          }}>
+            gap: theme.spacing[4],
+          }}
+        >
+          <div
+            style={{
+              width: 20,
+              height: 20,
+              borderRadius: '50%',
+              background: `linear-gradient(135deg, ${theme.colors.primaryPurple}, ${theme.colors.turquoise})`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '12px',
+              fontWeight: theme.fontWeights.bold,
+            }}
+          >
             i
           </div>
           <div>
-            <div style={{
-              fontFamily: theme.fonts.heading,
-              fontWeight: theme.fontWeights.semibold,
-              color: theme.colors.text.primary,
-              marginBottom: theme.spacing[1],
-              fontSize: theme.fontSizes.sm
-            }}>
+            <div
+              style={{
+                fontFamily: theme.fonts.heading,
+                fontWeight: theme.fontWeights.semibold,
+                color: theme.colors.text.primary,
+                marginBottom: theme.spacing[1],
+                fontSize: theme.fontSizes.sm,
+              }}
+            >
               Modo Demostración
             </div>
-            <div style={{
-              fontSize: theme.fontSizes.xs,
-              color: theme.colors.text.secondary,
-              lineHeight: '1.4'
-            }}>
+            <div
+              style={{
+                fontSize: theme.fontSizes.xs,
+                color: theme.colors.text.secondary,
+                lineHeight: '1.4',
+              }}
+            >
               Mostrando datos de ejemplo hasta la conexión con el backend
             </div>
           </div>
@@ -479,43 +521,52 @@ export const AuthProviderDashboard: React.FC = () => {
         {/* Distribución por Proveedor */}
         <div>
           <SectionTitle>Distribución por Proveedor</SectionTitle>
-          {stats.usersByProvider.map((provider: AuthProviderStats['usersByProvider'][0]) => {
-            const color = getProviderColor(provider.provider);
-            return (
-              <ProviderCard key={provider.provider} color={color}>
-                <ProviderHeader>
-                  <ProviderInfo>
-                    <ProviderIcon color={color}>
-                      {getProviderIcon(provider.provider)}
-                    </ProviderIcon>
-                    <div>
-                      <div style={{ 
-                        fontWeight: theme.fontWeights.semibold,
-                        color: theme.colors.text.primary 
-                      }}>
-                        {getProviderLabel(provider.provider)}
+          {stats.usersByProvider.map(
+            (provider: AuthProviderStats['usersByProvider'][0]) => {
+              const color = getProviderColor(provider.provider);
+              return (
+                <ProviderCard key={provider.provider} color={color}>
+                  <ProviderHeader>
+                    <ProviderInfo>
+                      <ProviderIcon color={color}>
+                        {getProviderIcon(provider.provider)}
+                      </ProviderIcon>
+                      <div>
+                        <div
+                          style={{
+                            fontWeight: theme.fontWeights.semibold,
+                            color: theme.colors.text.primary,
+                          }}
+                        >
+                          {getProviderLabel(provider.provider)}
+                        </div>
                       </div>
-                    </div>
-                  </ProviderInfo>
-                  
-                  <ProviderStats>
-                    <ProviderMetric>
-                      <MetricNumber color={color}>{provider.count}</MetricNumber>
-                      <MetricLabel>Usuarios</MetricLabel>
-                    </ProviderMetric>
-                    <ProviderMetric>
-                      <MetricNumber color={color}>
-                        {provider.percentage.toFixed(1)}%
-                      </MetricNumber>
-                      <MetricLabel>Porcentaje</MetricLabel>
-                    </ProviderMetric>
-                  </ProviderStats>
-                </ProviderHeader>
-                
-                <PercentageBar percentage={provider.percentage} color={color} />
-              </ProviderCard>
-            );
-          })}
+                    </ProviderInfo>
+
+                    <ProviderStats>
+                      <ProviderMetric>
+                        <MetricNumber color={color}>
+                          {provider.count}
+                        </MetricNumber>
+                        <MetricLabel>Usuarios</MetricLabel>
+                      </ProviderMetric>
+                      <ProviderMetric>
+                        <MetricNumber color={color}>
+                          {provider.percentage.toFixed(1)}%
+                        </MetricNumber>
+                        <MetricLabel>Porcentaje</MetricLabel>
+                      </ProviderMetric>
+                    </ProviderStats>
+                  </ProviderHeader>
+
+                  <PercentageBar
+                    percentage={provider.percentage}
+                    color={color}
+                  />
+                </ProviderCard>
+              );
+            }
+          )}
         </div>
 
         {/* Actividad Reciente */}
@@ -523,52 +574,63 @@ export const AuthProviderDashboard: React.FC = () => {
           <SectionTitle>Actividad Reciente</SectionTitle>
           <RecentActivitySection>
             <ActivityList>
-              {stats.recentLogins.slice(0, 5).map((login: AuthProviderStats['recentLogins'][0], index: number) => {
-                const color = getProviderColor(login.provider);
-                return (
-                  <ActivityItem key={`${login.userId}-${index}`}>
-                    <ActivityIcon color={color}>
-                      {getProviderIcon(login.provider)}
-                    </ActivityIcon>
-                    <ActivityInfo>
-                      <ActivityUser>{login.email}</ActivityUser>
-                      <ActivityDetails>
-                        <span>{getProviderLabel(login.provider)}</span>
-                        <Clock size={12} />
-                        <span>{formatDate(login.loginAt)}</span>
-                        {login.ipAddress && login.ipAddress !== 'N/A' && (
-                          <>
-                            <MapPin size={12} />
-                            <span>{login.ipAddress}</span>
-                          </>
-                        )}
-                        {login.userAgent && login.userAgent !== 'N/A' && (
-                          <span style={{ fontSize: '11px', opacity: 0.7 }}>
-                            {login.userAgent.length > 30 ? 
-                              `${login.userAgent.substring(0, 30)}...` : 
-                              login.userAgent
-                            }
-                          </span>
-                        )}
-                      </ActivityDetails>
-                    </ActivityInfo>
-                  </ActivityItem>
-                );
-              })}
-              
+              {stats.recentLogins
+                .slice(0, 5)
+                .map(
+                  (
+                    login: AuthProviderStats['recentLogins'][0],
+                    index: number
+                  ) => {
+                    const color = getProviderColor(login.provider);
+                    return (
+                      <ActivityItem key={`${login.userId}-${index}`}>
+                        <ActivityIcon color={color}>
+                          {getProviderIcon(login.provider)}
+                        </ActivityIcon>
+                        <ActivityInfo>
+                          <ActivityUser>{login.email}</ActivityUser>
+                          <ActivityDetails>
+                            <span>{getProviderLabel(login.provider)}</span>
+                            <Clock size={12} />
+                            <span>{formatDate(login.loginAt)}</span>
+                            {login.ipAddress && login.ipAddress !== 'N/A' && (
+                              <>
+                                <MapPin size={12} />
+                                <span>{login.ipAddress}</span>
+                              </>
+                            )}
+                            {login.userAgent && login.userAgent !== 'N/A' && (
+                              <span style={{ fontSize: '11px', opacity: 0.7 }}>
+                                {login.userAgent.length > 30
+                                  ? `${login.userAgent.substring(0, 30)}...`
+                                  : login.userAgent}
+                              </span>
+                            )}
+                          </ActivityDetails>
+                        </ActivityInfo>
+                      </ActivityItem>
+                    );
+                  }
+                )}
+
               {stats.recentLogins.length === 0 && (
-                <div style={{ 
-                  textAlign: 'center', 
-                  color: theme.colors.text.secondary,
-                  padding: theme.spacing[4]
-                }}>
+                <div
+                  style={{
+                    textAlign: 'center',
+                    color: theme.colors.text.secondary,
+                    padding: theme.spacing[4],
+                  }}
+                >
                   {isUsingFallbackData ? (
                     <div>
                       <div style={{ marginBottom: theme.spacing[2] }}>
                         📊 Sin actividad reciente
                       </div>
-                      <div style={{ fontSize: theme.fontSizes.sm, opacity: 0.7 }}>
-                        Los logins recientes aparecerán aquí cuando haya usuarios activos
+                      <div
+                        style={{ fontSize: theme.fontSizes.sm, opacity: 0.7 }}
+                      >
+                        Los logins recientes aparecerán aquí cuando haya
+                        usuarios activos
                       </div>
                     </div>
                   ) : (

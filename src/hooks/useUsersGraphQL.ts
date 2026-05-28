@@ -1,5 +1,5 @@
-import { 
-  useGetUsersQuery, 
+import {
+  useGetUsersQuery,
   useGetUserStatsQuery,
   useCreateUserMutation,
   useUpdateUserMutation,
@@ -9,7 +9,7 @@ import {
   UpdateUserProfileInput,
   InputMaybe,
   UserRole,
-  useUpdateUserOptimizedMutation
+  useUpdateUserOptimizedMutation,
 } from '../generated/graphql';
 import toast from 'react-hot-toast';
 
@@ -21,36 +21,36 @@ interface UseUsersOptions {
 
 export const useUsers = (options: UseUsersOptions = {}) => {
   const { filter, limit = 20, skip = false } = options;
-  
+
   // 🔍 DEBUGGING: Log de parámetros recibidos
   console.log('🔍 DEBUG useUsers hook - Parámetros recibidos:', {
     options,
     filter,
     limit,
     skip,
-    filterString: JSON.stringify(filter)
+    filterString: JSON.stringify(filter),
   });
-  
+
   const { data, loading, error, fetchMore, refetch } = useGetUsersQuery({
     variables: {
       filter: filter as InputMaybe<UserFilterInput>,
-      pagination: { limit, offset: 0 }
+      pagination: { limit, offset: 0 },
     },
     skip,
     notifyOnNetworkStatusChange: true,
-    errorPolicy: 'all'
+    errorPolicy: 'all',
   });
 
   const loadMore = () => {
     if (!data?.users?.data?.pagination?.hasMore) return;
-    
+
     return fetchMore({
       variables: {
         pagination: {
           limit,
-          offset: data.users.data?.items?.length || 0
-        }
-      }
+          offset: data.users.data?.items?.length || 0,
+        },
+      },
     });
   };
 
@@ -61,7 +61,7 @@ export const useUsers = (options: UseUsersOptions = {}) => {
     total: data?.users?.data?.pagination?.total || 0,
     hasMore: data?.users?.data?.pagination?.hasMore || false,
     loading,
-    error
+    error,
   });
 
   return {
@@ -71,7 +71,7 @@ export const useUsers = (options: UseUsersOptions = {}) => {
     loading,
     error,
     loadMore,
-    refetch
+    refetch,
   };
 };
 
@@ -83,27 +83,28 @@ export const useCreateUser = () => {
   const create = async (input: CreateUserProfileInput) => {
     try {
       const result = await createUserMutation({
-        variables: { input }
+        variables: { input },
       });
-      
+
       const response = result.data?.createUser;
-      
+
       if (!response) {
         throw new Error('No se recibió respuesta del servidor');
       }
-      
+
       if (!response.success) {
         // Manejar errores de validación del servidor
         const errorMessage = response.message || 'Error al crear usuario';
         const errorCode = response.code || 'UNKNOWN_ERROR';
-        
+
         throw new Error(`${errorMessage} (${errorCode})`);
       }
-      
+
       toast.success('Usuario creado exitosamente');
       return response;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Error al crear usuario';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Error al crear usuario';
       toast.error(errorMessage);
       throw error;
     }
@@ -120,7 +121,7 @@ export const useUpdateUser = () => {
   const update = async (id: string, input: UpdateUserProfileInput) => {
     try {
       const result = await updateUserMutation({
-        variables: { id, input }
+        variables: { id, input },
       });
       toast.success('Usuario actualizado exitosamente');
       return result.data?.updateUser;
@@ -135,7 +136,8 @@ export const useUpdateUser = () => {
 
 // Optimized update user hook - only returns essential fields
 export const useUpdateUserOptimized = () => {
-  const [updateUserOptimized, { loading, error, data }] = useUpdateUserOptimizedMutation();
+  const [updateUserOptimized, { loading, error, data }] =
+    useUpdateUserOptimizedMutation();
 
   const update = async (id: string, input: UpdateUserProfileInput) => {
     try {
@@ -146,7 +148,7 @@ export const useUpdateUserOptimized = () => {
           if (data?.updateUser?.id && typeof data.updateUser.id === 'string') {
             const userId = data.updateUser.id; // TypeScript ahora sabe que es string
             const cacheId = cache.identify({ __typename: 'User', id: userId });
-            
+
             if (cacheId) {
               cache.modify({
                 id: cacheId,
@@ -178,31 +180,31 @@ export const useUpdateUserOptimized = () => {
 
 export const useUserStats = () => {
   const { data, loading, error, refetch } = useGetUserStatsQuery({
-    errorPolicy: 'all'
+    errorPolicy: 'all',
   });
 
   return {
     stats: data?.userStats?.data,
     loading,
     error,
-    refetch
+    refetch,
   };
 };
 
 export const useUsersByRole = (role: UserRole) => {
   return useUsers({
-    filter: { role: role as InputMaybe<UserRole> }
+    filter: { role: role as InputMaybe<UserRole> },
   });
 };
 
 export const useActiveUsers = () => {
   return useUsers({
-    filter: { isActive: true }
+    filter: { isActive: true },
   });
 };
 
 export const useRecentUsers = () => {
   return useUsers({
-    limit: 10
+    limit: 10,
   });
-}; 
+};

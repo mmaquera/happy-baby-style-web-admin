@@ -4,12 +4,7 @@ import { theme } from '@/styles/theme';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
-import { 
-  Search,
-  Filter,
-  X,
-  Tag
-} from 'lucide-react';
+import { Search, Filter, X, Tag } from 'lucide-react';
 
 interface ProductFiltersProps {
   filters: {
@@ -140,22 +135,23 @@ const TagsContainer = styled.div`
 
 const TagChip = styled.div<{ isSelected: boolean }>`
   padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  background: ${({ isSelected }) => 
+  background: ${({ isSelected }) =>
     isSelected ? theme.colors.primaryPurple : theme.colors.background.accent};
-  color: ${({ isSelected }) => 
+  color: ${({ isSelected }) =>
     isSelected ? theme.colors.white : theme.colors.text.secondary};
   border-radius: ${theme.borderRadius.full};
   font-size: ${theme.fontSizes.xs};
   cursor: pointer;
   transition: all ${theme.transitions.base};
-  border: 1px solid ${({ isSelected }) => 
-    isSelected ? theme.colors.primaryPurple : theme.colors.border.light};
+  border: 1px solid
+    ${({ isSelected }) =>
+      isSelected ? theme.colors.primaryPurple : theme.colors.border.light};
   display: flex;
   align-items: center;
   gap: ${theme.spacing[1]};
 
   &:hover {
-    background: ${({ isSelected }) => 
+    background: ${({ isSelected }) =>
       isSelected ? theme.colors.primaryPurple : theme.colors.softPurple};
     transform: translateY(-1px);
   }
@@ -206,9 +202,12 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
   categories,
   availableTags,
   onFilterChange,
-  onClearFilters
+  onClearFilters,
 }) => {
-  const handleInputChange = (field: keyof ProductFiltersProps['filters'], value: any) => {
+  const handleInputChange = (
+    field: keyof ProductFiltersProps['filters'],
+    value: any
+  ) => {
     onFilterChange({ [field]: value });
   };
 
@@ -242,11 +241,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           Filtros de Productos
         </FiltersTitle>
         {hasActiveFilters && (
-          <ClearButton
-            variant="ghost"
-            size="small"
-            onClick={onClearFilters}
-          >
+          <ClearButton variant='ghost' size='small' onClick={onClearFilters}>
             <X size={14} />
             Limpiar Filtros
           </ClearButton>
@@ -257,9 +252,9 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
         <FilterGroup>
           <FilterLabel>Buscar Productos</FilterLabel>
           <Input
-            placeholder="Nombre, descripción o SKU..."
+            placeholder='Nombre, descripción o SKU...'
             value={filters.search || ''}
-            onChange={(e) => handleInputChange('search', e.target.value)}
+            onChange={e => handleInputChange('search', e.target.value)}
             leftIcon={<Search size={16} />}
           />
         </FilterGroup>
@@ -268,9 +263,11 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           <FilterLabel>Categoría</FilterLabel>
           <Select
             value={filters.categoryId || ''}
-            onChange={(e) => handleInputChange('categoryId', e.target.value || undefined)}
+            onChange={e =>
+              handleInputChange('categoryId', e.target.value || undefined)
+            }
           >
-            <option value="">Todas las categorías</option>
+            <option value=''>Todas las categorías</option>
             {categories.map(category => (
               <option key={category.id} value={category.id}>
                 {category.name}
@@ -283,22 +280,24 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           <FilterLabel>Estado</FilterLabel>
           <CheckboxContainer>
             <Checkbox
-              type="checkbox"
-              id="isActive"
+              type='checkbox'
+              id='isActive'
               checked={filters.isActive !== false}
-              onChange={(e) => handleInputChange('isActive', e.target.checked)}
+              onChange={e => handleInputChange('isActive', e.target.checked)}
             />
-            <CheckboxLabel htmlFor="isActive">Solo productos activos</CheckboxLabel>
+            <CheckboxLabel htmlFor='isActive'>
+              Solo productos activos
+            </CheckboxLabel>
           </CheckboxContainer>
-          
+
           <CheckboxContainer>
             <Checkbox
-              type="checkbox"
-              id="inStock"
+              type='checkbox'
+              id='inStock'
               checked={filters.inStock !== false}
-              onChange={(e) => handleInputChange('inStock', e.target.checked)}
+              onChange={e => handleInputChange('inStock', e.target.checked)}
             />
-            <CheckboxLabel htmlFor="inStock">Solo en stock</CheckboxLabel>
+            <CheckboxLabel htmlFor='inStock'>Solo en stock</CheckboxLabel>
           </CheckboxContainer>
         </FilterGroup>
 
@@ -306,21 +305,31 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           <FilterLabel>Rango de Precios</FilterLabel>
           <PriceRangeContainer>
             <PriceInput
-              type="number"
-              placeholder="Mínimo"
+              type='number'
+              placeholder='Mínimo'
               value={filters.minPrice || ''}
-              onChange={(e) => handleInputChange('minPrice', e.target.value ? Number(e.target.value) : undefined)}
-              min="0"
-              step="0.01"
+              onChange={e =>
+                handleInputChange(
+                  'minPrice',
+                  e.target.value ? Number(e.target.value) : undefined
+                )
+              }
+              min='0'
+              step='0.01'
             />
             <PriceSeparator>-</PriceSeparator>
             <PriceInput
-              type="number"
-              placeholder="Máximo"
+              type='number'
+              placeholder='Máximo'
               value={filters.maxPrice || ''}
-              onChange={(e) => handleInputChange('maxPrice', e.target.value ? Number(e.target.value) : undefined)}
-              min="0"
-              step="0.01"
+              onChange={e =>
+                handleInputChange(
+                  'maxPrice',
+                  e.target.value ? Number(e.target.value) : undefined
+                )
+              }
+              min='0'
+              step='0.01'
             />
           </PriceRangeContainer>
         </FilterGroup>
@@ -346,46 +355,60 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
 
       {hasActiveFilters && (
         <ActiveFiltersContainer>
-          <span style={{ fontSize: theme.fontSizes.sm, color: theme.colors.text.secondary }}>
+          <span
+            style={{
+              fontSize: theme.fontSizes.sm,
+              color: theme.colors.text.secondary,
+            }}
+          >
             Filtros activos:
           </span>
-          
+
           {filters.search && (
             <ActiveFilterTag>
               Búsqueda: "{filters.search}"
-              <RemoveFilterButton onClick={() => handleInputChange('search', '')}>
+              <RemoveFilterButton
+                onClick={() => handleInputChange('search', '')}
+              >
                 <X size={12} />
               </RemoveFilterButton>
             </ActiveFilterTag>
           )}
-          
+
           {filters.categoryId && (
             <ActiveFilterTag>
-              Categoría: {categories.find(c => c.id === filters.categoryId)?.name}
-              <RemoveFilterButton onClick={() => handleInputChange('categoryId', undefined)}>
+              Categoría:{' '}
+              {categories.find(c => c.id === filters.categoryId)?.name}
+              <RemoveFilterButton
+                onClick={() => handleInputChange('categoryId', undefined)}
+              >
                 <X size={12} />
               </RemoveFilterButton>
             </ActiveFilterTag>
           )}
-          
+
           {filters.minPrice && (
             <ActiveFilterTag>
               Precio mínimo: S/ {filters.minPrice}
-              <RemoveFilterButton onClick={() => handleInputChange('minPrice', undefined)}>
+              <RemoveFilterButton
+                onClick={() => handleInputChange('minPrice', undefined)}
+              >
                 <X size={12} />
               </RemoveFilterButton>
             </ActiveFilterTag>
           )}
-          
+
           {filters.maxPrice && (
             <ActiveFilterTag>
               Precio máximo: S/ {filters.maxPrice}
-              <RemoveFilterButton onClick={() => handleInputChange('maxPrice', undefined)}>
+              <RemoveFilterButton
+                onClick={() => handleInputChange('maxPrice', undefined)}
+              >
                 <X size={12} />
               </RemoveFilterButton>
             </ActiveFilterTag>
           )}
-          
+
           {filters.tags?.map(tag => (
             <ActiveFilterTag key={tag}>
               Etiqueta: {tag}

@@ -12,7 +12,11 @@ const UnauthorizedContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, ${theme.colors.softPurple} 0%, ${theme.colors.background.secondary} 100%);
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.softPurple} 0%,
+    ${theme.colors.background.secondary} 100%
+  );
   padding: ${theme.spacing[4]};
 `;
 
@@ -28,13 +32,17 @@ const IconContainer = styled.div`
   width: 120px;
   height: 120px;
   border-radius: ${theme.borderRadius.full};
-  background: linear-gradient(135deg, ${theme.colors.warning}20, ${theme.colors.error}20);
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.warning}20,
+    ${theme.colors.error}20
+  );
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto ${theme.spacing[6]} auto;
   border: 3px solid ${theme.colors.warning};
-  
+
   svg {
     width: 60px;
     height: 60px;
@@ -116,32 +124,32 @@ export const Unauthorized: React.FC = () => {
 
   return (
     <UnauthorizedContainer>
-      <UnauthorizedCard shadow="large" padding="large">
+      <UnauthorizedCard shadow='large' padding='large'>
         <IconContainer>
           <Shield />
         </IconContainer>
 
         <Title>403</Title>
         <Subtitle>Acceso Denegado</Subtitle>
-        
+
         <Description>
-          No tienes permisos para acceder a esta página. 
-          Si crees que esto es un error, contacta al administrador del sistema.
+          No tienes permisos para acceder a esta página. Si crees que esto es un
+          error, contacta al administrador del sistema.
         </Description>
 
         <ActionsContainer>
           <Button
-            variant="outline"
-            size="medium"
+            variant='outline'
+            size='medium'
             icon={<ArrowLeft size={18} />}
             onClick={handleGoBack}
           >
             Volver
           </Button>
-          
+
           <Button
-            variant="primary"
-            size="medium"
+            variant='primary'
+            size='medium'
             icon={<Home size={18} />}
             onClick={handleGoHome}
           >
@@ -152,8 +160,10 @@ export const Unauthorized: React.FC = () => {
         <ErrorCode>
           <ErrorCodeTitle>Información del Error</ErrorCodeTitle>
           <ErrorCodeText>
-            Error: 403 Forbidden<br />
-            Timestamp: {new Date().toISOString()}<br />
+            Error: 403 Forbidden
+            <br />
+            Timestamp: {new Date().toISOString()}
+            <br />
             Path: {window.location.pathname}
           </ErrorCodeText>
         </ErrorCode>
@@ -162,4 +172,4 @@ export const Unauthorized: React.FC = () => {
   );
 };
 
-export default Unauthorized; 
+export default Unauthorized;

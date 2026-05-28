@@ -1,14 +1,14 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
-import { 
-  CategoryHeader, 
+import {
+  CategoryHeader,
   CategoryGrid,
   CategoryListView,
   CreateCategoryModal,
   EditCategoryModal,
   CategoryDetailModal,
-  CategoryFilters
+  CategoryFilters,
 } from '@/components/categories';
 import { useCategories } from '@/hooks/useCategories';
 import { toast } from 'react-hot-toast';
@@ -17,7 +17,7 @@ const CategoriesContainer = styled.div`
   padding: ${theme.spacing[6]};
   max-width: 1400px;
   margin: 0 auto;
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     padding: ${theme.spacing[4]};
   }
@@ -45,8 +45,12 @@ const LoadingSpinner = styled.div`
   animation: spin 1s linear infinite;
 
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -95,8 +99,12 @@ const UpdateSpinner = styled.div`
   animation: spin 1s linear infinite;
 
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -150,14 +158,14 @@ export const Categories: React.FC = () => {
     selectAllCategories,
     clearSelection,
     isCategorySelected,
-    clearError
+    clearError,
   } = useCategories();
 
   // Computed stats
   const stats = {
     totalCategories: pagination.total,
     activeCategories: categories.filter(cat => cat.isActive).length,
-    inactiveCategories: categories.filter(cat => !cat.isActive).length
+    inactiveCategories: categories.filter(cat => !cat.isActive).length,
   };
 
   // Event handlers
@@ -192,13 +200,16 @@ export const Categories: React.FC = () => {
     console.log('Import clicked');
   }, []);
 
-  const handleEditCategory = useCallback((categoryId: string) => {
-    const category = categories.find(cat => cat.id === categoryId);
-    if (category) {
-      setSelectedCategory(category);
-      setIsEditModalOpen(true);
-    }
-  }, [categories]);
+  const handleEditCategory = useCallback(
+    (categoryId: string) => {
+      const category = categories.find(cat => cat.id === categoryId);
+      if (category) {
+        setSelectedCategory(category);
+        setIsEditModalOpen(true);
+      }
+    },
+    [categories]
+  );
 
   const handleEditModalClose = useCallback(() => {
     setIsEditModalOpen(false);
@@ -214,39 +225,50 @@ export const Categories: React.FC = () => {
     setTimeout(() => setIsUpdating(false), 1000);
   }, []);
 
-  const handleDeleteCategory = useCallback(async (categoryId: string) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta categoría?')) {
+  const handleDeleteCategory = useCallback(
+    async (categoryId: string) => {
+      if (
+        window.confirm('¿Estás seguro de que quieres eliminar esta categoría?')
+      ) {
+        try {
+          setIsUpdating(true);
+          await deleteCategory(categoryId);
+          // La tabla se actualizará automáticamente via refetch con filtros preservados
+          setTimeout(() => setIsUpdating(false), 1000);
+        } catch (error) {
+          setIsUpdating(false);
+          console.error('Error deleting category:', error);
+        }
+      }
+    },
+    [deleteCategory]
+  );
+
+  const handleToggleStatus = useCallback(
+    async (categoryId: string, isActive: boolean) => {
       try {
         setIsUpdating(true);
-        await deleteCategory(categoryId);
+        await toggleStatus(categoryId, isActive);
         // La tabla se actualizará automáticamente via refetch con filtros preservados
         setTimeout(() => setIsUpdating(false), 1000);
       } catch (error) {
         setIsUpdating(false);
-        console.error('Error deleting category:', error);
+        console.error('Error toggling status:', error);
       }
-    }
-  }, [deleteCategory]);
+    },
+    [toggleStatus]
+  );
 
-  const handleToggleStatus = useCallback(async (categoryId: string, isActive: boolean) => {
-    try {
-      setIsUpdating(true);
-      await toggleStatus(categoryId, isActive);
-      // La tabla se actualizará automáticamente via refetch con filtros preservados
-      setTimeout(() => setIsUpdating(false), 1000);
-    } catch (error) {
-      setIsUpdating(false);
-      console.error('Error toggling status:', error);
-    }
-  }, [toggleStatus]);
-
-  const handleViewDetails = useCallback((categoryId: string) => {
-    const category = categories.find(cat => cat.id === categoryId);
-    if (category) {
-      setSelectedCategory(category);
-      setIsDetailModalOpen(true);
-    }
-  }, [categories]);
+  const handleViewDetails = useCallback(
+    (categoryId: string) => {
+      const category = categories.find(cat => cat.id === categoryId);
+      if (category) {
+        setSelectedCategory(category);
+        setIsDetailModalOpen(true);
+      }
+    },
+    [categories]
+  );
 
   const handleDetailModalClose = useCallback(() => {
     setIsDetailModalOpen(false);
@@ -263,21 +285,30 @@ export const Categories: React.FC = () => {
     setViewMode(mode);
   }, []);
 
-  const handleFiltersChange = useCallback((newFilters: any) => {
-    setFilters(newFilters);
-  }, [setFilters]);
+  const handleFiltersChange = useCallback(
+    (newFilters: any) => {
+      setFilters(newFilters);
+    },
+    [setFilters]
+  );
 
   const handleClearFilters = useCallback(() => {
     clearFilters();
   }, [clearFilters]);
 
-  const handleSortChange = useCallback((field: string, direction: 'asc' | 'desc') => {
-    handleSort(field);
-  }, [handleSort]);
+  const handleSortChange = useCallback(
+    (field: string, direction: 'asc' | 'desc') => {
+      handleSort(field);
+    },
+    [handleSort]
+  );
 
-  const handlePageChange = useCallback((page: number) => {
-    goToPage(page);
-  }, [goToPage]);
+  const handlePageChange = useCallback(
+    (page: number) => {
+      goToPage(page);
+    },
+    [goToPage]
+  );
 
   // Toggle filters visibility
   const toggleFilters = useCallback(() => {
@@ -307,7 +338,7 @@ export const Categories: React.FC = () => {
       )}
 
       <CategoryHeader
-        title="Categorías Happy Baby Style"
+        title='Categorías Happy Baby Style'
         stats={stats}
         viewMode={viewMode}
         onViewModeChange={handleViewModeChange}
@@ -346,7 +377,7 @@ export const Categories: React.FC = () => {
           onDelete={handleDeleteCategory}
           onToggleStatus={handleToggleStatus}
           onViewDetails={handleViewDetails}
-          emptyMessage="No se encontraron categorías"
+          emptyMessage='No se encontraron categorías'
         />
       ) : (
         <CategoryListView

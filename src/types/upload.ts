@@ -30,7 +30,11 @@ export interface ImageUploadProps {
 }
 
 export interface UseImageUploadReturn {
-  upload: (files: FileList, entityId?: string, entityType?: string) => Promise<UploadResult>;
+  upload: (
+    files: FileList,
+    entityId?: string,
+    entityType?: string
+  ) => Promise<UploadResult>;
   loading: boolean;
   progress: UploadProgress;
   error: string | null;

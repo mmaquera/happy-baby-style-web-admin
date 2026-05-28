@@ -72,7 +72,7 @@ const EnhancedErrorMessage = styled.div`
   text-align: center;
   margin-top: ${theme.spacing[3]};
   animation: slideIn 0.3s ease-out;
-  
+
   @keyframes slideIn {
     from {
       opacity: 0;
@@ -112,7 +112,6 @@ const ErrorActions = styled.div`
   flex-wrap: wrap;
 `;
 
-
 // Component following Single Responsibility Principle
 export const LoginForm: React.FC = () => {
   const {
@@ -127,7 +126,11 @@ export const LoginForm: React.FC = () => {
 
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = form;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = form;
 
   // Enhanced error handling following development standards
   useEffect(() => {
@@ -160,9 +163,9 @@ export const LoginForm: React.FC = () => {
 
       <FormContainer onSubmit={handleSubmit(onSubmit)}>
         <Input
-          label="Correo Electrónico"
-          type="email"
-          placeholder="admin@happybabystyle.com"
+          label='Correo Electrónico'
+          type='email'
+          placeholder='admin@happybabystyle.com'
           leftIcon={<Mail size={18} />}
           fullWidth
           {...register('email', {
@@ -176,14 +179,16 @@ export const LoginForm: React.FC = () => {
         />
 
         <Input
-          label="Contraseña"
+          label='Contraseña'
           type={showPassword ? 'text' : 'password'}
-          placeholder="••••••••"
+          placeholder='••••••••'
           leftIcon={<Lock size={18} />}
           rightIcon={showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           rightIconClickable={true}
           onRightIconClick={togglePasswordVisibility}
-          rightIconAriaLabel={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+          rightIconAriaLabel={
+            showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+          }
           fullWidth
           {...register('password', {
             required: 'La contraseña es requerida',
@@ -195,37 +200,37 @@ export const LoginForm: React.FC = () => {
           error={errors.password?.message || ''}
         />
 
-        <ForgotPasswordLink 
-          type="button"
+        <ForgotPasswordLink
+          type='button'
           onClick={handleForgotPassword}
-          aria-label="¿Olvidaste tu contraseña?"
+          aria-label='¿Olvidaste tu contraseña?'
         >
           ¿Olvidaste tu contraseña?
         </ForgotPasswordLink>
 
         {/* ✅ Banner de error mejorado siguiendo estándares */}
         {error && (
-          <EnhancedErrorMessage role="alert" aria-live="polite">
+          <EnhancedErrorMessage role='alert' aria-live='polite'>
             <ErrorIcon>
               <AlertCircle size={20} />
             </ErrorIcon>
             <ErrorTitle>Error de autenticación</ErrorTitle>
             <ErrorDescription>{error}</ErrorDescription>
-            
+
             <ErrorActions>
               <Button
-                type="button"
-                variant="outline"
-                size="small"
+                type='button'
+                variant='outline'
+                size='small'
                 onClick={clearError}
               >
                 <RefreshCw size={14} />
                 Reintentar
               </Button>
               <Button
-                type="button"
-                variant="outline"
-                size="small"
+                type='button'
+                variant='outline'
+                size='small'
                 onClick={() => setIsForgotPasswordOpen(true)}
               >
                 Recuperar contraseña
@@ -236,9 +241,9 @@ export const LoginForm: React.FC = () => {
 
         {/* ✅ Botón con estados mejorados siguiendo estándares */}
         <Button
-          type="submit"
-          variant="primary"
-          size="large"
+          type='submit'
+          variant='primary'
+          size='large'
           fullWidth
           isLoading={isLoading}
           disabled={isLoading || !form.formState.isValid}

@@ -34,19 +34,29 @@ export class LocalTokenStorage implements ITokenStorage {
     return expiry ? new Date(expiry) : null;
   }
 
-  setTokens(accessToken: string, refreshToken?: string, expiresAt?: Date): void {
+  setTokens(
+    accessToken: string,
+    refreshToken?: string,
+    expiresAt?: Date
+  ): void {
     localStorage.setItem(LocalTokenStorage.ACCESS_TOKEN_KEY, accessToken);
-    
+
     if (refreshToken) {
       localStorage.setItem(LocalTokenStorage.REFRESH_TOKEN_KEY, refreshToken);
     }
-    
+
     if (expiresAt) {
-      localStorage.setItem(LocalTokenStorage.TOKEN_EXPIRY_KEY, expiresAt.toISOString());
+      localStorage.setItem(
+        LocalTokenStorage.TOKEN_EXPIRY_KEY,
+        expiresAt.toISOString()
+      );
     } else {
       // Default expiry: 1 hour from now
       const defaultExpiry = new Date(Date.now() + 3600000);
-      localStorage.setItem(LocalTokenStorage.TOKEN_EXPIRY_KEY, defaultExpiry.toISOString());
+      localStorage.setItem(
+        LocalTokenStorage.TOKEN_EXPIRY_KEY,
+        defaultExpiry.toISOString()
+      );
     }
   }
 
@@ -59,15 +69,15 @@ export class LocalTokenStorage implements ITokenStorage {
   hasValidToken(): boolean {
     const token = this.getAccessToken();
     const expiry = this.getTokenExpiry();
-    
+
     if (!token || !expiry) {
       return false;
     }
-    
+
     // Check if token is expired (with 5 minute buffer)
     const now = new Date();
     const bufferTime = 5 * 60 * 1000; // 5 minutes in milliseconds
-    return expiry.getTime() > (now.getTime() + bufferTime);
+    return expiry.getTime() > now.getTime() + bufferTime;
   }
 }
 
@@ -90,19 +100,32 @@ export class SessionTokenStorage implements ITokenStorage {
     return expiry ? new Date(expiry) : null;
   }
 
-  setTokens(accessToken: string, refreshToken?: string, expiresAt?: Date): void {
+  setTokens(
+    accessToken: string,
+    refreshToken?: string,
+    expiresAt?: Date
+  ): void {
     sessionStorage.setItem(SessionTokenStorage.ACCESS_TOKEN_KEY, accessToken);
-    
+
     if (refreshToken) {
-      sessionStorage.setItem(SessionTokenStorage.REFRESH_TOKEN_KEY, refreshToken);
+      sessionStorage.setItem(
+        SessionTokenStorage.REFRESH_TOKEN_KEY,
+        refreshToken
+      );
     }
-    
+
     if (expiresAt) {
-      sessionStorage.setItem(SessionTokenStorage.TOKEN_EXPIRY_KEY, expiresAt.toISOString());
+      sessionStorage.setItem(
+        SessionTokenStorage.TOKEN_EXPIRY_KEY,
+        expiresAt.toISOString()
+      );
     } else {
       // Default expiry: 1 hour from now
       const defaultExpiry = new Date(Date.now() + 3600000);
-      sessionStorage.setItem(SessionTokenStorage.TOKEN_EXPIRY_KEY, defaultExpiry.toISOString());
+      sessionStorage.setItem(
+        SessionTokenStorage.TOKEN_EXPIRY_KEY,
+        defaultExpiry.toISOString()
+      );
     }
   }
 
@@ -115,15 +138,15 @@ export class SessionTokenStorage implements ITokenStorage {
   hasValidToken(): boolean {
     const token = this.getAccessToken();
     const expiry = this.getTokenExpiry();
-    
+
     if (!token || !expiry) {
       return false;
     }
-    
+
     // Check if token is expired (with 5 minute buffer)
     const now = new Date();
     const bufferTime = 5 * 60 * 1000; // 5 minutes in milliseconds
-    return expiry.getTime() > (now.getTime() + bufferTime);
+    return expiry.getTime() > now.getTime() + bufferTime;
   }
 }
 

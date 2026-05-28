@@ -51,70 +51,81 @@ const validatePassword = (password: string): string[] => {
  * Follows ERROR_HANDLING_STANDARDS.md patterns
  */
 export const useSetUserPassword = (): UseSetUserPasswordReturn => {
-  const [setUserPasswordMutation, { loading, error }] = useSetUserPasswordMutation();
+  const [setUserPasswordMutation, { loading, error }] =
+    useSetUserPasswordMutation();
   const [localError, setLocalError] = useState<string | null>(null);
   const { isAuthenticated } = useAuth();
 
-  const setUserPassword = useCallback(async (userId: string, newPassword: string): Promise<boolean> => {
-    try {
-      // ✅ PASO 1: Limpiar errores previos
-      setLocalError(null);
+  const setUserPassword = useCallback(
+    async (userId: string, newPassword: string): Promise<boolean> => {
+      try {
+        // ✅ PASO 1: Limpiar errores previos
+        setLocalError(null);
 
-      // ✅ PASO 1.5: Verificar autenticación
-      if (!isAuthenticated) {
-        const errorMessage = 'Debes estar autenticado para realizar esta acción';
-        setLocalError(errorMessage);
-        toast.error(errorMessage);
-        return false;
-      }
-
-      // ✅ PASO 2: Validación local
-      const validationErrors = validatePassword(newPassword);
-      if (validationErrors.length > 0) {
-        const errorMessage = validationErrors.join('. ');
-        setLocalError(errorMessage);
-        toast.error(errorMessage);
-        return false;
-      }
-
-      // ✅ PASO 3: Ejecutar mutación
-      const result = await setUserPasswordMutation({
-        variables: {
-          userId,
-          newPassword
+        // ✅ PASO 1.5: Verificar autenticación
+        if (!isAuthenticated) {
+          const errorMessage =
+            'Debes estar autenticado para realizar esta acción';
+          setLocalError(errorMessage);
+          toast.error(errorMessage);
+          return false;
         }
-      });
 
-      // ✅ PASO 4: Validar respuesta del servidor
-      const response = result.data?.setUserPassword;
+        // ✅ PASO 2: Validación local
+        const validationErrors = validatePassword(newPassword);
+        if (validationErrors.length > 0) {
+          const errorMessage = validationErrors.join('. ');
+          setLocalError(errorMessage);
+          toast.error(errorMessage);
+          return false;
+        }
 
-      if (!response) {
-        throw new Error('No se recibió respuesta del servidor');
-      }
+        // ✅ PASO 3: Ejecutar mutación
+        const result = await setUserPasswordMutation({
+          variables: {
+            userId,
+            newPassword,
+          },
+        });
 
-      if (!response.success) {
-        const errorMessage = response.message || 'Error al establecer nueva contraseña';
-        const errorCode = response.code || 'UNKNOWN_ERROR';
+        // ✅ PASO 4: Validar respuesta del servidor
+        const response = result.data?.setUserPassword;
 
-        setLocalError(`${errorMessage} (${errorCode})`);
+        if (!response) {
+          throw new Error('No se recibió respuesta del servidor');
+        }
+
+        if (!response.success) {
+          const errorMessage =
+            response.message || 'Error al establecer nueva contraseña';
+          const errorCode = response.code || 'UNKNOWN_ERROR';
+
+          setLocalError(`${errorMessage} (${errorCode})`);
+          toast.error(errorMessage);
+          return false;
+        }
+
+        // ✅ PASO 5: Éxito
+        toast.success(
+          response.message || 'Nueva contraseña establecida exitosamente'
+        );
+        return true;
+      } catch (error) {
+        // ✅ PASO 6: Manejo de errores
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : 'Error inesperado al establecer contraseña';
+        setLocalError(errorMessage);
         toast.error(errorMessage);
         return false;
       }
-
-      // ✅ PASO 5: Éxito
-      toast.success(response.message || 'Nueva contraseña establecida exitosamente');
-      return true;
-    } catch (error) {
-      // ✅ PASO 6: Manejo de errores
-      const errorMessage = error instanceof Error ? error.message : 'Error inesperado al establecer contraseña';
-      setLocalError(errorMessage);
-      toast.error(errorMessage);
-      return false;
-    }
-  }, [setUserPasswordMutation, isAuthenticated]);
+    },
+    [setUserPasswordMutation, isAuthenticated]
+  );
 
   // ✅ PASO 7: Combinar errores
-  const combinedError = localError || (error?.message || null);
+  const combinedError = localError || error?.message || null;
 
   return {
     setUserPassword,
@@ -122,6 +133,6 @@ export const useSetUserPassword = (): UseSetUserPasswordReturn => {
     error: combinedError,
     clearError: () => {
       setLocalError(null);
-    }
+    },
   };
 };

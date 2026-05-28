@@ -22,13 +22,17 @@ const LogoIcon = styled.div`
   width: 80px;
   height: 80px;
   border-radius: ${theme.borderRadius.full};
-  background: linear-gradient(135deg, ${theme.colors.primaryPurple}, ${theme.colors.coralAccent});
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.primaryPurple},
+    ${theme.colors.coralAccent}
+  );
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: ${theme.spacing[4]};
   box-shadow: ${theme.shadows.accent};
-  
+
   svg {
     width: 40px;
     height: 40px;

@@ -18,7 +18,9 @@ export const GRAPHQL_ENDPOINTS = {
 
 // Default GraphQL middleware configuration
 export const defaultGraphQLConfig: GraphQLMiddlewareConfig = {
-  uri: isDevelopment ? GRAPHQL_ENDPOINTS.development : GRAPHQL_ENDPOINTS.production,
+  uri: isDevelopment
+    ? GRAPHQL_ENDPOINTS.development
+    : GRAPHQL_ENDPOINTS.production,
   enableRetry: true,
   maxRetries: isProduction ? 2 : 3,
   retryDelay: isProduction ? 500 : 300,

@@ -4,7 +4,7 @@ import { theme } from '@/styles/theme';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { CURRENCY_SYMBOL } from '@/config/currency';
-import { 
+import {
   List,
   Eye,
   Edit,
@@ -16,7 +16,7 @@ import {
   Star,
   SortAsc,
   SortDesc,
-  MoreHorizontal
+  MoreHorizontal,
 } from 'lucide-react';
 
 interface Product {
@@ -94,7 +94,7 @@ const ListViewHeader = styled.div`
   border-radius: ${theme.borderRadius.lg};
   border: 1px solid ${theme.colors.border.light};
   box-shadow: ${theme.shadows.sm};
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     flex-direction: column;
     gap: ${theme.spacing[3]};
@@ -106,7 +106,7 @@ const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[4]};
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     justify-content: center;
     gap: ${theme.spacing[2]};
@@ -153,7 +153,7 @@ const TableHeader = styled.div`
   position: sticky;
   top: 0;
   z-index: 10;
-  
+
   @media (max-width: ${theme.breakpoints.lg}) {
     grid-template-columns: 50px 150px 100px 80px 80px 80px 80px 80px;
     gap: ${theme.spacing[2]};
@@ -166,13 +166,15 @@ const TableHeaderCell = styled.div<{ sortable?: boolean }>`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[1]};
-  cursor: ${({ sortable }) => sortable ? 'pointer' : 'default'};
+  cursor: ${({ sortable }) => (sortable ? 'pointer' : 'default')};
   user-select: none;
   transition: all ${theme.transitions.fast};
   padding: ${theme.spacing[1]};
   border-radius: ${theme.borderRadius.sm};
-  
-  ${({ sortable }) => sortable && `
+
+  ${({ sortable }) =>
+    sortable &&
+    `
     &:hover {
       color: ${theme.colors.primaryPurple};
       background: ${theme.colors.background.light};
@@ -200,7 +202,7 @@ const ProductRow = styled.div<{ isEven: boolean }>`
   border-bottom: 1px solid ${theme.colors.border.light};
   align-items: center;
   transition: all ${theme.transitions.base};
-  background: ${({ isEven }) => 
+  background: ${({ isEven }) =>
     isEven ? theme.colors.white : theme.colors.background.light};
   position: relative;
 
@@ -218,7 +220,7 @@ const ProductRow = styled.div<{ isEven: boolean }>`
   &:last-child {
     border-bottom: none;
   }
-  
+
   @media (max-width: ${theme.breakpoints.lg}) {
     grid-template-columns: 50px 150px 100px 80px 80px 80px 80px 80px;
     gap: ${theme.spacing[2]};
@@ -236,7 +238,7 @@ const ProductImage = styled.div`
   align-items: center;
   justify-content: center;
   border: 1px solid ${theme.colors.border.light};
-  
+
   img {
     width: 100%;
     height: 100%;
@@ -303,10 +305,12 @@ const StockStatus = styled.div<{ isLowStock: boolean; isOutOfStock: boolean }>`
   gap: ${theme.spacing[1]};
   font-size: ${theme.fontSizes.sm};
   font-weight: ${theme.fontWeights.medium};
-  color: ${({ isOutOfStock, isLowStock }) => 
-    isOutOfStock ? theme.colors.error : 
-    isLowStock ? theme.colors.warning : 
-    theme.colors.success};
+  color: ${({ isOutOfStock, isLowStock }) =>
+    isOutOfStock
+      ? theme.colors.error
+      : isLowStock
+        ? theme.colors.warning
+        : theme.colors.success};
 `;
 
 const RatingContainer = styled.div`
@@ -328,9 +332,13 @@ const StatusBadge = styled.div<{ isActive: boolean }>`
   font-size: ${theme.fontSizes.xs};
   font-weight: ${theme.fontWeights.medium};
   text-align: center;
-  background: ${({ isActive }) => isActive ? `${theme.colors.success}15` : `${theme.colors.warning}15`};
-  color: ${({ isActive }) => isActive ? theme.colors.success : theme.colors.warning};
-  border: 1px solid ${({ isActive }) => isActive ? `${theme.colors.success}30` : `${theme.colors.warning}30`};
+  background: ${({ isActive }) =>
+    isActive ? `${theme.colors.success}15` : `${theme.colors.warning}15`};
+  color: ${({ isActive }) =>
+    isActive ? theme.colors.success : theme.colors.warning};
+  border: 1px solid
+    ${({ isActive }) =>
+      isActive ? `${theme.colors.success}30` : `${theme.colors.warning}30`};
 `;
 
 // Enhanced Action Buttons with Minimalist Design
@@ -340,38 +348,54 @@ const ActionsContainer = styled.div`
   position: relative;
 `;
 
-const ActionButton = styled.button<{ 
+const ActionButton = styled.button<{
   variant: 'view' | 'edit' | 'toggle' | 'delete';
   isActive?: boolean;
 }>`
   background: ${({ variant, isActive }) => {
     if (isActive) return theme.colors.primaryPurple;
     switch (variant) {
-      case 'view': return theme.colors.background.light;
-      case 'edit': return theme.colors.background.light;
-      case 'toggle': return theme.colors.background.light;
-      case 'delete': return theme.colors.background.light;
-      default: return theme.colors.background.light;
+      case 'view':
+        return theme.colors.background.light;
+      case 'edit':
+        return theme.colors.background.light;
+      case 'toggle':
+        return theme.colors.background.light;
+      case 'delete':
+        return theme.colors.background.light;
+      default:
+        return theme.colors.background.light;
     }
   }};
-  border: 1px solid ${({ variant, isActive }) => {
-    if (isActive) return theme.colors.primaryPurple;
-    switch (variant) {
-      case 'view': return theme.colors.border.light;
-      case 'edit': return theme.colors.border.light;
-      case 'toggle': return theme.colors.border.light;
-      case 'delete': return theme.colors.border.light;
-      default: return theme.colors.border.light;
-    }
-  }};
+  border: 1px solid
+    ${({ variant, isActive }) => {
+      if (isActive) return theme.colors.primaryPurple;
+      switch (variant) {
+        case 'view':
+          return theme.colors.border.light;
+        case 'edit':
+          return theme.colors.border.light;
+        case 'toggle':
+          return theme.colors.border.light;
+        case 'delete':
+          return theme.colors.border.light;
+        default:
+          return theme.colors.border.light;
+      }
+    }};
   color: ${({ variant, isActive }) => {
     if (isActive) return theme.colors.white;
     switch (variant) {
-      case 'view': return theme.colors.info;
-      case 'edit': return theme.colors.primaryPurple;
-      case 'toggle': return theme.colors.warning;
-      case 'delete': return theme.colors.error;
-      default: return theme.colors.text.secondary;
+      case 'view':
+        return theme.colors.info;
+      case 'edit':
+        return theme.colors.primaryPurple;
+      case 'toggle':
+        return theme.colors.warning;
+      case 'delete':
+        return theme.colors.error;
+      default:
+        return theme.colors.text.secondary;
     }
   }};
   cursor: pointer;
@@ -390,21 +414,31 @@ const ActionButton = styled.button<{
     background: ${({ variant, isActive }) => {
       if (isActive) return theme.colors.primaryPurple;
       switch (variant) {
-        case 'view': return `${theme.colors.info}15`;
-        case 'edit': return `${theme.colors.primaryPurple}15`;
-        case 'toggle': return `${theme.colors.warning}15`;
-        case 'delete': return `${theme.colors.error}15`;
-        default: return theme.colors.background.accent;
+        case 'view':
+          return `${theme.colors.info}15`;
+        case 'edit':
+          return `${theme.colors.primaryPurple}15`;
+        case 'toggle':
+          return `${theme.colors.warning}15`;
+        case 'delete':
+          return `${theme.colors.error}15`;
+        default:
+          return theme.colors.background.accent;
       }
     }};
     border-color: ${({ variant, isActive }) => {
       if (isActive) return theme.colors.primaryPurple;
       switch (variant) {
-        case 'view': return theme.colors.info;
-        case 'edit': return theme.colors.primaryPurple;
-        case 'toggle': return theme.colors.warning;
-        case 'delete': return theme.colors.error;
-        default: return theme.colors.border.medium;
+        case 'view':
+          return theme.colors.info;
+        case 'edit':
+          return theme.colors.primaryPurple;
+        case 'toggle':
+          return theme.colors.warning;
+        case 'delete':
+          return theme.colors.error;
+        default:
+          return theme.colors.border.medium;
       }
     }};
     transform: translateY(-1px);
@@ -482,7 +516,7 @@ const PaginationContainer = styled.div`
   border-radius: ${theme.borderRadius.lg};
   border: 1px solid ${theme.colors.border.light};
   box-shadow: ${theme.shadows.sm};
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     flex-wrap: wrap;
     gap: ${theme.spacing[2]};
@@ -491,19 +525,20 @@ const PaginationContainer = styled.div`
 
 const PageButton = styled.button<{ isActive?: boolean }>`
   padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  background: ${({ isActive }) => 
+  background: ${({ isActive }) =>
     isActive ? theme.colors.primaryPurple : theme.colors.background.accent};
-  color: ${({ isActive }) => 
+  color: ${({ isActive }) =>
     isActive ? theme.colors.white : theme.colors.text.primary};
-  border: 1px solid ${({ isActive }) => 
-    isActive ? theme.colors.primaryPurple : theme.colors.border.light};
+  border: 1px solid
+    ${({ isActive }) =>
+      isActive ? theme.colors.primaryPurple : theme.colors.border.light};
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.fontSizes.sm};
   cursor: pointer;
   transition: all ${theme.transitions.base};
 
   &:hover:not(:disabled) {
-    background: ${({ isActive }) => 
+    background: ${({ isActive }) =>
       isActive ? theme.colors.primaryPurple : theme.colors.softPurple};
     border-color: ${theme.colors.primaryPurple};
     transform: translateY(-1px);
@@ -576,8 +611,12 @@ const LoadingSpinner = styled.div`
   margin-bottom: ${theme.spacing[4]};
 
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -638,24 +677,32 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
   onToggleStatus,
   onViewDetails,
   onSort,
-  onFilter
+  onFilter,
 }) => {
   const [sortField, setSortField] = useState<string>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
 
-  const handleSort = useCallback((field: string) => {
-    const newDirection = sortField === field && sortDirection === 'asc' ? 'desc' : 'asc';
-    setSortField(field);
-    setSortDirection(newDirection);
-    onSort(field, newDirection);
-  }, [sortField, sortDirection, onSort]);
+  const handleSort = useCallback(
+    (field: string) => {
+      const newDirection =
+        sortField === field && sortDirection === 'asc' ? 'desc' : 'asc';
+      setSortField(field);
+      setSortDirection(newDirection);
+      onSort(field, newDirection);
+    },
+    [sortField, sortDirection, onSort]
+  );
 
   const renderSortIcon = (field: string) => {
     if (sortField !== field) return null;
     return (
       <SortIcon>
-        {sortDirection === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />}
+        {sortDirection === 'asc' ? (
+          <SortAsc size={14} />
+        ) : (
+          <SortDesc size={14} />
+        )}
       </SortIcon>
     );
   };
@@ -669,7 +716,9 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
       <LoadingContainer>
         <LoadingSpinner />
         <LoadingText>Cargando productos...</LoadingText>
-        <EmptyMessage>Por favor espera mientras se cargan los datos</EmptyMessage>
+        <EmptyMessage>
+          Por favor espera mientras se cargan los datos
+        </EmptyMessage>
       </LoadingContainer>
     );
   }
@@ -693,7 +742,10 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
           <Package size={48} />
         </EmptyIcon>
         <EmptyTitle>No hay productos</EmptyTitle>
-        <EmptyMessage>No se encontraron productos que coincidan con los criterios de búsqueda</EmptyMessage>
+        <EmptyMessage>
+          No se encontraron productos que coincidan con los criterios de
+          búsqueda
+        </EmptyMessage>
       </EmptyState>
     );
   }
@@ -742,8 +794,8 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
         </TableHeader>
 
         {products.map((product, index) => (
-          <ProductRow 
-            key={product.id} 
+          <ProductRow
+            key={product.id}
             isEven={index % 2 === 0}
             onMouseEnter={() => handleRowHover(product.id)}
             onMouseLeave={() => handleRowHover(null)}
@@ -767,17 +819,23 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
             </ProductCategory>
 
             <PriceContainer>
-              <CurrentPrice>{CURRENCY_SYMBOL} {product.currentPrice}</CurrentPrice>
+              <CurrentPrice>
+                {CURRENCY_SYMBOL} {product.currentPrice}
+              </CurrentPrice>
               {product.hasDiscount && (
                 <>
-                  <OriginalPrice>{CURRENCY_SYMBOL} {product.price}</OriginalPrice>
+                  <OriginalPrice>
+                    {CURRENCY_SYMBOL} {product.price}
+                  </OriginalPrice>
                   <DiscountBadge>-{product.discountPercentage}%</DiscountBadge>
                 </>
               )}
             </PriceContainer>
 
-            <StockStatus 
-              isLowStock={product.stockQuantity <= 10 && product.stockQuantity > 0}
+            <StockStatus
+              isLowStock={
+                product.stockQuantity <= 10 && product.stockQuantity > 0
+              }
               isOutOfStock={product.stockQuantity === 0}
             >
               {product.stockQuantity === 0 ? (
@@ -796,9 +854,7 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
               <span>({product.reviewCount})</span>
             </RatingContainer>
 
-            <div>
-              {new Date(product.createdAt).toLocaleDateString('es-ES')}
-            </div>
+            <div>{new Date(product.createdAt).toLocaleDateString('es-ES')}</div>
 
             <StatusBadge isActive={product.isActive}>
               {product.isActive ? 'Activo' : 'Inactivo'}
@@ -806,10 +862,10 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
 
             <ActionsContainer>
               <ActionButtonWrapper>
-                <ActionButton 
-                  variant="view" 
-                  onClick={() => onViewDetails(product.id)} 
-                  title="Ver detalles"
+                <ActionButton
+                  variant='view'
+                  onClick={() => onViewDetails(product.id)}
+                  title='Ver detalles'
                   aria-label={`Ver detalles de ${product.name}`}
                 >
                   <Eye size={16} />
@@ -818,10 +874,10 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
               </ActionButtonWrapper>
 
               <ActionButtonWrapper>
-                <ActionButton 
-                  variant="edit" 
-                  onClick={() => onEdit(product.id)} 
-                  title="Editar"
+                <ActionButton
+                  variant='edit'
+                  onClick={() => onEdit(product.id)}
+                  title='Editar'
                   aria-label={`Editar ${product.name}`}
                 >
                   <Edit size={16} />
@@ -830,22 +886,28 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
               </ActionButtonWrapper>
 
               <ActionButtonWrapper>
-                <ActionButton 
-                  variant="toggle" 
-                  onClick={() => onToggleStatus(product.id, !product.isActive)} 
-                  title={product.isActive ? "Desactivar" : "Activar"}
+                <ActionButton
+                  variant='toggle'
+                  onClick={() => onToggleStatus(product.id, !product.isActive)}
+                  title={product.isActive ? 'Desactivar' : 'Activar'}
                   aria-label={`${product.isActive ? 'Desactivar' : 'Activar'} ${product.name}`}
                 >
-                  {product.isActive ? <XCircle size={16} /> : <CheckCircle size={16} />}
+                  {product.isActive ? (
+                    <XCircle size={16} />
+                  ) : (
+                    <CheckCircle size={16} />
+                  )}
                 </ActionButton>
-                <ActionTooltip>{product.isActive ? "Desactivar" : "Activar"}</ActionTooltip>
+                <ActionTooltip>
+                  {product.isActive ? 'Desactivar' : 'Activar'}
+                </ActionTooltip>
               </ActionButtonWrapper>
 
               <ActionButtonWrapper>
-                <ActionButton 
-                  variant="delete" 
-                  onClick={() => onDelete(product.id)} 
-                  title="Eliminar"
+                <ActionButton
+                  variant='delete'
+                  onClick={() => onDelete(product.id)}
+                  title='Eliminar'
                   aria-label={`Eliminar ${product.name}`}
                 >
                   <Trash2 size={16} />
@@ -863,12 +925,12 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
           <PageButton
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            aria-label="Página anterior"
+            aria-label='Página anterior'
           >
             Anterior
           </PageButton>
 
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
             <PageButton
               key={page}
               isActive={page === currentPage}
@@ -883,7 +945,7 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
           <PageButton
             onClick={() => onPageChange(currentPage + 1)}
             disabled={!hasMore}
-            aria-label="Página siguiente"
+            aria-label='Página siguiente'
           >
             Siguiente
           </PageButton>

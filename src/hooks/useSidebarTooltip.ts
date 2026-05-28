@@ -6,7 +6,9 @@ interface UseSidebarTooltipReturn {
   hideTooltip: () => void;
 }
 
-export const useSidebarTooltip = (delay: number = 500): UseSidebarTooltipReturn => {
+export const useSidebarTooltip = (
+  delay: number = 500
+): UseSidebarTooltipReturn => {
   const [isVisible, setIsVisible] = useState(false);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
@@ -14,11 +16,11 @@ export const useSidebarTooltip = (delay: number = 500): UseSidebarTooltipReturn 
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
-    
+
     const id = setTimeout(() => {
       setIsVisible(true);
     }, delay);
-    
+
     setTimeoutId(id);
   }, [delay, timeoutId]);
 

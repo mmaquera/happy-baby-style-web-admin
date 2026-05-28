@@ -65,7 +65,7 @@ const RoleBadge = styled.span<{ role: string }>`
   font-weight: ${theme.fontWeights.medium};
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  
+
   ${({ role }) => {
     switch (role) {
       case 'admin':
@@ -118,24 +118,23 @@ export const SessionInfo: React.FC<SessionInfoProps> = ({ className }) => {
         <Shield size={20} />
         Información de Sesión
       </SessionTitle>
-      
+
       <SessionDetails>
         <SessionItem>
           <User size={16} />
           <SessionLabel>Usuario:</SessionLabel>
           <SessionValue>
-            {user.profile?.firstName && user.profile?.lastName 
+            {user.profile?.firstName && user.profile?.lastName
               ? `${user.profile.firstName} ${user.profile.lastName}`
-              : user.email
-            }
+              : user.email}
           </SessionValue>
         </SessionItem>
-        
+
         <SessionItem>
           <SessionLabel>Email:</SessionLabel>
           <SessionValue>{user.email}</SessionValue>
         </SessionItem>
-        
+
         <SessionItem>
           <SessionLabel>Rol:</SessionLabel>
           <RoleBadge role={user.role}>
@@ -143,14 +142,14 @@ export const SessionInfo: React.FC<SessionInfoProps> = ({ className }) => {
             {getRoleLabel(user.role)}
           </RoleBadge>
         </SessionItem>
-        
+
         <SessionItem>
           <Clock size={16} />
           <SessionLabel>Sesión:</SessionLabel>
           <SessionValue>
-            {formatDistanceToNow(sessionStart, { 
-              addSuffix: true, 
-              locale: es 
+            {formatDistanceToNow(sessionStart, {
+              addSuffix: true,
+              locale: es,
             })}
           </SessionValue>
         </SessionItem>
@@ -159,4 +158,4 @@ export const SessionInfo: React.FC<SessionInfoProps> = ({ className }) => {
   );
 };
 
-export default SessionInfo; 
+export default SessionInfo;

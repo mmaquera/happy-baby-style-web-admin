@@ -4,13 +4,13 @@ import { theme } from '@/styles/theme';
 import { ProductCard } from './ProductCard';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { 
+import {
   Grid3X3,
   List,
   Package,
   AlertTriangle,
   XCircle,
-  CheckCircle
+  CheckCircle,
 } from 'lucide-react';
 
 interface Product {
@@ -50,14 +50,16 @@ const GridContainer = styled.div`
   gap: ${theme.spacing[6]};
   margin-bottom: ${theme.spacing[8]};
 
-  ${theme.breakpoints.md && `
+  ${theme.breakpoints.md &&
+  `
     @media (max-width: ${theme.breakpoints.md}) {
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: ${theme.spacing[4]};
     }
   `}
 
-  ${theme.breakpoints.sm && `
+  ${theme.breakpoints.sm &&
+  `
     @media (max-width: ${theme.breakpoints.sm}) {
       grid-template-columns: 1fr;
       gap: ${theme.spacing[4]};
@@ -84,8 +86,12 @@ const LoadingSpinner = styled.div`
   margin-bottom: ${theme.spacing[4]};
 
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -190,12 +196,13 @@ const ViewToggleContainer = styled.div`
 
 const ViewToggleButton = styled.button<{ isActive: boolean }>`
   padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  background: ${({ isActive }) => 
+  background: ${({ isActive }) =>
     isActive ? theme.colors.primaryPurple : theme.colors.background.light};
-  color: ${({ isActive }) => 
+  color: ${({ isActive }) =>
     isActive ? theme.colors.white : theme.colors.text.secondary};
-  border: 1px solid ${({ isActive }) => 
-    isActive ? theme.colors.primaryPurple : theme.colors.border.light};
+  border: 1px solid
+    ${({ isActive }) =>
+      isActive ? theme.colors.primaryPurple : theme.colors.border.light};
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.fontSizes.sm};
   cursor: pointer;
@@ -205,7 +212,7 @@ const ViewToggleButton = styled.button<{ isActive: boolean }>`
   gap: ${theme.spacing[1]};
 
   &:hover {
-    background: ${({ isActive }) => 
+    background: ${({ isActive }) =>
       isActive ? theme.colors.primaryPurple : theme.colors.softPurple};
     border-color: ${theme.colors.primaryPurple};
   }
@@ -221,7 +228,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   onDelete,
   onToggleStatus,
   onViewDetails,
-  emptyMessage = "No se encontraron productos que coincidan con los filtros aplicados."
+  emptyMessage = 'No se encontraron productos que coincidan con los filtros aplicados.',
 }) => {
   if (loading && products.length === 0) {
     return (
@@ -240,10 +247,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
         </ErrorIcon>
         <ErrorTitle>Error al cargar productos</ErrorTitle>
         <ErrorMessage>{error}</ErrorMessage>
-        <Button
-          variant="primary"
-          onClick={() => window.location.reload()}
-        >
+        <Button variant='primary' onClick={() => window.location.reload()}>
           Reintentar
         </Button>
       </ErrorContainer>
@@ -258,10 +262,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
         </EmptyIcon>
         <EmptyTitle>No hay productos</EmptyTitle>
         <EmptyMessage>{emptyMessage}</EmptyMessage>
-        <Button
-          variant="outline"
-          onClick={() => window.location.reload()}
-        >
+        <Button variant='outline' onClick={() => window.location.reload()}>
           Recargar
         </Button>
       </EmptyContainer>
@@ -274,7 +275,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
         <StatsText>
           Mostrando <ProductCount>{products.length}</ProductCount> productos
         </StatsText>
-        
+
         <ViewToggleContainer>
           <ViewToggleButton isActive={true}>
             <Grid3X3 size={14} />
@@ -288,7 +289,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
       </GridStats>
 
       <GridContainer>
-        {products.map((product) => (
+        {products.map(product => (
           <ProductCard
             key={product.id}
             product={product}
@@ -303,8 +304,8 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
       {hasMore && onLoadMore && (
         <LoadMoreContainer>
           <LoadMoreButton
-            variant="outline"
-            size="large"
+            variant='outline'
+            size='large'
             onClick={onLoadMore}
             isLoading={loading}
           >

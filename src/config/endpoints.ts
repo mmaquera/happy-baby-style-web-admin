@@ -12,5 +12,8 @@ export const GRAPHQL_ENDPOINTS = {
 
 export const getCurrentGraphQLEndpoint = (): string => {
   const mode = import.meta.env.VITE_MODE || 'development';
-  return GRAPHQL_ENDPOINTS[mode as keyof typeof GRAPHQL_ENDPOINTS] || GRAPHQL_ENDPOINTS.development;
+  return (
+    GRAPHQL_ENDPOINTS[mode as keyof typeof GRAPHQL_ENDPOINTS] ||
+    GRAPHQL_ENDPOINTS.development
+  );
 };

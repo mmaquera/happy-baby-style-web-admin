@@ -8,28 +8,30 @@ export const UploadContainer = styled.div`
 `;
 
 // Zona de upload
-export const UploadZone = styled.div<{ isDragOver: boolean; hasError: boolean }>`
-  border: 2px dashed ${({ isDragOver, hasError }) => 
-    hasError ? theme.colors.error : 
-    isDragOver ? theme.colors.primary : 
-    theme.colors.border.light
-  };
+export const UploadZone = styled.div<{
+  isDragOver: boolean;
+  hasError: boolean;
+}>`
+  border: 2px dashed
+    ${({ isDragOver, hasError }) =>
+      hasError
+        ? theme.colors.error
+        : isDragOver
+          ? theme.colors.primary
+          : theme.colors.border.light};
   border-radius: ${theme.borderRadius.lg};
   padding: ${theme.spacing[6]};
   text-align: center;
   transition: all ${theme.transitions.base};
-  background: ${({ isDragOver }) => 
-    isDragOver ? theme.colors.background.accent : 'transparent'
-  };
+  background: ${({ isDragOver }) =>
+    isDragOver ? theme.colors.background.accent : 'transparent'};
   cursor: pointer;
-  
+
   &:hover {
-    border-color: ${({ hasError }) => 
-      hasError ? theme.colors.error : theme.colors.primary
-    };
-    background: ${({ hasError }) => 
-      hasError ? theme.colors.error + '10' : theme.colors.background.accent
-    };
+    border-color: ${({ hasError }) =>
+      hasError ? theme.colors.error : theme.colors.primary};
+    background: ${({ hasError }) =>
+      hasError ? theme.colors.error + '10' : theme.colors.background.accent};
   }
 `;
 
@@ -79,13 +81,13 @@ export const UploadButton = styled.button`
   font-weight: ${theme.fontWeights.medium};
   cursor: pointer;
   transition: all ${theme.transitions.base};
-  
+
   &:hover {
     background: ${theme.colors.primary};
     opacity: 0.9;
     transform: translateY(-1px);
   }
-  
+
   &:disabled {
     background: ${theme.colors.border.light};
     cursor: not-allowed;
@@ -167,7 +169,7 @@ export const RemoveButton = styled.button`
   font-size: ${theme.fontSizes.xs};
   cursor: pointer;
   transition: all ${theme.transitions.base};
-  
+
   &:hover {
     background: ${theme.colors.error};
     opacity: 0.9;
@@ -185,7 +187,7 @@ export const ImagePreview = styled.div`
   border: 2px solid ${theme.colors.border.light};
   transition: all ${theme.transitions.base};
   flex-shrink: 0;
-  
+
   &:hover {
     border-color: ${theme.colors.primary};
     transform: translateY(-2px);
@@ -213,7 +215,7 @@ export const ImagePreviewOverlay = styled.div`
   justify-content: center;
   opacity: 0;
   transition: opacity ${theme.transitions.base};
-  
+
   ${ImagePreview}:hover & {
     opacity: 1;
   }
@@ -229,7 +231,11 @@ export const ImagePreviewActions = styled.div`
 // Animación para el spinner
 export const SpinnerAnimation = styled.div`
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;

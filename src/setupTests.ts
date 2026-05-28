@@ -195,7 +195,9 @@ declare global {
       toHaveDisplayValue(value: string | RegExp | (string | RegExp)[]): R;
       toBeEmpty(): R;
       toBeEmptyDOMElement(): R;
-      toHaveAccessibleDescription(expectedAccessibleDescription?: string | RegExp): R;
+      toHaveAccessibleDescription(
+        expectedAccessibleDescription?: string | RegExp
+      ): R;
       toHaveAccessibleName(expectedAccessibleName?: string | RegExp): R;
       toHaveErrorMessage(expectedErrorMessage?: string | RegExp): R;
       toHaveStyle(css: string | Record<string, any>): R;
@@ -212,7 +214,9 @@ declare global {
       toHaveFocus(): R;
       toHaveFormValues(expectedValues: Record<string, any>): R;
       toHaveDisplayValue(value: string | RegExp | (string | RegExp)[]): R;
-      toHaveAccessibleDescription(expectedAccessibleDescription?: string | RegExp): R;
+      toHaveAccessibleDescription(
+        expectedAccessibleDescription?: string | RegExp
+      ): R;
       toHaveAccessibleName(expectedAccessibleName?: string | RegExp): R;
       toHaveErrorMessage(expectedErrorMessage?: string | RegExp): R;
       toHaveStyle(css: string | Record<string, any>): R;

@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
-import { 
+import {
   Folder,
   Plus,
   Settings,
@@ -10,7 +10,7 @@ import {
   Upload,
   Printer,
   Grid3X3,
-  List
+  List,
 } from 'lucide-react';
 
 interface CategoryHeaderProps {
@@ -110,9 +110,12 @@ const StatCard = styled.div`
 const StatIcon = styled.div<{ variant: 'primary' | 'success' | 'warning' }>`
   color: ${({ variant }) => {
     switch (variant) {
-      case 'success': return theme.colors.success;
-      case 'warning': return theme.colors.warning;
-      default: return theme.colors.primaryPurple;
+      case 'success':
+        return theme.colors.success;
+      case 'warning':
+        return theme.colors.warning;
+      default:
+        return theme.colors.primaryPurple;
     }
   }};
   margin-bottom: ${theme.spacing[3]};
@@ -138,7 +141,8 @@ const StatLabel = styled.div`
 const StatChange = styled.div<{ isPositive: boolean }>`
   font-size: ${theme.fontSizes.xs};
   font-weight: ${theme.fontWeights.medium};
-  color: ${({ isPositive }) => isPositive ? theme.colors.success : theme.colors.warning};
+  color: ${({ isPositive }) =>
+    isPositive ? theme.colors.success : theme.colors.warning};
 `;
 
 const QuickActionsContainer = styled.div`
@@ -162,7 +166,7 @@ const QuickActionButton = styled(Button)`
 `;
 
 export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
-  title = "Categorías Happy Baby Style",
+  title = 'Categorías Happy Baby Style',
   stats,
   viewMode = 'list',
   onViewModeChange,
@@ -170,9 +174,10 @@ export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
   onBulkActions,
   onExport,
   onImport,
-  showActions = true
+  showActions = true,
 }) => {
-  const hasStats = stats && Object.values(stats).some(value => value !== undefined);
+  const hasStats =
+    stats && Object.values(stats).some(value => value !== undefined);
 
   return (
     <HeaderContainer>
@@ -183,7 +188,9 @@ export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
           </HeaderIcon>
           <HeaderContent>
             <HeaderTitle>{title}</HeaderTitle>
-            <HeaderSubtitle>Organiza tu catálogo de productos por categorías</HeaderSubtitle>
+            <HeaderSubtitle>
+              Organiza tu catálogo de productos por categorías
+            </HeaderSubtitle>
           </HeaderContent>
         </HeaderLeft>
 
@@ -192,7 +199,7 @@ export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
             <div style={{ display: 'flex', gap: theme.spacing[2] }}>
               <Button
                 variant={viewMode === 'list' ? 'primary' : 'outline'}
-                size="small"
+                size='small'
                 onClick={() => onViewModeChange('list')}
               >
                 <List size={16} />
@@ -200,7 +207,7 @@ export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
               </Button>
               <Button
                 variant={viewMode === 'grid' ? 'primary' : 'outline'}
-                size="small"
+                size='small'
                 onClick={() => onViewModeChange('grid')}
               >
                 <Grid3X3 size={16} />
@@ -208,46 +215,30 @@ export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
               </Button>
             </div>
           )}
-          
+
           {onImport && (
-            <Button
-              variant="ghost"
-              size="medium"
-              onClick={onImport}
-            >
+            <Button variant='ghost' size='medium' onClick={onImport}>
               <Upload size={16} />
               Importar
             </Button>
           )}
-          
+
           {onExport && (
-            <Button
-              variant="ghost"
-              size="medium"
-              onClick={onExport}
-            >
+            <Button variant='ghost' size='medium' onClick={onExport}>
               <Download size={16} />
               Exportar
             </Button>
           )}
-          
+
           {onBulkActions && (
-            <Button
-              variant="secondary"
-              size="medium"
-              onClick={onBulkActions}
-            >
+            <Button variant='secondary' size='medium' onClick={onBulkActions}>
               <Settings size={16} />
               Acciones Masivas
             </Button>
           )}
-          
+
           {onAddCategory && (
-            <Button
-              variant="primary"
-              size="medium"
-              onClick={onAddCategory}
-            >
+            <Button variant='primary' size='medium' onClick={onAddCategory}>
               <Plus size={16} />
               Nueva Categoría
             </Button>
@@ -259,7 +250,7 @@ export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
         <StatsGrid>
           {stats.totalCategories !== undefined && (
             <StatCard>
-              <StatIcon variant="primary">
+              <StatIcon variant='primary'>
                 <Folder size={24} />
               </StatIcon>
               <StatValue>{stats.totalCategories.toLocaleString()}</StatValue>
@@ -267,10 +258,10 @@ export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
               <StatChange isPositive={true}>+5% este mes</StatChange>
             </StatCard>
           )}
-          
+
           {stats.activeCategories !== undefined && (
             <StatCard>
-              <StatIcon variant="success">
+              <StatIcon variant='success'>
                 <Folder size={24} />
               </StatIcon>
               <StatValue>{stats.activeCategories.toLocaleString()}</StatValue>
@@ -278,10 +269,10 @@ export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
               <StatChange isPositive={true}>+3% este mes</StatChange>
             </StatCard>
           )}
-          
+
           {stats.inactiveCategories !== undefined && (
             <StatCard>
-              <StatIcon variant="warning">
+              <StatIcon variant='warning'>
                 <Folder size={24} />
               </StatIcon>
               <StatValue>{stats.inactiveCategories.toLocaleString()}</StatValue>
@@ -295,43 +286,39 @@ export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
       {showActions && (
         <QuickActionsContainer>
           <QuickActionsLabel>Acciones rápidas:</QuickActionsLabel>
-          
+
           {onAddCategory && (
             <QuickActionButton
-              variant="outline"
-              size="small"
+              variant='outline'
+              size='small'
               onClick={onAddCategory}
             >
               <Plus size={14} />
               Agregar Categoría
             </QuickActionButton>
           )}
-          
+
           {onBulkActions && (
             <QuickActionButton
-              variant="outline"
-              size="small"
+              variant='outline'
+              size='small'
               onClick={onBulkActions}
             >
               <Settings size={14} />
               Acciones Masivas
             </QuickActionButton>
           )}
-          
+
           {onExport && (
-            <QuickActionButton
-              variant="ghost"
-              size="small"
-              onClick={onExport}
-            >
+            <QuickActionButton variant='ghost' size='small' onClick={onExport}>
               <Download size={14} />
               Exportar Lista
             </QuickActionButton>
           )}
-          
+
           <QuickActionButton
-            variant="ghost"
-            size="small"
+            variant='ghost'
+            size='small'
             onClick={() => window.print()}
           >
             <Printer size={14} />

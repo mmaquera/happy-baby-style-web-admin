@@ -3,8 +3,25 @@ import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { 
-  List, Grid3X3, Eye, Edit, Trash2, Folder, CheckCircle, AlertTriangle, XCircle, Tag, Filter, Search, SortAsc, SortDesc, MoreHorizontal, Download, Upload, Settings
+import {
+  List,
+  Grid3X3,
+  Eye,
+  Edit,
+  Trash2,
+  Folder,
+  CheckCircle,
+  AlertTriangle,
+  XCircle,
+  Tag,
+  Filter,
+  Search,
+  SortAsc,
+  SortDesc,
+  MoreHorizontal,
+  Download,
+  Upload,
+  Settings,
 } from 'lucide-react';
 
 import { Category } from './types';
@@ -55,9 +72,13 @@ const ViewToggleButton = styled.button<{ isActive: boolean }>`
   align-items: center;
   gap: ${theme.spacing[2]};
   padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  border: 1px solid ${({ isActive }) => isActive ? theme.colors.primaryPurple : theme.colors.border.light};
-  background: ${({ isActive }) => isActive ? theme.colors.primaryPurple : theme.colors.white};
-  color: ${({ isActive }) => isActive ? theme.colors.white : theme.colors.text.secondary};
+  border: 1px solid
+    ${({ isActive }) =>
+      isActive ? theme.colors.primaryPurple : theme.colors.border.light};
+  background: ${({ isActive }) =>
+    isActive ? theme.colors.primaryPurple : theme.colors.white};
+  color: ${({ isActive }) =>
+    isActive ? theme.colors.white : theme.colors.text.secondary};
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.fontSizes.sm};
   font-weight: ${theme.fontWeights.medium};
@@ -65,7 +86,8 @@ const ViewToggleButton = styled.button<{ isActive: boolean }>`
   transition: all ${theme.transitions.base};
 
   &:hover {
-    background: ${({ isActive }) => isActive ? theme.colors.primaryPurple : theme.colors.background.accent};
+    background: ${({ isActive }) =>
+      isActive ? theme.colors.primaryPurple : theme.colors.background.accent};
     border-color: ${theme.colors.primaryPurple};
   }
 
@@ -191,7 +213,8 @@ const CategoryStatus = styled.div<{ isActive: boolean }>`
   gap: ${theme.spacing[1]};
   font-size: ${theme.fontSizes.sm};
   font-weight: ${theme.fontWeights.medium};
-  color: ${({ isActive }) => isActive ? theme.colors.success : theme.colors.warning};
+  color: ${({ isActive }) =>
+    isActive ? theme.colors.success : theme.colors.warning};
   justify-content: center;
 `;
 
@@ -250,16 +273,21 @@ const PaginationContainer = styled.div`
 
 const PageButton = styled.button<{ isActive?: boolean }>`
   padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  border: 1px solid ${({ isActive }) => isActive ? theme.colors.primaryPurple : theme.colors.border.light};
-  background: ${({ isActive }) => isActive ? theme.colors.primaryPurple : theme.colors.white};
-  color: ${({ isActive }) => isActive ? theme.colors.white : theme.colors.text.secondary};
+  border: 1px solid
+    ${({ isActive }) =>
+      isActive ? theme.colors.primaryPurple : theme.colors.border.light};
+  background: ${({ isActive }) =>
+    isActive ? theme.colors.primaryPurple : theme.colors.white};
+  color: ${({ isActive }) =>
+    isActive ? theme.colors.white : theme.colors.text.secondary};
   border-radius: ${theme.borderRadius.md};
   cursor: pointer;
   transition: all ${theme.transitions.base};
   font-size: ${theme.fontSizes.sm};
 
   &:hover {
-    background: ${({ isActive }) => isActive ? theme.colors.primaryPurple : theme.colors.background.accent};
+    background: ${({ isActive }) =>
+      isActive ? theme.colors.primaryPurple : theme.colors.background.accent};
     border-color: ${theme.colors.primaryPurple};
   }
 
@@ -270,29 +298,51 @@ const PageButton = styled.button<{ isActive?: boolean }>`
 `;
 
 export const CategoryListView: React.FC<CategoryListViewProps> = ({
-  categories, loading = false, error = null, total, currentPage, totalPages, hasMore,
-  onPageChange, onEdit, onDelete, onToggleStatus, onViewDetails, onSort, onFilter
+  categories,
+  loading = false,
+  error = null,
+  total,
+  currentPage,
+  totalPages,
+  hasMore,
+  onPageChange,
+  onEdit,
+  onDelete,
+  onToggleStatus,
+  onViewDetails,
+  onSort,
+  onFilter,
 }) => {
   const [sortField, setSortField] = useState<string>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  const handleSort = useCallback((field: string) => {
-    const newDirection = sortField === field && sortDirection === 'asc' ? 'desc' : 'asc';
-    setSortField(field);
-    setSortDirection(newDirection);
-    onSort(field, newDirection);
-  }, [sortField, sortDirection, onSort]);
+  const handleSort = useCallback(
+    (field: string) => {
+      const newDirection =
+        sortField === field && sortDirection === 'asc' ? 'desc' : 'asc';
+      setSortField(field);
+      setSortDirection(newDirection);
+      onSort(field, newDirection);
+    },
+    [sortField, sortDirection, onSort]
+  );
 
   const renderSortIcon = (field: string) => {
     if (sortField !== field) return null;
-    return sortDirection === 'asc' ? <SortAsc size={14} /> : <SortDesc size={14} />;
+    return sortDirection === 'asc' ? (
+      <SortAsc size={14} />
+    ) : (
+      <SortDesc size={14} />
+    );
   };
 
   if (loading) {
     return (
       <ListViewContainer>
         <div style={{ padding: theme.spacing[12], textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', marginBottom: theme.spacing[4] }}>⏳</div>
+          <div style={{ fontSize: '2rem', marginBottom: theme.spacing[4] }}>
+            ⏳
+          </div>
           <h3>Cargando categorías...</h3>
         </div>
       </ListViewContainer>
@@ -303,7 +353,9 @@ export const CategoryListView: React.FC<CategoryListViewProps> = ({
     return (
       <ListViewContainer>
         <div style={{ padding: theme.spacing[12], textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', marginBottom: theme.spacing[4] }}>❌</div>
+          <div style={{ fontSize: '2rem', marginBottom: theme.spacing[4] }}>
+            ❌
+          </div>
           <h3>Error al cargar categorías</h3>
           <p>{error}</p>
         </div>
@@ -315,7 +367,9 @@ export const CategoryListView: React.FC<CategoryListViewProps> = ({
     return (
       <ListViewContainer>
         <div style={{ padding: theme.spacing[12], textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', marginBottom: theme.spacing[4] }}>📁</div>
+          <div style={{ fontSize: '2rem', marginBottom: theme.spacing[4] }}>
+            📁
+          </div>
           <h3>No hay categorías</h3>
           <p>No se encontraron categorías para mostrar</p>
         </div>
@@ -334,17 +388,19 @@ export const CategoryListView: React.FC<CategoryListViewProps> = ({
             <Grid3X3 size={16} /> Grid
           </ViewToggleButton>
         </ViewToggleContainer>
-        <CategoryCount>Mostrando {categories.length} de {total} categorías</CategoryCount>
+        <CategoryCount>
+          Mostrando {categories.length} de {total} categorías
+        </CategoryCount>
         <HeaderActions>
-          <Button variant="outline" size="small">
+          <Button variant='outline' size='small'>
             <Filter size={14} />
             Filtros
           </Button>
-          <Button variant="outline" size="small">
+          <Button variant='outline' size='small'>
             <Download size={14} />
             Exportar
           </Button>
-          <Button variant="outline" size="small">
+          <Button variant='outline' size='small'>
             <Settings size={14} />
             Acciones
           </Button>
@@ -363,7 +419,7 @@ export const CategoryListView: React.FC<CategoryListViewProps> = ({
           <div>Acciones</div>
         </TableHeader>
 
-        {categories.map((category) => (
+        {categories.map(category => (
           <CategoryRow key={category.id}>
             <CategoryImage>
               {category.image ? (
@@ -376,7 +432,9 @@ export const CategoryListView: React.FC<CategoryListViewProps> = ({
             <CategoryInfo>
               <CategoryName>{category.name}</CategoryName>
               {category.description && (
-                <CategoryDescription>{category.description}</CategoryDescription>
+                <CategoryDescription>
+                  {category.description}
+                </CategoryDescription>
               )}
             </CategoryInfo>
 
@@ -402,16 +460,29 @@ export const CategoryListView: React.FC<CategoryListViewProps> = ({
             </CategoryDate>
 
             <CategoryActions>
-              <ActionButton onClick={() => onViewDetails(category.id)} title="Ver detalles">
+              <ActionButton
+                onClick={() => onViewDetails(category.id)}
+                title='Ver detalles'
+              >
                 <Eye size={16} />
               </ActionButton>
-              <ActionButton onClick={() => onEdit(category.id)} title="Editar">
+              <ActionButton onClick={() => onEdit(category.id)} title='Editar'>
                 <Edit size={16} />
               </ActionButton>
-              <ActionButton onClick={() => onToggleStatus(category.id, !category.isActive)} title="Cambiar estado">
-                {category.isActive ? <XCircle size={16} /> : <CheckCircle size={16} />}
+              <ActionButton
+                onClick={() => onToggleStatus(category.id, !category.isActive)}
+                title='Cambiar estado'
+              >
+                {category.isActive ? (
+                  <XCircle size={16} />
+                ) : (
+                  <CheckCircle size={16} />
+                )}
               </ActionButton>
-              <ActionButton onClick={() => onDelete(category.id)} title="Eliminar">
+              <ActionButton
+                onClick={() => onDelete(category.id)}
+                title='Eliminar'
+              >
                 <Trash2 size={16} />
               </ActionButton>
             </CategoryActions>
@@ -421,14 +492,14 @@ export const CategoryListView: React.FC<CategoryListViewProps> = ({
 
       {totalPages > 1 && (
         <PaginationContainer>
-          <PageButton 
+          <PageButton
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
           >
             Anterior
           </PageButton>
-          
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
             <PageButton
               key={page}
               isActive={page === currentPage}
@@ -437,8 +508,8 @@ export const CategoryListView: React.FC<CategoryListViewProps> = ({
               {page}
             </PageButton>
           ))}
-          
-          <PageButton 
+
+          <PageButton
             onClick={() => onPageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
           >

@@ -4,18 +4,18 @@ import { CreateUserProfileInput, UserRole } from '@/generated/graphql';
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { 
-  UserPlus, 
-  X, 
-  Mail, 
-  Shield, 
-  Users, 
+import {
+  UserPlus,
+  X,
+  Mail,
+  Shield,
+  Users,
   Phone,
   CheckCircle,
   Eye,
   EyeOff,
   Lock,
-  User as UserIcon
+  User as UserIcon,
 } from 'lucide-react';
 
 interface CreateUserModalProps {
@@ -92,28 +92,33 @@ const FormStep = styled.div<{ active: boolean; completed: boolean }>`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[2]};
-  opacity: ${props => props.active || props.completed ? 1 : 0.5};
+  opacity: ${props => (props.active || props.completed ? 1 : 0.5)};
 `;
 
 const StepNumber = styled.div<{ active?: boolean; completed?: boolean }>`
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: ${props => 
-    props.completed ? theme.colors.success :
-    props.active ? theme.colors.primary : 
-    theme.colors.background.primary};
-  color: ${props => 
+  background: ${props =>
+    props.completed
+      ? theme.colors.success
+      : props.active
+        ? theme.colors.primary
+        : theme.colors.background.primary};
+  color: ${props =>
     props.completed || props.active ? 'white' : theme.colors.text.secondary};
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: ${theme.fontSizes.sm};
   font-weight: ${theme.fontWeights.medium};
-  border: 2px solid ${props => 
-    props.completed ? theme.colors.success :
-    props.active ? theme.colors.primary : 
-    theme.colors.border.medium};
+  border: 2px solid
+    ${props =>
+      props.completed
+        ? theme.colors.success
+        : props.active
+          ? theme.colors.primary
+          : theme.colors.border.medium};
 `;
 
 const StepLabel = styled.span`
@@ -223,19 +228,23 @@ const PasswordStrengthBar = styled.div`
 const PasswordStrengthFill = styled.div<{ strength: number }>`
   height: 100%;
   width: ${props => props.strength}%;
-  background: ${props => 
-    props.strength < 30 ? theme.colors.error :
-    props.strength < 70 ? theme.colors.warning :
-    theme.colors.success};
+  background: ${props =>
+    props.strength < 30
+      ? theme.colors.error
+      : props.strength < 70
+        ? theme.colors.warning
+        : theme.colors.success};
   transition: all 0.3s ease;
 `;
 
 const PasswordStrengthText = styled.span<{ strength: number }>`
   font-size: ${theme.fontSizes.xs};
-  color: ${props => 
-    props.strength < 30 ? theme.colors.error :
-    props.strength < 70 ? theme.colors.warning :
-    theme.colors.success};
+  color: ${props =>
+    props.strength < 30
+      ? theme.colors.error
+      : props.strength < 70
+        ? theme.colors.warning
+        : theme.colors.success};
   font-weight: ${theme.fontWeights.medium};
 `;
 
@@ -258,9 +267,14 @@ const RoleGrid = styled.div`
 
 const RoleOption = styled.div<{ selected: boolean }>`
   padding: ${theme.spacing[4]};
-  border: 2px solid ${props => props.selected ? theme.colors.primary : theme.colors.border.medium};
+  border: 2px solid
+    ${props =>
+      props.selected ? theme.colors.primary : theme.colors.border.medium};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.selected ? theme.colors.background.accent : theme.colors.background.primary};
+  background: ${props =>
+    props.selected
+      ? theme.colors.background.accent
+      : theme.colors.background.primary};
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -269,15 +283,19 @@ const RoleOption = styled.div<{ selected: boolean }>`
 
   &:hover {
     border-color: ${theme.colors.primary};
-    background: ${props => props.selected ? theme.colors.background.accent : theme.colors.background.hover};
+    background: ${props =>
+      props.selected
+        ? theme.colors.background.accent
+        : theme.colors.background.hover};
   }
 `;
 
 const RoleIcon = styled.div<{ selected?: boolean }>`
   padding: ${theme.spacing[2]};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.selected ? theme.colors.primary : theme.colors.background.light};
-  color: ${props => props.selected ? 'white' : theme.colors.text.secondary};
+  background: ${props =>
+    props.selected ? theme.colors.primary : theme.colors.background.light};
+  color: ${props => (props.selected ? 'white' : theme.colors.text.secondary)};
 `;
 
 const RoleInfo = styled.div`
@@ -392,7 +410,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
-  isLoading
+  isLoading,
 }) => {
   const [formData, setFormData] = useState<CreateUserProfileInput>({
     email: '',
@@ -402,7 +420,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
     firstName: '',
     lastName: '',
     phone: '',
-    dateOfBirth: null
+    dateOfBirth: null,
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -419,7 +437,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
         firstName: '',
         lastName: '',
         phone: '',
-        dateOfBirth: null
+        dateOfBirth: null,
       });
       setErrors({});
       setShowPassword(false);
@@ -468,7 +486,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
       firstName: '',
       lastName: '',
       phone: '',
-      dateOfBirth: null
+      dateOfBirth: null,
     });
     setErrors({});
     onClose();
@@ -495,12 +513,14 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
             <UserPlus size={24} style={{ color: theme.colors.primary }} />
             <div>
               <ModalTitle>Crear Nuevo Usuario</ModalTitle>
-              <ModalSubtitle>Completa la información para crear una nueva cuenta de usuario</ModalSubtitle>
+              <ModalSubtitle>
+                Completa la información para crear una nueva cuenta de usuario
+              </ModalSubtitle>
             </div>
           </ModalHeaderLeft>
           <Button
-            variant="ghost"
-            size="small"
+            variant='ghost'
+            size='small'
             onClick={handleClose}
             style={{ padding: theme.spacing[2] }}
           >
@@ -527,16 +547,18 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
               <Mail size={18} style={{ color: theme.colors.primary }} />
               <SectionTitle>Información de Cuenta</SectionTitle>
             </SectionHeader>
-            
+
             <FormGrid>
               <InputWrapper>
                 <Input
-                  label="Email"
-                  type="email"
+                  label='Email'
+                  type='email'
                   value={formData.email}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setFormData(prev => ({ ...prev, email: e.target.value }))
+                  }
                   required
-                  placeholder="ejemplo@correo.com"
+                  placeholder='ejemplo@correo.com'
                   error={errors['email'] || ''}
                 />
                 <InputHint>
@@ -548,16 +570,21 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
               <InputWrapper>
                 <PasswordInputWrapper>
                   <Input
-                    label="Contraseña"
+                    label='Contraseña'
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password || ''}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setFormData(prev => ({
+                        ...prev,
+                        password: e.target.value,
+                      }))
+                    }
                     required
-                    placeholder="Mínimo 8 caracteres"
+                    placeholder='Mínimo 8 caracteres'
                     error={errors['password'] || ''}
                   />
                   <PasswordToggle
-                    type="button"
+                    type='button'
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -578,41 +605,47 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
               <Users size={18} style={{ color: theme.colors.primary }} />
               <SectionTitle>Información Personal</SectionTitle>
             </SectionHeader>
-            
+
             <FormGrid>
               <Input
-                label="Nombre"
+                label='Nombre'
                 value={formData.firstName || ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
-                  ...prev,
-                  firstName: e.target.value
-                }))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData(prev => ({
+                    ...prev,
+                    firstName: e.target.value,
+                  }))
+                }
                 required
-                placeholder="Nombre del usuario"
+                placeholder='Nombre del usuario'
                 error={errors['firstName'] || ''}
               />
-              
+
               <Input
-                label="Apellido"
+                label='Apellido'
                 value={formData.lastName || ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
-                  ...prev,
-                  lastName: e.target.value
-                }))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData(prev => ({
+                    ...prev,
+                    lastName: e.target.value,
+                  }))
+                }
                 required
-                placeholder="Apellido del usuario"
+                placeholder='Apellido del usuario'
                 error={errors['lastName'] || ''}
               />
 
               <InputWrapper>
                 <Input
-                  label="Teléfono"
+                  label='Teléfono'
                   value={formData.phone || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
-                    ...prev,
-                    phone: e.target.value
-                  }))}
-                  placeholder="+34 600 000 000"
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setFormData(prev => ({
+                      ...prev,
+                      phone: e.target.value,
+                    }))
+                  }
+                  placeholder='+34 600 000 000'
                 />
                 <InputHint>
                   <Phone size={12} />
@@ -621,14 +654,20 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
               </InputWrapper>
 
               <Input
-                label="Fecha de Nacimiento"
-                type="date"
-                value={formData.dateOfBirth ? new Date(formData.dateOfBirth).toISOString().split('T')[0] : ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
-                  ...prev,
-                  dateOfBirth: e.target.value || null
-                }))}
-                placeholder="dd/mm/yyyy"
+                label='Fecha de Nacimiento'
+                type='date'
+                value={
+                  formData.dateOfBirth
+                    ? new Date(formData.dateOfBirth).toISOString().split('T')[0]
+                    : ''
+                }
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData(prev => ({
+                    ...prev,
+                    dateOfBirth: e.target.value || null,
+                  }))
+                }
+                placeholder='dd/mm/yyyy'
               />
             </FormGrid>
           </FormSection>
@@ -643,36 +682,54 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
             <RoleSelector>
               <RoleLabel>Rol del Usuario</RoleLabel>
               <RoleGrid>
-                <RoleOption 
+                <RoleOption
                   selected={formData.role === UserRole.customer}
-                  onClick={() => setFormData(prev => ({ ...prev, role: UserRole.customer }))}
+                  onClick={() =>
+                    setFormData(prev => ({ ...prev, role: UserRole.customer }))
+                  }
                 >
-                  <RoleIcon selected={formData.role === UserRole.customer}><Users size={20} /></RoleIcon>
+                  <RoleIcon selected={formData.role === UserRole.customer}>
+                    <Users size={20} />
+                  </RoleIcon>
                   <RoleInfo>
                     <RoleName>Cliente</RoleName>
-                    <RoleDescription>Acceso a funciones básicas de cliente</RoleDescription>
+                    <RoleDescription>
+                      Acceso a funciones básicas de cliente
+                    </RoleDescription>
                   </RoleInfo>
                 </RoleOption>
 
-                <RoleOption 
+                <RoleOption
                   selected={formData.role === UserRole.staff}
-                  onClick={() => setFormData(prev => ({ ...prev, role: UserRole.staff }))}
+                  onClick={() =>
+                    setFormData(prev => ({ ...prev, role: UserRole.staff }))
+                  }
                 >
-                  <RoleIcon selected={formData.role === UserRole.staff}><UserPlus size={20} /></RoleIcon>
+                  <RoleIcon selected={formData.role === UserRole.staff}>
+                    <UserPlus size={20} />
+                  </RoleIcon>
                   <RoleInfo>
                     <RoleName>Staff</RoleName>
-                    <RoleDescription>Acceso a gestión de contenido y soporte</RoleDescription>
+                    <RoleDescription>
+                      Acceso a gestión de contenido y soporte
+                    </RoleDescription>
                   </RoleInfo>
                 </RoleOption>
 
-                <RoleOption 
+                <RoleOption
                   selected={formData.role === UserRole.admin}
-                  onClick={() => setFormData(prev => ({ ...prev, role: UserRole.admin }))}
+                  onClick={() =>
+                    setFormData(prev => ({ ...prev, role: UserRole.admin }))
+                  }
                 >
-                  <RoleIcon selected={formData.role === UserRole.admin}><Shield size={20} /></RoleIcon>
+                  <RoleIcon selected={formData.role === UserRole.admin}>
+                    <Shield size={20} />
+                  </RoleIcon>
                   <RoleInfo>
                     <RoleName>Administrador</RoleName>
-                    <RoleDescription>Acceso completo al sistema</RoleDescription>
+                    <RoleDescription>
+                      Acceso completo al sistema
+                    </RoleDescription>
                   </RoleInfo>
                 </RoleOption>
               </RoleGrid>
@@ -680,15 +737,17 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
 
             <CheckboxContainer>
               <Checkbox
-                type="checkbox"
-                id="isActiveCreate"
+                type='checkbox'
+                id='isActiveCreate'
                 checked={formData.isActive || false}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ 
-                  ...prev, 
-                  isActive: e.target.checked 
-                }))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData(prev => ({
+                    ...prev,
+                    isActive: e.target.checked,
+                  }))
+                }
               />
-              <CheckboxLabel htmlFor="isActiveCreate">
+              <CheckboxLabel htmlFor='isActiveCreate'>
                 <CheckCircle size={16} />
                 Usuario activo (puede acceder al sistema)
               </CheckboxLabel>
@@ -697,19 +756,15 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
         </FormContent>
 
         <FormActions>
-          <Button
-            variant="outline"
-            onClick={handleClose}
-            size="large"
-          >
+          <Button variant='outline' onClick={handleClose} size='large'>
             Cancelar
           </Button>
           <Button
-            variant="primary"
+            variant='primary'
             onClick={handleSubmit}
             isLoading={isLoading}
             disabled={!isFormValid()}
-            size="large"
+            size='large'
             icon={<UserPlus size={16} />}
           >
             {isLoading ? 'Creando...' : 'Crear Usuario'}

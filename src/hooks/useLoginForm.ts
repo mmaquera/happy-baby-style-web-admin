@@ -70,56 +70,64 @@ export const useLoginForm = (): UseLoginFormReturn => {
   // ✅ PASO 1: Función para procesar errores del servidor
   const processLoginError = useCallback((errorMessage: string): string => {
     const errorLower = errorMessage.toLowerCase();
-    
-    if (errorLower.includes('invalid email') || errorLower.includes('invalid password')) {
+
+    if (
+      errorLower.includes('invalid email') ||
+      errorLower.includes('invalid password')
+    ) {
       return 'Credenciales incorrectas. Verifica tu email y contraseña.';
     }
-    
+
     if (errorLower.includes('network') || errorLower.includes('connection')) {
       return 'Error de conexión. Verifica tu internet e intenta nuevamente.';
     }
-    
+
     if (errorLower.includes('server') || errorLower.includes('internal')) {
       return 'Error del servidor. Intenta nuevamente en unos momentos.';
     }
-    
+
     if (errorLower.includes('timeout')) {
       return 'La solicitud tardó demasiado. Intenta nuevamente.';
     }
-    
+
     return 'Error al iniciar sesión. Intenta nuevamente.';
   }, []);
 
   // ✅ PASO 2: Handle form submission siguiendo estándares
-  const onSubmit = useCallback(async (data: LoginFormData) => {
-    try {
-      // ✅ PASO 1: Limpiar errores previos
-      setLocalError(null);
-      clearAuthError();
+  const onSubmit = useCallback(
+    async (data: LoginFormData) => {
+      try {
+        // ✅ PASO 1: Limpiar errores previos
+        setLocalError(null);
+        clearAuthError();
 
-      // ✅ PASO 2: Validación local (ya manejada por react-hook-form)
-      // Los errores de validación se muestran automáticamente en los campos
+        // ✅ PASO 2: Validación local (ya manejada por react-hook-form)
+        // Los errores de validación se muestran automáticamente en los campos
 
-      // ✅ PASO 3: Ejecutar login
-      const success = await login(data);
-      
-      // ✅ PASO 4: Validar respuesta del servidor
-      if (success) {
-        // ✅ PASO 5: Éxito - El contexto ya maneja el toast de éxito
-        navigate(redirectPath, { replace: true });
-      } else {
-        // ✅ Manejar caso de fallo sin excepción - El contexto ya maneja el toast de error
-        const errorMessage = 'Credenciales incorrectas. Verifica tu email y contraseña.';
-        setLocalError(errorMessage);
+        // ✅ PASO 3: Ejecutar login
+        const success = await login(data);
+
+        // ✅ PASO 4: Validar respuesta del servidor
+        if (success) {
+          // ✅ PASO 5: Éxito - El contexto ya maneja el toast de éxito
+          navigate(redirectPath, { replace: true });
+        } else {
+          // ✅ Manejar caso de fallo sin excepción - El contexto ya maneja el toast de error
+          const errorMessage =
+            'Credenciales incorrectas. Verifica tu email y contraseña.';
+          setLocalError(errorMessage);
+        }
+      } catch (error) {
+        // ✅ PASO 6: Manejo de errores - El contexto ya maneja el toast de error
+        const errorMessage =
+          error instanceof Error ? error.message : 'Error al iniciar sesión';
+        const processedError = processLoginError(errorMessage);
+
+        setLocalError(processedError);
       }
-    } catch (error) {
-      // ✅ PASO 6: Manejo de errores - El contexto ya maneja el toast de error
-      const errorMessage = error instanceof Error ? error.message : 'Error al iniciar sesión';
-      const processedError = processLoginError(errorMessage);
-      
-      setLocalError(processedError);
-    }
-  }, [login, navigate, redirectPath, clearAuthError, processLoginError]);
+    },
+    [login, navigate, redirectPath, clearAuthError, processLoginError]
+  );
 
   // Toggle password visibility
   const togglePasswordVisibility = useCallback(() => {

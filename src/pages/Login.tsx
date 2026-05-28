@@ -20,7 +20,11 @@ const LoginContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, ${theme.colors.softPurple} 0%, ${theme.colors.background.secondary} 100%);
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.softPurple} 0%,
+    ${theme.colors.background.secondary} 100%
+  );
   padding: ${theme.spacing[4]};
 `;
 
@@ -80,7 +84,7 @@ export const Login: React.FC = () => {
   if (isLoading && !isInitialized) {
     return (
       <LoginContainer>
-        <LoginCard shadow="large" padding="large">
+        <LoginCard shadow='large' padding='large'>
           <LoginLogo />
           <div style={{ padding: '2rem', textAlign: 'center' }}>
             <p>Inicializando...</p>
@@ -92,7 +96,7 @@ export const Login: React.FC = () => {
 
   return (
     <LoginContainer>
-      <LoginCard shadow="large" padding="large">
+      <LoginCard shadow='large' padding='large'>
         <LoginLogo />
         <LoginForm />
         <FooterText>
@@ -103,4 +107,4 @@ export const Login: React.FC = () => {
   );
 };
 
-export default Login; 
+export default Login;

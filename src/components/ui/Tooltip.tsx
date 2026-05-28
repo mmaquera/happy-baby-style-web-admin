@@ -8,8 +8,8 @@ interface TooltipProps {
   position?: 'right' | 'left' | 'top' | 'bottom';
 }
 
-const TooltipContainer = styled.div<{ 
-  isVisible: boolean; 
+const TooltipContainer = styled.div<{
+  isVisible: boolean;
   position: string;
   adjustedPosition: string;
 }>`
@@ -21,15 +21,15 @@ const TooltipContainer = styled.div<{
   font-size: ${theme.fontSizes.sm};
   white-space: nowrap;
   z-index: 9999;
-  opacity: ${props => props.isVisible ? 1 : 0};
-  visibility: ${props => props.isVisible ? 'visible' : 'hidden'};
+  opacity: ${props => (props.isVisible ? 1 : 0)};
+  visibility: ${props => (props.isVisible ? 'visible' : 'hidden')};
   transition: opacity ${theme.transitions.fast};
   pointer-events: none;
   max-width: 150px;
   word-wrap: break-word;
   white-space: normal;
   text-align: center;
-  
+
   ${props => {
     switch (props.adjustedPosition) {
       case 'top':
@@ -57,7 +57,7 @@ const TooltipContainer = styled.div<{
     content: '';
     position: absolute;
     border: 4px solid transparent;
-    
+
     ${props => {
       switch (props.adjustedPosition) {
         case 'top':
@@ -93,10 +93,10 @@ const TooltipContainer = styled.div<{
   }
 `;
 
-export const Tooltip: React.FC<TooltipProps> = ({ 
-  children, 
-  isVisible, 
-  position = 'right' 
+export const Tooltip: React.FC<TooltipProps> = ({
+  children,
+  isVisible,
+  position = 'right',
 }) => {
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
@@ -112,22 +112,25 @@ export const Tooltip: React.FC<TooltipProps> = ({
       const parentRect = parentElement.getBoundingClientRect();
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
-      
+
       // Tooltip dimensions (approximate)
       const tooltipWidth = 150;
       const tooltipHeight = 40;
-      
+
       let newPosition = position;
       let top = parentRect.top + parentRect.height / 2;
       let left = parentRect.left;
 
       // Check if tooltip would overflow on the right
-      if (position === 'right' && parentRect.right + tooltipWidth + 8 > viewportWidth) {
+      if (
+        position === 'right' &&
+        parentRect.right + tooltipWidth + 8 > viewportWidth
+      ) {
         newPosition = 'top';
         top = parentRect.top - tooltipHeight - 8;
         left = parentRect.left + parentRect.width / 2;
       }
-      // Check if tooltip would overflow on the left  
+      // Check if tooltip would overflow on the left
       else if (position === 'left' && parentRect.left - tooltipWidth - 8 < 0) {
         newPosition = 'top';
         top = parentRect.top - tooltipHeight - 8;
@@ -140,7 +143,10 @@ export const Tooltip: React.FC<TooltipProps> = ({
         left = parentRect.left + parentRect.width / 2;
       }
       // Check if tooltip would overflow on bottom
-      else if (position === 'bottom' && parentRect.bottom + tooltipHeight + 8 > viewportHeight) {
+      else if (
+        position === 'bottom' &&
+        parentRect.bottom + tooltipHeight + 8 > viewportHeight
+      ) {
         newPosition = 'top';
         top = parentRect.top - tooltipHeight - 8;
         left = parentRect.left + parentRect.width / 2;
@@ -175,9 +181,9 @@ export const Tooltip: React.FC<TooltipProps> = ({
   if (!isVisible) return null;
 
   return (
-    <TooltipContainer 
+    <TooltipContainer
       ref={tooltipRef}
-      isVisible={isVisible} 
+      isVisible={isVisible}
       position={position}
       adjustedPosition={adjustedPosition}
       style={{

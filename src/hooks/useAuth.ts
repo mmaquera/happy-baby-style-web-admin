@@ -3,12 +3,12 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useApolloClient } from '@apollo/client';
-import { 
-  AuthServiceFactory, 
-  LoginCredentials, 
+import {
+  AuthServiceFactory,
+  LoginCredentials,
   RegisterCredentials,
   IAuthUser,
-  AuthError 
+  AuthError,
 } from '../services/auth/AuthService';
 import { UserRole } from '../types/unified';
 
@@ -38,7 +38,7 @@ export const useAuth = (): UseAuthReturn => {
     user: null,
     isAuthenticated: false,
     isLoading: true,
-    error: null
+    error: null,
   });
 
   // Memoize auth service instance
@@ -51,21 +51,21 @@ export const useAuth = (): UseAuthReturn => {
     const initializeAuth = async () => {
       try {
         setState(prev => ({ ...prev, isLoading: true }));
-        
+
         if (authService.isAuthenticated()) {
           const user = await authService.getCurrentUser();
           setState({
             user,
             isAuthenticated: !!user,
             isLoading: false,
-            error: null
+            error: null,
           });
         } else {
           setState({
             user: null,
             isAuthenticated: false,
             isLoading: false,
-            error: null
+            error: null,
           });
         }
       } catch (error) {
@@ -74,7 +74,8 @@ export const useAuth = (): UseAuthReturn => {
           user: null,
           isAuthenticated: false,
           isLoading: false,
-          error: error instanceof Error ? error.message : 'Authentication failed'
+          error:
+            error instanceof Error ? error.message : 'Authentication failed',
         });
       }
     };
@@ -83,47 +84,51 @@ export const useAuth = (): UseAuthReturn => {
   }, [authService]);
 
   // Login function
-  const login = useCallback(async (credentials: LoginCredentials) => {
-    try {
-      setState(prev => ({ ...prev, isLoading: true, error: null }));
-      
-      const response = await authService.login(credentials);
-      
-      setState({
-        user: response.user,
-        isAuthenticated: true,
-        isLoading: false,
-        error: null
-      });
-    } catch (error) {
-      const errorMessage = error instanceof AuthError 
-        ? error.message 
-        : error instanceof Error 
-          ? error.message 
-          : 'Login failed';
-      
-      setState(prev => ({
-        ...prev,
-        isLoading: false,
-        error: errorMessage
-      }));
-      
-      throw error;
-    }
-  }, [authService]);
+  const login = useCallback(
+    async (credentials: LoginCredentials) => {
+      try {
+        setState(prev => ({ ...prev, isLoading: true, error: null }));
+
+        const response = await authService.login(credentials);
+
+        setState({
+          user: response.user,
+          isAuthenticated: true,
+          isLoading: false,
+          error: null,
+        });
+      } catch (error) {
+        const errorMessage =
+          error instanceof AuthError
+            ? error.message
+            : error instanceof Error
+              ? error.message
+              : 'Login failed';
+
+        setState(prev => ({
+          ...prev,
+          isLoading: false,
+          error: errorMessage,
+        }));
+
+        throw error;
+      }
+    },
+    [authService]
+  );
 
   // Logout function
   const logout = useCallback(async () => {
     try {
       setState(prev => ({ ...prev, isLoading: true }));
-      
+
       await authService.logout();
-      
+
       setState({
         user: null,
         isAuthenticated: false,
         isLoading: false,
-        error: null
+        error: null,
       });
     } catch (error) {
       console.error('Logout failed:', error);
@@ -132,14 +137,16 @@ export const useAuth = (): UseAuthReturn => {
         user: null,
         isAuthenticated: false,
         isLoading: false,
-        error: null
+        error: null,
       });
     }
   }, [authService]);
 
   // Register function - Not implemented in this hook
   const register = useCallback(async (credentials: RegisterCredentials) => {
-    throw new Error('Registration is not available in useAuth. Please use useUnifiedAuth instead.');
+    throw new Error(
+      'Registration is not available in useAuth. Please use useUnifiedAuth instead.'
+    );
   }, []);
 
   // Refresh token function
@@ -149,15 +156,15 @@ export const useAuth = (): UseAuthReturn => {
       if (!refreshTokenValue) {
         throw new Error('No refresh token available');
       }
-      
+
       await authService.refreshToken(refreshTokenValue);
-      
+
       // Re-fetch current user
       const user = await authService.getCurrentUser();
       setState(prev => ({
         ...prev,
         user,
-        isAuthenticated: !!user
+        isAuthenticated: !!user,
       }));
     } catch (error) {
       console.error('Token refresh failed:', error);
@@ -172,13 +179,19 @@ export const useAuth = (): UseAuthReturn => {
   }, []);
 
   // Role checking utilities
-  const hasRole = useCallback((role: UserRole): boolean => {
-    return state.user?.role === role;
-  }, [state.user]);
+  const hasRole = useCallback(
+    (role: UserRole): boolean => {
+      return state.user?.role === role;
+    },
+    [state.user]
+  );
 
-  const hasAnyRole = useCallback((roles: UserRole[]): boolean => {
-    return state.user ? roles.includes(state.user.role) : false;
-  }, [state.user]);
+  const hasAnyRole = useCallback(
+    (roles: UserRole[]): boolean => {
+      return state.user ? roles.includes(state.user.role) : false;
+    },
+    [state.user]
+  );
 
   return {
     ...state,
@@ -188,23 +201,23 @@ export const useAuth = (): UseAuthReturn => {
     refreshToken,
     clearError,
     hasRole,
-    hasAnyRole
+    hasAnyRole,
   };
 };
 
 // Custom hook for role-based access control
 export const useRoleAccess = (requiredRoles: UserRole[]) => {
   const { user, isAuthenticated, hasAnyRole } = useAuth();
-  
+
   const hasAccess = useMemo(() => {
     if (!isAuthenticated || !user) return false;
     return hasAnyRole(requiredRoles);
   }, [isAuthenticated, user, hasAnyRole, requiredRoles]);
-  
+
   return {
     hasAccess,
     user,
-    isAuthenticated
+    isAuthenticated,
   };
 };
 
@@ -216,4 +229,4 @@ export const useAdminAccess = () => {
 // Custom hook for staff access
 export const useStaffAccess = () => {
   return useRoleAccess([UserRole.admin, UserRole.staff]);
-}; 
+};

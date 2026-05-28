@@ -30,13 +30,13 @@ export const useLogout = (): UseLogoutReturn => {
   const handleLogout = useCallback(async () => {
     try {
       setIsLoggingOut(true);
-      
+
       // Ejecutar logout del servicio de autenticación
       await logout();
-      
+
       // Mostrar mensaje de éxito
       toast.success('Sesión cerrada exitosamente');
-      
+
       // Cerrar modal
       setIsLogoutModalOpen(false);
     } catch (error) {
@@ -54,4 +54,4 @@ export const useLogout = (): UseLogoutReturn => {
     closeLogoutModal,
     handleLogout,
   };
-}; 
+};

@@ -53,6 +53,7 @@ User Input → Local Validation → API Call → Response Processing → Error D
 ### 1. **Hook Layer (useCreateUser)**
 
 #### Estructura Requerida
+
 ```typescript
 export const useCreateUser = () => {
   const [createUserMutation, { loading, error }] = useCreateUserMutation({
@@ -62,30 +63,31 @@ export const useCreateUser = () => {
   const create = async (input: CreateUserProfileInput) => {
     try {
       const result = await createUserMutation({
-        variables: { input }
+        variables: { input },
       });
-      
+
       const response = result.data?.createUser;
-      
+
       // ✅ VALIDACIÓN OBLIGATORIA: Verificar respuesta del servidor
       if (!response) {
         throw new Error('No se recibió respuesta del servidor');
       }
-      
+
       // ✅ VALIDACIÓN OBLIGATORIA: Verificar success antes de mostrar éxito
       if (!response.success) {
         const errorMessage = response.message || 'Error al crear usuario';
         const errorCode = response.code || 'UNKNOWN_ERROR';
-        
+
         throw new Error(`${errorMessage} (${errorCode})`);
       }
-      
+
       // ✅ SOLO mostrar éxito cuando success = true
       toast.success('Usuario creado exitosamente');
       return response;
     } catch (error) {
       // ✅ Manejar errores con mensajes descriptivos
-      const errorMessage = error instanceof Error ? error.message : 'Error al crear usuario';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Error al crear usuario';
       toast.error(errorMessage);
       throw error;
     }
@@ -96,6 +98,7 @@ export const useCreateUser = () => {
 ```
 
 #### Reglas Obligatorias
+
 - ✅ **Siempre** validar `response.success` antes de mostrar mensajes de éxito
 - ✅ **Siempre** incluir códigos de error en los mensajes de error
 - ✅ **Siempre** manejar casos donde `response` es `null` o `undefined`
@@ -104,6 +107,7 @@ export const useCreateUser = () => {
 ### 2. **Modal Layer (ImprovedCreateUserModal)**
 
 #### Estados de Error Requeridos
+
 ```typescript
 interface CreateUserModalProps {
   isOpen: boolean;
@@ -119,6 +123,7 @@ const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
 ```
 
 #### Validación Local Obligatoria
+
 ```typescript
 const validateForm = (): boolean => {
   const newErrors: Record<string, string> = {};
@@ -150,7 +155,7 @@ const validateForm = (): boolean => {
   if (formData.dateOfBirth) {
     const birthDate = new Date(formData.dateOfBirth);
     const today = new Date();
-    
+
     if (isNaN(birthDate.getTime())) {
       newErrors['dateOfBirth'] = 'Fecha de nacimiento no válida';
     } else if (birthDate > today) {
@@ -166,30 +171,39 @@ const validateForm = (): boolean => {
 ```
 
 #### Procesamiento de Errores del Servidor
+
 ```typescript
 // ✅ Función obligatoria para mapear errores del servidor a campos
 const processServerError = (errorMessage: string): void => {
   const newServerErrors: Record<string, string> = {};
-  
+
   // ✅ Mapeo inteligente de errores del servidor
-  if (errorMessage.toLowerCase().includes('birth date') || 
-      errorMessage.toLowerCase().includes('fecha de nacimiento')) {
+  if (
+    errorMessage.toLowerCase().includes('birth date') ||
+    errorMessage.toLowerCase().includes('fecha de nacimiento')
+  ) {
     newServerErrors['dateOfBirth'] = 'Fecha de nacimiento inválida';
   } else if (errorMessage.toLowerCase().includes('email')) {
     newServerErrors['email'] = 'Email inválido o ya existe';
   } else if (errorMessage.toLowerCase().includes('password')) {
     newServerErrors['password'] = 'Contraseña inválida';
-  } else if (errorMessage.toLowerCase().includes('first name') || 
-             errorMessage.toLowerCase().includes('nombre')) {
+  } else if (
+    errorMessage.toLowerCase().includes('first name') ||
+    errorMessage.toLowerCase().includes('nombre')
+  ) {
     newServerErrors['firstName'] = 'Nombre inválido';
-  } else if (errorMessage.toLowerCase().includes('last name') || 
-             errorMessage.toLowerCase().includes('apellido')) {
+  } else if (
+    errorMessage.toLowerCase().includes('last name') ||
+    errorMessage.toLowerCase().includes('apellido')
+  ) {
     newServerErrors['lastName'] = 'Apellido inválido';
-  } else if (errorMessage.toLowerCase().includes('phone') || 
-             errorMessage.toLowerCase().includes('teléfono')) {
+  } else if (
+    errorMessage.toLowerCase().includes('phone') ||
+    errorMessage.toLowerCase().includes('teléfono')
+  ) {
     newServerErrors['phone'] = 'Teléfono inválido';
   }
-  
+
   setServerErrors(newServerErrors);
 };
 
@@ -204,6 +218,7 @@ useEffect(() => {
 ```
 
 #### Manejo de Campos de Formulario
+
 ```typescript
 // ✅ Patrón obligatorio para todos los campos
 <Input
@@ -212,7 +227,7 @@ useEffect(() => {
   value={formData.email}
   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, email: e.target.value }));
-    
+
     // ✅ Limpiar errores cuando el usuario empiece a corregir
     if (errors['email'] || serverErrors['email']) {
       setErrors(prev => ({ ...prev, email: '' }));
@@ -227,15 +242,16 @@ useEffect(() => {
 ```
 
 #### Formateo de Datos para API
+
 ```typescript
 // ✅ Función obligatoria para formatear fechas
 const formatDateForAPI = (dateString: string): string | null => {
   if (!dateString) return null;
-  
+
   try {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return null;
-    
+
     // ✅ Asegurar formato ISO para el backend
     return date.toISOString();
   } catch {
@@ -248,13 +264,14 @@ const handleSubmit = async () => {
   if (validateForm()) {
     try {
       setServerErrors({});
-      
+
       const formattedData = {
         ...formData,
-        dateOfBirth: formData.dateOfBirth ? 
-          formatDateForAPI(formData.dateOfBirth as string) : null
+        dateOfBirth: formData.dateOfBirth
+          ? formatDateForAPI(formData.dateOfBirth as string)
+          : null,
       };
-      
+
       await onSubmit(formattedData);
     } catch (error) {
       console.error('Error en el modal:', error);
@@ -266,11 +283,12 @@ const handleSubmit = async () => {
 ### 3. **Page Layer (Users.tsx)**
 
 #### Manejo de Respuesta Obligatorio
+
 ```typescript
 const handleCreateUser = async (userData: any) => {
   try {
     const result = await createUserMutation.create(userData);
-    
+
     // ✅ Verificar success antes de cerrar modal
     if (result?.success) {
       setShowCreateModal(false);
@@ -287,6 +305,7 @@ const handleCreateUser = async (userData: any) => {
 ```
 
 #### Props del Modal Obligatorias
+
 ```typescript
 <ImprovedCreateUserModal
   isOpen={showCreateModal}
@@ -301,6 +320,7 @@ const handleCreateUser = async (userData: any) => {
 ## 🎨 Componentes de UI Requeridos
 
 ### 1. **Banner de Error del Servidor**
+
 ```typescript
 const ServerErrorBanner = styled.div`
   background: ${theme.colors.error}15;
@@ -326,6 +346,7 @@ const ServerErrorBanner = styled.div`
 ```
 
 ### 2. **Indicadores de Estado del Formulario**
+
 ```typescript
 // ✅ Indicador de pasos que considera errores del servidor
 <Step active={true} completed={isFormValid() && Object.keys(serverErrors).length === 0}>
@@ -349,6 +370,7 @@ const ServerErrorBanner = styled.div`
 ## 📊 Validación de Formularios
 
 ### 1. **Función de Validación Completa**
+
 ```typescript
 const isFormValid = (): boolean => {
   const hasRequiredFields = !!(
@@ -359,35 +381,36 @@ const isFormValid = (): boolean => {
     isValidEmail(formData.email) &&
     calculatePasswordStrength(formData.password) >= 50
   );
-  
+
   // ✅ OBLIGATORIO: Considerar errores del servidor
   const hasNoServerErrors = Object.keys(serverErrors).length === 0;
-  
+
   return hasRequiredFields && hasNoServerErrors;
 };
 ```
 
 ### 2. **Validaciones de Fecha**
+
 ```typescript
 // ✅ Validaciones obligatorias para fechas
 const validateDate = (dateString: string): string | null => {
   if (!dateString) return null;
-  
+
   const date = new Date(dateString);
   const today = new Date();
-  
+
   if (isNaN(date.getTime())) {
     return 'Fecha no válida';
   }
-  
+
   if (date > today) {
     return 'La fecha no puede ser futura';
   }
-  
+
   if (date < new Date('1900-01-01')) {
     return 'Fecha demasiado antigua';
   }
-  
+
   return null;
 };
 ```
@@ -395,11 +418,12 @@ const validateDate = (dateString: string): string | null => {
 ## 🔄 Flujo de Limpieza de Errores
 
 ### 1. **Limpieza Automática**
+
 ```typescript
 // ✅ Patrón obligatorio para limpiar errores
 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
   setFormData(prev => ({ ...prev, email: e.target.value }));
-  
+
   // Limpiar errores cuando el usuario empiece a corregir
   if (errors['email'] || serverErrors['email']) {
     setErrors(prev => ({ ...prev, email: '' }));
@@ -409,6 +433,7 @@ onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 ```
 
 ### 2. **Limpieza en Cierre del Modal**
+
 ```typescript
 const handleClose = () => {
   setFormData({
@@ -419,9 +444,9 @@ const handleClose = () => {
     phone: '',
     dateOfBirth: null,
     role: UserRole.customer,
-    isActive: true
+    isActive: true,
   });
-  
+
   // ✅ OBLIGATORIO: Limpiar todos los estados de error
   setErrors({});
   setServerErrors({});
@@ -432,6 +457,7 @@ const handleClose = () => {
 ## 🧪 Testing y Validación
 
 ### 1. **Casos de Prueba Obligatorios**
+
 - ✅ Validación local de campos requeridos
 - ✅ Validación de formato de email
 - ✅ Validación de fortaleza de contraseña
@@ -442,15 +468,16 @@ const handleClose = () => {
 - ✅ Estados del formulario con errores
 
 ### 2. **Validación de Respuestas del Servidor**
+
 ```typescript
 // ✅ Test obligatorio para respuesta exitosa
 test('should handle successful user creation', async () => {
   const mockResponse = {
     success: true,
     message: 'Usuario creado exitosamente',
-    data: { id: '1', email: 'test@example.com' }
+    data: { id: '1', email: 'test@example.com' },
   };
-  
+
   // ... implementación del test
 });
 
@@ -459,9 +486,9 @@ test('should handle server validation error', async () => {
   const mockResponse = {
     success: false,
     message: 'Validation failed: Birth date is invalid',
-    code: 'INTERNAL_ERROR'
+    code: 'INTERNAL_ERROR',
   };
-  
+
   // ... implementación del test
 });
 ```
@@ -469,12 +496,14 @@ test('should handle server validation error', async () => {
 ## 📝 Checklist de Implementación
 
 ### Hook Layer
+
 - [ ] Validar `response.success` antes de mostrar éxito
 - [ ] Incluir códigos de error en mensajes
 - [ ] Manejar casos de respuesta `null`/`undefined`
 - [ ] Propagar errores para manejo en capas superiores
 
 ### Modal Layer
+
 - [ ] Estados separados para errores locales y del servidor
 - [ ] Función de procesamiento de errores del servidor
 - [ ] useEffect para manejar cambios en errores del servidor
@@ -484,11 +513,13 @@ test('should handle server validation error', async () => {
 - [ ] Banner visual para errores del servidor
 
 ### Page Layer
+
 - [ ] Verificar `success` antes de cerrar modal
 - [ ] Pasar `serverError` como prop al modal
 - [ ] Manejo de casos edge en respuestas
 
 ### UI Components
+
 - [ ] Banner de error del servidor
 - [ ] Indicadores de estado del formulario
 - [ ] Botones deshabilitados con errores

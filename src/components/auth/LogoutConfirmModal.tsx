@@ -25,8 +25,8 @@ const ModalOverlay = styled.div<{ isOpen: boolean }>`
   align-items: center;
   justify-content: center;
   z-index: ${theme.zIndex.modal};
-  opacity: ${({ isOpen }) => isOpen ? 1 : 0};
-  visibility: ${({ isOpen }) => isOpen ? 'visible' : 'hidden'};
+  opacity: ${({ isOpen }) => (isOpen ? 1 : 0)};
+  visibility: ${({ isOpen }) => (isOpen ? 'visible' : 'hidden')};
   transition: all ${theme.transitions.base};
   padding: ${theme.spacing[4]};
 `;
@@ -37,7 +37,7 @@ const ModalContent = styled.div<{ isOpen: boolean }>`
   box-shadow: ${theme.shadows.xl};
   max-width: 400px;
   width: 100%;
-  transform: ${({ isOpen }) => isOpen ? 'scale(1)' : 'scale(0.9)'};
+  transform: ${({ isOpen }) => (isOpen ? 'scale(1)' : 'scale(0.9)')};
   transition: all ${theme.transitions.base};
   overflow: hidden;
 `;
@@ -90,7 +90,7 @@ const WarningIcon = styled.div`
   justify-content: center;
   margin: 0 auto ${theme.spacing[4]} auto;
   border: 2px solid ${theme.colors.warning};
-  
+
   svg {
     width: 30px;
     height: 30px;
@@ -158,7 +158,7 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
 
   return (
     <ModalOverlay isOpen={isOpen} onClick={handleClose}>
-      <ModalContent isOpen={isOpen} onClick={(e) => e.stopPropagation()}>
+      <ModalContent isOpen={isOpen} onClick={e => e.stopPropagation()}>
         <ModalHeader>
           <ModalTitle>
             <LogOut size={24} />
@@ -173,26 +173,26 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
           <WarningIcon>
             <AlertTriangle />
           </WarningIcon>
-          
+
           <ModalMessage>
-            ¿Estás seguro de que quieres cerrar tu sesión? 
-            Tendrás que volver a iniciar sesión para acceder al panel de administración.
+            ¿Estás seguro de que quieres cerrar tu sesión? Tendrás que volver a
+            iniciar sesión para acceder al panel de administración.
           </ModalMessage>
 
           <ModalActions>
             <Button
-              variant="outline"
-              size="medium"
+              variant='outline'
+              size='medium'
               onClick={handleClose}
               disabled={isLoading}
               fullWidth
             >
               Cancelar
             </Button>
-            
+
             <Button
-              variant="danger"
-              size="medium"
+              variant='danger'
+              size='medium'
               onClick={handleConfirm}
               isLoading={isLoading}
               icon={<LogOut size={18} />}
@@ -207,4 +207,4 @@ export const LogoutConfirmModal: React.FC<LogoutConfirmModalProps> = ({
   );
 };
 
-export default LogoutConfirmModal; 
+export default LogoutConfirmModal;

@@ -1,21 +1,26 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
-import { 
-  ProductHeader, 
-  ProductFilters, 
+import {
+  ProductHeader,
+  ProductFilters,
   ProductGrid,
   ProductListView,
   CreateProductModal,
   EditProductModal,
-  ProductDetailModal
+  ProductDetailModal,
 } from '@/components/products';
-import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from '@/hooks/useProductsGraphQL';
+import {
+  useProducts,
+  useCreateProduct,
+  useUpdateProduct,
+  useDeleteProduct,
+} from '@/hooks/useProductsGraphQL';
 import { useProductActions } from '@/hooks/useProductActions';
 import { useCategories } from '@/hooks/useCategories';
 import type { Category, ProductFilterInput } from '@/components/products/types';
 import type { Product } from '@/components/products/types';
-import { 
+import {
   Package,
   Search,
   CheckCircle,
@@ -31,7 +36,7 @@ import {
   Filter,
   Download,
   Upload,
-  Settings
+  Settings,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -50,7 +55,7 @@ const ProductsContainer = styled.div`
   padding: ${theme.spacing[6]};
   max-width: 1400px;
   margin: 0 auto;
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     padding: ${theme.spacing[4]};
   }
@@ -76,10 +81,14 @@ const LoadingSpinner = styled.div`
   border-top: 4px solid ${theme.colors.primary};
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  
+
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -105,7 +114,7 @@ export const Products: React.FC = () => {
   // =====================================================
   // STATE MANAGEMENT - Following Clean Architecture
   // =====================================================
-  
+
   // UI State - Local component state only
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -132,73 +141,79 @@ export const Products: React.FC = () => {
     inStock: true,
     minPrice: null,
     maxPrice: null,
-    tags: []
+    tags: [],
   });
 
   // =====================================================
   // HELPER FUNCTIONS - Clean and focused
   // =====================================================
-  
+
   // Map local filters to GraphQL filter format
-  const mapFiltersToGraphQL = useCallback((localFilters: typeof filters): ProductFilterInput => {
-    const graphqlFilters: ProductFilterInput = {
-      isActive: localFilters.isActive,
-      inStock: localFilters.inStock,
-      tags: localFilters.tags.length > 0 ? localFilters.tags : null
-    };
+  const mapFiltersToGraphQL = useCallback(
+    (localFilters: typeof filters): ProductFilterInput => {
+      const graphqlFilters: ProductFilterInput = {
+        isActive: localFilters.isActive,
+        inStock: localFilters.inStock,
+        tags: localFilters.tags.length > 0 ? localFilters.tags : null,
+      };
 
-    // Add optional filters only if they have values
-    if (localFilters.categoryId) {
-      graphqlFilters.categoryId = localFilters.categoryId;
-    }
-    if (localFilters.minPrice !== null) {
-      graphqlFilters.minPrice = localFilters.minPrice;
-    }
-    if (localFilters.maxPrice !== null) {
-      graphqlFilters.maxPrice = localFilters.maxPrice;
-    }
-    if (localFilters.search) {
-      graphqlFilters.search = localFilters.search;
-    }
+      // Add optional filters only if they have values
+      if (localFilters.categoryId) {
+        graphqlFilters.categoryId = localFilters.categoryId;
+      }
+      if (localFilters.minPrice !== null) {
+        graphqlFilters.minPrice = localFilters.minPrice;
+      }
+      if (localFilters.maxPrice !== null) {
+        graphqlFilters.maxPrice = localFilters.maxPrice;
+      }
+      if (localFilters.search) {
+        graphqlFilters.search = localFilters.search;
+      }
 
-    return graphqlFilters;
-  }, []);
+      return graphqlFilters;
+    },
+    []
+  );
 
   // =====================================================
   // GRAPHQL INTEGRATION - Using existing hooks
   // =====================================================
-  
+
   // Products data from GraphQL
-  const { 
-    products, 
-    loading: productsLoading, 
-    error: productsError, 
-    total, 
-    hasMore, 
-    loadMore, 
-    refetch: refetchProducts 
-  } = useProducts({ 
+  const {
+    products,
+    loading: productsLoading,
+    error: productsError,
+    total,
+    hasMore,
+    loadMore,
+    refetch: refetchProducts,
+  } = useProducts({
     filter: mapFiltersToGraphQL(filters),
-    limit: 20 
+    limit: 20,
   });
 
   // Categories data from GraphQL
-  const { 
-    categories: graphqlCategories, 
-    loading: categoriesLoading, 
+  const {
+    categories: graphqlCategories,
+    loading: categoriesLoading,
     error: categoriesError,
-    refetchCategories 
+    refetchCategories,
   } = useCategories();
 
   // Product mutations
-  const { create: createProduct, loading: creatingProduct } = useCreateProduct();
-  const { update: updateProduct, loading: updatingProduct } = useUpdateProduct();
-  const { remove: deleteProduct, loading: deletingProduct } = useDeleteProduct();
+  const { create: createProduct, loading: creatingProduct } =
+    useCreateProduct();
+  const { update: updateProduct, loading: updatingProduct } =
+    useUpdateProduct();
+  const { remove: deleteProduct, loading: deletingProduct } =
+    useDeleteProduct();
 
   // =====================================================
   // COMPUTED VALUES - Using useMemo for performance
   // =====================================================
-  
+
   // Compute available categories (GraphQL + fallback)
   const availableCategories = useMemo(() => {
     if (graphqlCategories.length > 0) {
@@ -211,33 +226,41 @@ export const Products: React.FC = () => {
 
   // Compute product statistics from real data
   const productStats = useMemo(() => {
-    if (!products.length) return {
-      totalProducts: 0,
-      activeProducts: 0,
-      lowStockProducts: 0,
-      outOfStockProducts: 0
-    };
+    if (!products.length)
+      return {
+        totalProducts: 0,
+        activeProducts: 0,
+        lowStockProducts: 0,
+        outOfStockProducts: 0,
+      };
 
     const activeProducts = products.filter(p => p.isActive).length;
-    const lowStockProducts = products.filter(p => p.stockQuantity <= 10 && p.stockQuantity > 0).length;
-    const outOfStockProducts = products.filter(p => p.stockQuantity === 0).length;
+    const lowStockProducts = products.filter(
+      p => p.stockQuantity <= 10 && p.stockQuantity > 0
+    ).length;
+    const outOfStockProducts = products.filter(
+      p => p.stockQuantity === 0
+    ).length;
 
     return {
       totalProducts: total,
       activeProducts,
       lowStockProducts,
-      outOfStockProducts
+      outOfStockProducts,
     };
   }, [products, total]);
 
   // =====================================================
   // EVENT HANDLERS - Following Single Responsibility
   // =====================================================
-  
-  const handleFilterChange = useCallback((newFilters: Partial<typeof filters>) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
-    setCurrentPage(1); // Reset to first page when filters change
-  }, []);
+
+  const handleFilterChange = useCallback(
+    (newFilters: Partial<typeof filters>) => {
+      setFilters(prev => ({ ...prev, ...newFilters }));
+      setCurrentPage(1); // Reset to first page when filters change
+    },
+    []
+  );
 
   const handleClearFilters = useCallback(() => {
     setFilters({
@@ -247,7 +270,7 @@ export const Products: React.FC = () => {
       inStock: true,
       minPrice: null,
       maxPrice: null,
-      tags: []
+      tags: [],
     });
     setCurrentPage(1);
   }, []);
@@ -256,65 +279,85 @@ export const Products: React.FC = () => {
     setIsCreateModalOpen(true);
   }, []);
 
-  const handleCreateProductSuccess = useCallback((product: Product) => {
-    console.log('Producto creado exitosamente:', product);
-    refetchProducts(); // Refresh products list
-    setIsCreateModalOpen(false);
-  }, [refetchProducts]);
+  const handleCreateProductSuccess = useCallback(
+    (product: Product) => {
+      console.log('Producto creado exitosamente:', product);
+      refetchProducts(); // Refresh products list
+      setIsCreateModalOpen(false);
+    },
+    [refetchProducts]
+  );
 
   const handleCloseCreateModal = useCallback(() => {
     setIsCreateModalOpen(false);
   }, []);
 
-  const handleEditProduct = useCallback((productId: string) => {
-    const product = products.find(p => p.id === productId);
-    if (product) {
-      setEditingProduct(product as Product);
-      setIsEditModalOpen(true);
-    }
-  }, [products]);
+  const handleEditProduct = useCallback(
+    (productId: string) => {
+      const product = products.find(p => p.id === productId);
+      if (product) {
+        setEditingProduct(product as Product);
+        setIsEditModalOpen(true);
+      }
+    },
+    [products]
+  );
 
-  const handleEditProductSuccess = useCallback((product: Product) => {
-    console.log('Producto editado exitosamente:', product);
-    refetchProducts(); // Refresh products list
-    setIsEditModalOpen(false);
-    setEditingProduct(null);
-  }, [refetchProducts]);
+  const handleEditProductSuccess = useCallback(
+    (product: Product) => {
+      console.log('Producto editado exitosamente:', product);
+      refetchProducts(); // Refresh products list
+      setIsEditModalOpen(false);
+      setEditingProduct(null);
+    },
+    [refetchProducts]
+  );
 
   const handleCloseEditModal = useCallback(() => {
     setIsEditModalOpen(false);
     setEditingProduct(null);
   }, []);
 
-  const handleDeleteProduct = useCallback(async (productId: string) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este producto?')) {
-      try {
-        await deleteProduct(productId);
-        // Product will be automatically removed from list via Apollo cache
-      } catch (error) {
-        console.error('Error deleting product:', error);
+  const handleDeleteProduct = useCallback(
+    async (productId: string) => {
+      if (
+        window.confirm('¿Estás seguro de que quieres eliminar este producto?')
+      ) {
+        try {
+          await deleteProduct(productId);
+          // Product will be automatically removed from list via Apollo cache
+        } catch (error) {
+          console.error('Error deleting product:', error);
+        }
       }
-    }
-  }, [deleteProduct]);
+    },
+    [deleteProduct]
+  );
 
-  const handleToggleStatus = useCallback(async (productId: string, isActive: boolean) => {
-    try {
+  const handleToggleStatus = useCallback(
+    async (productId: string, isActive: boolean) => {
+      try {
+        const product = products.find(p => p.id === productId);
+        if (!product) return;
+
+        await updateProduct(productId, { isActive });
+        // Product will be automatically updated via Apollo cache
+      } catch (error) {
+        console.error('Error updating product status:', error);
+      }
+    },
+    [products, updateProduct]
+  );
+
+  const handleViewDetails = useCallback(
+    (productId: string) => {
       const product = products.find(p => p.id === productId);
-      if (!product) return;
-
-      await updateProduct(productId, { isActive });
-      // Product will be automatically updated via Apollo cache
-    } catch (error) {
-      console.error('Error updating product status:', error);
-    }
-  }, [products, updateProduct]);
-
-  const handleViewDetails = useCallback((productId: string) => {
-    const product = products.find(p => p.id === productId);
-    if (product) {
-      setSelectedProduct(product as Product);
-    }
-  }, [products]);
+      if (product) {
+        setSelectedProduct(product as Product);
+      }
+    },
+    [products]
+  );
 
   const handleCloseProductDetailModal = useCallback(() => {
     setSelectedProduct(null);
@@ -346,10 +389,10 @@ export const Products: React.FC = () => {
   // =====================================================
   // LOADING AND ERROR STATES - Following standards
   // =====================================================
-  
+
   // Initial loading state - only show when loading categories for the first time
   const isInitialLoading = categoriesLoading && graphqlCategories.length === 0;
-  
+
   // Products loading state
   const isProductsLoading = productsLoading && products.length === 0;
 
@@ -359,9 +402,7 @@ export const Products: React.FC = () => {
       <ProductsContainer>
         <LoadingOverlay>
           <LoadingSpinner />
-          <LoadingText>
-            Cargando módulo de productos...
-          </LoadingText>
+          <LoadingText>Cargando módulo de productos...</LoadingText>
         </LoadingOverlay>
       </ProductsContainer>
     );
@@ -373,11 +414,14 @@ export const Products: React.FC = () => {
       <ProductsContainer>
         <Card>
           <ErrorState>
-            <AlertTriangle size={48} style={{ marginBottom: theme.spacing[4] }} />
+            <AlertTriangle
+              size={48}
+              style={{ marginBottom: theme.spacing[4] }}
+            />
             <h2>Error al cargar categorías</h2>
             <p>{categoriesError}</p>
-            <Button 
-              variant="primary" 
+            <Button
+              variant='primary'
               onClick={() => refetchCategories()}
               style={{ marginTop: theme.spacing[4] }}
             >
@@ -395,11 +439,14 @@ export const Products: React.FC = () => {
       <ProductsContainer>
         <Card>
           <ErrorState>
-            <AlertTriangle size={48} style={{ marginBottom: theme.spacing[4] }} />
+            <AlertTriangle
+              size={48}
+              style={{ marginBottom: theme.spacing[4] }}
+            />
             <h2>Error al cargar productos</h2>
             <p>{productsError.message}</p>
-            <Button 
-              variant="primary" 
+            <Button
+              variant='primary'
               onClick={() => refetchProducts()}
               style={{ marginTop: theme.spacing[4] }}
             >
@@ -414,12 +461,12 @@ export const Products: React.FC = () => {
   // =====================================================
   // RENDER - Clean and focused
   // =====================================================
-  
+
   return (
     <ProductsContainer>
       {/* Consolidated ProductHeader with all controls */}
       <ProductHeader
-        title="Productos Happy Baby Style"
+        title='Productos Happy Baby Style'
         stats={productStats}
         viewMode={viewMode}
         onAddProduct={handleAddProduct}
@@ -431,38 +478,46 @@ export const Products: React.FC = () => {
 
       {/* Subtle loading indicator for category updates */}
       {categoriesLoading && graphqlCategories.length > 0 && (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: theme.spacing[2],
-          padding: theme.spacing[2],
-          backgroundColor: theme.colors.background.accent,
-          borderRadius: theme.borderRadius.base,
-          marginBottom: theme.spacing[4],
-          fontSize: theme.fontSizes.sm,
-          color: theme.colors.text.secondary
-        }}>
-          <LoadingSpinner style={{ width: '16px', height: '16px', borderWidth: '2px' }} />
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: theme.spacing[2],
+            padding: theme.spacing[2],
+            backgroundColor: theme.colors.background.accent,
+            borderRadius: theme.borderRadius.base,
+            marginBottom: theme.spacing[4],
+            fontSize: theme.fontSizes.sm,
+            color: theme.colors.text.secondary,
+          }}
+        >
+          <LoadingSpinner
+            style={{ width: '16px', height: '16px', borderWidth: '2px' }}
+          />
           Actualizando categorías...
         </div>
       )}
 
       {/* Subtle loading indicator for product updates */}
       {productsLoading && products.length > 0 && (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: theme.spacing[2],
-          padding: theme.spacing[2],
-          backgroundColor: theme.colors.background.accent,
-          borderRadius: theme.borderRadius.base,
-          marginBottom: theme.spacing[4],
-          fontSize: theme.fontSizes.sm,
-          color: theme.colors.text.secondary
-        }}>
-          <LoadingSpinner style={{ width: '16px', height: '16px', borderWidth: '2px' }} />
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: theme.spacing[2],
+            padding: theme.spacing[2],
+            backgroundColor: theme.colors.background.accent,
+            borderRadius: theme.borderRadius.base,
+            marginBottom: theme.spacing[4],
+            fontSize: theme.fontSizes.sm,
+            color: theme.colors.text.secondary,
+          }}
+        >
+          <LoadingSpinner
+            style={{ width: '16px', height: '16px', borderWidth: '2px' }}
+          />
           Actualizando productos...
         </div>
       )}
@@ -475,12 +530,12 @@ export const Products: React.FC = () => {
             categoryId: filters.categoryId,
             isActive: filters.isActive,
             inStock: filters.inStock,
-            tags: filters.tags
+            tags: filters.tags,
           };
-          
+
           if (filters.minPrice !== null) filterObj.minPrice = filters.minPrice;
           if (filters.maxPrice !== null) filterObj.maxPrice = filters.maxPrice;
-          
+
           return filterObj;
         })()}
         categories={availableCategories}
@@ -501,7 +556,7 @@ export const Products: React.FC = () => {
           onDelete={handleDeleteProduct}
           onToggleStatus={handleToggleStatus}
           onViewDetails={handleViewDetails}
-          emptyMessage="No se encontraron productos que coincidan con los filtros aplicados."
+          emptyMessage='No se encontraron productos que coincidan con los filtros aplicados.'
         />
       ) : (
         <ProductListView
@@ -541,13 +596,13 @@ export const Products: React.FC = () => {
         availableTags={[]} // TODO: Implement tags from GraphQL
       />
 
-             {/* Product Detail Modal */}
-       <ProductDetailModal
-         isOpen={!!selectedProduct}
-         onClose={handleCloseProductDetailModal}
-         product={selectedProduct}
-         onEdit={(product) => handleEditProduct(product.id)}
-       />
+      {/* Product Detail Modal */}
+      <ProductDetailModal
+        isOpen={!!selectedProduct}
+        onClose={handleCloseProductDetailModal}
+        product={selectedProduct}
+        onEdit={product => handleEditProduct(product.id)}
+      />
     </ProductsContainer>
   );
 };

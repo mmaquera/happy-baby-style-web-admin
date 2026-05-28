@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
-import { Search, Bell, User, Settings, LogOut, ChevronDown } from 'lucide-react';
+import {
+  Search,
+  Bell,
+  User,
+  Settings,
+  LogOut,
+  ChevronDown,
+} from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLogout } from '@/hooks/useLogout';
 import { LogoutConfirmModal } from '@/components/auth/LogoutConfirmModal';
@@ -40,7 +47,7 @@ const HeaderContainer = styled.header<{ sidebarWidth: number }>`
 
 const SearchContainer = styled.div<{ isCollapsed: boolean }>`
   flex: 1;
-  max-width: ${props => props.isCollapsed ? '500px' : '400px'};
+  max-width: ${props => (props.isCollapsed ? '500px' : '400px')};
   position: relative;
   margin-right: ${theme.spacing[6]};
   transition: max-width ${theme.transitions.base};
@@ -140,14 +147,18 @@ const UserProfile = styled.div`
 const Avatar = styled.div`
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, ${theme.colors.primaryPurple}, ${theme.colors.coralAccent});
+  background: linear-gradient(
+    135deg,
+    ${theme.colors.primaryPurple},
+    ${theme.colors.coralAccent}
+  );
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: ${theme.colors.white};
   font-weight: ${theme.fontWeights.medium};
-  
+
   @media (max-width: ${theme.breakpoints.sm}) {
     width: 32px;
     height: 32px;
@@ -158,7 +169,7 @@ const Avatar = styled.div`
 const UserInfo = styled.div`
   display: flex;
   flex-direction: column;
-  
+
   @media (max-width: ${theme.breakpoints.sm}) {
     display: none;
   }
@@ -211,9 +222,10 @@ const UserDropdownMenu = styled.div<{ isOpen: boolean }>`
   border-radius: ${theme.borderRadius.lg};
   box-shadow: ${theme.shadows.lg};
   min-width: 200px;
-  opacity: ${({ isOpen }) => isOpen ? 1 : 0};
-  visibility: ${({ isOpen }) => isOpen ? 'visible' : 'hidden'};
-  transform: ${({ isOpen }) => isOpen ? 'translateY(0)' : 'translateY(-10px)'};
+  opacity: ${({ isOpen }) => (isOpen ? 1 : 0)};
+  visibility: ${({ isOpen }) => (isOpen ? 'visible' : 'hidden')};
+  transform: ${({ isOpen }) =>
+    isOpen ? 'translateY(0)' : 'translateY(-10px)'};
   transition: all ${theme.transitions.base};
   z-index: ${theme.zIndex.dropdown};
 `;
@@ -254,18 +266,18 @@ const UserDropdownItem = styled.button`
 
 const DropdownArrow = styled(ChevronDown)<{ isOpen: boolean }>`
   transition: transform ${theme.transitions.fast};
-  transform: ${({ isOpen }) => isOpen ? 'rotate(180deg)' : 'rotate(0deg)'};
+  transform: ${({ isOpen }) => (isOpen ? 'rotate(180deg)' : 'rotate(0deg)')};
 `;
 
 export const Header: React.FC = () => {
   const { user } = useAuth();
   const { isCollapsed } = useSidebar();
-  const { 
-    isLogoutModalOpen, 
-    isLoggingOut, 
-    openLogoutModal, 
-    closeLogoutModal, 
-    handleLogout 
+  const {
+    isLogoutModalOpen,
+    isLoggingOut,
+    openLogoutModal,
+    closeLogoutModal,
+    handleLogout,
   } = useLogout();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -289,7 +301,7 @@ export const Header: React.FC = () => {
 
   const getUserInitials = (name: string) => {
     if (!name) return 'U';
-    
+
     // If it's an email, use the part before @
     if (name.includes('@')) {
       const emailUser = name.split('@')[0];
@@ -297,7 +309,7 @@ export const Header: React.FC = () => {
         return emailUser.charAt(0).toUpperCase();
       }
     }
-    
+
     // If it's a regular name, use first letters of words
     return name
       .split(' ')
@@ -315,10 +327,7 @@ export const Header: React.FC = () => {
 
       <SearchContainer isCollapsed={isCollapsed}>
         <SearchIcon />
-        <SearchInput 
-          placeholder="Buscar productos, pedidos..." 
-          type="search"
-        />
+        <SearchInput placeholder='Buscar productos, pedidos...' type='search' />
       </SearchContainer>
 
       <HeaderActions>
@@ -330,20 +339,23 @@ export const Header: React.FC = () => {
         <UserDropdown>
           <UserProfile onClick={handleUserClick}>
             <Avatar>
-              {user ? getUserInitials(
-                user.profile?.firstName && user.profile?.lastName 
-                  ? `${user.profile.firstName} ${user.profile.lastName}`
-                  : user.email
-              ) : 'U'}
+              {user
+                ? getUserInitials(
+                    user.profile?.firstName && user.profile?.lastName
+                      ? `${user.profile.firstName} ${user.profile.lastName}`
+                      : user.email
+                  )
+                : 'U'}
             </Avatar>
             <UserInfo>
               <UserName>
-                {user?.profile?.firstName && user?.profile?.lastName 
+                {user?.profile?.firstName && user?.profile?.lastName
                   ? `${user.profile.firstName} ${user.profile.lastName}`
-                  : user?.email || 'Usuario'
-                }
+                  : user?.email || 'Usuario'}
               </UserName>
-              <UserRole>{user?.role === 'admin' ? 'Administrador' : 'Usuario'}</UserRole>
+              <UserRole>
+                {user?.role === 'admin' ? 'Administrador' : 'Usuario'}
+              </UserRole>
             </UserInfo>
             <DropdownArrow size={16} isOpen={isDropdownOpen} />
           </UserProfile>

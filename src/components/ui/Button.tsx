@@ -12,7 +12,15 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const StyledButton = styled.button.withConfig({
-  shouldForwardProp: (prop) => !['variant', 'size', 'isLoading', 'fullWidth', 'icon', 'iconPosition'].includes(prop),
+  shouldForwardProp: prop =>
+    ![
+      'variant',
+      'size',
+      'isLoading',
+      'fullWidth',
+      'icon',
+      'iconPosition',
+    ].includes(prop),
 })<ButtonProps>`
   display: inline-flex;
   align-items: center;
@@ -34,9 +42,11 @@ const StyledButton = styled.button.withConfig({
     transform: none !important;
   }
 
-  ${({ fullWidth }) => fullWidth && css`
-    width: 100%;
-  `}
+  ${({ fullWidth }) =>
+    fullWidth &&
+    css`
+      width: 100%;
+    `}
 
   ${({ size }) => {
     switch (size) {
@@ -150,13 +160,15 @@ const StyledButton = styled.button.withConfig({
     }
   }}
 
-  ${({ isLoading }) => isLoading && css`
-    pointer-events: none;
-    
-    .loading-spinner {
-      animation: spin 1s linear infinite;
-    }
-  `}
+  ${({ isLoading }) =>
+    isLoading &&
+    css`
+      pointer-events: none;
+
+      .loading-spinner {
+        animation: spin 1s linear infinite;
+      }
+    `}
 `;
 
 const LoadingSpinner = styled.div`
@@ -180,7 +192,7 @@ export const Button: React.FC<ButtonProps> = ({
 }) => {
   const content = (
     <>
-      {isLoading && <LoadingSpinner className="loading-spinner" />}
+      {isLoading && <LoadingSpinner className='loading-spinner' />}
       {!isLoading && icon && iconPosition === 'left' && icon}
       {children}
       {!isLoading && icon && iconPosition === 'right' && icon}

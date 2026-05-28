@@ -3,7 +3,10 @@ import { useCategoriesGraphQL } from './useCategoriesGraphQL';
 import { useCategoryActions } from './useCategoryActions';
 import { useCategoryFilters } from './useCategoryFilters';
 import { PaginationInput } from '@/generated/graphql';
-import { CategoryFilters, CategoryFilterInput } from '@/components/categories/types';
+import {
+  CategoryFilters,
+  CategoryFilterInput,
+} from '@/components/categories/types';
 
 export interface UseCategoriesReturn {
   // Data
@@ -11,7 +14,7 @@ export interface UseCategoriesReturn {
   category: any | null;
   loading: boolean;
   error: string | null;
-  
+
   // Pagination
   pagination: {
     total: number;
@@ -21,42 +24,45 @@ export interface UseCategoriesReturn {
     currentPage: number;
     totalPages: number;
   };
-  
+
   // Filters and sorting
   filters: CategoryFilters;
   sortConfig: {
     field: string;
     direction: 'asc' | 'desc';
   };
-  
+
   // Actions
   createCategory: (input: any) => Promise<any>;
   updateCategory: (id: string, input: any) => Promise<any>;
   deleteCategory: (id: string) => Promise<boolean>;
   toggleStatus: (categoryId: string, isActive: boolean) => Promise<boolean>;
   bulkDelete: (categoryIds: string[]) => Promise<boolean>;
-  bulkToggleStatus: (categoryIds: string[], isActive: boolean) => Promise<boolean>;
-  
+  bulkToggleStatus: (
+    categoryIds: string[],
+    isActive: boolean
+  ) => Promise<boolean>;
+
   // Filter actions
   setFilters: (filters: CategoryFilters) => void;
   updateFilter: (key: string, value: any) => void;
   clearFilters: () => void;
-  
+
   // Sorting actions
   handleSort: (field: string) => void;
-  
+
   // Pagination actions
   goToPage: (page: number) => void;
   nextPage: () => void;
   prevPage: () => void;
-  
+
   // Selection actions
   selectCategory: (categoryId: string) => void;
   deselectCategory: (categoryId: string) => void;
   selectAllCategories: (categoryIds: string[]) => void;
   clearSelection: () => void;
   isCategorySelected: (categoryId: string) => boolean;
-  
+
   // Utilities
   refetchCategories: () => Promise<void>;
   clearError: () => void;
@@ -65,60 +71,99 @@ export interface UseCategoriesReturn {
 
 export const useCategories = (): UseCategoriesReturn => {
   // Helper function to map GraphQL filters to local filters
-  const mapGraphQLFiltersToLocal = useCallback((graphqlFilters: CategoryFilterInput): CategoryFilters => {
-    const localFilters: CategoryFilters = {};
-    
-    // Only add properties that are not null or undefined
-    if (graphqlFilters.isActive !== null && graphqlFilters.isActive !== undefined) {
-      localFilters.isActive = graphqlFilters.isActive;
-    }
-    
-    if (graphqlFilters.search !== null && graphqlFilters.search !== undefined) {
-      localFilters.search = graphqlFilters.search;
-    }
+  const mapGraphQLFiltersToLocal = useCallback(
+    (graphqlFilters: CategoryFilterInput): CategoryFilters => {
+      const localFilters: CategoryFilters = {};
 
-    if (graphqlFilters.hasImage !== null && graphqlFilters.hasImage !== undefined) {
-      localFilters.hasImage = graphqlFilters.hasImage;
-    }
+      // Only add properties that are not null or undefined
+      if (
+        graphqlFilters.isActive !== null &&
+        graphqlFilters.isActive !== undefined
+      ) {
+        localFilters.isActive = graphqlFilters.isActive;
+      }
 
-    if (graphqlFilters.hasDescription !== null && graphqlFilters.hasDescription !== undefined) {
-      localFilters.hasDescription = graphqlFilters.hasDescription;
-    }
+      if (
+        graphqlFilters.search !== null &&
+        graphqlFilters.search !== undefined
+      ) {
+        localFilters.search = graphqlFilters.search;
+      }
 
-    if (graphqlFilters.hasProducts !== null && graphqlFilters.hasProducts !== undefined) {
-      localFilters.hasProducts = graphqlFilters.hasProducts;
-    }
+      if (
+        graphqlFilters.hasImage !== null &&
+        graphqlFilters.hasImage !== undefined
+      ) {
+        localFilters.hasImage = graphqlFilters.hasImage;
+      }
 
-    if (graphqlFilters.minProducts !== null && graphqlFilters.minProducts !== undefined) {
-      localFilters.minProducts = graphqlFilters.minProducts;
-    }
+      if (
+        graphqlFilters.hasDescription !== null &&
+        graphqlFilters.hasDescription !== undefined
+      ) {
+        localFilters.hasDescription = graphqlFilters.hasDescription;
+      }
 
-    if (graphqlFilters.maxProducts !== null && graphqlFilters.maxProducts !== undefined) {
-      localFilters.maxProducts = graphqlFilters.maxProducts;
-    }
+      if (
+        graphqlFilters.hasProducts !== null &&
+        graphqlFilters.hasProducts !== undefined
+      ) {
+        localFilters.hasProducts = graphqlFilters.hasProducts;
+      }
 
-    if (graphqlFilters.createdAfter !== null && graphqlFilters.createdAfter !== undefined) {
-      localFilters.createdAfter = graphqlFilters.createdAfter;
-    }
+      if (
+        graphqlFilters.minProducts !== null &&
+        graphqlFilters.minProducts !== undefined
+      ) {
+        localFilters.minProducts = graphqlFilters.minProducts;
+      }
 
-    if (graphqlFilters.createdBefore !== null && graphqlFilters.createdBefore !== undefined) {
-      localFilters.createdBefore = graphqlFilters.createdBefore;
-    }
+      if (
+        graphqlFilters.maxProducts !== null &&
+        graphqlFilters.maxProducts !== undefined
+      ) {
+        localFilters.maxProducts = graphqlFilters.maxProducts;
+      }
 
-    if (graphqlFilters.updatedAfter !== null && graphqlFilters.updatedAfter !== undefined) {
-      localFilters.updatedAfter = graphqlFilters.updatedAfter;
-    }
+      if (
+        graphqlFilters.createdAfter !== null &&
+        graphqlFilters.createdAfter !== undefined
+      ) {
+        localFilters.createdAfter = graphqlFilters.createdAfter;
+      }
 
-    if (graphqlFilters.updatedBefore !== null && graphqlFilters.updatedBefore !== undefined) {
-      localFilters.updatedBefore = graphqlFilters.updatedBefore;
-    }
+      if (
+        graphqlFilters.createdBefore !== null &&
+        graphqlFilters.createdBefore !== undefined
+      ) {
+        localFilters.createdBefore = graphqlFilters.createdBefore;
+      }
 
-    if (graphqlFilters.sortOrder !== null && graphqlFilters.sortOrder !== undefined) {
-      localFilters.sortOrder = graphqlFilters.sortOrder;
-    }
-    
-    return localFilters;
-  }, []);
+      if (
+        graphqlFilters.updatedAfter !== null &&
+        graphqlFilters.updatedAfter !== undefined
+      ) {
+        localFilters.updatedAfter = graphqlFilters.updatedAfter;
+      }
+
+      if (
+        graphqlFilters.updatedBefore !== null &&
+        graphqlFilters.updatedBefore !== undefined
+      ) {
+        localFilters.updatedBefore = graphqlFilters.updatedBefore;
+      }
+
+      if (
+        graphqlFilters.sortOrder !== null &&
+        graphqlFilters.sortOrder !== undefined
+      ) {
+        localFilters.sortOrder = graphqlFilters.sortOrder;
+      }
+
+      return localFilters;
+    },
+    []
+  );
 
   // Core GraphQL operations
   const {
@@ -132,7 +177,7 @@ export const useCategories = (): UseCategoriesReturn => {
     updateCategory: updateCategoryGraphQL,
     deleteCategory: deleteCategoryGraphQL,
     refetchCategories,
-    clearError
+    clearError,
   } = useCategoriesGraphQL();
 
   // Actions
@@ -146,7 +191,7 @@ export const useCategories = (): UseCategoriesReturn => {
     deselectCategory,
     selectAllCategories,
     clearSelection,
-    isCategorySelected
+    isCategorySelected,
   } = useCategoryActions();
 
   // Filters and pagination
@@ -162,7 +207,7 @@ export const useCategories = (): UseCategoriesReturn => {
     nextPage,
     prevPage,
     resetToDefaults,
-    mapFiltersToGraphQL
+    mapFiltersToGraphQL,
   } = useCategoryFilters(pagination.total);
 
   // Load categories on mount and when filters/pagination change
@@ -172,94 +217,149 @@ export const useCategories = (): UseCategoriesReturn => {
       const graphqlFilters = mapFiltersToGraphQL(filters);
       await fetchCategories(graphqlFilters, localPagination);
     };
-    
+
     loadCategories();
   }, [fetchCategories, filters, localPagination, mapFiltersToGraphQL]);
 
   // Wrapper for create category
-  const createCategory = useCallback(async (input: any) => {
-    try {
-      // Convert local filters to GraphQL format
-      const graphqlFilters = mapFiltersToGraphQL(filters);
-      const result = await createCategoryGraphQL(input, graphqlFilters, localPagination);
-      return result;
-    } catch (error) {
-      throw error;
-    }
-  }, [createCategoryGraphQL, mapFiltersToGraphQL, filters, localPagination]);
+  const createCategory = useCallback(
+    async (input: any) => {
+      try {
+        // Convert local filters to GraphQL format
+        const graphqlFilters = mapFiltersToGraphQL(filters);
+        const result = await createCategoryGraphQL(
+          input,
+          graphqlFilters,
+          localPagination
+        );
+        return result;
+      } catch (error) {
+        throw error;
+      }
+    },
+    [createCategoryGraphQL, mapFiltersToGraphQL, filters, localPagination]
+  );
 
   // Wrapper for update category
-  const updateCategory = useCallback(async (id: string, input: any) => {
-    try {
-      // Convert local filters to GraphQL format
-      const graphqlFilters = mapFiltersToGraphQL(filters);
-      const result = await updateCategoryGraphQL(id, input, graphqlFilters, localPagination);
-      return result;
-    } catch (error) {
-      throw error;
-    }
-  }, [updateCategoryGraphQL, mapFiltersToGraphQL, filters, localPagination]);
+  const updateCategory = useCallback(
+    async (id: string, input: any) => {
+      try {
+        // Convert local filters to GraphQL format
+        const graphqlFilters = mapFiltersToGraphQL(filters);
+        const result = await updateCategoryGraphQL(
+          id,
+          input,
+          graphqlFilters,
+          localPagination
+        );
+        return result;
+      } catch (error) {
+        throw error;
+      }
+    },
+    [updateCategoryGraphQL, mapFiltersToGraphQL, filters, localPagination]
+  );
 
   // Wrapper for delete category
-  const deleteCategory = useCallback(async (id: string) => {
-    try {
-      // Convert local filters to GraphQL format
-      const graphqlFilters = mapFiltersToGraphQL(filters);
-      const result = await deleteCategoryGraphQL(id, graphqlFilters, localPagination);
-      return result;
-    } catch (error) {
-      throw error;
-    }
-  }, [deleteCategoryGraphQL, mapFiltersToGraphQL, filters, localPagination]);
+  const deleteCategory = useCallback(
+    async (id: string) => {
+      try {
+        // Convert local filters to GraphQL format
+        const graphqlFilters = mapFiltersToGraphQL(filters);
+        const result = await deleteCategoryGraphQL(
+          id,
+          graphqlFilters,
+          localPagination
+        );
+        return result;
+      } catch (error) {
+        throw error;
+      }
+    },
+    [deleteCategoryGraphQL, mapFiltersToGraphQL, filters, localPagination]
+  );
 
   // Wrapper for toggle status
-  const toggleStatus = useCallback(async (categoryId: string, isActive: boolean) => {
-    try {
-      const result = await handleToggleStatus(categoryId, isActive);
-      // Convert local filters to GraphQL format and refetch
-      const graphqlFilters = mapFiltersToGraphQL(filters);
-      await fetchCategories(graphqlFilters, localPagination);
-      return result;
-    } catch (error) {
-      throw error;
-    }
-  }, [handleToggleStatus, fetchCategories, mapFiltersToGraphQL, filters, localPagination]);
+  const toggleStatus = useCallback(
+    async (categoryId: string, isActive: boolean) => {
+      try {
+        const result = await handleToggleStatus(categoryId, isActive);
+        // Convert local filters to GraphQL format and refetch
+        const graphqlFilters = mapFiltersToGraphQL(filters);
+        await fetchCategories(graphqlFilters, localPagination);
+        return result;
+      } catch (error) {
+        throw error;
+      }
+    },
+    [
+      handleToggleStatus,
+      fetchCategories,
+      mapFiltersToGraphQL,
+      filters,
+      localPagination,
+    ]
+  );
 
   // Wrapper for bulk delete
-  const bulkDelete = useCallback(async (categoryIds: string[]) => {
-    try {
-      const result = await handleBulkDelete(categoryIds);
-      // Convert local filters to GraphQL format and refetch
-      const graphqlFilters = mapFiltersToGraphQL(filters);
-      await fetchCategories(graphqlFilters, localPagination);
-      return result;
-    } catch (error) {
-      throw error;
-    }
-  }, [handleBulkDelete, fetchCategories, mapFiltersToGraphQL, filters, localPagination]);
+  const bulkDelete = useCallback(
+    async (categoryIds: string[]) => {
+      try {
+        const result = await handleBulkDelete(categoryIds);
+        // Convert local filters to GraphQL format and refetch
+        const graphqlFilters = mapFiltersToGraphQL(filters);
+        await fetchCategories(graphqlFilters, localPagination);
+        return result;
+      } catch (error) {
+        throw error;
+      }
+    },
+    [
+      handleBulkDelete,
+      fetchCategories,
+      mapFiltersToGraphQL,
+      filters,
+      localPagination,
+    ]
+  );
 
   // Wrapper for bulk toggle status
-  const bulkToggleStatus = useCallback(async (categoryIds: string[], isActive: boolean) => {
-    try {
-      const result = await handleBulkToggleStatus(categoryIds, isActive);
-      // Convert local filters to GraphQL format and refetch
-      const graphqlFilters = mapFiltersToGraphQL(filters);
-      await fetchCategories(graphqlFilters, localPagination);
-      return result;
-    } catch (error) {
-      throw error;
-    }
-  }, [handleBulkToggleStatus, fetchCategories, mapFiltersToGraphQL, filters, localPagination]);
+  const bulkToggleStatus = useCallback(
+    async (categoryIds: string[], isActive: boolean) => {
+      try {
+        const result = await handleBulkToggleStatus(categoryIds, isActive);
+        // Convert local filters to GraphQL format and refetch
+        const graphqlFilters = mapFiltersToGraphQL(filters);
+        await fetchCategories(graphqlFilters, localPagination);
+        return result;
+      } catch (error) {
+        throw error;
+      }
+    },
+    [
+      handleBulkToggleStatus,
+      fetchCategories,
+      mapFiltersToGraphQL,
+      filters,
+      localPagination,
+    ]
+  );
 
   // Wrapper for set filters
-  const setFilters = useCallback((newFilters: CategoryFilters) => {
-    setFiltersLocal(newFilters);
-  }, [setFiltersLocal]);
+  const setFilters = useCallback(
+    (newFilters: CategoryFilters) => {
+      setFiltersLocal(newFilters);
+    },
+    [setFiltersLocal]
+  );
 
   // Wrapper for update filter
-  const updateFilter = useCallback((key: string, value: any) => {
-    updateFilterLocal(key as any, value);
-  }, [updateFilterLocal]);
+  const updateFilter = useCallback(
+    (key: string, value: any) => {
+      updateFilterLocal(key as any, value);
+    },
+    [updateFilterLocal]
+  );
 
   // Wrapper for clear filters
   const clearFilters = useCallback(() => {
@@ -267,9 +367,12 @@ export const useCategories = (): UseCategoriesReturn => {
   }, [clearFiltersLocal]);
 
   // Wrapper for handle sort
-  const handleSort = useCallback((field: string) => {
-    handleSortLocal(field);
-  }, [handleSortLocal]);
+  const handleSort = useCallback(
+    (field: string) => {
+      handleSortLocal(field);
+    },
+    [handleSortLocal]
+  );
 
   return {
     // Data
@@ -277,14 +380,14 @@ export const useCategories = (): UseCategoriesReturn => {
     category,
     loading,
     error,
-    
+
     // Pagination
     pagination,
-    
+
     // Filters and sorting
     filters,
     sortConfig,
-    
+
     // Actions
     createCategory,
     updateCategory,
@@ -292,30 +395,30 @@ export const useCategories = (): UseCategoriesReturn => {
     toggleStatus,
     bulkDelete,
     bulkToggleStatus,
-    
+
     // Filter actions
     setFilters,
     updateFilter,
     clearFilters,
-    
+
     // Sorting actions
     handleSort,
-    
+
     // Pagination actions
     goToPage,
     nextPage,
     prevPage,
-    
+
     // Selection actions
     selectCategory,
     deselectCategory,
     selectAllCategories,
     clearSelection,
     isCategorySelected,
-    
+
     // Utilities
     refetchCategories,
     clearError,
-    resetToDefaults
+    resetToDefaults,
   };
 };

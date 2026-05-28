@@ -35,7 +35,7 @@ const mockProduct: Product = {
     sortOrder: 1,
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
-    products: []
+    products: [],
   },
   variants: [],
   cartItems: [],
@@ -44,14 +44,14 @@ const mockProduct: Product = {
   reviews: [],
   appEvents: [],
   inventoryTransactions: [],
-  stockAlerts: []
+  stockAlerts: [],
 };
 
 const mockHandlers = {
   onEdit: jest.fn(),
   onDelete: jest.fn(),
   onToggleStatus: jest.fn(),
-  onViewDetails: jest.fn()
+  onViewDetails: jest.fn(),
 };
 
 describe('ProductCard', () => {
@@ -139,7 +139,11 @@ describe('ProductCard', () => {
   });
 
   it('displays out of stock status correctly', () => {
-    const outOfStockProduct = { ...mockProduct, stockQuantity: 0, isInStock: false };
+    const outOfStockProduct = {
+      ...mockProduct,
+      stockQuantity: 0,
+      isInStock: false,
+    };
     render(<ProductCard product={outOfStockProduct} {...mockHandlers} />);
 
     expect(screen.getByText('Sin stock')).toBeInTheDocument();
@@ -163,14 +167,20 @@ describe('ProductCard', () => {
 
   it('handles product without description gracefully', () => {
     const productWithoutDescription = { ...mockProduct, description: null };
-    render(<ProductCard product={productWithoutDescription} {...mockHandlers} />);
+    render(
+      <ProductCard product={productWithoutDescription} {...mockHandlers} />
+    );
 
     // Should not crash and should handle null description
     expect(screen.getByText('Test Product')).toBeInTheDocument();
   });
 
   it('handles product without rating gracefully', () => {
-    const productWithoutRating = { ...mockProduct, rating: null, reviewCount: 0 };
+    const productWithoutRating = {
+      ...mockProduct,
+      rating: null,
+      reviewCount: 0,
+    };
     render(<ProductCard product={productWithoutRating} {...mockHandlers} />);
 
     // Should not show rating section

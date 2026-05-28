@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { 
+import {
   X,
   Eye,
   Hash,
@@ -14,7 +14,7 @@ import {
   CheckCircle,
   XCircle,
   Link,
-  Edit3
+  Edit3,
 } from 'lucide-react';
 
 interface Category {
@@ -59,7 +59,7 @@ const ModalOverlay = styled.div<{ isOpen: boolean }>`
   bottom: 0;
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(8px);
-  display: ${({ isOpen }) => isOpen ? 'flex' : 'none'};
+  display: ${({ isOpen }) => (isOpen ? 'flex' : 'none')};
   align-items: center;
   justify-content: center;
   z-index: ${theme.zIndex?.modal || 1000};
@@ -176,9 +176,13 @@ const StatusBadge = styled.span<{ isActive: boolean }>`
   border-radius: ${theme.borderRadius.full};
   font-size: ${theme.fontSizes.xs};
   font-weight: ${theme.fontWeights.medium};
-  background: ${({ isActive }) => isActive ? `${theme.colors.success}20` : `${theme.colors.error}20`};
-  color: ${({ isActive }) => isActive ? theme.colors.success : theme.colors.error};
-  border: 1px solid ${({ isActive }) => isActive ? `${theme.colors.success}40` : `${theme.colors.error}40`};
+  background: ${({ isActive }) =>
+    isActive ? `${theme.colors.success}20` : `${theme.colors.error}20`};
+  color: ${({ isActive }) =>
+    isActive ? theme.colors.success : theme.colors.error};
+  border: 1px solid
+    ${({ isActive }) =>
+      isActive ? `${theme.colors.success}40` : `${theme.colors.error}40`};
 `;
 
 const ImagePreview = styled.div`
@@ -281,7 +285,7 @@ export const CategoryDetailModal: React.FC<CategoryDetailModalProps> = ({
   isOpen,
   onClose,
   category,
-  onEdit
+  onEdit,
 }) => {
   if (!isOpen || !category) return null;
 
@@ -291,14 +295,14 @@ export const CategoryDetailModal: React.FC<CategoryDetailModalProps> = ({
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('es-ES', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'USD',
     }).format(price);
   };
 
@@ -372,7 +376,13 @@ export const CategoryDetailModal: React.FC<CategoryDetailModalProps> = ({
               <InfoCard>
                 <InfoLabel>Slug</InfoLabel>
                 <InfoValue>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[1] }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: theme.spacing[1],
+                    }}
+                  >
                     <Link size={14} />
                     {category.slug}
                   </div>
@@ -382,7 +392,12 @@ export const CategoryDetailModal: React.FC<CategoryDetailModalProps> = ({
                 <InfoLabel>Descripción</InfoLabel>
                 <InfoValue>
                   {category.description || (
-                    <span style={{ color: theme.colors.text.secondary, fontStyle: 'italic' }}>
+                    <span
+                      style={{
+                        color: theme.colors.text.secondary,
+                        fontStyle: 'italic',
+                      }}
+                    >
                       Sin descripción
                     </span>
                   )}
@@ -391,7 +406,13 @@ export const CategoryDetailModal: React.FC<CategoryDetailModalProps> = ({
               <InfoCard>
                 <InfoLabel>Orden de Clasificación</InfoLabel>
                 <InfoValue>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[1] }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: theme.spacing[1],
+                    }}
+                  >
                     <SortAsc size={14} />
                     {category.sortOrder}
                   </div>
@@ -445,7 +466,7 @@ export const CategoryDetailModal: React.FC<CategoryDetailModalProps> = ({
                   Total: {category.products.length} productos
                 </InfoLabel>
                 <ProductGrid>
-                  {category.products.slice(0, 6).map((product) => (
+                  {category.products.slice(0, 6).map(product => (
                     <ProductCard key={product.id}>
                       <ProductName>{product.name}</ProductName>
                       <ProductMeta>
@@ -462,21 +483,31 @@ export const CategoryDetailModal: React.FC<CategoryDetailModalProps> = ({
                   ))}
                 </ProductGrid>
                 {category.products.length > 6 && (
-                  <div style={{ 
-                    textAlign: 'center', 
-                    marginTop: theme.spacing[3],
-                    color: theme.colors.text.secondary,
-                    fontSize: theme.fontSizes.sm
-                  }}>
+                  <div
+                    style={{
+                      textAlign: 'center',
+                      marginTop: theme.spacing[3],
+                      color: theme.colors.text.secondary,
+                      fontSize: theme.fontSizes.sm,
+                    }}
+                  >
                     +{category.products.length - 6} productos más...
                   </div>
                 )}
               </ProductsSection>
             ) : (
               <EmptyState>
-                <Package size={48} style={{ marginBottom: theme.spacing[2], opacity: 0.5 }} />
+                <Package
+                  size={48}
+                  style={{ marginBottom: theme.spacing[2], opacity: 0.5 }}
+                />
                 <div>No hay productos en esta categoría</div>
-                <div style={{ fontSize: theme.fontSizes.xs, marginTop: theme.spacing[1] }}>
+                <div
+                  style={{
+                    fontSize: theme.fontSizes.xs,
+                    marginTop: theme.spacing[1],
+                  }}
+                >
                   Los productos aparecerán aquí cuando sean agregados
                 </div>
               </EmptyState>
@@ -491,17 +522,11 @@ export const CategoryDetailModal: React.FC<CategoryDetailModalProps> = ({
             <div>Slug: {category.slug}</div>
           </FooterLeft>
           <FooterRight>
-            <Button
-              variant="outline"
-              onClick={handleEdit}
-            >
+            <Button variant='outline' onClick={handleEdit}>
               <Edit3 size={16} />
               Editar
             </Button>
-            <Button
-              variant="outline"
-              onClick={onClose}
-            >
+            <Button variant='outline' onClick={onClose}>
               Cerrar
             </Button>
           </FooterRight>

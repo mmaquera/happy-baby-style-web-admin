@@ -4,12 +4,12 @@
 // Dependency Inversion: Depends on abstractions
 
 import { ApolloClient, gql } from '@apollo/client';
-import { 
-  LoginUserDocument, 
-  RefreshTokenDocument, 
-  LogoutUserDocument, 
+import {
+  LoginUserDocument,
+  RefreshTokenDocument,
+  LogoutUserDocument,
   GetCurrentUserDocument,
-  RegisterUserDocument
+  RegisterUserDocument,
 } from '@/generated/graphql';
 import { UserRole } from '@/types/unified';
 import {
@@ -17,7 +17,7 @@ import {
   IAuthUser,
   IAuthResponse,
   IAuthError,
-  ITokenStorage
+  ITokenStorage,
 } from '@/types/auth';
 
 // Local storage implementation
@@ -34,13 +34,15 @@ export class LocalTokenStorage implements ITokenStorage {
     const accessToken = localStorage.getItem('accessToken');
     const refreshToken = localStorage.getItem('refreshToken');
     const expiresAt = localStorage.getItem('tokenExpiresAt');
-    
+
     if (!accessToken) return null;
-    
+
     return {
       accessToken,
-      ...(refreshToken && { refreshToken }),  // Solo incluir si existe
-      expiresAt: expiresAt ? new Date(expiresAt) : new Date(Date.now() + 3600000)
+      ...(refreshToken && { refreshToken }), // Solo incluir si existe
+      expiresAt: expiresAt
+        ? new Date(expiresAt)
+        : new Date(Date.now() + 3600000),
     };
   }
 
@@ -73,23 +75,36 @@ export class UnifiedAuthService {
   }
 
   // Register user
-  async register(input: { email: string; password: string; role?: UserRole; firstName?: string; lastName?: string; phone?: string; dateOfBirth?: string | null }): Promise<IAuthResponse> {
+  async register(input: {
+    email: string;
+    password: string;
+    role?: UserRole;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    dateOfBirth?: string | null;
+  }): Promise<IAuthResponse> {
     try {
       const { data } = await this.client.mutate({
         mutation: RegisterUserDocument,
-        variables: { input }
+        variables: { input },
       });
 
       if (!data?.registerUser?.success) {
-        throw new AuthError('REGISTRATION_FAILED', data?.registerUser?.message || 'Registration failed');
+        throw new AuthError(
+          'REGISTRATION_FAILED',
+          data?.registerUser?.message || 'Registration failed'
+        );
       }
 
       const response = data.registerUser;
       const user = this.mapGraphQLUserToAuthUser(response.data?.user);
       const tokens: IAuthToken = {
         accessToken: response.data?.accessToken || '',
-        ...(response.data?.refreshToken && { refreshToken: response.data.refreshToken }),
-        expiresAt: new Date(Date.now() + 3600000) // 1 hour
+        ...(response.data?.refreshToken && {
+          refreshToken: response.data.refreshToken,
+        }),
+        expiresAt: new Date(Date.now() + 3600000), // 1 hour
       };
 
       await this.tokenStorage.storeTokens(tokens);
@@ -101,43 +116,59 @@ export class UnifiedAuthService {
         message: response.message,
         code: response.code,
         timestamp: response.timestamp,
-        metadata: response.metadata ? {
-          ...(response.metadata.requestId && { requestId: response.metadata.requestId }),
-          ...(response.metadata.traceId && { traceId: response.metadata.traceId }),
-          ...(response.metadata.duration && { duration: response.metadata.duration }),
-          timestamp: response.metadata.timestamp
-        } : undefined
+        metadata: response.metadata
+          ? {
+              ...(response.metadata.requestId && {
+                requestId: response.metadata.requestId,
+              }),
+              ...(response.metadata.traceId && {
+                traceId: response.metadata.traceId,
+              }),
+              ...(response.metadata.duration && {
+                duration: response.metadata.duration,
+              }),
+              timestamp: response.metadata.timestamp,
+            }
+          : undefined,
       };
     } catch (error: any) {
-      throw new AuthError('REGISTRATION_FAILED', error.message || 'Registration failed');
+      throw new AuthError(
+        'REGISTRATION_FAILED',
+        error.message || 'Registration failed'
+      );
     }
   }
 
   // Login user - Following Clean Architecture and SOLID principles
-  async login(credentials: { email: string; password: string }): Promise<IAuthResponse> {
+  async login(credentials: {
+    email: string;
+    password: string;
+  }): Promise<IAuthResponse> {
     try {
       const { data } = await this.client.mutate({
         mutation: LoginUserDocument,
         variables: {
           email: credentials.email,
-          password: credentials.password
-        }
+          password: credentials.password,
+        },
       });
 
       // Handle GraphQL errors first
       if (data?.loginUser?.errors) {
-        const errorMessage = data.loginUser.errors[0]?.message || 'Login failed';
+        const errorMessage =
+          data.loginUser.errors[0]?.message || 'Login failed';
         throw new AuthError('LOGIN_FAILED', errorMessage);
       }
 
       // Check if login was successful according to backend response
       if (!data?.loginUser?.success) {
-        const errorMessage = data?.loginUser?.message || 'Invalid email or password';
+        const errorMessage =
+          data?.loginUser?.message || 'Invalid email or password';
         throw new AuthError('LOGIN_FAILED', errorMessage);
       }
 
       const response = data.loginUser;
-      
+
       // Validate that we have the required data
       if (!response.data?.user || !response.data?.accessToken) {
         throw new AuthError('LOGIN_FAILED', 'Invalid response from server');
@@ -145,12 +176,14 @@ export class UnifiedAuthService {
 
       // Map GraphQL user to internal user format
       const user = this.mapGraphQLUserToAuthUser(response.data.user);
-      
+
       // Create token object with proper structure
       const tokens: IAuthToken = {
         accessToken: response.data.accessToken,
-        ...(response.data.refreshToken && { refreshToken: response.data.refreshToken }),
-        expiresAt: new Date(Date.now() + 3600000) // 1 hour
+        ...(response.data.refreshToken && {
+          refreshToken: response.data.refreshToken,
+        }),
+        expiresAt: new Date(Date.now() + 3600000), // 1 hour
       };
 
       // Store tokens securely
@@ -164,19 +197,27 @@ export class UnifiedAuthService {
         message: response.message,
         code: response.code,
         timestamp: response.timestamp,
-        metadata: response.metadata ? {
-          ...(response.metadata.requestId && { requestId: response.metadata.requestId }),
-          ...(response.metadata.traceId && { traceId: response.metadata.traceId }),
-          ...(response.metadata.duration && { duration: response.metadata.duration }),
-          timestamp: response.metadata.timestamp
-        } : undefined
+        metadata: response.metadata
+          ? {
+              ...(response.metadata.requestId && {
+                requestId: response.metadata.requestId,
+              }),
+              ...(response.metadata.traceId && {
+                traceId: response.metadata.traceId,
+              }),
+              ...(response.metadata.duration && {
+                duration: response.metadata.duration,
+              }),
+              timestamp: response.metadata.timestamp,
+            }
+          : undefined,
       };
     } catch (error: any) {
       // Enhanced error handling following SOLID principles
       if (error instanceof AuthError) {
         throw error; // Re-throw AuthError instances
       }
-      
+
       // Handle GraphQL errors
       if (error?.graphQLErrors?.length > 0) {
         const graphQLError = error.graphQLErrors[0];
@@ -184,14 +225,18 @@ export class UnifiedAuthService {
         const errorCode = graphQLError.extensions?.code || 'LOGIN_FAILED';
         throw new AuthError(errorCode, errorMessage);
       }
-      
+
       // Handle network errors
       if (error?.networkError) {
-        throw new AuthError('NETWORK_ERROR', 'Unable to connect to server. Please check your internet connection.');
+        throw new AuthError(
+          'NETWORK_ERROR',
+          'Unable to connect to server. Please check your internet connection.'
+        );
       }
-      
+
       // Handle generic errors
-      const errorMessage = error?.message || 'An unexpected error occurred during login';
+      const errorMessage =
+        error?.message || 'An unexpected error occurred during login';
       throw new AuthError('LOGIN_FAILED', errorMessage);
     }
   }
@@ -200,18 +245,28 @@ export class UnifiedAuthService {
   async logout(): Promise<void> {
     try {
       await this.client.mutate({
-        mutation: LogoutUserDocument
+        mutation: LogoutUserDocument,
       });
     } catch (error: any) {
       console.warn('Logout server call failed:', error);
-      
+
       // Lanzar error específico para mejor manejo en capas superiores
-      if (error?.graphQLErrors?.some((err: any) => err.extensions?.['code'] === 'UNAUTHENTICATED')) {
+      if (
+        error?.graphQLErrors?.some(
+          (err: any) => err.extensions?.['code'] === 'UNAUTHENTICATED'
+        )
+      ) {
         throw new AuthError('UNAUTHENTICATED', 'Usuario no autenticado');
       } else if (error?.networkError) {
-        throw new AuthError('NETWORK_ERROR', 'Error de conexión al cerrar sesión');
+        throw new AuthError(
+          'NETWORK_ERROR',
+          'Error de conexión al cerrar sesión'
+        );
       } else {
-        throw new AuthError('LOGOUT_FAILED', 'Error al cerrar sesión en el servidor');
+        throw new AuthError(
+          'LOGOUT_FAILED',
+          'Error al cerrar sesión en el servidor'
+        );
       }
     } finally {
       await this.tokenStorage.clearTokens();
@@ -223,24 +278,30 @@ export class UnifiedAuthService {
     try {
       const { data } = await this.client.mutate({
         mutation: RefreshTokenDocument,
-        variables: { refreshToken }
+        variables: { refreshToken },
       });
 
       if (!data?.refreshToken?.success) {
-        throw new AuthError('REFRESH_FAILED', data?.refreshToken?.message || 'Token refresh failed');
+        throw new AuthError(
+          'REFRESH_FAILED',
+          data?.refreshToken?.message || 'Token refresh failed'
+        );
       }
 
       const response = data.refreshToken;
       const tokens: IAuthToken = {
         accessToken: response.data?.accessToken || '',
         refreshToken: response.data?.refreshToken,
-        expiresAt: new Date(Date.now() + 3600000)
+        expiresAt: new Date(Date.now() + 3600000),
       };
 
       await this.tokenStorage.storeTokens(tokens);
       return tokens;
     } catch (error: any) {
-      throw new AuthError('REFRESH_FAILED', error.message || 'Token refresh failed');
+      throw new AuthError(
+        'REFRESH_FAILED',
+        error.message || 'Token refresh failed'
+      );
     }
   }
 
@@ -256,12 +317,14 @@ export class UnifiedAuthService {
         query: GetCurrentUserDocument,
         context: {
           headers: {
-            Authorization: `Bearer ${tokens.accessToken}`
-          }
-        }
+            Authorization: `Bearer ${tokens.accessToken}`,
+          },
+        },
       });
 
-      return data.currentUser ? this.mapGraphQLUserToAuthUser(data.currentUser) : null;
+      return data.currentUser
+        ? this.mapGraphQLUserToAuthUser(data.currentUser)
+        : null;
     } catch (error) {
       console.error('Failed to get current user:', error);
       return null;
@@ -277,7 +340,7 @@ export class UnifiedAuthService {
   shouldRefreshToken(): boolean {
     const tokens = this.tokenStorage.getStoredTokens();
     if (!tokens) return false;
-    
+
     // Refresh if token expires in less than 5 minutes
     const fiveMinutesFromNow = new Date(Date.now() + 5 * 60 * 1000);
     return tokens.expiresAt < fiveMinutesFromNow;
@@ -322,14 +385,26 @@ export class UnifiedAuthService {
       isActive: graphqlUser.isActive,
       emailVerified: graphqlUser.emailVerified,
       ...(graphqlUser.lastLoginAt && { lastLoginAt: graphqlUser.lastLoginAt }),
-      profile: graphqlUser.profile ? {
-        id: graphqlUser.profile.id,
-        ...(graphqlUser.profile.firstName && { firstName: graphqlUser.profile.firstName }),
-        ...(graphqlUser.profile.lastName && { lastName: graphqlUser.profile.lastName }),
-        ...(graphqlUser.profile.phone && { phone: graphqlUser.profile.phone }),
-        ...(graphqlUser.profile.birthDate && { birthDate: graphqlUser.profile.birthDate }),
-        ...(graphqlUser.profile.avatar && { avatar: graphqlUser.profile.avatar }),
-      } : undefined
+      profile: graphqlUser.profile
+        ? {
+            id: graphqlUser.profile.id,
+            ...(graphqlUser.profile.firstName && {
+              firstName: graphqlUser.profile.firstName,
+            }),
+            ...(graphqlUser.profile.lastName && {
+              lastName: graphqlUser.profile.lastName,
+            }),
+            ...(graphqlUser.profile.phone && {
+              phone: graphqlUser.profile.phone,
+            }),
+            ...(graphqlUser.profile.birthDate && {
+              birthDate: graphqlUser.profile.birthDate,
+            }),
+            ...(graphqlUser.profile.avatar && {
+              avatar: graphqlUser.profile.avatar,
+            }),
+          }
+        : undefined,
     };
   }
 

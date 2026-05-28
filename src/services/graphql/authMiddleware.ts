@@ -1,11 +1,21 @@
 // AuthMiddleware - Apollo Client middleware for authentication
 // Following SOLID principles and Clean Architecture
 
-import { ApolloClient, ApolloLink, InMemoryCache, createHttpLink, from } from '@apollo/client';
+import {
+  ApolloClient,
+  ApolloLink,
+  InMemoryCache,
+  createHttpLink,
+  from,
+} from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { RetryLink } from '@apollo/client/link/retry';
-import { AuthServiceFactory, GraphQLAuthService, IAuthToken } from '../auth/AuthService';
+import {
+  AuthServiceFactory,
+  GraphQLAuthService,
+  IAuthToken,
+} from '../auth/AuthService';
 
 export interface AuthMiddlewareConfig {
   uri: string;
@@ -27,7 +37,7 @@ export class AuthMiddleware {
   private createAuthLink(): ApolloLink {
     return setContext(async (_operation, { headers }) => {
       const tokens = this.getStoredTokens();
-      
+
       if (tokens && !this.isTokenExpired(tokens)) {
         return {
           headers: {
@@ -36,11 +46,13 @@ export class AuthMiddleware {
           },
         };
       }
-      
+
       // Try to refresh token if expired
       if (tokens?.refreshToken) {
         try {
-          const newTokens = await this.authService.refreshToken(tokens.refreshToken);
+          const newTokens = await this.authService.refreshToken(
+            tokens.refreshToken
+          );
           return {
             headers: {
               ...headers,
@@ -52,7 +64,7 @@ export class AuthMiddleware {
           this.clearTokens();
         }
       }
-      
+
       return { headers };
     });
   }
@@ -63,15 +75,18 @@ export class AuthMiddleware {
       if (graphQLErrors) {
         for (const err of graphQLErrors) {
           // Handle authentication errors
-          if (err.extensions?.['code'] === 'UNAUTHENTICATED' || err.message.includes('jwt')) {
+          if (
+            err.extensions?.['code'] === 'UNAUTHENTICATED' ||
+            err.message.includes('jwt')
+          ) {
             console.warn('Authentication error detected:', err.message);
-            
+
             // Clear tokens and redirect to login
             this.clearTokens();
             this.redirectToLogin();
             return;
           }
-          
+
           // Handle authorization errors
           if (err.extensions?.['code'] === 'FORBIDDEN') {
             console.warn('Authorization error detected:', err.message);
@@ -80,10 +95,10 @@ export class AuthMiddleware {
           }
         }
       }
-      
+
       if (networkError) {
         console.error('Network error:', networkError);
-        
+
         // Handle network errors that might be auth-related
         if ('statusCode' in networkError && networkError.statusCode === 401) {
           this.clearTokens();
@@ -112,7 +127,7 @@ export class AuthMiddleware {
           if (error?.extensions?.['code'] === 'UNAUTHENTICATED') {
             return false;
           }
-          
+
           // Retry network errors and server errors
           return !!error;
         },
@@ -127,7 +142,7 @@ export class AuthMiddleware {
     });
 
     const authMiddleware = new AuthMiddleware({} as ApolloClient<any>);
-    
+
     const authLink = authMiddleware.createAuthLink();
     const errorLink = authMiddleware.createErrorLink();
     const retryLink = authMiddleware.createRetryLink(config);
@@ -147,7 +162,8 @@ export class AuthMiddleware {
 
     // Update the auth middleware with the created client
     authMiddleware.client = client;
-    authMiddleware.authService = AuthServiceFactory.createGraphQLAuthService(client);
+    authMiddleware.authService =
+      AuthServiceFactory.createGraphQLAuthService(client);
 
     return client;
   }
@@ -157,18 +173,20 @@ export class AuthMiddleware {
     // Usar el método público getRefreshToken y recrear la estructura
     const refreshToken = this.authService.getRefreshToken();
     if (!refreshToken) return null;
-    
+
     // Obtener tokens del localStorage directamente para este caso específico
     // ya que AuthService no expone getStoredTokens públicamente
     const accessToken = localStorage.getItem('accessToken');
     const expiresAt = localStorage.getItem('tokenExpiresAt');
-    
+
     if (!accessToken) return null;
-    
+
     return {
       accessToken,
       refreshToken,
-      expiresAt: expiresAt ? new Date(expiresAt) : new Date(Date.now() + 3600000)
+      expiresAt: expiresAt
+        ? new Date(expiresAt)
+        : new Date(Date.now() + 3600000),
     };
   }
 
@@ -190,7 +208,9 @@ export class AuthMiddleware {
 }
 
 // Factory function for creating Apollo Client with auth
-export const createApolloClientWithAuth = (config: AuthMiddlewareConfig): ApolloClient<any> => {
+export const createApolloClientWithAuth = (
+  config: AuthMiddlewareConfig
+): ApolloClient<any> => {
   return AuthMiddleware.createClient(config);
 };
 

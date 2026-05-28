@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { 
+import {
   CheckCircle,
   XCircle,
   AlertTriangle,
@@ -11,7 +11,7 @@ import {
   Eye,
   Edit,
   Trash2,
-  Package
+  Package,
 } from 'lucide-react';
 
 interface ProductCardProps {
@@ -77,7 +77,8 @@ const StatusBadge = styled.div<{ isActive: boolean }>`
   top: ${theme.spacing[3]};
   right: ${theme.spacing[3]};
   padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  background: ${({ isActive }) => isActive ? theme.colors.success : theme.colors.warning};
+  background: ${({ isActive }) =>
+    isActive ? theme.colors.success : theme.colors.warning};
   color: ${theme.colors.white};
   font-size: ${theme.fontSizes.xs};
   font-weight: ${theme.fontWeights.medium};
@@ -93,10 +94,12 @@ const StockBadge = styled.div<{ isLowStock: boolean; isOutOfStock: boolean }>`
   top: ${theme.spacing[3]};
   left: ${theme.spacing[3]};
   padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  background: ${({ isOutOfStock, isLowStock }) => 
-    isOutOfStock ? theme.colors.error : 
-    isLowStock ? theme.colors.warning : 
-    theme.colors.success};
+  background: ${({ isOutOfStock, isLowStock }) =>
+    isOutOfStock
+      ? theme.colors.error
+      : isLowStock
+        ? theme.colors.warning
+        : theme.colors.success};
   color: ${theme.colors.white};
   font-size: ${theme.fontSizes.xs};
   font-weight: ${theme.fontWeights.medium};
@@ -219,72 +222,77 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   onEdit,
   onDelete,
   onToggleStatus,
-  onViewDetails
+  onViewDetails,
 }) => {
   const hasDiscount = product.salePrice && product.salePrice < product.price;
-  const discountPercentage = hasDiscount 
+  const discountPercentage = hasDiscount
     ? Math.round(((product.price - product.salePrice!) / product.price) * 100)
     : 0;
-  
+
   const isLowStock = product.stockQuantity <= 5 && product.stockQuantity > 0;
   const isOutOfStock = product.stockQuantity === 0;
-  
+
   const currentPrice = product.salePrice || product.price;
-  const safeCurrentPrice = typeof currentPrice === 'number' ? currentPrice : product.price;
+  const safeCurrentPrice =
+    typeof currentPrice === 'number' ? currentPrice : product.price;
 
   return (
-    <Card hover clickable shadow="medium" padding="small">
+    <Card hover clickable shadow='medium' padding='small'>
       <ProductImageContainer>
         {product.images.length > 0 ? (
-          <ProductImage 
-            src={product.images[0]} 
+          <ProductImage
+            src={product.images[0]}
             alt={product.name}
-            onError={(e) => {
+            onError={e => {
               const target = e.target as HTMLImageElement;
               target.style.display = 'none';
             }}
           />
         ) : (
-          <div style={{
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: theme.colors.background.light,
-            color: theme.colors.warmGray,
-            fontSize: theme.fontSizes.sm
-          }}>
-            <Package size={24} data-testid="placeholder-icon" />
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: theme.colors.background.light,
+              color: theme.colors.warmGray,
+              fontSize: theme.fontSizes.sm,
+            }}
+          >
+            <Package size={24} data-testid='placeholder-icon' />
           </div>
         )}
-        
+
         <ImageOverlay />
-        
+
         <StatusBadge isActive={product.isActive}>
           {product.isActive ? <CheckCircle size={12} /> : <XCircle size={12} />}
           {product.isActive ? 'Activo' : 'Inactivo'}
         </StatusBadge>
-        
+
         <StockBadge isLowStock={isLowStock} isOutOfStock={isOutOfStock}>
-          {isOutOfStock ? <XCircle size={12} /> : 
-           isLowStock ? <AlertTriangle size={12} /> : 
-           <CheckCircle size={12} />}
+          {isOutOfStock ? (
+            <XCircle size={12} />
+          ) : isLowStock ? (
+            <AlertTriangle size={12} />
+          ) : (
+            <CheckCircle size={12} />
+          )}
           {isOutOfStock ? 'Sin stock' : isLowStock ? 'Stock bajo' : 'En stock'}
         </StockBadge>
       </ProductImageContainer>
 
       <ProductInfo>
-        {product.category && (
-          <CategoryTag>{product.category.name}</CategoryTag>
-        )}
-        
+        {product.category && <CategoryTag>{product.category.name}</CategoryTag>}
+
         <ProductName>{product.name}</ProductName>
-        
+
         {product.description && (
           <ProductDescription>{product.description}</ProductDescription>
         )}
-        
+
         <PriceContainer>
           <CurrentPrice>S/ {safeCurrentPrice.toFixed(2)}</CurrentPrice>
           {hasDiscount && (
@@ -294,7 +302,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             </>
           )}
         </PriceContainer>
-        
+
         <ProductMeta>
           <RatingContainer>
             <StarIcon />
@@ -303,61 +311,59 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </RatingContainer>
           <span>Stock: {product.stockQuantity}</span>
         </ProductMeta>
-        
+
         {product.tags.length > 0 && (
           <TagsContainer>
             {product.tags.slice(0, 3).map((tag, index) => (
               <Tag key={index}>{tag}</Tag>
             ))}
-            {product.tags.length > 3 && (
-              <Tag>+{product.tags.length - 3}</Tag>
-            )}
+            {product.tags.length > 3 && <Tag>+{product.tags.length - 3}</Tag>}
           </TagsContainer>
         )}
-        
+
         <ActionsContainer>
           {onViewDetails && (
             <Button
-              variant="primary"
-              size="small"
+              variant='primary'
+              size='small'
               onClick={() => onViewDetails(product.id)}
               fullWidth
-              aria-label="Ver detalles del producto"
+              aria-label='Ver detalles del producto'
             >
               <Eye size={14} />
               Ver Detalles
             </Button>
           )}
-          
+
           {onEdit && (
             <Button
-              variant="outline"
-              size="small"
+              variant='outline'
+              size='small'
               onClick={() => onEdit(product.id)}
-              aria-label="Editar producto"
+              aria-label='Editar producto'
             >
               <Edit size={14} />
               Editar
             </Button>
           )}
-          
+
           {onToggleStatus && (
             <Button
-              variant={product.isActive ? "ghost" : "secondary"}
-              size="small"
+              variant={product.isActive ? 'ghost' : 'secondary'}
+              size='small'
               onClick={() => onToggleStatus(product.id, !product.isActive)}
-              aria-label="Cambiar estado del producto"
+              aria-label='Cambiar estado del producto'
             >
               {product.isActive ? 'Desactivar' : 'Activar'}
             </Button>
           )}
-          
+
           {onDelete && (
             <Button
-              variant="danger"
-              size="small"
+              variant='danger'
+              size='small'
               onClick={() => onDelete(product.id)}
-              aria-label="Eliminar producto"
+              aria-label='Eliminar producto'
             >
               <Trash2 size={14} />
               Eliminar

@@ -13,9 +13,10 @@ interface LogoutButtonWithTooltipProps {
 const StyledLogoutButton = styled.button<{ isCollapsed: boolean }>`
   display: flex;
   align-items: center;
-  gap: ${props => props.isCollapsed ? 0 : theme.spacing[3]};
+  gap: ${props => (props.isCollapsed ? 0 : theme.spacing[3])};
   width: 100%;
-  padding: ${props => props.isCollapsed ? theme.spacing[4] : theme.spacing[3]} ${props => props.isCollapsed ? theme.spacing[2] : theme.spacing[4]};
+  padding: ${props => (props.isCollapsed ? theme.spacing[4] : theme.spacing[3])}
+    ${props => (props.isCollapsed ? theme.spacing[2] : theme.spacing[4])};
   background: none;
   border: 1px solid ${theme.colors.border.light};
   border-radius: ${theme.borderRadius.md};
@@ -24,7 +25,7 @@ const StyledLogoutButton = styled.button<{ isCollapsed: boolean }>`
   cursor: pointer;
   transition: all ${theme.transitions.base};
   margin-bottom: ${theme.spacing[3]};
-  justify-content: ${props => props.isCollapsed ? 'center' : 'flex-start'};
+  justify-content: ${props => (props.isCollapsed ? 'center' : 'flex-start')};
   min-height: 48px;
   position: relative;
 
@@ -40,18 +41,17 @@ const StyledLogoutButton = styled.button<{ isCollapsed: boolean }>`
   }
 
   span {
-    opacity: ${props => props.isCollapsed ? 0 : 1};
+    opacity: ${props => (props.isCollapsed ? 0 : 1)};
     transition: opacity ${theme.transitions.base};
     white-space: nowrap;
     overflow: hidden;
-    width: ${props => props.isCollapsed ? 0 : 'auto'};
+    width: ${props => (props.isCollapsed ? 0 : 'auto')};
   }
 `;
 
-export const LogoutButtonWithTooltip: React.FC<LogoutButtonWithTooltipProps> = ({
-  onClick,
-  isCollapsed
-}) => {
+export const LogoutButtonWithTooltip: React.FC<
+  LogoutButtonWithTooltipProps
+> = ({ onClick, isCollapsed }) => {
   const { isVisible, showTooltip, hideTooltip } = useSidebarTooltip(300);
 
   return (
@@ -64,7 +64,7 @@ export const LogoutButtonWithTooltip: React.FC<LogoutButtonWithTooltipProps> = (
       <LogOut />
       <span>Cerrar Sesión</span>
       {isCollapsed && (
-        <Tooltip isVisible={isVisible} position="right">
+        <Tooltip isVisible={isVisible} position='right'>
           Cerrar Sesión
         </Tooltip>
       )}

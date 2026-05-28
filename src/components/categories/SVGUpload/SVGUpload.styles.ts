@@ -14,37 +14,46 @@ export const SVGUploadContainer = styled.div`
 `;
 
 // Upload zone with drag and drop functionality
-export const SVGUploadZone = styled.div<{ 
-  isDragOver: boolean; 
-  hasError: boolean; 
+export const SVGUploadZone = styled.div<{
+  isDragOver: boolean;
+  hasError: boolean;
   disabled: boolean;
 }>`
-  border: 2px dashed ${({ isDragOver, hasError, disabled }) => 
-    disabled ? theme.colors.border.light :
-    hasError ? theme.colors.error : 
-    isDragOver ? theme.colors.coralAccent : 
-    theme.colors.border.light
-  };
+  border: 2px dashed
+    ${({ isDragOver, hasError, disabled }) =>
+      disabled
+        ? theme.colors.border.light
+        : hasError
+          ? theme.colors.error
+          : isDragOver
+            ? theme.colors.coralAccent
+            : theme.colors.border.light};
   border-radius: ${theme.borderRadius.lg};
   padding: ${theme.spacing[6]};
   text-align: center;
   transition: all ${theme.transitions.base};
-  background: ${({ isDragOver, disabled }) => 
-    disabled ? theme.colors.background.light :
-    isDragOver ? theme.colors.background.accent : 'transparent'
-  };
-  cursor: ${({ disabled }) => disabled ? 'not-allowed' : 'pointer'};
-  opacity: ${({ disabled }) => disabled ? 0.6 : 1};
-  
+  background: ${({ isDragOver, disabled }) =>
+    disabled
+      ? theme.colors.background.light
+      : isDragOver
+        ? theme.colors.background.accent
+        : 'transparent'};
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+  opacity: ${({ disabled }) => (disabled ? 0.6 : 1)};
+
   &:hover {
-    border-color: ${({ hasError, disabled }) => 
-      disabled ? theme.colors.border.light :
-      hasError ? theme.colors.error : theme.colors.coralAccent
-    };
-    background: ${({ hasError, disabled }) => 
-      disabled ? theme.colors.background.light :
-      hasError ? theme.colors.error + '10' : theme.colors.background.accent
-    };
+    border-color: ${({ hasError, disabled }) =>
+      disabled
+        ? theme.colors.border.light
+        : hasError
+          ? theme.colors.error
+          : theme.colors.coralAccent};
+    background: ${({ hasError, disabled }) =>
+      disabled
+        ? theme.colors.background.light
+        : hasError
+          ? theme.colors.error + '10'
+          : theme.colors.background.accent};
   }
 `;
 
@@ -66,7 +75,7 @@ export const SVGUploadIcon = styled.div`
   color: ${theme.colors.text.secondary};
   font-size: 2.5rem;
   margin-bottom: ${theme.spacing[2]};
-  
+
   svg {
     width: 2.5rem;
     height: 2.5rem;
@@ -90,27 +99,24 @@ export const SVGUploadSubtext = styled.p`
 
 // Upload button
 export const SVGUploadButton = styled.button<{ disabled: boolean }>`
-  background: ${({ disabled }) => 
-    disabled ? theme.colors.border.light : theme.colors.coralAccent
-  };
-  color: ${({ disabled }) => 
-    disabled ? theme.colors.text.secondary : 'white'
-  };
+  background: ${({ disabled }) =>
+    disabled ? theme.colors.border.light : theme.colors.coralAccent};
+  color: ${({ disabled }) =>
+    disabled ? theme.colors.text.secondary : 'white'};
   border: none;
   border-radius: ${theme.borderRadius.md};
   padding: ${theme.spacing[3]} ${theme.spacing[4]};
   font-size: ${theme.fontSizes.sm};
   font-weight: ${theme.fontWeights.medium};
-  cursor: ${({ disabled }) => disabled ? 'not-allowed' : 'pointer'};
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   transition: all ${theme.transitions.base};
-  opacity: ${({ disabled }) => disabled ? 0.6 : 1};
-  
+  opacity: ${({ disabled }) => (disabled ? 0.6 : 1)};
+
   &:hover {
-    background: ${({ disabled }) => 
-      disabled ? theme.colors.border.light : theme.colors.coralAccent
-    };
-    opacity: ${({ disabled }) => disabled ? 0.6 : 0.9};
-    transform: ${({ disabled }) => disabled ? 'none' : 'translateY(-1px)'};
+    background: ${({ disabled }) =>
+      disabled ? theme.colors.border.light : theme.colors.coralAccent};
+    opacity: ${({ disabled }) => (disabled ? 0.6 : 0.9)};
+    transform: ${({ disabled }) => (disabled ? 'none' : 'translateY(-1px)')};
   }
 `;
 
@@ -195,7 +201,7 @@ export const SVGRemoveButton = styled.button`
   font-size: ${theme.fontSizes.xs};
   cursor: pointer;
   transition: all ${theme.transitions.base};
-  
+
   &:hover {
     background: ${theme.colors.error};
     opacity: 0.9;
@@ -214,7 +220,7 @@ export const SVGPreview = styled.div`
   transition: all ${theme.transitions.base};
   flex-shrink: 0;
   margin: ${theme.spacing[4]} auto;
-  
+
   &:hover {
     border-color: ${theme.colors.coralAccent};
     transform: translateY(-2px);
@@ -239,7 +245,7 @@ export const SVGPreviewImg = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   svg {
     max-width: 100%;
     max-height: 100%;
@@ -261,7 +267,7 @@ export const SVGPreviewOverlay = styled.div`
   justify-content: center;
   opacity: 0;
   transition: opacity ${theme.transitions.base};
-  
+
   ${SVGPreview}:hover & {
     opacity: 1;
   }
@@ -278,10 +284,14 @@ export const SVGPreviewActions = styled.div`
 // Loading spinner
 export const SVGLoadingSpinner = styled.div`
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
-  
+
   animation: spin 1s linear infinite;
   width: 2rem;
   height: 2rem;
@@ -291,12 +301,14 @@ export const SVGLoadingSpinner = styled.div`
 `;
 
 // Validation message
-export const SVGValidationMessage = styled.div<{ type: 'error' | 'warning' | 'success' }>`
+export const SVGValidationMessage = styled.div<{
+  type: 'error' | 'warning' | 'success';
+}>`
   padding: ${theme.spacing[2]} ${theme.spacing[3]};
   border-radius: ${theme.borderRadius.md};
   margin-top: ${theme.spacing[2]};
   font-size: ${theme.fontSizes.sm};
-  
+
   ${({ type }) => {
     switch (type) {
       case 'error':
@@ -333,7 +345,7 @@ export const SVGClearButton = styled.button`
   font-size: ${theme.fontSizes.sm};
   cursor: pointer;
   transition: all ${theme.transitions.base};
-  
+
   &:hover {
     background: ${theme.colors.background.light};
     border-color: ${theme.colors.text.secondary};

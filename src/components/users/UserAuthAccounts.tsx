@@ -4,14 +4,17 @@ import { UserAccount, AuthProvider } from '@/types/unified';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { theme } from '@/styles/theme';
-import { useAccountManagement, useProviderUtils } from '@/hooks/useAuthManagement';
-import { 
+import {
+  useAccountManagement,
+  useProviderUtils,
+} from '@/hooks/useAuthManagement';
+import {
   Unlink,
   Clock,
   Shield,
   AlertTriangle,
   CheckCircle,
-  XCircle
+  XCircle,
 } from 'lucide-react';
 
 interface UserAuthAccountsProps {
@@ -103,7 +106,7 @@ const StatusBadge = styled.span<{ isExpired: boolean }>`
   font-weight: ${theme.fontWeights.medium};
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  
+
   ${({ isExpired }) => {
     if (isExpired) {
       return `
@@ -147,15 +150,18 @@ const getProviderBorderColor = (provider: AuthProvider) => {
   }
 };
 
-export const UserAuthAccounts: React.FC<UserAuthAccountsProps> = ({ 
-  accounts, 
-  onAccountUnlinked 
+export const UserAuthAccounts: React.FC<UserAuthAccountsProps> = ({
+  accounts,
+  onAccountUnlinked,
 }) => {
   const { loading, unlinkAccount } = useAccountManagement();
   const { getProviderLabel, getProviderIcon } = useProviderUtils();
 
   const handleUnlinkAccount = async (account: UserAccount) => {
-    const result = await unlinkAccount(account.id, getProviderLabel(account.provider));
+    const result = await unlinkAccount(
+      account.id,
+      getProviderLabel(account.provider)
+    );
     if (result?.success && onAccountUnlinked) {
       onAccountUnlinked();
     }
@@ -163,13 +169,14 @@ export const UserAuthAccounts: React.FC<UserAuthAccountsProps> = ({
 
   const formatDate = (date: Date | string | number) => {
     if (!date) return 'N/A';
-    const dateObj = typeof date === 'number' ? new Date(date * 1000) : new Date(date);
+    const dateObj =
+      typeof date === 'number' ? new Date(date * 1000) : new Date(date);
     return dateObj.toLocaleDateString('es-ES', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     });
   };
 
@@ -190,7 +197,7 @@ export const UserAuthAccounts: React.FC<UserAuthAccountsProps> = ({
 
   return (
     <AccountsContainer>
-      {accounts.map((account) => (
+      {accounts.map(account => (
         <AccountCard key={account.id} provider={account.provider}>
           <AccountHeader>
             <ProviderInfo>
@@ -198,16 +205,18 @@ export const UserAuthAccounts: React.FC<UserAuthAccountsProps> = ({
                 {getProviderIcon(account.provider)}
               </ProviderIcon>
               <div>
-                <ProviderName>{getProviderLabel(account.provider)}</ProviderName>
+                <ProviderName>
+                  {getProviderLabel(account.provider)}
+                </ProviderName>
                 <DetailValue>ID: {account.providerAccountId}</DetailValue>
               </div>
             </ProviderInfo>
-            
+
             <AccountActions>
               {account.provider !== AuthProvider.email && (
                 <Button
-                  variant="outline"
-                  size="small"
+                  variant='outline'
+                  size='small'
                   onClick={() => handleUnlinkAccount(account)}
                   disabled={loading}
                   icon={<Unlink size={14} />}
@@ -247,7 +256,13 @@ export const UserAuthAccounts: React.FC<UserAuthAccountsProps> = ({
               <DetailItem>
                 <DetailLabel>Expira</DetailLabel>
                 <DetailValue>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing[1] }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: theme.spacing[1],
+                    }}
+                  >
                     <Clock size={12} />
                     {formatDate(account.expiresAt)}
                   </div>
@@ -265,12 +280,14 @@ export const UserAuthAccounts: React.FC<UserAuthAccountsProps> = ({
             <DetailItem>
               <DetailLabel>Permisos</DetailLabel>
               <DetailValue>
-                <div style={{ 
-                  display: 'flex', 
-                  flexWrap: 'wrap', 
-                  gap: theme.spacing[1],
-                  marginTop: theme.spacing[1]
-                }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: theme.spacing[1],
+                    marginTop: theme.spacing[1],
+                  }}
+                >
                   {account.scope.split(' ').map((scope, index) => (
                     <span
                       key={index}
@@ -279,7 +296,7 @@ export const UserAuthAccounts: React.FC<UserAuthAccountsProps> = ({
                         padding: `${theme.spacing[1]} ${theme.spacing[2]}`,
                         borderRadius: theme.borderRadius.sm,
                         fontSize: theme.fontSizes.xs,
-                        color: theme.colors.text.secondary
+                        color: theme.colors.text.secondary,
                       }}
                     >
                       {scope}
@@ -291,21 +308,26 @@ export const UserAuthAccounts: React.FC<UserAuthAccountsProps> = ({
           )}
 
           {isTokenExpired(account.expiresAt) && (
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: theme.spacing[2],
-              padding: theme.spacing[2],
-              background: theme.colors.warning + '20',
-              borderRadius: theme.borderRadius.md,
-              marginTop: theme.spacing[2]
-            }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: theme.spacing[2],
+                padding: theme.spacing[2],
+                background: theme.colors.warning + '20',
+                borderRadius: theme.borderRadius.md,
+                marginTop: theme.spacing[2],
+              }}
+            >
               <AlertTriangle size={16} color={theme.colors.warning} />
-              <span style={{ 
-                fontSize: theme.fontSizes.sm, 
-                color: theme.colors.warning 
-              }}>
-                El token de acceso ha expirado. El usuario necesitará re-autenticarse.
+              <span
+                style={{
+                  fontSize: theme.fontSizes.sm,
+                  color: theme.colors.warning,
+                }}
+              >
+                El token de acceso ha expirado. El usuario necesitará
+                re-autenticarse.
               </span>
             </div>
           )}

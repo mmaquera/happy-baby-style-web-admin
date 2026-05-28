@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { User, UserRole } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { theme } from '@/styles/theme';
-import { 
+import {
   MoreVertical,
   Edit,
   Eye,
@@ -13,7 +13,7 @@ import {
   Trash2,
   Key,
   Shield,
-  ShieldOff
+  ShieldOff,
 } from 'lucide-react';
 
 interface UserActionsMenuProps {
@@ -63,7 +63,7 @@ const MenuButton = styled.button`
 `;
 
 const MenuDropdown = styled.div.withConfig({
-  shouldForwardProp: (prop) => !['isOpen', 'top', 'left'].includes(prop),
+  shouldForwardProp: prop => !['isOpen', 'top', 'left'].includes(prop),
 })<{ isOpen: boolean; top: number; left: number }>`
   position: fixed !important;
   top: ${props => props.top}px !important;
@@ -71,7 +71,9 @@ const MenuDropdown = styled.div.withConfig({
   background: ${theme.colors.white};
   border: 1px solid ${theme.colors.border.light};
   border-radius: ${theme.borderRadius.md};
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 8px 16px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.15),
+    0 8px 16px rgba(0, 0, 0, 0.1);
   z-index: 999999 !important;
   min-width: 200px;
   max-width: 250px;
@@ -79,31 +81,32 @@ const MenuDropdown = styled.div.withConfig({
   max-height: calc(100vh - 32px) !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
-  visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
-  transform: ${props => props.isOpen ? 'translateY(0) scale(1)' : 'translateY(-10px) scale(0.95)'};
-  opacity: ${props => props.isOpen ? '1' : '0'};
+  visibility: ${props => (props.isOpen ? 'visible' : 'hidden')};
+  transform: ${props =>
+    props.isOpen ? 'translateY(0) scale(1)' : 'translateY(-10px) scale(0.95)'};
+  opacity: ${props => (props.isOpen ? '1' : '0')};
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: ${props => props.isOpen ? 'auto' : 'none'};
+  pointer-events: ${props => (props.isOpen ? 'auto' : 'none')};
   transform-origin: top right;
-  
+
   /* Force it to be above everything */
   contain: layout style paint;
   isolation: isolate;
-  
+
   /* Ensure scrollbar styling */
   &::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: ${theme.colors.background.light};
     border-radius: 3px;
   }
-  
+
   &::-webkit-scrollbar-thumb {
     background: ${theme.colors.border.medium};
     border-radius: 3px;
-    
+
     &:hover {
       background: ${theme.colors.border.dark};
     }
@@ -112,13 +115,15 @@ const MenuDropdown = styled.div.withConfig({
 
 const MenuSection = styled.div`
   padding: ${theme.spacing[2]} 0;
-  
+
   &:not(:last-child) {
     border-bottom: 1px solid ${theme.colors.border.light};
   }
 `;
 
-const MenuItem = styled.button<{ variant?: 'default' | 'success' | 'warning' | 'danger' }>`
+const MenuItem = styled.button<{
+  variant?: 'default' | 'success' | 'warning' | 'danger';
+}>`
   width: 100%;
   padding: ${theme.spacing[2]} ${theme.spacing[3]};
   text-align: left;
@@ -176,7 +181,7 @@ export const UserActionsMenu: React.FC<UserActionsMenuProps> = ({
   onResetPassword,
   onPromoteToAdmin,
   onDemoteFromAdmin,
-  disabled = false
+  disabled = false,
 }) => {
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -189,7 +194,7 @@ export const UserActionsMenu: React.FC<UserActionsMenuProps> = ({
       const viewportWidth = window.innerWidth;
       const menuWidth = 200;
       const padding = 16;
-      
+
       // Try to get actual menu height if available
       let menuHeight = 350; // Default estimate
       if (menuRef.current) {
@@ -199,11 +204,11 @@ export const UserActionsMenu: React.FC<UserActionsMenuProps> = ({
           menuHeight = menuRect.height;
         }
       }
-      
+
       // Position relative to viewport (since we're using position: fixed)
       let top = rect.bottom + 8;
       let left = rect.left - menuWidth + rect.width; // Align right edge of menu with right edge of button
-      
+
       // Adjust if menu would go off-screen vertically
       if (top + menuHeight > viewportHeight - padding) {
         // Try positioning above the button
@@ -215,27 +220,25 @@ export const UserActionsMenu: React.FC<UserActionsMenuProps> = ({
           top = viewportHeight - menuHeight - padding;
         }
       }
-      
+
       // Ensure top is not negative
       top = Math.max(padding, top);
-      
-      // Adjust if menu would go off-screen horizontally  
+
+      // Adjust if menu would go off-screen horizontally
       if (left + menuWidth > viewportWidth - padding) {
         left = viewportWidth - menuWidth - padding;
       }
       if (left < padding) {
         left = padding;
       }
-      
+
       setMenuPosition({ top, left });
-      
-      
     }
   };
 
   const handleMenuClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    
+
     // Siempre calcular posición cuando se abre el menú
     if (!isOpen) {
       calculateMenuPosition();
@@ -267,10 +270,10 @@ export const UserActionsMenu: React.FC<UserActionsMenuProps> = ({
       const handleReposition = () => {
         calculateMenuPosition();
       };
-      
+
       window.addEventListener('scroll', handleReposition, true);
       window.addEventListener('resize', handleReposition);
-      
+
       return () => {
         window.removeEventListener('scroll', handleReposition, true);
         window.removeEventListener('resize', handleReposition);
@@ -286,13 +289,11 @@ export const UserActionsMenu: React.FC<UserActionsMenuProps> = ({
       const timer = setTimeout(() => {
         calculateMenuPosition();
       }, 10);
-      
+
       return () => clearTimeout(timer);
     }
     return undefined;
   }, [isOpen]);
-
-
 
   return (
     <>
@@ -301,20 +302,18 @@ export const UserActionsMenu: React.FC<UserActionsMenuProps> = ({
           ref={buttonRef}
           onClick={handleMenuClick}
           disabled={disabled}
-
         >
           <MoreVertical size={16} />
         </MenuButton>
       </MenuContainer>
-      
+
       {/* Render menu as portal to bypass parent container constraints */}
       {createPortal(
-        <MenuDropdown 
+        <MenuDropdown
           ref={menuRef}
           isOpen={isOpen}
           top={menuPosition.top}
           left={menuPosition.left}
-
         >
           {/* Basic Actions */}
           <MenuSection>
@@ -332,68 +331,70 @@ export const UserActionsMenu: React.FC<UserActionsMenuProps> = ({
           {/* Status Actions */}
           <MenuSection>
             <MenuLabel>Estado</MenuLabel>
-            {user.isActive ? (
-              onDeactivate && (
-                <MenuItem 
-                  variant="warning" 
-                  onClick={() => handleItemClick(() => onDeactivate(user))}
-                >
-                  <UserX size={16} />
-                  Desactivar Usuario
-                </MenuItem>
-              )
-            ) : (
-              onActivate && (
-                <MenuItem 
-                  variant="success" 
-                  onClick={() => handleItemClick(() => onActivate(user))}
-                >
-                  <UserCheck size={16} />
-                  Activar Usuario
-                </MenuItem>
-              )
-            )}
+            {user.isActive
+              ? onDeactivate && (
+                  <MenuItem
+                    variant='warning'
+                    onClick={() => handleItemClick(() => onDeactivate(user))}
+                  >
+                    <UserX size={16} />
+                    Desactivar Usuario
+                  </MenuItem>
+                )
+              : onActivate && (
+                  <MenuItem
+                    variant='success'
+                    onClick={() => handleItemClick(() => onActivate(user))}
+                  >
+                    <UserCheck size={16} />
+                    Activar Usuario
+                  </MenuItem>
+                )}
           </MenuSection>
 
           {/* Security Actions */}
           <MenuSection>
             <MenuLabel>Seguridad</MenuLabel>
             {onResetPassword && (
-              <MenuItem onClick={() => handleItemClick(() => onResetPassword(user))}>
+              <MenuItem
+                onClick={() => handleItemClick(() => onResetPassword(user))}
+              >
                 <Key size={16} />
                 Restablecer Contraseña
               </MenuItem>
             )}
-            
-            {user.role !== UserRole.admin ? (
-              onPromoteToAdmin && (
-                <MenuItem 
-                  variant="warning"
-                  onClick={() => handleItemClick(() => onPromoteToAdmin(user))}
-                >
-                  <Shield size={16} />
-                  Promover a Admin
-                </MenuItem>
-              )
-            ) : (
-              onDemoteFromAdmin && (
-                <MenuItem 
-                  variant="warning"
-                  onClick={() => handleItemClick(() => onDemoteFromAdmin(user))}
-                >
-                  <ShieldOff size={16} />
-                  Remover Admin
-                </MenuItem>
-              )
-            )}
+
+            {user.role !== UserRole.admin
+              ? onPromoteToAdmin && (
+                  <MenuItem
+                    variant='warning'
+                    onClick={() =>
+                      handleItemClick(() => onPromoteToAdmin(user))
+                    }
+                  >
+                    <Shield size={16} />
+                    Promover a Admin
+                  </MenuItem>
+                )
+              : onDemoteFromAdmin && (
+                  <MenuItem
+                    variant='warning'
+                    onClick={() =>
+                      handleItemClick(() => onDemoteFromAdmin(user))
+                    }
+                  >
+                    <ShieldOff size={16} />
+                    Remover Admin
+                  </MenuItem>
+                )}
           </MenuSection>
 
           {/* Danger Actions */}
           {onDelete && (
             <MenuSection>
               <MenuLabel>Zona Peligrosa</MenuLabel>
-              <MenuItem 
-                variant="danger" 
+              <MenuItem
+                variant='danger'
                 onClick={() => handleItemClick(() => onDelete(user))}
               >
                 <Trash2 size={16} />

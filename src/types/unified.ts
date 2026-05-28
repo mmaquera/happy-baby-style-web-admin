@@ -1,21 +1,29 @@
 // Unified Types - Resolves conflicts between local types and GraphQL generated types
 // Following SOLID principles and Clean Architecture
 
-import { User as GraphQLUser, Order as GraphQLOrder, OrderItem as GraphQLOrderItem, UserProfile as GraphQLUserProfile, UserRole as GraphQLUserRole, AuthProvider as GraphQLAuthProvider, OrderStatus as GraphQLOrderStatus } from '../generated/graphql';
+import {
+  User as GraphQLUser,
+  Order as GraphQLOrder,
+  OrderItem as GraphQLOrderItem,
+  UserProfile as GraphQLUserProfile,
+  UserRole as GraphQLUserRole,
+  AuthProvider as GraphQLAuthProvider,
+  OrderStatus as GraphQLOrderStatus,
+} from '../generated/graphql';
 
 // Re-export GraphQL types as the source of truth
 export type {
   User as GraphQLUser,
   Order as GraphQLOrder,
   OrderItem as GraphQLOrderItem,
-  UserProfile as GraphQLUserProfile
+  UserProfile as GraphQLUserProfile,
 } from '../generated/graphql';
 
 // Unified UserRole enum - using GraphQL as source of truth
 export enum UserRole {
   admin = 'admin',
   customer = 'customer',
-  staff = 'staff'
+  staff = 'staff',
 }
 
 // Unified AuthProvider enum - using GraphQL as source of truth
@@ -23,7 +31,7 @@ export enum AuthProvider {
   google = 'google',
   facebook = 'facebook',
   apple = 'apple',
-  email = 'email'
+  email = 'email',
 }
 
 // Unified OrderStatus enum - using GraphQL as source of truth
@@ -34,7 +42,7 @@ export enum OrderStatus {
   shipped = 'shipped',
   delivered = 'delivered',
   cancelled = 'cancelled',
-  refunded = 'refunded'
+  refunded = 'refunded',
 }
 
 // Unified User interface - explicitly defined to avoid conflicts
@@ -221,15 +229,21 @@ export const convertGraphQLUserToUser = (graphqlUser: GraphQLUser): User => {
     isActive: graphqlUser.isActive,
     emailVerified: graphqlUser.emailVerified,
     lastLoginAt: graphqlUser.lastLoginAt || null,
-    profile: graphqlUser.profile ? convertGraphQLUserProfileToUserProfile(graphqlUser.profile) : null,
-    accounts: graphqlUser.accounts?.map(convertGraphQLUserAccountToUserAccount) || [],
-    sessions: graphqlUser.sessions?.map(convertGraphQLUserSessionToUserSession) || [],
+    profile: graphqlUser.profile
+      ? convertGraphQLUserProfileToUserProfile(graphqlUser.profile)
+      : null,
+    accounts:
+      graphqlUser.accounts?.map(convertGraphQLUserAccountToUserAccount) || [],
+    sessions:
+      graphqlUser.sessions?.map(convertGraphQLUserSessionToUserSession) || [],
     createdAt: graphqlUser.createdAt,
-    updatedAt: graphqlUser.updatedAt
+    updatedAt: graphqlUser.updatedAt,
   };
 };
 
-export const convertGraphQLUserProfileToUserProfile = (graphqlProfile: GraphQLUserProfile): UserProfile => {
+export const convertGraphQLUserProfileToUserProfile = (
+  graphqlProfile: GraphQLUserProfile
+): UserProfile => {
   return {
     id: graphqlProfile.id,
     firstName: graphqlProfile.firstName || null,
@@ -238,25 +252,34 @@ export const convertGraphQLUserProfileToUserProfile = (graphqlProfile: GraphQLUs
     dateOfBirth: graphqlProfile.dateOfBirth || null,
     avatar: graphqlProfile.avatar || null,
     createdAt: graphqlProfile.createdAt,
-    updatedAt: graphqlProfile.updatedAt
+    updatedAt: graphqlProfile.updatedAt,
   };
 };
 
-export const convertGraphQLOrderToOrder = (graphqlOrder: GraphQLOrder): Order => {
+export const convertGraphQLOrderToOrder = (
+  graphqlOrder: GraphQLOrder
+): Order => {
   return {
     id: graphqlOrder.id,
     userId: graphqlOrder.userId,
     status: convertGraphQLOrderStatusToOrderStatus(graphqlOrder.status),
     totalAmount: Number(graphqlOrder.totalAmount),
     shippingAddress: graphqlOrder.shippingAddress || {},
-    items: graphqlOrder.items?.map(item => convertGraphQLOrderItemToOrderItem(item)) || [],
-    ...(graphqlOrder.user && { user: convertGraphQLUserProfileToUserProfile(graphqlOrder.user) }),
+    items:
+      graphqlOrder.items?.map(item =>
+        convertGraphQLOrderItemToOrderItem(item)
+      ) || [],
+    ...(graphqlOrder.user && {
+      user: convertGraphQLUserProfileToUserProfile(graphqlOrder.user),
+    }),
     createdAt: new Date(graphqlOrder.createdAt),
-    updatedAt: new Date(graphqlOrder.updatedAt)
+    updatedAt: new Date(graphqlOrder.updatedAt),
   };
 };
 
-export const convertGraphQLOrderItemToOrderItem = (graphqlOrderItem: GraphQLOrderItem): OrderItem => {
+export const convertGraphQLOrderItemToOrderItem = (
+  graphqlOrderItem: GraphQLOrderItem
+): OrderItem => {
   return {
     id: graphqlOrderItem.id,
     orderId: graphqlOrderItem.orderId,
@@ -264,12 +287,16 @@ export const convertGraphQLOrderItemToOrderItem = (graphqlOrderItem: GraphQLOrde
     quantity: graphqlOrderItem.quantity,
     unitPrice: Number(graphqlOrderItem.unitPrice),
     totalPrice: Number(graphqlOrderItem.totalPrice),
-    ...(graphqlOrderItem.product && { product: convertGraphQLProductToProduct(graphqlOrderItem.product) }),
-    createdAt: new Date(graphqlOrderItem.createdAt)
+    ...(graphqlOrderItem.product && {
+      product: convertGraphQLProductToProduct(graphqlOrderItem.product),
+    }),
+    createdAt: new Date(graphqlOrderItem.createdAt),
   };
 };
 
-export const convertGraphQLProductToProduct = (graphqlProduct: any): Product => {
+export const convertGraphQLProductToProduct = (
+  graphqlProduct: any
+): Product => {
   return {
     id: graphqlProduct.id,
     name: graphqlProduct.name,
@@ -281,11 +308,13 @@ export const convertGraphQLProductToProduct = (graphqlProduct: any): Product => 
     images: graphqlProduct.images || [],
     isActive: graphqlProduct.isActive,
     createdAt: new Date(graphqlProduct.createdAt),
-    updatedAt: new Date(graphqlProduct.updatedAt)
+    updatedAt: new Date(graphqlProduct.updatedAt),
   };
 };
 
-export const convertGraphQLUserRoleToUserRole = (graphqlRole: GraphQLUserRole): UserRole => {
+export const convertGraphQLUserRoleToUserRole = (
+  graphqlRole: GraphQLUserRole
+): UserRole => {
   switch (graphqlRole) {
     case GraphQLUserRole.admin:
       return UserRole.admin;
@@ -298,7 +327,9 @@ export const convertGraphQLUserRoleToUserRole = (graphqlRole: GraphQLUserRole): 
   }
 };
 
-export const convertGraphQLAuthProviderToAuthProvider = (graphqlProvider: GraphQLAuthProvider): AuthProvider => {
+export const convertGraphQLAuthProviderToAuthProvider = (
+  graphqlProvider: GraphQLAuthProvider
+): AuthProvider => {
   switch (graphqlProvider) {
     case GraphQLAuthProvider.google:
       return AuthProvider.google;
@@ -313,7 +344,9 @@ export const convertGraphQLAuthProviderToAuthProvider = (graphqlProvider: GraphQ
   }
 };
 
-export const convertGraphQLOrderStatusToOrderStatus = (graphqlStatus: GraphQLOrderStatus): OrderStatus => {
+export const convertGraphQLOrderStatusToOrderStatus = (
+  graphqlStatus: GraphQLOrderStatus
+): OrderStatus => {
   switch (graphqlStatus) {
     case GraphQLOrderStatus.pending:
       return OrderStatus.pending;
@@ -334,7 +367,9 @@ export const convertGraphQLOrderStatusToOrderStatus = (graphqlStatus: GraphQLOrd
   }
 };
 
-export const convertGraphQLUserAccountToUserAccount = (graphqlAccount: any): UserAccount => {
+export const convertGraphQLUserAccountToUserAccount = (
+  graphqlAccount: any
+): UserAccount => {
   return {
     id: graphqlAccount.id,
     userId: graphqlAccount.userId,
@@ -347,11 +382,13 @@ export const convertGraphQLUserAccountToUserAccount = (graphqlAccount: any): Use
     idToken: graphqlAccount.idToken || null,
     expiresAt: graphqlAccount.expiresAt || null,
     createdAt: graphqlAccount.createdAt,
-    updatedAt: graphqlAccount.updatedAt
+    updatedAt: graphqlAccount.updatedAt,
   };
 };
 
-export const convertGraphQLUserSessionToUserSession = (graphqlSession: any): UserSession => {
+export const convertGraphQLUserSessionToUserSession = (
+  graphqlSession: any
+): UserSession => {
   return {
     id: graphqlSession.id,
     userId: graphqlSession.userId,
@@ -363,6 +400,6 @@ export const convertGraphQLUserSessionToUserSession = (graphqlSession: any): Use
     accessToken: graphqlSession.accessToken,
     refreshToken: graphqlSession.refreshToken || undefined,
     createdAt: graphqlSession.createdAt,
-    updatedAt: graphqlSession.updatedAt
+    updatedAt: graphqlSession.updatedAt,
   };
 };

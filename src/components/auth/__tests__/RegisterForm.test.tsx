@@ -25,9 +25,9 @@ const mockRegisterUserMutation = {
         lastName: 'Doe',
         isActive: true,
         phone: '',
-        dateOfBirth: null
-      }
-    }
+        dateOfBirth: null,
+      },
+    },
   },
   result: {
     data: {
@@ -50,21 +50,21 @@ const mockRegisterUserMutation = {
               lastName: 'Doe',
               phone: null,
               dateOfBirth: null,
-              avatar: null
-            }
+              avatar: null,
+            },
           },
           accessToken: 'access-token',
-          refreshToken: 'refresh-token'
+          refreshToken: 'refresh-token',
         },
         metadata: {
           requestId: 'req-123',
           traceId: 'trace-123',
           duration: 100,
-          timestamp: '2025-01-01T00:00:00Z'
-        }
-      }
-    }
-  }
+          timestamp: '2025-01-01T00:00:00Z',
+        },
+      },
+    },
+  },
 };
 
 const mockErrorMutation = {
@@ -79,9 +79,9 @@ const mockErrorMutation = {
         lastName: 'Doe',
         isActive: true,
         phone: '',
-        dateOfBirth: null
-      }
-    }
+        dateOfBirth: null,
+      },
+    },
   },
   result: {
     data: {
@@ -91,10 +91,10 @@ const mockErrorMutation = {
         code: 'EMAIL_EXISTS',
         timestamp: '2025-01-01T00:00:00Z',
         data: null,
-        metadata: null
-      }
-    }
-  }
+        metadata: null,
+      },
+    },
+  },
 };
 
 describe('RegisterForm', () => {
@@ -135,7 +135,9 @@ describe('RegisterForm', () => {
       expect(screen.getByText(/nombre es requerido/i)).toBeInTheDocument();
       expect(screen.getByText(/apellido es requerido/i)).toBeInTheDocument();
       expect(screen.getByText(/contraseña es requerida/i)).toBeInTheDocument();
-      expect(screen.getByText(/confirmar contraseña es requerida/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/confirmar contraseña es requerida/i)
+      ).toBeInTheDocument();
     });
   });
 
@@ -171,7 +173,9 @@ describe('RegisterForm', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/contraseña debe tener al menos 8 caracteres/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/contraseña debe tener al menos 8 caracteres/i)
+      ).toBeInTheDocument();
     });
   });
 
@@ -186,13 +190,17 @@ describe('RegisterForm', () => {
     const confirmPasswordInput = screen.getByLabelText(/confirmar contraseña/i);
 
     fireEvent.change(passwordInput, { target: { value: 'password123' } });
-    fireEvent.change(confirmPasswordInput, { target: { value: 'password456' } });
+    fireEvent.change(confirmPasswordInput, {
+      target: { value: 'password456' },
+    });
 
     const submitButton = screen.getByRole('button', { name: /crear cuenta/i });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/las contraseñas no coinciden/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/las contraseñas no coinciden/i)
+      ).toBeInTheDocument();
     });
   });
 
@@ -204,17 +212,29 @@ describe('RegisterForm', () => {
     );
 
     // Fill in form fields
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'test@example.com' } });
-    fireEvent.change(screen.getByLabelText(/nombre/i), { target: { value: 'John' } });
-    fireEvent.change(screen.getByLabelText(/apellido/i), { target: { value: 'Doe' } });
-    fireEvent.change(screen.getByLabelText(/contraseña/i), { target: { value: 'password123' } });
-    fireEvent.change(screen.getByLabelText(/confirmar contraseña/i), { target: { value: 'password123' } });
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: 'test@example.com' },
+    });
+    fireEvent.change(screen.getByLabelText(/nombre/i), {
+      target: { value: 'John' },
+    });
+    fireEvent.change(screen.getByLabelText(/apellido/i), {
+      target: { value: 'Doe' },
+    });
+    fireEvent.change(screen.getByLabelText(/contraseña/i), {
+      target: { value: 'password123' },
+    });
+    fireEvent.change(screen.getByLabelText(/confirmar contraseña/i), {
+      target: { value: 'password123' },
+    });
 
     const submitButton = screen.getByRole('button', { name: /crear cuenta/i });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/¡usuario registrado exitosamente!/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/¡usuario registrado exitosamente!/i)
+      ).toBeInTheDocument();
     });
 
     expect(mockOnSuccess).toHaveBeenCalled();
@@ -228,11 +248,21 @@ describe('RegisterForm', () => {
     );
 
     // Fill in form fields
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'test@example.com' } });
-    fireEvent.change(screen.getByLabelText(/nombre/i), { target: { value: 'John' } });
-    fireEvent.change(screen.getByLabelText(/apellido/i), { target: { value: 'Doe' } });
-    fireEvent.change(screen.getByLabelText(/contraseña/i), { target: { value: 'password123' } });
-    fireEvent.change(screen.getByLabelText(/confirmar contraseña/i), { target: { value: 'password123' } });
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: 'test@example.com' },
+    });
+    fireEvent.change(screen.getByLabelText(/nombre/i), {
+      target: { value: 'John' },
+    });
+    fireEvent.change(screen.getByLabelText(/apellido/i), {
+      target: { value: 'Doe' },
+    });
+    fireEvent.change(screen.getByLabelText(/contraseña/i), {
+      target: { value: 'password123' },
+    });
+    fireEvent.change(screen.getByLabelText(/confirmar contraseña/i), {
+      target: { value: 'password123' },
+    });
 
     const submitButton = screen.getByRole('button', { name: /crear cuenta/i });
     fireEvent.click(submitButton);

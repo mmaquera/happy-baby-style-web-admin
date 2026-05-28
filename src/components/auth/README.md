@@ -7,6 +7,7 @@ Este módulo implementa un sistema completo de autenticación siguiendo los prin
 ## Componentes Implementados
 
 ### 1. **RegisterForm** (`RegisterForm.tsx`)
+
 - **Responsabilidad**: Formulario de registro de usuarios
 - **Características**:
   - Validación del lado del cliente
@@ -16,6 +17,7 @@ Este módulo implementa un sistema completo de autenticación siguiendo los prin
   - Estados de carga y éxito
 
 ### 2. **RegisterModal** (`RegisterModal.tsx`)
+
 - **Responsabilidad**: Modal reutilizable para registro
 - **Características**:
   - Diseño consistente con otros modales
@@ -23,6 +25,7 @@ Este módulo implementa un sistema completo de autenticación siguiendo los prin
   - Responsive design
 
 ### 3. **LoginForm** (`LoginForm.tsx`)
+
 - **Responsabilidad**: Formulario de inicio de sesión
 - **Características**:
   - Enlace al registro
@@ -32,6 +35,7 @@ Este módulo implementa un sistema completo de autenticación siguiendo los prin
 ## Hooks Implementados
 
 ### 1. **useRegisterUser** (`useRegisterUser.ts`)
+
 - **Responsabilidad**: Lógica de negocio para registro
 - **Características**:
   - Validación de entrada
@@ -40,6 +44,7 @@ Este módulo implementa un sistema completo de autenticación siguiendo los prin
   - Notificaciones toast
 
 ### 2. **useUnifiedAuth** (`useUnifiedAuth.ts`)
+
 - **Responsabilidad**: Estado global de autenticación
 - **Características**:
   - Método de registro integrado
@@ -49,6 +54,7 @@ Este módulo implementa un sistema completo de autenticación siguiendo los prin
 ## Servicios Implementados
 
 ### 1. **UnifiedAuthService** (`UnifiedAuthService.ts`)
+
 - **Responsabilidad**: Lógica de autenticación unificada
 - **Características**:
   - Método `register()` implementado
@@ -58,6 +64,7 @@ Este módulo implementa un sistema completo de autenticación siguiendo los prin
 ## Páginas Implementadas
 
 ### 1. **Register** (`Register.tsx`)
+
 - **Responsabilidad**: Página independiente de registro
 - **Características**:
   - Redirección post-registro
@@ -84,6 +91,7 @@ graph TD
 ## Validaciones Implementadas
 
 ### Validaciones del Cliente
+
 - **Email**: Formato válido y requerido
 - **Contraseña**: Mínimo 8 caracteres
 - **Confirmación**: Las contraseñas deben coincidir
@@ -91,6 +99,7 @@ graph TD
 - **Rol**: Selección obligatoria
 
 ### Validaciones del Servidor
+
 - **Email único**: No puede existir otro usuario con el mismo email
 - **Contraseña segura**: Validación de complejidad
 - **Datos de perfil**: Validación de formato y longitud
@@ -98,11 +107,13 @@ graph TD
 ## Manejo de Errores
 
 ### Tipos de Errores
+
 1. **Errores de Validación**: Campos requeridos, formatos inválidos
 2. **Errores del Servidor**: Email duplicado, problemas de base de datos
 3. **Errores de Red**: Problemas de conectividad, timeouts
 
 ### Estrategias de Manejo
+
 - **Validación Proactiva**: Errores se muestran en tiempo real
 - **Mensajes Contextuales**: Errores específicos para cada campo
 - **Recuperación Graceful**: El formulario mantiene el estado en caso de error
@@ -110,11 +121,13 @@ graph TD
 ## Testing
 
 ### Cobertura de Tests
+
 - **useRegisterUser**: Tests unitarios para lógica de negocio
 - **RegisterForm**: Tests de integración para UI y validaciones
 - **Mocks GraphQL**: Simulación de respuestas del servidor
 
 ### Ejecución de Tests
+
 ```bash
 # Ejecutar tests de autenticación
 npm test -- --testPathPattern=auth
@@ -127,12 +140,14 @@ npm test -- RegisterForm.test.ts
 ## Integración con el Sistema
 
 ### Dependencias
+
 - **Apollo Client**: Cliente GraphQL
 - **React Router**: Navegación entre páginas
 - **Styled Components**: Estilos y temas
 - **React Hook Form**: Gestión de formularios (futuro)
 
 ### Contexto de Autenticación
+
 - **AuthContext**: Estado global de autenticación
 - **Protected Routes**: Rutas protegidas por autenticación
 - **Role-based Access**: Control de acceso basado en roles
@@ -140,6 +155,7 @@ npm test -- RegisterForm.test.ts
 ## Estándares de Calidad
 
 ### Principios SOLID
+
 - **Single Responsibility**: Cada componente tiene una responsabilidad única
 - **Open/Closed**: Extensible para nuevas funcionalidades
 - **Liskov Substitution**: Comportamiento consistente entre implementaciones
@@ -147,11 +163,13 @@ npm test -- RegisterForm.test.ts
 - **Dependency Inversion**: Dependencias de abstracciones, no implementaciones
 
 ### Clean Architecture
+
 - **Separación de Capas**: UI, lógica de negocio y datos separados
 - **Inversión de Dependencias**: Hooks dependen de servicios, no de implementaciones
 - **Testabilidad**: Componentes fácilmente testables
 
 ### Manejo de Errores
+
 - **Consistencia**: Patrón uniforme de manejo de errores
 - **UX**: Mensajes claros y accionables
 - **Logging**: Registro de errores para debugging
@@ -159,12 +177,14 @@ npm test -- RegisterForm.test.ts
 ## Futuras Mejoras
 
 ### Funcionalidades Planificadas
+
 1. **Verificación de Email**: Confirmación por email post-registro
 2. **Captcha**: Protección contra bots
 3. **OAuth Social**: Login con Google, Facebook, etc.
 4. **2FA**: Autenticación de dos factores
 
 ### Optimizaciones Técnicas
+
 1. **Lazy Loading**: Carga diferida de componentes
 2. **Memoización**: Optimización de re-renders
 3. **Service Workers**: Funcionalidad offline
@@ -173,6 +193,7 @@ npm test -- RegisterForm.test.ts
 ## Documentación de API
 
 ### GraphQL Mutation
+
 ```graphql
 mutation RegisterUser($input: CreateUserProfileInput!) {
   registerUser(input: $input) {
@@ -207,6 +228,7 @@ mutation RegisterUser($input: CreateUserProfileInput!) {
 ```
 
 ### Tipos TypeScript
+
 ```typescript
 interface CreateUserProfileInput {
   email: string;
@@ -233,12 +255,14 @@ interface AuthResponse {
 ## Contribución
 
 ### Guías de Desarrollo
+
 1. **Seguir principios SOLID** en todas las implementaciones
 2. **Mantener consistencia** con patrones existentes
 3. **Agregar tests** para nuevas funcionalidades
 4. **Documentar cambios** en este README
 
 ### Proceso de Review
+
 1. **Code Review**: Mínimo 2 aprobaciones
 2. **Tests**: Todos los tests deben pasar
 3. **Linting**: Sin errores de ESLint

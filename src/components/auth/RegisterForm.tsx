@@ -7,7 +7,17 @@
 
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Eye, EyeOff, Lock, Mail, User, Phone, Calendar, Users, Shield } from 'lucide-react';
+import {
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  User,
+  Phone,
+  Calendar,
+  Users,
+  Shield,
+} from 'lucide-react';
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -94,9 +104,14 @@ const RoleGrid = styled.div`
 
 const RoleOption = styled.div<{ selected: boolean }>`
   padding: ${theme.spacing[4]};
-  border: 2px solid ${props => props.selected ? theme.colors.primary : theme.colors.border.medium};
+  border: 2px solid
+    ${props =>
+      props.selected ? theme.colors.primary : theme.colors.border.medium};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.selected ? theme.colors.background.accent : theme.colors.background.primary};
+  background: ${props =>
+    props.selected
+      ? theme.colors.background.accent
+      : theme.colors.background.primary};
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -105,15 +120,19 @@ const RoleOption = styled.div<{ selected: boolean }>`
 
   &:hover {
     border-color: ${theme.colors.primary};
-    background: ${props => props.selected ? theme.colors.background.accent : theme.colors.background.hover};
+    background: ${props =>
+      props.selected
+        ? theme.colors.background.accent
+        : theme.colors.background.hover};
   }
 `;
 
 const RoleIcon = styled.div<{ selected?: boolean }>`
   padding: ${theme.spacing[2]};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.selected ? theme.colors.primary : theme.colors.background.light};
-  color: ${props => props.selected ? 'white' : theme.colors.text.secondary};
+  background: ${props =>
+    props.selected ? theme.colors.primary : theme.colors.background.light};
+  color: ${props => (props.selected ? 'white' : theme.colors.text.secondary)};
 `;
 
 const RoleInfo = styled.div`
@@ -178,12 +197,14 @@ const SuccessMessage = styled.div`
 `;
 
 // Component following Single Responsibility Principle
-export const RegisterForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
+export const RegisterForm: React.FC<{ onSuccess?: () => void }> = ({
+  onSuccess,
+}) => {
   const { register, isLoading, error, clearError } = useRegisterUser();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [success, setSuccess] = useState(false);
-  
+
   const [formData, setFormData] = useState<CreateUserProfileInput>({
     email: '',
     password: '',
@@ -192,7 +213,7 @@ export const RegisterForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }
     firstName: '',
     lastName: '',
     phone: '',
-    dateOfBirth: null
+    dateOfBirth: null,
   });
 
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -249,31 +270,31 @@ export const RegisterForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-          if (validateForm()) {
-        const success = await register(formData);
-        if (success) {
-          setSuccess(true);
-          // Reset form
-          setFormData({
-            email: '',
-            password: '',
-            role: UserRole.customer,
-            isActive: true,
-            firstName: '',
-            lastName: '',
-            phone: '',
-            dateOfBirth: null
-          });
-          setConfirmPassword('');
-          setFormErrors({});
-          
-          // Call onSuccess callback if provided
-          if (onSuccess) {
-            onSuccess();
-          }
+
+    if (validateForm()) {
+      const success = await register(formData);
+      if (success) {
+        setSuccess(true);
+        // Reset form
+        setFormData({
+          email: '',
+          password: '',
+          role: UserRole.customer,
+          isActive: true,
+          firstName: '',
+          lastName: '',
+          phone: '',
+          dateOfBirth: null,
+        });
+        setConfirmPassword('');
+        setFormErrors({});
+
+        // Call onSuccess callback if provided
+        if (onSuccess) {
+          onSuccess();
         }
       }
+    }
   };
 
   const isFormValid = (): boolean => {
@@ -301,74 +322,84 @@ export const RegisterForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }
         </SuccessMessage>
       )}
 
-      {error && (
-        <ErrorMessage>
-          {error}
-        </ErrorMessage>
-      )}
+      {error && <ErrorMessage>{error}</ErrorMessage>}
 
       <FormContainer onSubmit={handleSubmit}>
         {/* Account Information Section */}
         <FormGrid>
           <FullWidthField>
             <Input
-              label="Email"
-              type="email"
+              label='Email'
+              type='email'
               value={formData.email}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setFormData(prev => ({ ...prev, email: e.target.value }))
+              }
               required
-              placeholder="ejemplo@correo.com"
+              placeholder='ejemplo@correo.com'
               leftIcon={<Mail size={18} />}
               error={formErrors['email'] || ''}
             />
           </FullWidthField>
 
           <Input
-            label="Nombre"
+            label='Nombre'
             value={formData.firstName || ''}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
-              ...prev,
-              firstName: e.target.value
-            }))}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setFormData(prev => ({
+                ...prev,
+                firstName: e.target.value,
+              }))
+            }
             required
-            placeholder="Nombre del usuario"
+            placeholder='Nombre del usuario'
             leftIcon={<User size={18} />}
             error={formErrors['firstName'] || ''}
           />
-          
+
           <Input
-            label="Apellido"
+            label='Apellido'
             value={formData.lastName || ''}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
-              ...prev,
-              lastName: e.target.value
-            }))}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setFormData(prev => ({
+                ...prev,
+                lastName: e.target.value,
+              }))
+            }
             required
-            placeholder="Apellido del usuario"
+            placeholder='Apellido del usuario'
             leftIcon={<User size={18} />}
             error={formErrors['lastName'] || ''}
           />
 
           <Input
-            label="Teléfono"
+            label='Teléfono'
             value={formData.phone || ''}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
-              ...prev,
-              phone: e.target.value
-            }))}
-            placeholder="+34 600 000 000"
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setFormData(prev => ({
+                ...prev,
+                phone: e.target.value,
+              }))
+            }
+            placeholder='+34 600 000 000'
             leftIcon={<Phone size={18} />}
           />
 
           <Input
-            label="Fecha de Nacimiento"
-            type="date"
-            value={formData.dateOfBirth ? new Date(formData.dateOfBirth).toISOString().split('T')[0] : ''}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
-              ...prev,
-              dateOfBirth: e.target.value || null
-            }))}
-            placeholder="dd/mm/yyyy"
+            label='Fecha de Nacimiento'
+            type='date'
+            value={
+              formData.dateOfBirth
+                ? new Date(formData.dateOfBirth).toISOString().split('T')[0]
+                : ''
+            }
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setFormData(prev => ({
+                ...prev,
+                dateOfBirth: e.target.value || null,
+              }))
+            }
+            placeholder='dd/mm/yyyy'
             leftIcon={<Calendar size={18} />}
           />
         </FormGrid>
@@ -377,17 +408,19 @@ export const RegisterForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }
         <FormGrid>
           <PasswordInputWrapper>
             <Input
-              label="Contraseña"
+              label='Contraseña'
               type={showPassword ? 'text' : 'password'}
               value={formData.password || ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setFormData(prev => ({ ...prev, password: e.target.value }))
+              }
               required
-              placeholder="Mínimo 8 caracteres"
+              placeholder='Mínimo 8 caracteres'
               leftIcon={<Lock size={18} />}
               error={formErrors['password'] || ''}
             />
             <PasswordToggle
-              type="button"
+              type='button'
               onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -396,17 +429,19 @@ export const RegisterForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }
 
           <PasswordInputWrapper>
             <Input
-              label="Confirmar Contraseña"
+              label='Confirmar Contraseña'
               type={showConfirmPassword ? 'text' : 'password'}
               value={confirmPassword}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setConfirmPassword(e.target.value)
+              }
               required
-              placeholder="Repite tu contraseña"
+              placeholder='Repite tu contraseña'
               leftIcon={<Lock size={18} />}
               error={formErrors['confirmPassword'] || ''}
             />
             <PasswordToggle
-              type="button"
+              type='button'
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             >
               {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -418,25 +453,37 @@ export const RegisterForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }
         <RoleSelector>
           <RoleLabel>Rol del Usuario</RoleLabel>
           <RoleGrid>
-            <RoleOption 
+            <RoleOption
               selected={formData.role === UserRole.customer}
-              onClick={() => setFormData(prev => ({ ...prev, role: UserRole.customer }))}
+              onClick={() =>
+                setFormData(prev => ({ ...prev, role: UserRole.customer }))
+              }
             >
-              <RoleIcon selected={formData.role === UserRole.customer}><Users size={20} /></RoleIcon>
+              <RoleIcon selected={formData.role === UserRole.customer}>
+                <Users size={20} />
+              </RoleIcon>
               <RoleInfo>
                 <RoleName>Cliente</RoleName>
-                <RoleDescription>Acceso a funciones básicas de cliente</RoleDescription>
+                <RoleDescription>
+                  Acceso a funciones básicas de cliente
+                </RoleDescription>
               </RoleInfo>
             </RoleOption>
 
-            <RoleOption 
+            <RoleOption
               selected={formData.role === UserRole.staff}
-              onClick={() => setFormData(prev => ({ ...prev, role: UserRole.staff }))}
+              onClick={() =>
+                setFormData(prev => ({ ...prev, role: UserRole.staff }))
+              }
             >
-              <RoleIcon selected={formData.role === UserRole.staff}><Shield size={20} /></RoleIcon>
+              <RoleIcon selected={formData.role === UserRole.staff}>
+                <Shield size={20} />
+              </RoleIcon>
               <RoleInfo>
                 <RoleName>Staff</RoleName>
-                <RoleDescription>Acceso a gestión de contenido y soporte</RoleDescription>
+                <RoleDescription>
+                  Acceso a gestión de contenido y soporte
+                </RoleDescription>
               </RoleInfo>
             </RoleOption>
           </RoleGrid>
@@ -445,23 +492,25 @@ export const RegisterForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }
         {/* Active Status */}
         <CheckboxContainer>
           <Checkbox
-            type="checkbox"
-            id="isActiveRegister"
+            type='checkbox'
+            id='isActiveRegister'
             checked={formData.isActive || false}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ 
-              ...prev, 
-              isActive: e.target.checked 
-            }))}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setFormData(prev => ({
+                ...prev,
+                isActive: e.target.checked,
+              }))
+            }
           />
-          <CheckboxLabel htmlFor="isActiveRegister">
+          <CheckboxLabel htmlFor='isActiveRegister'>
             Usuario activo (puede acceder al sistema)
           </CheckboxLabel>
         </CheckboxContainer>
 
         <Button
-          type="submit"
-          variant="primary"
-          size="large"
+          type='submit'
+          variant='primary'
+          size='large'
           fullWidth
           isLoading={isLoading}
           disabled={!isFormValid()}

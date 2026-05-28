@@ -4,7 +4,7 @@ import { theme } from '@/styles/theme';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
+import {
   ArrowLeft,
   CheckCircle,
   XCircle,
@@ -17,21 +17,22 @@ import {
   Settings,
   Download,
   Upload,
-  Printer
+  Printer,
 } from 'lucide-react';
 
 // Mock product data - in real app this would come from GraphQL
 const mockProduct = {
   id: '1',
   name: 'Body Orgánico para Recién Nacido',
-  description: 'Body 100% algodón orgánico, suave y transpirable para la piel sensible del bebé. Diseñado con costuras planas para evitar irritaciones y etiquetas removibles para mayor comodidad.',
+  description:
+    'Body 100% algodón orgánico, suave y transpirable para la piel sensible del bebé. Diseñado con costuras planas para evitar irritaciones y etiquetas removibles para mayor comodidad.',
   price: 25.99,
   salePrice: 19.99,
   sku: 'BODY-ORG-001',
   images: [
     'https://via.placeholder.com/400x400/FFB6C1/000000?text=Body+Bebe+1',
     'https://via.placeholder.com/400x400/FFB6C1/000000?text=Body+Bebe+2',
-    'https://via.placeholder.com/400x400/FFB6C1/000000?text=Body+Bebe+3'
+    'https://via.placeholder.com/400x400/FFB6C1/000000?text=Body+Bebe+3',
   ],
   stockQuantity: 45,
   isActive: true,
@@ -44,22 +45,40 @@ const mockProduct = {
     talla: '0-3 meses',
     peso: '80g',
     lavado: 'Lavable a máquina 30°C',
-    certificaciones: 'GOTS, OEKO-TEX'
+    certificaciones: 'GOTS, OEKO-TEX',
   },
   variants: [
-    { id: '1', name: 'Blanco', price: 19.99, stockQuantity: 20, isActive: true },
-    { id: '2', name: 'Azul Claro', price: 19.99, stockQuantity: 15, isActive: true },
-    { id: '3', name: 'Rosa Suave', price: 19.99, stockQuantity: 10, isActive: true }
+    {
+      id: '1',
+      name: 'Blanco',
+      price: 19.99,
+      stockQuantity: 20,
+      isActive: true,
+    },
+    {
+      id: '2',
+      name: 'Azul Claro',
+      price: 19.99,
+      stockQuantity: 15,
+      isActive: true,
+    },
+    {
+      id: '3',
+      name: 'Rosa Suave',
+      price: 19.99,
+      stockQuantity: 10,
+      isActive: true,
+    },
   ],
   createdAt: '2024-01-15T10:00:00Z',
-  updatedAt: '2024-01-20T14:30:00Z'
+  updatedAt: '2024-01-20T14:30:00Z',
 };
 
 const ProductDetailContainer = styled.div`
   padding: ${theme.spacing[6]};
   max-width: 1400px;
   margin: 0 auto;
-  
+
   @media (max-width: ${theme.breakpoints.md}) {
     padding: ${theme.spacing[4]};
   }
@@ -122,7 +141,7 @@ const ProductContent = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: ${theme.spacing[8]};
   margin-bottom: ${theme.spacing[8]};
-  
+
   @media (max-width: ${theme.breakpoints.lg}) {
     grid-template-columns: 1fr;
     gap: ${theme.spacing[6]};
@@ -141,7 +160,7 @@ const MainImage = styled.div`
   overflow: hidden;
   margin-bottom: ${theme.spacing[4]};
   background: ${theme.colors.background.light};
-  
+
   img {
     width: 100%;
     height: 100%;
@@ -161,15 +180,16 @@ const Thumbnail = styled.div<{ isActive: boolean }>`
   border-radius: ${theme.borderRadius.md};
   overflow: hidden;
   cursor: pointer;
-  border: 2px solid ${({ isActive }) => 
-    isActive ? theme.colors.primaryPurple : theme.colors.border.light};
+  border: 2px solid
+    ${({ isActive }) =>
+      isActive ? theme.colors.primaryPurple : theme.colors.border.light};
   transition: all ${theme.transitions.base};
-  
+
   &:hover {
     border-color: ${theme.colors.primaryPurple};
     transform: scale(1.05);
   }
-  
+
   img {
     width: 100%;
     height: 100%;
@@ -219,14 +239,18 @@ const StockStatus = styled.div<{ isLowStock: boolean; isOutOfStock: boolean }>`
   border-radius: ${theme.borderRadius.full};
   font-size: ${theme.fontSizes.sm};
   font-weight: ${theme.fontWeights.medium};
-  background: ${({ isOutOfStock, isLowStock }) => 
-    isOutOfStock ? `${theme.colors.error}20` : 
-    isLowStock ? `${theme.colors.warning}20` : 
-    `${theme.colors.success}20`};
-  color: ${({ isOutOfStock, isLowStock }) => 
-    isOutOfStock ? theme.colors.error : 
-    isLowStock ? theme.colors.warning : 
-    theme.colors.success};
+  background: ${({ isOutOfStock, isLowStock }) =>
+    isOutOfStock
+      ? `${theme.colors.error}20`
+      : isLowStock
+        ? `${theme.colors.warning}20`
+        : `${theme.colors.success}20`};
+  color: ${({ isOutOfStock, isLowStock }) =>
+    isOutOfStock
+      ? theme.colors.error
+      : isLowStock
+        ? theme.colors.warning
+        : theme.colors.success};
 `;
 
 const RatingSection = styled.div`
@@ -311,9 +335,10 @@ const VariantCard = styled(Card)<{ isActive: boolean }>`
   text-align: center;
   cursor: pointer;
   transition: all ${theme.transitions.base};
-  border: 2px solid ${({ isActive }) => 
-    isActive ? theme.colors.primaryPurple : theme.colors.border.light};
-  
+  border: 2px solid
+    ${({ isActive }) =>
+      isActive ? theme.colors.primaryPurple : theme.colors.border.light};
+
   &:hover {
     border-color: ${theme.colors.primaryPurple};
     transform: translateY(-2px);
@@ -373,15 +398,17 @@ const StatusBadge = styled.div<{ isActive: boolean }>`
   border-radius: ${theme.borderRadius.full};
   font-size: ${theme.fontSizes.xs};
   font-weight: ${theme.fontWeights.medium};
-  background: ${({ isActive }) => isActive ? `${theme.colors.success}20` : `${theme.colors.warning}20`};
-  color: ${({ isActive }) => isActive ? theme.colors.success : theme.colors.warning};
+  background: ${({ isActive }) =>
+    isActive ? `${theme.colors.success}20` : `${theme.colors.warning}20`};
+  color: ${({ isActive }) =>
+    isActive ? theme.colors.success : theme.colors.warning};
 `;
 
 export const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState(0);
-  
+
   // In real app, fetch product by ID from GraphQL
   const product = mockProduct;
 
@@ -395,7 +422,9 @@ export const ProductDetail: React.FC = () => {
   }, [product.id]);
 
   const handleDelete = useCallback(() => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+    if (
+      window.confirm('¿Estás seguro de que quieres eliminar este producto?')
+    ) {
       // TODO: Implement delete functionality
       console.log('Delete product:', product.id);
       navigate('/products');
@@ -420,13 +449,13 @@ export const ProductDetail: React.FC = () => {
   const isLowStock = product.stockQuantity <= 10 && product.stockQuantity > 0;
   const isOutOfStock = product.stockQuantity === 0;
   const hasDiscount = product.salePrice && product.salePrice < product.price;
-  const discountPercentage = hasDiscount 
+  const discountPercentage = hasDiscount
     ? Math.round(((product.price - product.salePrice!) / product.price) * 100)
     : 0;
 
   return (
     <ProductDetailContainer>
-      <BackButton variant="ghost" onClick={handleBack}>
+      <BackButton variant='ghost' onClick={handleBack}>
         <ArrowLeft size={16} />
         Volver a Productos
       </BackButton>
@@ -454,14 +483,14 @@ export const ProductDetail: React.FC = () => {
         </HeaderLeft>
 
         <HeaderActions>
-          <Button variant="outline" onClick={handleToggleStatus}>
+          <Button variant='outline' onClick={handleToggleStatus}>
             {product.isActive ? 'Desactivar' : 'Activar'}
           </Button>
-          <Button variant="secondary" onClick={handleEdit}>
+          <Button variant='secondary' onClick={handleEdit}>
             <Edit size={16} />
             Editar
           </Button>
-          <Button variant="danger" onClick={handleDelete}>
+          <Button variant='danger' onClick={handleDelete}>
             <Trash2 size={16} />
             Eliminar
           </Button>
@@ -471,12 +500,12 @@ export const ProductDetail: React.FC = () => {
       <ProductContent>
         <ImageSection>
           <MainImage>
-            <img 
-              src={product.images[selectedImage]} 
+            <img
+              src={product.images[selectedImage]}
               alt={`${product.name} - Imagen ${selectedImage + 1}`}
             />
           </MainImage>
-          
+
           <ThumbnailGrid>
             {product.images.map((image, index) => (
               <Thumbnail
@@ -484,7 +513,10 @@ export const ProductDetail: React.FC = () => {
                 isActive={index === selectedImage}
                 onClick={() => setSelectedImage(index)}
               >
-                <img src={image} alt={`${product.name} - Thumbnail ${index + 1}`} />
+                <img
+                  src={image}
+                  alt={`${product.name} - Thumbnail ${index + 1}`}
+                />
               </Thumbnail>
             ))}
           </ThumbnailGrid>
@@ -492,9 +524,7 @@ export const ProductDetail: React.FC = () => {
 
         <InfoSection>
           <PriceSection>
-            <CurrentPrice>
-              S/ {product.salePrice || product.price}
-            </CurrentPrice>
+            <CurrentPrice>S/ {product.salePrice || product.price}</CurrentPrice>
             {hasDiscount && (
               <>
                 <OriginalPrice>S/ {product.price}</OriginalPrice>
@@ -504,18 +534,23 @@ export const ProductDetail: React.FC = () => {
           </PriceSection>
 
           <StockStatus isLowStock={isLowStock} isOutOfStock={isOutOfStock}>
-            {isOutOfStock ? <XCircle size={16} /> : 
-             isLowStock ? <AlertTriangle size={16} /> : 
-             <CheckCircle size={16} />}
-            {isOutOfStock ? 'Sin stock' : 
-             isLowStock ? 'Stock bajo' : 'En stock'}
+            {isOutOfStock ? (
+              <XCircle size={16} />
+            ) : isLowStock ? (
+              <AlertTriangle size={16} />
+            ) : (
+              <CheckCircle size={16} />
+            )}
+            {isOutOfStock
+              ? 'Sin stock'
+              : isLowStock
+                ? 'Stock bajo'
+                : 'En stock'}
             <span>({product.stockQuantity} unidades)</span>
           </StockStatus>
 
           <RatingSection>
-            <RatingStars>
-              {renderRating(product.rating)}
-            </RatingStars>
+            <RatingStars>{renderRating(product.rating)}</RatingStars>
             <RatingText>
               {product.rating} ({product.reviewCount} reseñas)
             </RatingText>
@@ -543,13 +578,11 @@ export const ProductDetail: React.FC = () => {
             <VariantsSection>
               <h3>Variantes Disponibles</h3>
               <VariantGrid>
-                {product.variants.map((variant) => (
+                {product.variants.map(variant => (
                   <VariantCard key={variant.id} isActive={variant.isActive}>
                     <VariantName>{variant.name}</VariantName>
                     <VariantPrice>S/ {variant.price}</VariantPrice>
-                    <VariantStock>
-                      Stock: {variant.stockQuantity}
-                    </VariantStock>
+                    <VariantStock>Stock: {variant.stockQuantity}</VariantStock>
                   </VariantCard>
                 ))}
               </VariantGrid>
@@ -565,10 +598,21 @@ export const ProductDetail: React.FC = () => {
             Información del Producto
           </InfoCardTitle>
           <InfoCardContent>
-            <p><strong>Fecha de creación:</strong> {new Date(product.createdAt).toLocaleDateString('es-ES')}</p>
-            <p><strong>Última actualización:</strong> {new Date(product.updatedAt).toLocaleDateString('es-ES')}</p>
-            <p><strong>Total de variantes:</strong> {product.variants.length}</p>
-            <p><strong>Estado del producto:</strong> {product.isActive ? 'Activo en el catálogo' : 'Inactivo'}</p>
+            <p>
+              <strong>Fecha de creación:</strong>{' '}
+              {new Date(product.createdAt).toLocaleDateString('es-ES')}
+            </p>
+            <p>
+              <strong>Última actualización:</strong>{' '}
+              {new Date(product.updatedAt).toLocaleDateString('es-ES')}
+            </p>
+            <p>
+              <strong>Total de variantes:</strong> {product.variants.length}
+            </p>
+            <p>
+              <strong>Estado del producto:</strong>{' '}
+              {product.isActive ? 'Activo en el catálogo' : 'Inactivo'}
+            </p>
           </InfoCardContent>
         </InfoCard>
 
@@ -578,10 +622,18 @@ export const ProductDetail: React.FC = () => {
             Categorización
           </InfoCardTitle>
           <InfoCardContent>
-            <p><strong>Categoría principal:</strong> {product.category.name}</p>
-            <p><strong>Etiquetas:</strong> {product.tags.join(', ')}</p>
-            <p><strong>SKU:</strong> {product.sku}</p>
-            <p><strong>Tipo:</strong> Producto físico</p>
+            <p>
+              <strong>Categoría principal:</strong> {product.category.name}
+            </p>
+            <p>
+              <strong>Etiquetas:</strong> {product.tags.join(', ')}
+            </p>
+            <p>
+              <strong>SKU:</strong> {product.sku}
+            </p>
+            <p>
+              <strong>Tipo:</strong> Producto físico
+            </p>
           </InfoCardContent>
         </InfoCard>
 
@@ -591,12 +643,21 @@ export const ProductDetail: React.FC = () => {
             Información de Precios
           </InfoCardTitle>
           <InfoCardContent>
-            <p><strong>Precio base:</strong> S/ {product.price}</p>
+            <p>
+              <strong>Precio base:</strong> S/ {product.price}
+            </p>
             {hasDiscount && (
-              <p><strong>Precio de oferta:</strong> S/ {product.salePrice}</p>
+              <p>
+                <strong>Precio de oferta:</strong> S/ {product.salePrice}
+              </p>
             )}
-            <p><strong>Descuento:</strong> {hasDiscount ? `${discountPercentage}%` : 'Sin descuento'}</p>
-            <p><strong>Margen estimado:</strong> 35%</p>
+            <p>
+              <strong>Descuento:</strong>{' '}
+              {hasDiscount ? `${discountPercentage}%` : 'Sin descuento'}
+            </p>
+            <p>
+              <strong>Margen estimado:</strong> 35%
+            </p>
           </InfoCardContent>
         </InfoCard>
       </AdditionalInfo>

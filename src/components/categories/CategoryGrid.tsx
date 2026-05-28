@@ -2,10 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { CategoryCard } from './CategoryCard';
-import { 
-  Folder,
-  AlertTriangle
-} from 'lucide-react';
+import { Folder, AlertTriangle } from 'lucide-react';
 
 import { Category } from './types';
 
@@ -82,8 +79,12 @@ const LoadingSpinner = styled.div`
   margin: 0 auto ${theme.spacing[4]};
 
   @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -109,14 +110,16 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
   onDelete,
   onToggleStatus,
   onViewDetails,
-  emptyMessage = "No se encontraron categorías"
+  emptyMessage = 'No se encontraron categorías',
 }) => {
   if (loading) {
     return (
       <LoadingState>
         <LoadingSpinner />
         <EmptyTitle>Cargando categorías...</EmptyTitle>
-        <EmptyMessage>Por favor espera mientras se cargan los datos</EmptyMessage>
+        <EmptyMessage>
+          Por favor espera mientras se cargan los datos
+        </EmptyMessage>
       </LoadingState>
     );
   }
@@ -147,7 +150,7 @@ export const CategoryGrid: React.FC<CategoryGridProps> = ({
 
   return (
     <GridContainer>
-      {categories.map((category) => (
+      {categories.map(category => (
         <CategoryCard
           key={category.id}
           category={category}

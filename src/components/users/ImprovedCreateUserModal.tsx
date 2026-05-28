@@ -5,18 +5,18 @@ import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
-import { 
-  UserPlus, 
-  X, 
-  Mail, 
-  Shield, 
-  Users, 
+import {
+  UserPlus,
+  X,
+  Mail,
+  Shield,
+  Users,
   Phone,
   CheckCircle,
   Eye,
   EyeOff,
   Lock,
-  User as UserIcon
+  User as UserIcon,
 } from 'lucide-react';
 
 interface CreateUserModalProps {
@@ -150,28 +150,35 @@ const Step = styled.div<{ active: boolean; completed: boolean }>`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[2]};
-  opacity: ${props => props.active || props.completed ? 1 : 0.5};
+  opacity: ${props => (props.active || props.completed ? 1 : 0.5)};
 `;
 
 const StepNumber = styled.div<{ active?: boolean; completed?: boolean }>`
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: ${props => 
-    props.completed ? theme.colors.success :
-    props.active ? theme.colors.primaryPurple : 
-    theme.colors.border.medium};
-  color: ${props => 
-    props.completed || props.active ? theme.colors.white : theme.colors.text.secondary};
+  background: ${props =>
+    props.completed
+      ? theme.colors.success
+      : props.active
+        ? theme.colors.primaryPurple
+        : theme.colors.border.medium};
+  color: ${props =>
+    props.completed || props.active
+      ? theme.colors.white
+      : theme.colors.text.secondary};
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: ${theme.fontSizes.xs};
   font-weight: ${theme.fontWeights.semibold};
-  border: 2px solid ${props => 
-    props.completed ? theme.colors.success :
-    props.active ? theme.colors.primaryPurple : 
-    theme.colors.border.medium};
+  border: 2px solid
+    ${props =>
+      props.completed
+        ? theme.colors.success
+        : props.active
+          ? theme.colors.primaryPurple
+          : theme.colors.border.medium};
   transition: all ${theme.transitions.fast};
 `;
 
@@ -257,8 +264,6 @@ const FieldHint = styled.div`
   font-family: ${theme.fonts.primary};
 `;
 
-
-
 const PasswordStrength = styled.div`
   margin-top: ${theme.spacing[2]};
 `;
@@ -274,19 +279,23 @@ const StrengthBar = styled.div`
 const StrengthFill = styled.div<{ strength: number }>`
   height: 100%;
   width: ${props => props.strength}%;
-  background: ${props => 
-    props.strength < 30 ? theme.colors.error :
-    props.strength < 70 ? theme.colors.warning :
-    theme.colors.success};
+  background: ${props =>
+    props.strength < 30
+      ? theme.colors.error
+      : props.strength < 70
+        ? theme.colors.warning
+        : theme.colors.success};
   transition: all ${theme.transitions.base};
 `;
 
 const StrengthText = styled.span<{ strength: number }>`
   font-size: ${theme.fontSizes.xs};
-  color: ${props => 
-    props.strength < 30 ? theme.colors.error :
-    props.strength < 70 ? theme.colors.warning :
-    theme.colors.success};
+  color: ${props =>
+    props.strength < 30
+      ? theme.colors.error
+      : props.strength < 70
+        ? theme.colors.warning
+        : theme.colors.success};
   font-weight: ${theme.fontWeights.medium};
   font-family: ${theme.fonts.primary};
 `;
@@ -319,9 +328,12 @@ const RoleOptions = styled.div`
 
 const RoleOption = styled.div<{ selected: boolean }>`
   padding: ${theme.spacing[4]};
-  border: 2px solid ${props => props.selected ? theme.colors.primaryPurple : theme.colors.border.medium};
+  border: 2px solid
+    ${props =>
+      props.selected ? theme.colors.primaryPurple : theme.colors.border.medium};
   border-radius: ${theme.borderRadius.md};
-  background: ${props => props.selected ? theme.colors.background.accent : theme.colors.white};
+  background: ${props =>
+    props.selected ? theme.colors.background.accent : theme.colors.white};
   cursor: pointer;
   transition: all ${theme.transitions.fast};
   display: flex;
@@ -332,7 +344,10 @@ const RoleOption = styled.div<{ selected: boolean }>`
 
   &:hover {
     border-color: ${theme.colors.primaryPurple};
-    background: ${props => props.selected ? theme.colors.background.accent : theme.colors.background.hover};
+    background: ${props =>
+      props.selected
+        ? theme.colors.background.accent
+        : theme.colors.background.hover};
     transform: translateY(-1px);
     box-shadow: ${theme.shadows.md};
   }
@@ -342,7 +357,9 @@ const RoleOption = styled.div<{ selected: boolean }>`
     box-shadow: ${theme.shadows.sm};
   }
 
-  ${props => props.selected && `
+  ${props =>
+    props.selected &&
+    `
     &::before {
       content: "✓";
       position: absolute;
@@ -358,8 +375,12 @@ const RoleOption = styled.div<{ selected: boolean }>`
 const RoleIconContainer = styled.div<{ selected?: boolean }>`
   padding: ${theme.spacing[2]};
   border-radius: ${theme.borderRadius.base};
-  background: ${props => props.selected ? theme.colors.primaryPurple : theme.colors.background.light};
-  color: ${props => props.selected ? theme.colors.white : theme.colors.text.secondary};
+  background: ${props =>
+    props.selected
+      ? theme.colors.primaryPurple
+      : theme.colors.background.light};
+  color: ${props =>
+    props.selected ? theme.colors.white : theme.colors.text.secondary};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -456,7 +477,7 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
   onClose,
   onSubmit,
   isLoading,
-  serverError
+  serverError,
 }) => {
   const [formData, setFormData] = useState<CreateUserProfileInput>({
     email: '',
@@ -466,7 +487,7 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
     phone: '',
     dateOfBirth: null,
     role: UserRole.customer,
-    isActive: true
+    isActive: true,
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -484,7 +505,7 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
         phone: '',
         dateOfBirth: null,
         role: UserRole.customer,
-        isActive: true
+        isActive: true,
       });
       setErrors({});
       setServerErrors({});
@@ -504,11 +525,11 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
   // Función para validar y formatear fecha
   const formatDateForAPI = (dateString: string): string | null => {
     if (!dateString) return null;
-    
+
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return null;
-      
+
       // Asegurar formato ISO para el backend
       return date.toISOString();
     } catch {
@@ -519,22 +540,34 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
   // Función para procesar errores del servidor y mapearlos a campos específicos
   const processServerError = (errorMessage: string): void => {
     const newServerErrors: Record<string, string> = {};
-    
+
     // Mapear errores específicos del servidor a campos del formulario
-    if (errorMessage.toLowerCase().includes('birth date') || errorMessage.toLowerCase().includes('fecha de nacimiento')) {
+    if (
+      errorMessage.toLowerCase().includes('birth date') ||
+      errorMessage.toLowerCase().includes('fecha de nacimiento')
+    ) {
       newServerErrors['dateOfBirth'] = 'Fecha de nacimiento inválida';
     } else if (errorMessage.toLowerCase().includes('email')) {
       newServerErrors['email'] = 'Email inválido o ya existe';
     } else if (errorMessage.toLowerCase().includes('password')) {
       newServerErrors['password'] = 'Contraseña inválida';
-    } else if (errorMessage.toLowerCase().includes('first name') || errorMessage.toLowerCase().includes('nombre')) {
+    } else if (
+      errorMessage.toLowerCase().includes('first name') ||
+      errorMessage.toLowerCase().includes('nombre')
+    ) {
       newServerErrors['firstName'] = 'Nombre inválido';
-    } else if (errorMessage.toLowerCase().includes('last name') || errorMessage.toLowerCase().includes('apellido')) {
+    } else if (
+      errorMessage.toLowerCase().includes('last name') ||
+      errorMessage.toLowerCase().includes('apellido')
+    ) {
       newServerErrors['lastName'] = 'Apellido inválido';
-    } else if (errorMessage.toLowerCase().includes('phone') || errorMessage.toLowerCase().includes('teléfono')) {
+    } else if (
+      errorMessage.toLowerCase().includes('phone') ||
+      errorMessage.toLowerCase().includes('teléfono')
+    ) {
       newServerErrors['phone'] = 'Teléfono inválido';
     }
-    
+
     setServerErrors(newServerErrors);
   };
 
@@ -565,7 +598,7 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
     if (formData.dateOfBirth) {
       const birthDate = new Date(formData.dateOfBirth);
       const today = new Date();
-      
+
       if (isNaN(birthDate.getTime())) {
         newErrors['dateOfBirth'] = 'Fecha de nacimiento no válida';
       } else if (birthDate > today) {
@@ -584,13 +617,15 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
       try {
         // Limpiar errores del servidor antes de enviar
         setServerErrors({});
-        
+
         // Formatear la fecha antes de enviar
         const formattedData = {
           ...formData,
-          dateOfBirth: formData.dateOfBirth ? formatDateForAPI(formData.dateOfBirth as string) : null
+          dateOfBirth: formData.dateOfBirth
+            ? formatDateForAPI(formData.dateOfBirth as string)
+            : null,
         };
-        
+
         await onSubmit(formattedData);
       } catch (error) {
         // Los errores se manejan en el hook, pero podemos mostrar errores específicos aquí si es necesario
@@ -608,7 +643,7 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
       phone: '',
       dateOfBirth: null,
       role: UserRole.customer,
-      isActive: true
+      isActive: true,
     });
     setErrors({});
     setServerErrors({});
@@ -624,11 +659,11 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
       isValidEmail(formData.email) &&
       calculatePasswordStrength(formData.password) >= 50
     );
-    
+
     // Solo validar que no haya errores de validación locales
     // Los errores del servidor no deberían impedir que el usuario pueda enviar el formulario
     const hasNoValidationErrors = Object.keys(errors).length === 0;
-    
+
     return hasRequiredFields && hasNoValidationErrors;
   };
 
@@ -646,7 +681,9 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
             </HeaderIcon>
             <HeaderText>
               <ModalTitle>Crear Nuevo Usuario</ModalTitle>
-              <ModalSubtitle>Completa la información para crear una nueva cuenta de usuario</ModalSubtitle>
+              <ModalSubtitle>
+                Completa la información para crear una nueva cuenta de usuario
+              </ModalSubtitle>
             </HeaderText>
           </HeaderLeft>
           <CloseButton onClick={handleClose}>
@@ -656,7 +693,9 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
 
         <StepsIndicator>
           <Step active={true} completed={isFormValid()}>
-            <StepNumber active={true} completed={isFormValid()}>1</StepNumber>
+            <StepNumber active={true} completed={isFormValid()}>
+              1
+            </StepNumber>
             <StepLabel>Datos Básicos</StepLabel>
           </Step>
           <StepLine />
@@ -674,19 +713,19 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
               {serverError}
             </ServerErrorBanner>
           )}
-          
+
           {/* Account Information Section */}
           <Section>
             <SectionHeader>
               <Mail size={16} style={{ color: theme.colors.primaryPurple }} />
               <SectionTitle>Información de Cuenta</SectionTitle>
             </SectionHeader>
-            
+
             <FormGrid>
               <FormField>
                 <Input
-                  label="Email"
-                  type="email"
+                  label='Email'
+                  type='email'
                   value={formData.email}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setFormData(prev => ({ ...prev, email: e.target.value }));
@@ -697,7 +736,7 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
                     }
                   }}
                   required
-                  placeholder="ejemplo@correo.com"
+                  placeholder='ejemplo@correo.com'
                   error={errors['email'] || serverErrors['email'] || ''}
                 />
                 <FieldHint>
@@ -708,11 +747,14 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
 
               <FormField>
                 <Input
-                  label="Contraseña"
+                  label='Contraseña'
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password || ''}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setFormData(prev => ({ ...prev, password: e.target.value }));
+                    setFormData(prev => ({
+                      ...prev,
+                      password: e.target.value,
+                    }));
                     // Limpiar errores cuando el usuario empiece a corregir
                     if (errors['password'] || serverErrors['password']) {
                       setErrors(prev => ({ ...prev, password: '' }));
@@ -720,12 +762,16 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
                     }
                   }}
                   required
-                  placeholder="Mínimo 8 caracteres"
+                  placeholder='Mínimo 8 caracteres'
                   error={errors['password'] || serverErrors['password'] || ''}
-                  rightIcon={showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  rightIcon={
+                    showPassword ? <EyeOff size={16} /> : <Eye size={16} />
+                  }
                   onRightIconClick={() => setShowPassword(!showPassword)}
                   rightIconClickable={true}
-                  rightIconAriaLabel={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  rightIconAriaLabel={
+                    showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                  }
                 />
                 {formData.password && (
                   <PasswordStrength>
@@ -748,18 +794,21 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
           {/* Personal Information Section */}
           <Section>
             <SectionHeader>
-              <UserIcon size={16} style={{ color: theme.colors.primaryPurple }} />
+              <UserIcon
+                size={16}
+                style={{ color: theme.colors.primaryPurple }}
+              />
               <SectionTitle>Información Personal</SectionTitle>
             </SectionHeader>
-            
+
             <FormGrid>
               <Input
-                label="Nombre"
+                label='Nombre'
                 value={formData.firstName || ''}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setFormData(prev => ({
                     ...prev,
-                    firstName: e.target.value
+                    firstName: e.target.value,
                   }));
                   // Limpiar errores cuando el usuario empiece a corregir
                   if (errors['firstName'] || serverErrors['firstName']) {
@@ -768,17 +817,17 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
                   }
                 }}
                 required
-                placeholder="Nombre del usuario"
+                placeholder='Nombre del usuario'
                 error={errors['firstName'] || serverErrors['firstName'] || ''}
               />
-              
+
               <Input
-                label="Apellido"
+                label='Apellido'
                 value={formData.lastName || ''}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setFormData(prev => ({
                     ...prev,
-                    lastName: e.target.value
+                    lastName: e.target.value,
                   }));
                   // Limpiar errores cuando el usuario empiece a corregir
                   if (errors['lastName'] || serverErrors['lastName']) {
@@ -787,18 +836,18 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
                   }
                 }}
                 required
-                placeholder="Apellido del usuario"
+                placeholder='Apellido del usuario'
                 error={errors['lastName'] || serverErrors['lastName'] || ''}
               />
 
               <FormField>
                 <Input
-                  label="Teléfono"
+                  label='Teléfono'
                   value={formData.phone || ''}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setFormData(prev => ({
                       ...prev,
-                      phone: e.target.value
+                      phone: e.target.value,
                     }));
                     // Limpiar errores cuando el usuario empiece a corregir
                     if (errors['phone'] || serverErrors['phone']) {
@@ -806,7 +855,7 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
                       setServerErrors(prev => ({ ...prev, phone: '' }));
                     }
                   }}
-                  placeholder="+34 600 000 000"
+                  placeholder='+34 600 000 000'
                   error={errors['phone'] || serverErrors['phone'] || ''}
                 />
                 <FieldHint>
@@ -816,14 +865,20 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
               </FormField>
 
               <Input
-                label="Fecha de Nacimiento"
-                type="date"
-                value={formData.dateOfBirth ? new Date(formData.dateOfBirth as string).toISOString().split('T')[0] : ''}
+                label='Fecha de Nacimiento'
+                type='date'
+                value={
+                  formData.dateOfBirth
+                    ? new Date(formData.dateOfBirth as string)
+                        .toISOString()
+                        .split('T')[0]
+                    : ''
+                }
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   const formattedDate = formatDateForAPI(e.target.value);
                   setFormData(prev => ({
                     ...prev,
-                    dateOfBirth: formattedDate
+                    dateOfBirth: formattedDate,
                   }));
                   // Limpiar tanto errores de validación como errores del servidor
                   if (errors['dateOfBirth'] || serverErrors['dateOfBirth']) {
@@ -831,7 +886,9 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
                     setServerErrors(prev => ({ ...prev, dateOfBirth: '' }));
                   }
                 }}
-                error={errors['dateOfBirth'] || serverErrors['dateOfBirth'] || ''}
+                error={
+                  errors['dateOfBirth'] || serverErrors['dateOfBirth'] || ''
+                }
               />
             </FormGrid>
           </Section>
@@ -847,42 +904,60 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
               <RoleLabel>Rol del Usuario</RoleLabel>
               <RoleHint>Haz clic en una opción para seleccionarla</RoleHint>
               <RoleOptions>
-                <RoleOption 
+                <RoleOption
                   selected={formData.role === UserRole.customer}
-                  onClick={() => setFormData(prev => ({ ...prev, role: UserRole.customer }))}
+                  onClick={() =>
+                    setFormData(prev => ({ ...prev, role: UserRole.customer }))
+                  }
                 >
-                  <RoleIconContainer selected={formData.role === UserRole.customer}>
+                  <RoleIconContainer
+                    selected={formData.role === UserRole.customer}
+                  >
                     <Users size={16} />
                   </RoleIconContainer>
                   <RoleInfo>
                     <RoleName>Cliente</RoleName>
-                    <RoleDescription>Acceso a funciones básicas de cliente</RoleDescription>
+                    <RoleDescription>
+                      Acceso a funciones básicas de cliente
+                    </RoleDescription>
                   </RoleInfo>
                 </RoleOption>
 
-                <RoleOption 
+                <RoleOption
                   selected={formData.role === UserRole.staff}
-                  onClick={() => setFormData(prev => ({ ...prev, role: UserRole.staff }))}
+                  onClick={() =>
+                    setFormData(prev => ({ ...prev, role: UserRole.staff }))
+                  }
                 >
-                  <RoleIconContainer selected={formData.role === UserRole.staff}>
+                  <RoleIconContainer
+                    selected={formData.role === UserRole.staff}
+                  >
                     <UserPlus size={16} />
                   </RoleIconContainer>
                   <RoleInfo>
                     <RoleName>Staff</RoleName>
-                    <RoleDescription>Acceso a gestión de contenido y soporte</RoleDescription>
+                    <RoleDescription>
+                      Acceso a gestión de contenido y soporte
+                    </RoleDescription>
                   </RoleInfo>
                 </RoleOption>
 
-                <RoleOption 
+                <RoleOption
                   selected={formData.role === UserRole.admin}
-                  onClick={() => setFormData(prev => ({ ...prev, role: UserRole.admin }))}
+                  onClick={() =>
+                    setFormData(prev => ({ ...prev, role: UserRole.admin }))
+                  }
                 >
-                  <RoleIconContainer selected={formData.role === UserRole.admin}>
+                  <RoleIconContainer
+                    selected={formData.role === UserRole.admin}
+                  >
                     <Shield size={16} />
                   </RoleIconContainer>
                   <RoleInfo>
                     <RoleName>Administrador</RoleName>
-                    <RoleDescription>Acceso completo al sistema</RoleDescription>
+                    <RoleDescription>
+                      Acceso completo al sistema
+                    </RoleDescription>
                   </RoleInfo>
                 </RoleOption>
               </RoleOptions>
@@ -890,15 +965,17 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
 
             <ActiveUserCheckbox>
               <Checkbox
-                type="checkbox"
-                id="isActiveCreate"
+                type='checkbox'
+                id='isActiveCreate'
                 checked={formData.isActive || false}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ 
-                  ...prev, 
-                  isActive: e.target.checked 
-                }))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData(prev => ({
+                    ...prev,
+                    isActive: e.target.checked,
+                  }))
+                }
               />
-              <CheckboxLabel htmlFor="isActiveCreate">
+              <CheckboxLabel htmlFor='isActiveCreate'>
                 <CheckCircle size={14} />
                 Usuario activo (puede acceder al sistema)
               </CheckboxLabel>
@@ -907,19 +984,15 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
         </ModalContent>
 
         <ModalFooter>
-          <Button
-            variant="outline"
-            onClick={handleClose}
-            size="large"
-          >
+          <Button variant='outline' onClick={handleClose} size='large'>
             Cancelar
           </Button>
           <Button
-            variant="primary"
+            variant='primary'
             onClick={handleSubmit}
             isLoading={isLoading}
             disabled={!isFormValid()}
-            size="large"
+            size='large'
             icon={<UserPlus size={14} />}
           >
             {isLoading ? 'Creando...' : 'Crear Usuario'}

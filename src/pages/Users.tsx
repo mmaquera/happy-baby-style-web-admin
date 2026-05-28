@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
-import { useUsers, useUserStats, useCreateUser, useUpdateUserOptimized } from '@/hooks/useUsersGraphQL';
+import {
+  useUsers,
+  useUserStats,
+  useCreateUser,
+  useUpdateUserOptimized,
+} from '@/hooks/useUsersGraphQL';
 import { User, UserRole } from '@/types';
 import { InputMaybe } from '@/generated/graphql';
 import { Card } from '@/components/ui/Card';
@@ -11,11 +16,14 @@ import { AuthProviderDashboard } from '@/components/users/AuthProviderDashboard'
 import { ImprovedCreateUserModal } from '@/components/users/ImprovedCreateUserModal';
 import { UserActionsMenu } from '@/components/users/UserActionsMenu';
 import { PasswordManagementModal } from '@/components/users/PasswordManagementModal';
-import { useProviderUtils, useAccountManagement } from '@/hooks/useAuthManagement';
+import {
+  useProviderUtils,
+  useAccountManagement,
+} from '@/hooks/useAuthManagement';
 import { useUserActions } from '@/hooks/useUserActions';
 import { theme } from '@/styles/theme';
 import { AuthProvider } from '@/types';
-import { 
+import {
   Users as UsersIcon,
   UserPlus,
   Search,
@@ -29,7 +37,7 @@ import {
   Plus,
   Shield,
   MoreVertical,
-  Key
+  Key,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -156,7 +164,7 @@ const FormSelect = styled.select`
   background-color: ${theme.colors.white};
   color: ${theme.colors.text.primary};
   width: 100%;
-  
+
   &:focus {
     outline: none;
     border-color: ${theme.colors.primaryPurple};
@@ -251,7 +259,7 @@ const UserRoleBadge = styled.span<{ role: UserRole }>`
   font-weight: ${theme.fontWeights.medium};
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  
+
   ${({ role }) => {
     switch (role) {
       case UserRole.admin:
@@ -283,7 +291,7 @@ const UserStatus = styled.span<{ active: boolean }>`
   font-weight: ${theme.fontWeights.medium};
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  
+
   ${({ active }) => {
     if (active) {
       return `
@@ -430,11 +438,14 @@ const Tab = styled.button<{ active: boolean }>`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[2]};
-  
-  ${({ active }) => active ? `
+
+  ${({ active }) =>
+    active
+      ? `
     color: ${theme.colors.primaryPurple};
     border-bottom: 2px solid ${theme.colors.primaryPurple};
-  ` : `
+  `
+      : `
     color: ${theme.colors.text.secondary};
     
     &:hover {
@@ -452,10 +463,12 @@ export const UsersPage: React.FC = () => {
   const [filters, setFilters] = useState({
     search: '',
     role: null as InputMaybe<UserRole>,
-    isActive: null as InputMaybe<boolean>
+    isActive: null as InputMaybe<boolean>,
   });
-  
-  const [activeTab, setActiveTab] = useState<'users' | 'auth-dashboard'>('users');
+
+  const [activeTab, setActiveTab] = useState<'users' | 'auth-dashboard'>(
+    'users'
+  );
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -468,7 +481,7 @@ export const UsersPage: React.FC = () => {
   const effectiveFilters = {
     search: filters.search || null,
     role: filters.role || null,
-    isActive: filters.isActive || null
+    isActive: filters.isActive || null,
   };
 
   // 🔍 DEBUGGING: Logs para diagnosticar el problema
@@ -476,10 +489,15 @@ export const UsersPage: React.FC = () => {
     filters,
     effectiveFilters,
     filtersString: JSON.stringify(filters),
-    effectiveFiltersString: JSON.stringify(effectiveFilters)
+    effectiveFiltersString: JSON.stringify(effectiveFilters),
   });
 
-  const { users = [], loading: usersLoading, error: usersError, refetch } = useUsers({ filter: effectiveFilters });
+  const {
+    users = [],
+    loading: usersLoading,
+    error: usersError,
+    refetch,
+  } = useUsers({ filter: effectiveFilters });
 
   // 🔍 DEBUGGING: Logs del hook useUsers
   console.log('🔍 DEBUG Users.tsx - Hook useUsers:', {
@@ -487,13 +505,13 @@ export const UsersPage: React.FC = () => {
     usersLength: users.length,
     loading: usersLoading,
     error: usersError,
-    hasRefetch: !!refetch
+    hasRefetch: !!refetch,
   });
   const { stats } = useUserStats();
   const createUserMutation = useCreateUser();
   const updateUserMutation = useUpdateUserOptimized();
   const { getProviderIcon } = useProviderUtils();
-  
+
   // Password management hooks
   const { forcePasswordReset } = useAccountManagement();
   const userActions = useUserActions();
@@ -514,7 +532,8 @@ export const UsersPage: React.FC = () => {
   useEffect(() => {
     console.log('🔍 DEBUG Users.tsx - useEffect de filtros ejecutándose', {
       filters,
-      shouldRefetch: filters.search || filters.role !== null || filters.isActive !== null
+      shouldRefetch:
+        filters.search || filters.role !== null || filters.isActive !== null,
     });
     if (filters.search || filters.role !== null || filters.isActive !== null) {
       stableRefetch();
@@ -531,14 +550,14 @@ export const UsersPage: React.FC = () => {
       firstName: '',
       lastName: '',
       phone: '',
-      dateOfBirth: undefined as string | undefined
-    }
+      dateOfBirth: undefined as string | undefined,
+    },
   });
 
   const handleCreateUser = async (userData: any) => {
     try {
       const result = await createUserMutation.create(userData);
-      
+
       if (result?.success) {
         setShowCreateModal(false);
         // El toast ya se maneja en el hook
@@ -554,17 +573,17 @@ export const UsersPage: React.FC = () => {
 
   const handleUpdateUser = async () => {
     if (!selectedUser) return;
-    
+
     try {
       const updateData = {
         email: formData.email,
         role: formData.role,
         isActive: formData.isActive,
-        profile: formData.profile
+        profile: formData.profile,
       };
-      
+
       await updateUserMutation.update(selectedUser.id, updateData);
-      
+
       setShowEditModal(false);
       setSelectedUser(null);
       toast.success('Usuario actualizado exitosamente');
@@ -580,12 +599,12 @@ export const UsersPage: React.FC = () => {
       password: '',
       role: user.role,
       isActive: user.isActive,
-              profile: {
-          firstName: user.profile?.firstName || '',
-          lastName: user.profile?.lastName || '',
-          phone: user.profile?.phone || '',
-          dateOfBirth: user.profile?.dateOfBirth || undefined
-        }
+      profile: {
+        firstName: user.profile?.firstName || '',
+        lastName: user.profile?.lastName || '',
+        phone: user.profile?.phone || '',
+        dateOfBirth: user.profile?.dateOfBirth || undefined,
+      },
     });
     setShowEditModal(true);
   };
@@ -627,10 +646,14 @@ export const UsersPage: React.FC = () => {
 
   const getRoleLabel = (role: UserRole) => {
     switch (role) {
-      case UserRole.admin: return 'Administrador';
-      case UserRole.staff: return 'Personal';
-      case UserRole.customer: return 'Cliente';
-      default: return role;
+      case UserRole.admin:
+        return 'Administrador';
+      case UserRole.staff:
+        return 'Personal';
+      case UserRole.customer:
+        return 'Cliente';
+      default:
+        return role;
     }
   };
 
@@ -645,7 +668,7 @@ export const UsersPage: React.FC = () => {
             </HeaderInfo>
             <HeaderActions>
               <Button
-                variant="primary"
+                variant='primary'
                 onClick={() => setShowCreateModal(true)}
                 icon={<UserPlus size={16} />}
               >
@@ -697,34 +720,46 @@ export const UsersPage: React.FC = () => {
         <FiltersSection>
           <FiltersRow>
             <SearchInput
-              placeholder="Buscar usuarios..."
+              placeholder='Buscar usuarios...'
               value={filters.search}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setFilters(prev => ({ ...prev, search: e.target.value }))
+              }
               icon={<Search size={16} />}
               style={{ minWidth: '250px' }}
             />
             <FilterSelect
               value={filters.role || ''}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilters(prev => ({ 
-                ...prev, 
-                role: e.target.value ? e.target.value as UserRole : null 
-              }))}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                setFilters(prev => ({
+                  ...prev,
+                  role: e.target.value ? (e.target.value as UserRole) : null,
+                }))
+              }
             >
-              <option value="">Todos los roles</option>
-              <option value="admin">Administrador</option>
-              <option value="customer">Cliente</option>
-              <option value="staff">Staff</option>
+              <option value=''>Todos los roles</option>
+              <option value='admin'>Administrador</option>
+              <option value='customer'>Cliente</option>
+              <option value='staff'>Staff</option>
             </FilterSelect>
             <FilterSelect
-              value={filters.isActive === null ? '' : filters.isActive ? 'true' : 'false'}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilters(prev => ({ 
-                ...prev, 
-                isActive: e.target.value ? e.target.value === 'true' : null 
-              }))}
+              value={
+                filters.isActive === null
+                  ? ''
+                  : filters.isActive
+                    ? 'true'
+                    : 'false'
+              }
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                setFilters(prev => ({
+                  ...prev,
+                  isActive: e.target.value ? e.target.value === 'true' : null,
+                }))
+              }
             >
-              <option value="">Todos los estados</option>
-              <option value="true">Activo</option>
-              <option value="false">Inactivo</option>
+              <option value=''>Todos los estados</option>
+              <option value='true'>Activo</option>
+              <option value='false'>Inactivo</option>
             </FilterSelect>
           </FiltersRow>
         </FiltersSection>
@@ -748,7 +783,7 @@ export const UsersPage: React.FC = () => {
           <HeaderActions>
             {activeTab === 'users' && (
               <Button
-                variant="primary"
+                variant='primary'
                 onClick={() => setShowCreateModal(true)}
                 icon={<UserPlus size={16} />}
               >
@@ -761,15 +796,15 @@ export const UsersPage: React.FC = () => {
 
       {/* Tabs Navigation */}
       <TabsContainer>
-        <Tab 
-          active={activeTab === 'users'} 
+        <Tab
+          active={activeTab === 'users'}
           onClick={() => setActiveTab('users')}
         >
           <UsersIcon size={16} />
           Gestión de Usuarios
         </Tab>
-        <Tab 
-          active={activeTab === 'auth-dashboard'} 
+        <Tab
+          active={activeTab === 'auth-dashboard'}
           onClick={() => setActiveTab('auth-dashboard')}
         >
           <Shield size={16} />
@@ -783,171 +818,213 @@ export const UsersPage: React.FC = () => {
           <>
             {/* Stats Cards */}
             <StatsGrid>
-        <StatsCard>
-          <StatsIcon>
-            <UsersIcon size={24} />
-          </StatsIcon>
-          <StatsContent>
-            <StatsNumber>{stats?.totalUsers || 0}</StatsNumber>
-            <StatsLabel>Total Usuarios</StatsLabel>
-          </StatsContent>
-        </StatsCard>
-        <StatsCard>
-          <StatsIcon>
-            <UserPlus size={24} />
-          </StatsIcon>
-          <StatsContent>
-            <StatsNumber>{stats?.activeUsers || 0}</StatsNumber>
-            <StatsLabel>Usuarios Activos</StatsLabel>
-          </StatsContent>
-        </StatsCard>
-        <StatsCard>
-          <StatsIcon>
-            <Shield size={24} />
-          </StatsIcon>
-          <StatsContent>
-                         <StatsNumber>{stats?.activeUsers || 0}</StatsNumber>
-            <StatsLabel>Email Verificado</StatsLabel>
-          </StatsContent>
-        </StatsCard>
-        <StatsCard>
-          <StatsIcon>
-            <Calendar size={24} />
-          </StatsIcon>
-          <StatsContent>
-            <StatsNumber>{stats?.newUsersThisMonth || 0}</StatsNumber>
-            <StatsLabel>Nuevos este Mes</StatsLabel>
-          </StatsContent>
-        </StatsCard>
-      </StatsGrid>
+              <StatsCard>
+                <StatsIcon>
+                  <UsersIcon size={24} />
+                </StatsIcon>
+                <StatsContent>
+                  <StatsNumber>{stats?.totalUsers || 0}</StatsNumber>
+                  <StatsLabel>Total Usuarios</StatsLabel>
+                </StatsContent>
+              </StatsCard>
+              <StatsCard>
+                <StatsIcon>
+                  <UserPlus size={24} />
+                </StatsIcon>
+                <StatsContent>
+                  <StatsNumber>{stats?.activeUsers || 0}</StatsNumber>
+                  <StatsLabel>Usuarios Activos</StatsLabel>
+                </StatsContent>
+              </StatsCard>
+              <StatsCard>
+                <StatsIcon>
+                  <Shield size={24} />
+                </StatsIcon>
+                <StatsContent>
+                  <StatsNumber>{stats?.activeUsers || 0}</StatsNumber>
+                  <StatsLabel>Email Verificado</StatsLabel>
+                </StatsContent>
+              </StatsCard>
+              <StatsCard>
+                <StatsIcon>
+                  <Calendar size={24} />
+                </StatsIcon>
+                <StatsContent>
+                  <StatsNumber>{stats?.newUsersThisMonth || 0}</StatsNumber>
+                  <StatsLabel>Nuevos este Mes</StatsLabel>
+                </StatsContent>
+              </StatsCard>
+            </StatsGrid>
 
-      {/* Filters */}
-      <FiltersSection>
-        <FiltersRow>
-          <SearchInput
-            placeholder="Buscar usuarios..."
-            value={filters.search}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-            icon={<Search size={16} />}
-            style={{ minWidth: '250px' }}
-          />
-          <FilterSelect
-            value={filters.role || ''}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilters(prev => ({ 
-              ...prev, 
-              role: e.target.value ? e.target.value as UserRole : null 
-            }))}
-          >
-            <option value="">Todos los roles</option>
-            <option value="admin">Administrador</option>
-            <option value="customer">Cliente</option>
-            <option value="staff">Staff</option>
-          </FilterSelect>
-          <FilterSelect
-            value={filters.isActive === null ? '' : filters.isActive ? 'true' : 'false'}
-            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFilters(prev => ({ 
-              ...prev, 
-              isActive: e.target.value ? e.target.value === 'true' : null 
-            }))}
-          >
-            <option value="">Todos los estados</option>
-            <option value="true">Activo</option>
-            <option value="false">Inactivo</option>
-          </FilterSelect>
-        </FiltersRow>
-      </FiltersSection>
+            {/* Filters */}
+            <FiltersSection>
+              <FiltersRow>
+                <SearchInput
+                  placeholder='Buscar usuarios...'
+                  value={filters.search}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setFilters(prev => ({ ...prev, search: e.target.value }))
+                  }
+                  icon={<Search size={16} />}
+                  style={{ minWidth: '250px' }}
+                />
+                <FilterSelect
+                  value={filters.role || ''}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                    setFilters(prev => ({
+                      ...prev,
+                      role: e.target.value
+                        ? (e.target.value as UserRole)
+                        : null,
+                    }))
+                  }
+                >
+                  <option value=''>Todos los roles</option>
+                  <option value='admin'>Administrador</option>
+                  <option value='customer'>Cliente</option>
+                  <option value='staff'>Staff</option>
+                </FilterSelect>
+                <FilterSelect
+                  value={
+                    filters.isActive === null
+                      ? ''
+                      : filters.isActive
+                        ? 'true'
+                        : 'false'
+                  }
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                    setFilters(prev => ({
+                      ...prev,
+                      isActive: e.target.value
+                        ? e.target.value === 'true'
+                        : null,
+                    }))
+                  }
+                >
+                  <option value=''>Todos los estados</option>
+                  <option value='true'>Activo</option>
+                  <option value='false'>Inactivo</option>
+                </FilterSelect>
+              </FiltersRow>
+            </FiltersSection>
 
-      {/* 🔍 DEBUGGING: Log del render final */}
-      {(() => {
-        console.log('🔍 DEBUG Users.tsx - Render final:', {
-          usersLength: users.length,
-          loading: usersLoading,
-          error: usersError,
-          filters,
-          effectiveFilters,
-          usersArray: users
-        });
-        return null;
-      })()}
+            {/* 🔍 DEBUGGING: Log del render final */}
+            {(() => {
+              console.log('🔍 DEBUG Users.tsx - Render final:', {
+                usersLength: users.length,
+                loading: usersLoading,
+                error: usersError,
+                filters,
+                effectiveFilters,
+                usersArray: users,
+              });
+              return null;
+            })()}
 
-      {/* Users List */}
-      {usersLoading ? (
-        <LoadingMessage>Cargando usuarios...</LoadingMessage>
-      ) : usersError ? (
-        <ErrorMessage>Error al cargar usuarios: Error desconocido</ErrorMessage>
-      ) : (
-        <UsersGrid>
-          {users.map((user: any) => {
-            // Determinar el proveedor principal del usuario
-            const primaryProvider = AuthProvider.email;
-            console.log(user);
-            return (
-              <UserCard key={user.id} onClick={() => openEditModal(user as any)}>
-                {/* Indicador del proveedor de autenticación */}
-                <AuthProviderIndicator provider={primaryProvider}>
-                  {getProviderIcon(primaryProvider)}
-                </AuthProviderIndicator>
-                <UserAvatar>
-                  {user.profile?.firstName?.[0]}{user.profile?.lastName?.[0] || 'U'}
-                </UserAvatar>
-                <UserInfo>
-                <UserName>
-                  {user.profile?.firstName} {user.profile?.lastName}
-                </UserName>
-                <UserEmail>{user.email}</UserEmail>
-                <UserDetails>
-                  <UserRoleBadge role={user.role}>
-                    {getRoleLabel(user.role)}
-                  </UserRoleBadge>
-                  <UserStatus active={user.isActive}>
-                    {user.isActive ? 'Activo' : 'Inactivo'}
-                  </UserStatus>
-                </UserDetails>
-                {user.profile?.phone && (
-                  <UserPhone>
-                    <Phone size={12} />
-                    {user.profile.phone}
-                  </UserPhone>
-                )}
-                {user.profile?.dateOfBirth && (
-                  <UserBirthDate>
-                    <Calendar size={12} />
-                    {new Date(user.profile.dateOfBirth).toLocaleDateString()}
-                  </UserBirthDate>
-                )}
-              </UserInfo>
-              <UserActions>
-                <div onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                  <UserActionsMenu
-                    user={user as any}
-                    isOpen={openMenuUserId === user.id}
-                    onToggle={() => handleMenuToggle(user.id)}
-                    onClose={handleMenuClose}
-                    onEdit={openEditModal}
-                    onView={(user) => {
-                      setSelectedUser(user as any);
-                      setShowDetailModal(true);
-                    }}
-                    onActivate={user.isActive ? () => {} : (user: any) => handleActivateUser(user)}
-                    onDeactivate={user.isActive ? (user: any) => handleDeactivateUser(user) : () => {}}
-                    onDelete={(user: any) => handleDeleteUser(user)}
-                    onResetPassword={(user: any) => handleResetPassword(user)}
-                    onPromoteToAdmin={user.role !== UserRole.admin ? (user: any) => handlePromoteToAdmin(user) : () => {}}
-                    onDemoteFromAdmin={user.role === UserRole.admin ? (user: any) => handleDemoteFromAdmin(user) : () => {}}
-                  />
-                </div>
-              </UserActions>
-            </UserCard>
-            );
-          })}
-        </UsersGrid>
-      )}
+            {/* Users List */}
+            {usersLoading ? (
+              <LoadingMessage>Cargando usuarios...</LoadingMessage>
+            ) : usersError ? (
+              <ErrorMessage>
+                Error al cargar usuarios: Error desconocido
+              </ErrorMessage>
+            ) : (
+              <UsersGrid>
+                {users.map((user: any) => {
+                  // Determinar el proveedor principal del usuario
+                  const primaryProvider = AuthProvider.email;
+                  console.log(user);
+                  return (
+                    <UserCard
+                      key={user.id}
+                      onClick={() => openEditModal(user as any)}
+                    >
+                      {/* Indicador del proveedor de autenticación */}
+                      <AuthProviderIndicator provider={primaryProvider}>
+                        {getProviderIcon(primaryProvider)}
+                      </AuthProviderIndicator>
+                      <UserAvatar>
+                        {user.profile?.firstName?.[0]}
+                        {user.profile?.lastName?.[0] || 'U'}
+                      </UserAvatar>
+                      <UserInfo>
+                        <UserName>
+                          {user.profile?.firstName} {user.profile?.lastName}
+                        </UserName>
+                        <UserEmail>{user.email}</UserEmail>
+                        <UserDetails>
+                          <UserRoleBadge role={user.role}>
+                            {getRoleLabel(user.role)}
+                          </UserRoleBadge>
+                          <UserStatus active={user.isActive}>
+                            {user.isActive ? 'Activo' : 'Inactivo'}
+                          </UserStatus>
+                        </UserDetails>
+                        {user.profile?.phone && (
+                          <UserPhone>
+                            <Phone size={12} />
+                            {user.profile.phone}
+                          </UserPhone>
+                        )}
+                        {user.profile?.dateOfBirth && (
+                          <UserBirthDate>
+                            <Calendar size={12} />
+                            {new Date(
+                              user.profile.dateOfBirth
+                            ).toLocaleDateString()}
+                          </UserBirthDate>
+                        )}
+                      </UserInfo>
+                      <UserActions>
+                        <div
+                          onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                        >
+                          <UserActionsMenu
+                            user={user as any}
+                            isOpen={openMenuUserId === user.id}
+                            onToggle={() => handleMenuToggle(user.id)}
+                            onClose={handleMenuClose}
+                            onEdit={openEditModal}
+                            onView={user => {
+                              setSelectedUser(user as any);
+                              setShowDetailModal(true);
+                            }}
+                            onActivate={
+                              user.isActive
+                                ? () => {}
+                                : (user: any) => handleActivateUser(user)
+                            }
+                            onDeactivate={
+                              user.isActive
+                                ? (user: any) => handleDeactivateUser(user)
+                                : () => {}
+                            }
+                            onDelete={(user: any) => handleDeleteUser(user)}
+                            onResetPassword={(user: any) =>
+                              handleResetPassword(user)
+                            }
+                            onPromoteToAdmin={
+                              user.role !== UserRole.admin
+                                ? (user: any) => handlePromoteToAdmin(user)
+                                : () => {}
+                            }
+                            onDemoteFromAdmin={
+                              user.role === UserRole.admin
+                                ? (user: any) => handleDemoteFromAdmin(user)
+                                : () => {}
+                            }
+                          />
+                        </div>
+                      </UserActions>
+                    </UserCard>
+                  );
+                })}
+              </UsersGrid>
+            )}
           </>
         )}
 
-        {activeTab === 'auth-dashboard' && (
-          <AuthProviderDashboard />
-        )}
+        {activeTab === 'auth-dashboard' && <AuthProviderDashboard />}
       </TabContent>
 
       {/* Create User Modal */}
@@ -966,8 +1043,8 @@ export const UsersPage: React.FC = () => {
             <ModalHeader>
               <ModalTitle>Editar Usuario</ModalTitle>
               <Button
-                variant="ghost"
-                size="small"
+                variant='ghost'
+                size='small'
                 onClick={() => setShowEditModal(false)}
               >
                 ✕
@@ -976,65 +1053,88 @@ export const UsersPage: React.FC = () => {
 
             <FormGrid>
               <Input
-                label="Email"
-                type="email"
+                label='Email'
+                type='email'
                 value={formData.email}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData(prev => ({ ...prev, email: e.target.value }))
+                }
                 required
               />
               <Input
-                label="Nombre"
+                label='Nombre'
                 value={formData.profile?.firstName || ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
-                  ...prev,
-                  profile: { ...prev.profile!, firstName: e.target.value }
-                }))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData(prev => ({
+                    ...prev,
+                    profile: { ...prev.profile!, firstName: e.target.value },
+                  }))
+                }
                 required
               />
               <Input
-                label="Apellido"
+                label='Apellido'
                 value={formData.profile?.lastName || ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
-                  ...prev,
-                  profile: { ...prev.profile!, lastName: e.target.value }
-                }))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData(prev => ({
+                    ...prev,
+                    profile: { ...prev.profile!, lastName: e.target.value },
+                  }))
+                }
                 required
               />
               <Input
-                label="Teléfono"
+                label='Teléfono'
                 value={formData.profile?.phone || ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
-                  ...prev,
-                  profile: { ...prev.profile!, phone: e.target.value }
-                }))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData(prev => ({
+                    ...prev,
+                    profile: { ...prev.profile!, phone: e.target.value },
+                  }))
+                }
               />
               <Input
-                label="Fecha de Nacimiento"
-                type="date"
-                value={formData.profile?.dateOfBirth ? new Date(formData.profile.dateOfBirth).toISOString().split('T')[0] : ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({
-                  ...prev,
-                  profile: { ...prev.profile!, dateOfBirth: e.target.value || undefined }
-                }))}
+                label='Fecha de Nacimiento'
+                type='date'
+                value={
+                  formData.profile?.dateOfBirth
+                    ? new Date(formData.profile.dateOfBirth)
+                        .toISOString()
+                        .split('T')[0]
+                    : ''
+                }
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData(prev => ({
+                    ...prev,
+                    profile: {
+                      ...prev.profile!,
+                      dateOfBirth: e.target.value || undefined,
+                    },
+                  }))
+                }
               />
             </FormGrid>
 
             <div style={{ marginBottom: theme.spacing[4] }}>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: theme.spacing[2], 
-                fontSize: theme.fontSizes.sm,
-                fontWeight: theme.fontWeights.medium,
-                color: theme.colors.text.primary 
-              }}>
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: theme.spacing[2],
+                  fontSize: theme.fontSizes.sm,
+                  fontWeight: theme.fontWeights.medium,
+                  color: theme.colors.text.primary,
+                }}
+              >
                 Rol
               </label>
               <FormSelect
                 value={formData.role}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFormData(prev => ({ 
-                  ...prev, 
-                  role: e.target.value as UserRole 
-                }))}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                  setFormData(prev => ({
+                    ...prev,
+                    role: e.target.value as UserRole,
+                  }))
+                }
               >
                 <option value={UserRole.customer}>Cliente</option>
                 <option value={UserRole.staff}>Staff</option>
@@ -1044,26 +1144,27 @@ export const UsersPage: React.FC = () => {
 
             <CheckboxContainer>
               <Checkbox
-                type="checkbox"
-                id="isActiveEdit"
+                type='checkbox'
+                id='isActiveEdit'
                 checked={formData.isActive}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData(prev => ({ 
-                  ...prev, 
-                  isActive: e.target.checked 
-                }))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData(prev => ({
+                    ...prev,
+                    isActive: e.target.checked,
+                  }))
+                }
               />
-              <CheckboxLabel htmlFor="isActiveEdit">Usuario activo</CheckboxLabel>
+              <CheckboxLabel htmlFor='isActiveEdit'>
+                Usuario activo
+              </CheckboxLabel>
             </CheckboxContainer>
 
             <FormActions>
-              <Button
-                variant="outline"
-                onClick={() => setShowEditModal(false)}
-              >
+              <Button variant='outline' onClick={() => setShowEditModal(false)}>
                 Cancelar
               </Button>
               <Button
-                variant="primary"
+                variant='primary'
                 onClick={handleUpdateUser}
                 isLoading={updateUserMutation.loading}
               >
@@ -1101,4 +1202,4 @@ export const UsersPage: React.FC = () => {
   );
 };
 
-export default UsersPage; 
+export default UsersPage;

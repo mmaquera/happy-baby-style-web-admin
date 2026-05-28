@@ -9,6 +9,7 @@ El sistema de categorías proporciona una gestión completa y robusta para organ
 ### Componentes Principales
 
 #### 1. **CategoryHeader** (`CategoryHeader.tsx`)
+
 - **Responsabilidad**: Encabezado principal con estadísticas y acciones rápidas
 - **Características**:
   - Estadísticas en tiempo real (total, activas, inactivas)
@@ -17,6 +18,7 @@ El sistema de categorías proporciona una gestión completa y robusta para organ
   - Diseño responsive y accesible
 
 #### 2. **CategoryGrid** (`CategoryGrid.tsx`)
+
 - **Responsabilidad**: Vista en cuadrícula de categorías
 - **Características**:
   - Layout responsive con CSS Grid
@@ -25,6 +27,7 @@ El sistema de categorías proporciona una gestión completa y robusta para organ
   - Animaciones y transiciones suaves
 
 #### 3. **CategoryListView** (`CategoryListView.tsx`)
+
 - **Responsabilidad**: Vista en lista con funcionalidades avanzadas
 - **Características**:
   - Tabla con ordenamiento por columnas
@@ -33,6 +36,7 @@ El sistema de categorías proporciona una gestión completa y robusta para organ
   - Filtros y búsqueda integrados
 
 #### 4. **CategoryCard** (`CategoryCard.tsx`)
+
 - **Responsabilidad**: Tarjeta individual de categoría
 - **Características**:
   - Diseño de tarjeta moderna y atractiva
@@ -41,6 +45,7 @@ El sistema de categorías proporciona una gestión completa y robusta para organ
   - Estados visuales claros (activa/inactiva)
 
 #### 5. **CategoryFilters** (`CategoryFilters.tsx`)
+
 - **Responsabilidad**: Sistema de filtros avanzado
 - **Características**:
   - Búsqueda por texto (nombre, descripción, slug)
@@ -49,6 +54,7 @@ El sistema de categorías proporciona una gestión completa y robusta para organ
   - Diseño intuitivo y fácil de usar
 
 #### 6. **CreateCategoryModal** (`CreateCategoryModal.tsx`)
+
 - **Responsabilidad**: Modal para crear nuevas categorías
 - **Características**:
   - Formulario completo con validaciones
@@ -59,6 +65,7 @@ El sistema de categorías proporciona una gestión completa y robusta para organ
 ### Hooks Personalizados
 
 #### 1. **useCategories** (`useCategories.ts`)
+
 - **Responsabilidad**: Hook principal que integra toda la funcionalidad
 - **Características**:
   - Interfaz unificada para todas las operaciones
@@ -67,6 +74,7 @@ El sistema de categorías proporciona una gestión completa y robusta para organ
   - Integración con GraphQL
 
 #### 2. **useCategoriesGraphQL** (`useCategoriesGraphQL.ts`)
+
 - **Responsabilidad**: Operaciones GraphQL para categorías
 - **Características**:
   - Queries y mutations completas
@@ -75,6 +83,7 @@ El sistema de categorías proporciona una gestión completa y robusta para organ
   - Paginación y filtros del servidor
 
 #### 3. **useCategoryActions** (`useCategoryActions.ts`)
+
 - **Responsabilidad**: Acciones y operaciones CRUD
 - **Características**:
   - Crear, actualizar, eliminar categorías
@@ -83,6 +92,7 @@ El sistema de categorías proporciona una gestión completa y robusta para organ
   - Selección múltiple de categorías
 
 #### 4. **useCategoryFilters** (`useCategoryFilters.ts`)
+
 - **Responsabilidad**: Gestión de filtros y ordenamiento
 - **Características**:
   - Filtros por estado y búsqueda
@@ -91,6 +101,7 @@ El sistema de categorías proporciona una gestión completa y robusta para organ
   - Reset y restauración de filtros
 
 #### 5. **useCreateCategory** (`useCreateCategory.ts`)
+
 - **Responsabilidad**: Creación específica de categorías
 - **Características**:
   - Mutation GraphQL optimizada
@@ -101,36 +112,42 @@ El sistema de categorías proporciona una gestión completa y robusta para organ
 ## 🔧 Funcionalidades Implementadas
 
 ### ✅ Operaciones CRUD Completas
+
 - **Crear**: Modal completo con validaciones
 - **Leer**: Lista paginada con filtros y búsqueda
 - **Actualizar**: Cambio de estado y edición
 - **Eliminar**: Confirmación y eliminación segura
 
 ### ✅ Sistema de Filtros Avanzado
+
 - Búsqueda por texto en tiempo real
 - Filtro por estado de categoría
 - Filtros activos visibles y removibles
 - Reset y restauración de filtros
 
 ### ✅ Ordenamiento y Paginación
+
 - Ordenamiento por múltiples campos
 - Paginación del lado del servidor
 - Navegación entre páginas
 - Límites configurables
 
 ### ✅ Gestión de Estados
+
 - Estados de carga, error y vacío
 - Manejo robusto de errores
 - Notificaciones toast
 - Estados visuales claros
 
 ### ✅ Acciones Masivas
+
 - Selección múltiple de categorías
 - Eliminación masiva
 - Cambio masivo de estado
 - Confirmaciones de seguridad
 
 ### ✅ Diseño Responsive
+
 - Adaptación a diferentes tamaños de pantalla
 - Grid y lista adaptativos
 - Componentes móvil-friendly
@@ -139,6 +156,7 @@ El sistema de categorías proporciona una gestión completa y robusta para organ
 ## 📊 Integración con GraphQL
 
 ### Schema Utilizado
+
 ```graphql
 type Category {
   id: ID!
@@ -155,6 +173,7 @@ type Category {
 ```
 
 ### Operaciones Implementadas
+
 - `GetCategories`: Lista paginada con filtros
 - `GetCategory`: Categoría individual por ID
 - `GetCategoryBySlug`: Categoría por slug
@@ -165,12 +184,14 @@ type Category {
 ## 🎨 Sistema de Diseño
 
 ### Tema y Estilos
+
 - **Colores**: Paleta consistente con el tema de la aplicación
 - **Tipografía**: Jerarquía clara y legible
 - **Espaciado**: Sistema de espaciado consistente
 - **Bordes y Sombras**: Elementos visuales modernos
 
 ### Componentes de UI
+
 - **Button**: Variantes primary, secondary, outline, ghost
 - **Input**: Con validaciones y estados de error
 - **Card**: Contenedores con sombras y bordes
@@ -179,12 +200,14 @@ type Category {
 ## 🧪 Testing y Calidad
 
 ### Estándares de Testing
+
 - **Cobertura**: Mínimo 80% de tests unitarios
 - **Tipos**: TypeScript para verificación de tipos
 - **Validaciones**: Formularios con validaciones robustas
 - **Manejo de Errores**: Estados de error manejados consistentemente
 
 ### Principios SOLID Aplicados
+
 - **Single Responsibility**: Cada componente tiene una responsabilidad clara
 - **Open/Closed**: Extensible sin modificar código existente
 - **Liskov Substitution**: Interfaces consistentes
@@ -194,19 +217,21 @@ type Category {
 ## 🚀 Uso y Implementación
 
 ### Instalación
+
 ```typescript
-import { 
-  CategoryHeader, 
+import {
+  CategoryHeader,
   CategoryGrid,
   CategoryListView,
   CreateCategoryModal,
-  CategoryFilters
+  CategoryFilters,
 } from '@/components/categories';
 
 import { useCategories } from '@/hooks/useCategories';
 ```
 
 ### Uso Básico
+
 ```typescript
 const CategoriesPage = () => {
   const {
@@ -229,13 +254,14 @@ const CategoriesPage = () => {
 ```
 
 ### Configuración de Filtros
+
 ```typescript
 const { filters, setFilters, clearFilters } = useCategories();
 
 // Aplicar filtros
 setFilters({
   isActive: true,
-  search: 'ropa'
+  search: 'ropa',
 });
 
 // Limpiar filtros
@@ -245,12 +271,14 @@ clearFilters();
 ## 📈 Métricas y Performance
 
 ### Indicadores de Calidad
+
 - **Tiempo de Carga**: < 2 segundos para listas
 - **Responsividad**: < 100ms para interacciones
 - **Accesibilidad**: WCAG 2.1 AA compliance
 - **SEO**: URLs amigables y metadatos
 
 ### Optimizaciones Implementadas
+
 - **Lazy Loading**: Carga bajo demanda
 - **Debouncing**: Búsqueda optimizada
 - **Cache**: GraphQL cache inteligente
@@ -259,6 +287,7 @@ clearFilters();
 ## 🔮 Roadmap y Mejoras Futuras
 
 ### Próximas Funcionalidades
+
 - [ ] Drag & Drop para reordenar categorías
 - [ ] Importación masiva desde CSV/Excel
 - [ ] Exportación en múltiples formatos
@@ -267,6 +296,7 @@ clearFilters();
 - [ ] Plantillas de categorías
 
 ### Mejoras Técnicas
+
 - [ ] Tests de integración
 - [ ] Performance monitoring
 - [ ] A/B testing para UX
@@ -276,12 +306,14 @@ clearFilters();
 ## 🤝 Contribución
 
 ### Guías de Desarrollo
+
 1. **Seguir estándares**: Adherirse a los estándares establecidos
 2. **Testing**: Agregar tests para nuevas funcionalidades
 3. **Documentación**: Actualizar README y comentarios
 4. **Code Review**: Revisión obligatoria antes de merge
 
 ### Estructura de Commits
+
 ```
 feat(categories): agregar filtros avanzados
 fix(categories): corregir paginación en móvil

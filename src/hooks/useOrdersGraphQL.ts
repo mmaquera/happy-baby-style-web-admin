@@ -1,5 +1,5 @@
-import { 
-  useGetOrdersQuery, 
+import {
+  useGetOrdersQuery,
   useGetOrderQuery,
   useCreateOrderMutation,
   useUpdateOrderMutation,
@@ -13,16 +13,21 @@ import {
   CreateOrderInput,
   UpdateOrderInput,
   OrderStatus,
-  PaginationInput
+  PaginationInput,
 } from '../generated/graphql';
 import toast from 'react-hot-toast';
 
 // Helper functions to map TypeScript types to GraphQL types
-const mapToGraphQLFilter = (filter: OrderFilterInput | undefined): OrderFilterInput | null => {
+const mapToGraphQLFilter = (
+  filter: OrderFilterInput | undefined
+): OrderFilterInput | null => {
   return filter || null;
 };
 
-const mapToGraphQLPagination = (limit: number, offset: number = 0): PaginationInput => {
+const mapToGraphQLPagination = (
+  limit: number,
+  offset: number = 0
+): PaginationInput => {
   return { limit, offset };
 };
 
@@ -38,27 +43,27 @@ interface UseOrdersOptions {
 
 export const useOrders = (options: UseOrdersOptions = {}) => {
   const { filter, limit = 20, skip = false } = options;
-  
+
   const { data, loading, error, fetchMore, refetch } = useGetOrdersQuery({
     variables: {
       filter: mapToGraphQLFilter(filter),
-      pagination: mapToGraphQLPagination(limit, 0)
+      pagination: mapToGraphQLPagination(limit, 0),
     },
     skip,
     notifyOnNetworkStatusChange: true,
-    errorPolicy: 'all'
+    errorPolicy: 'all',
   });
 
   const loadMore = () => {
     if (!data?.orders.hasMore) return;
-    
+
     return fetchMore({
       variables: {
         pagination: {
           limit,
-          offset: data.orders.orders.length
-        }
-      }
+          offset: data.orders.orders.length,
+        },
+      },
     });
   };
 
@@ -69,7 +74,7 @@ export const useOrders = (options: UseOrdersOptions = {}) => {
     loading,
     error,
     loadMore,
-    refetch
+    refetch,
   };
 };
 
@@ -77,26 +82,28 @@ export const useOrder = (id: string, skip = false) => {
   const { data, loading, error, refetch } = useGetOrderQuery({
     variables: { id },
     skip: skip || !id,
-    errorPolicy: 'all'
+    errorPolicy: 'all',
   });
 
   return {
     order: data?.order,
     loading,
     error,
-    refetch
+    refetch,
   };
 };
 
 export const useCreateOrder = () => {
   const [createOrder, { loading, error }] = useCreateOrderMutation({
     refetchQueries: [GetOrdersDocument],
-    onCompleted: (data) => {
-      toast.success(`Pedido #${data.createOrder.orderNumber} creado exitosamente`);
+    onCompleted: data => {
+      toast.success(
+        `Pedido #${data.createOrder.orderNumber} creado exitosamente`
+      );
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Error al crear pedido: ${error.message}`);
-    }
+    },
   });
 
   const create = (input: CreateOrderInput) => {
@@ -108,12 +115,14 @@ export const useCreateOrder = () => {
 
 export const useUpdateOrder = () => {
   const [updateOrder, { loading, error }] = useUpdateOrderMutation({
-    onCompleted: (data) => {
-      toast.success(`Pedido #${data.updateOrder.orderNumber} actualizado exitosamente`);
+    onCompleted: data => {
+      toast.success(
+        `Pedido #${data.updateOrder.orderNumber} actualizado exitosamente`
+      );
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Error al actualizar pedido: ${error.message}`);
-    }
+    },
   });
 
   const update = (id: string, input: UpdateOrderInput) => {
@@ -126,12 +135,14 @@ export const useUpdateOrder = () => {
 export const useUpdateOrderStatus = () => {
   const [updateOrderStatus, { loading, error }] = useUpdateOrderStatusMutation({
     refetchQueries: [GetOrdersDocument],
-    onCompleted: (data) => {
-      toast.success(`Estado del pedido #${data.updateOrderStatus.orderNumber} actualizado a ${data.updateOrderStatus.status}`);
+    onCompleted: data => {
+      toast.success(
+        `Estado del pedido #${data.updateOrderStatus.orderNumber} actualizado a ${data.updateOrderStatus.status}`
+      );
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Error al actualizar estado del pedido: ${error.message}`);
-    }
+    },
   });
 
   const updateStatus = (id: string, status: OrderStatus) => {
@@ -144,12 +155,14 @@ export const useUpdateOrderStatus = () => {
 export const useCancelOrder = () => {
   const [cancelOrder, { loading, error }] = useCancelOrderMutation({
     refetchQueries: [GetOrdersDocument],
-    onCompleted: (data) => {
-      toast.success(`Pedido #${data.cancelOrder.orderNumber} cancelado exitosamente`);
+    onCompleted: data => {
+      toast.success(
+        `Pedido #${data.cancelOrder.orderNumber} cancelado exitosamente`
+      );
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Error al cancelar pedido: ${error.message}`);
-    }
+    },
   });
 
   const cancel = (id: string) => {
@@ -162,20 +175,22 @@ export const useCancelOrder = () => {
 export const useShipOrder = () => {
   const [shipOrder, { loading, error }] = useShipOrderMutation({
     refetchQueries: [GetOrdersDocument],
-    onCompleted: (data) => {
-      toast.success(`Pedido #${data.shipOrder.orderNumber} enviado exitosamente`);
+    onCompleted: data => {
+      toast.success(
+        `Pedido #${data.shipOrder.orderNumber} enviado exitosamente`
+      );
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Error al enviar pedido: ${error.message}`);
-    }
+    },
   });
 
   const ship = (id: string, trackingNumber?: string) => {
-    return shipOrder({ 
-      variables: { 
-        id, 
-        trackingNumber: mapToGraphQLString(trackingNumber) 
-      } 
+    return shipOrder({
+      variables: {
+        id,
+        trackingNumber: mapToGraphQLString(trackingNumber),
+      },
     });
   };
 
@@ -185,12 +200,14 @@ export const useShipOrder = () => {
 export const useDeliverOrder = () => {
   const [deliverOrder, { loading, error }] = useDeliverOrderMutation({
     refetchQueries: [GetOrdersDocument],
-    onCompleted: (data) => {
-      toast.success(`Pedido #${data.deliverOrder.orderNumber} entregado exitosamente`);
+    onCompleted: data => {
+      toast.success(
+        `Pedido #${data.deliverOrder.orderNumber} entregado exitosamente`
+      );
     },
-    onError: (error) => {
+    onError: error => {
       toast.error(`Error al entregar pedido: ${error.message}`);
-    }
+    },
   });
 
   const deliver = (id: string) => {
@@ -202,14 +219,14 @@ export const useDeliverOrder = () => {
 
 export const useOrderStats = () => {
   const { data, loading, error, refetch } = useGetOrderStatsQuery({
-    errorPolicy: 'all'
+    errorPolicy: 'all',
   });
 
   return {
     stats: data?.orderStats?.data,
     loading,
     error,
-    refetch
+    refetch,
   };
 };
 
@@ -217,7 +234,7 @@ export const useOrderStats = () => {
 export const useOrdersByStatus = (status: OrderStatus) => {
   return useOrders({
     filter: { status },
-    limit: 10
+    limit: 10,
   });
 };
 
@@ -227,6 +244,6 @@ export const useRecentOrders = () => {
     limit: 5,
     filter: {
       startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // Last 7 days
-    }
+    },
   });
 };

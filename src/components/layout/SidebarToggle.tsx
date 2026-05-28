@@ -7,7 +7,7 @@ import { useSidebar } from '@/contexts/SidebarContext';
 const ToggleButton = styled.button<{ isCollapsed: boolean }>`
   position: fixed;
   top: ${theme.spacing[6]};
-  left: ${props => props.isCollapsed ? '64px' : '264px'};
+  left: ${props => (props.isCollapsed ? '64px' : '264px')};
   width: 32px;
   height: 32px;
   background: ${theme.colors.white};
@@ -52,8 +52,8 @@ export const SidebarToggle: React.FC = () => {
   const { isCollapsed, toggleSidebar } = useSidebar();
 
   return (
-    <ToggleButton 
-      isCollapsed={isCollapsed} 
+    <ToggleButton
+      isCollapsed={isCollapsed}
       onClick={toggleSidebar}
       aria-label={isCollapsed ? 'Expandir sidebar' : 'Colapsar sidebar'}
       title={isCollapsed ? 'Expandir sidebar' : 'Colapsar sidebar'}

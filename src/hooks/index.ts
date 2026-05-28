@@ -2,11 +2,11 @@
 // Single entry point for all hooks
 
 // Authentication hooks
-export { 
+export {
   useUnifiedAuth,
   useRoleAccess,
   useAdminAccess,
-  useStaffAccess
+  useStaffAccess,
 } from './useUnifiedAuth';
 
 export { useLoginForm } from './useLoginForm';

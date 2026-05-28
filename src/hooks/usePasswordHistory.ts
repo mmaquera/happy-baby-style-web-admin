@@ -21,19 +21,30 @@ interface UsePasswordHistoryReturn {
 /**
  * Maps SecurityEvent eventType to PasswordAction type
  */
-const mapEventTypeToActionType = (eventType: string): PasswordAction['type'] => {
+const mapEventTypeToActionType = (
+  eventType: string
+): PasswordAction['type'] => {
   const normalizedType = eventType.toLowerCase();
-  
+
   if (normalizedType.includes('reset')) {
     return 'reset';
-  } else if (normalizedType.includes('temporary') || normalizedType.includes('temp')) {
+  } else if (
+    normalizedType.includes('temporary') ||
+    normalizedType.includes('temp')
+  ) {
     return 'temporary';
-  } else if (normalizedType.includes('admin') || normalizedType.includes('set')) {
+  } else if (
+    normalizedType.includes('admin') ||
+    normalizedType.includes('set')
+  ) {
     return 'admin_set';
-  } else if (normalizedType.includes('change') || normalizedType.includes('update')) {
+  } else if (
+    normalizedType.includes('change') ||
+    normalizedType.includes('update')
+  ) {
     return 'user_change';
   }
-  
+
   // Default fallback
   return 'reset';
 };
@@ -45,7 +56,7 @@ const mapStatusFromMetadata = (metadata: any): PasswordAction['status'] => {
   if (!metadata || typeof metadata !== 'object') {
     return 'completed'; // Default status
   }
-  
+
   const status = metadata.status?.toLowerCase();
   if (status === 'pending') return 'pending';
   if (status === 'failed' || status === 'error') return 'failed';
@@ -55,7 +66,10 @@ const mapStatusFromMetadata = (metadata: any): PasswordAction['status'] => {
 /**
  * Extracts admin user from metadata or user object
  */
-const extractAdminUser = (metadata: any, userEmail?: string | null): string | undefined => {
+const extractAdminUser = (
+  metadata: any,
+  userEmail?: string | null
+): string | undefined => {
   if (metadata?.adminUser) {
     return metadata.adminUser;
   }
@@ -77,24 +91,29 @@ const extractAdminUser = (metadata: any, userEmail?: string | null): string | un
  */
 const isPasswordRelatedEvent = (eventType: string): boolean => {
   const normalizedType = eventType.toLowerCase();
-  return normalizedType.includes('password') || 
-         normalizedType.includes('reset') ||
-         normalizedType.includes('temporary');
+  return (
+    normalizedType.includes('password') ||
+    normalizedType.includes('reset') ||
+    normalizedType.includes('temporary')
+  );
 };
 
 /**
  * Transforms SecurityEvent to PasswordAction
  */
-const transformSecurityEventToPasswordAction = (event: any): PasswordAction | null => {
+const transformSecurityEventToPasswordAction = (
+  event: any
+): PasswordAction | null => {
   try {
     // Filter only password-related events
     if (!isPasswordRelatedEvent(event.eventType)) {
       return null;
     }
 
-    const metadata = typeof event.metadata === 'string' 
-      ? JSON.parse(event.metadata) 
-      : event.metadata || {};
+    const metadata =
+      typeof event.metadata === 'string'
+        ? JSON.parse(event.metadata)
+        : event.metadata || {};
 
     const adminUser = extractAdminUser(metadata, event.user?.email);
 
@@ -104,7 +123,7 @@ const transformSecurityEventToPasswordAction = (event: any): PasswordAction | nu
       timestamp: new Date(event.createdAt),
       description: event.description || 'Evento de contraseña',
       ...(adminUser && { adminUser }),
-      status: mapStatusFromMetadata(metadata)
+      status: mapStatusFromMetadata(metadata),
     };
   } catch (error) {
     console.error('Error transforming security event:', error);
@@ -116,20 +135,22 @@ const transformSecurityEventToPasswordAction = (event: any): PasswordAction | nu
  * Hook for fetching user password history
  * Follows ERROR_HANDLING_STANDARDS.md patterns
  */
-export const usePasswordHistory = (userId: string | null): UsePasswordHistoryReturn => {
+export const usePasswordHistory = (
+  userId: string | null
+): UsePasswordHistoryReturn => {
   const [localError, setLocalError] = useState<string | null>(null);
   const [passwordHistory, setPasswordHistory] = useState<PasswordAction[]>([]);
 
-  const { 
-    data, 
-    loading, 
-    error: queryError, 
-    refetch: refetchQuery 
+  const {
+    data,
+    loading,
+    error: queryError,
+    refetch: refetchQuery,
   } = useGetUserPasswordHistoryQuery({
     variables: { userId: userId || '' },
     skip: !userId,
     errorPolicy: 'all',
-    fetchPolicy: 'cache-and-network'
+    fetchPolicy: 'cache-and-network',
   });
 
   // Process response and transform data
@@ -145,7 +166,8 @@ export const usePasswordHistory = (userId: string | null): UsePasswordHistoryRet
 
       // ✅ Validate response structure
       if (!response.success) {
-        const errorMessage = response.message || 'Error al obtener historial de contraseñas';
+        const errorMessage =
+          response.message || 'Error al obtener historial de contraseñas';
         const errorCode = response.code || 'UNKNOWN_ERROR';
         setLocalError(`${errorMessage} (${errorCode})`);
         setPasswordHistory([]);
@@ -161,7 +183,10 @@ export const usePasswordHistory = (userId: string | null): UsePasswordHistoryRet
 
       setPasswordHistory(transformedActions);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Error inesperado al procesar historial';
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Error inesperado al procesar historial';
       setLocalError(errorMessage);
       setPasswordHistory([]);
       console.error('Error processing password history:', error);
@@ -171,7 +196,8 @@ export const usePasswordHistory = (userId: string | null): UsePasswordHistoryRet
   // Handle query errors
   useEffect(() => {
     if (queryError) {
-      const errorMessage = queryError.message || 'Error al cargar historial de contraseñas';
+      const errorMessage =
+        queryError.message || 'Error al cargar historial de contraseñas';
       setLocalError(errorMessage);
       setPasswordHistory([]);
     }
@@ -182,19 +208,22 @@ export const usePasswordHistory = (userId: string | null): UsePasswordHistoryRet
       setLocalError(null);
       await refetchQuery();
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Error al actualizar historial';
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Error al actualizar historial';
       setLocalError(errorMessage);
       toast.error(errorMessage);
     }
   }, [refetchQuery]);
 
   // Combine errors
-  const combinedError = localError || (queryError?.message || null);
+  const combinedError = localError || queryError?.message || null;
 
   return {
     passwordHistory,
     loading,
     error: combinedError,
-    refetch
+    refetch,
   };
 };

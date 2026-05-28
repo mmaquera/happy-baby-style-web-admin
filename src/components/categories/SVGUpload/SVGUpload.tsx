@@ -6,18 +6,22 @@
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import { 
-  Upload, 
-  FileText, 
-  X, 
-  CheckCircle, 
+import {
+  Upload,
+  FileText,
+  X,
+  CheckCircle,
   AlertTriangle,
   Loader2,
-  Image as ImageIcon
+  Image as ImageIcon,
 } from 'lucide-react';
 import { theme } from '@/styles/theme';
 import { useSVGUpload } from '@/hooks/useSVGUpload';
-import { SVGUploadProps, SVGUploadResult, SVG_UPLOAD_DEFAULTS } from './SVGUpload.types';
+import {
+  SVGUploadProps,
+  SVGUploadResult,
+  SVG_UPLOAD_DEFAULTS,
+} from './SVGUpload.types';
 import {
   SVGUploadContainer,
   SVGUploadZone,
@@ -61,11 +65,13 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
 }) => {
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   // State
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [uploadResult, setUploadResult] = useState<SVGUploadResult | null>(null);
+  const [uploadResult, setUploadResult] = useState<SVGUploadResult | null>(
+    null
+  );
   const [validationMessage, setValidationMessage] = useState<{
     type: 'error' | 'warning' | 'success';
     message: string;
@@ -95,99 +101,120 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
   }, [error]);
 
   // Handle file selection
-  const handleFileSelect = useCallback(async (file: File) => {
-    if (disabled) return;
+  const handleFileSelect = useCallback(
+    async (file: File) => {
+      if (disabled) return;
 
-    // Clear previous state
-    clearError();
-    setValidationMessage(null);
+      // Clear previous state
+      clearError();
+      setValidationMessage(null);
 
-    // Validate file
-    const validation = validateSVG(file);
-    
-    if (!validation.isValid) {
-      setValidationMessage({
-        type: 'error',
-        message: validation.errors.join(', '),
-      });
-      onUploadError?.(validation.errors.join(', '));
-      return;
-    }
+      // Validate file
+      const validation = validateSVG(file);
 
-    // Show warnings if any
-    if (validation.warnings.length > 0) {
-      setValidationMessage({
-        type: 'warning',
-        message: validation.warnings.join(', '),
-      });
-    }
+      if (!validation.isValid) {
+        setValidationMessage({
+          type: 'error',
+          message: validation.errors.join(', '),
+        });
+        onUploadError?.(validation.errors.join(', '));
+        return;
+      }
 
-    setSelectedFile(file);
+      // Show warnings if any
+      if (validation.warnings.length > 0) {
+        setValidationMessage({
+          type: 'warning',
+          message: validation.warnings.join(', '),
+        });
+      }
 
-    try {
-      // Upload file
-      const result = await uploadSVG(file);
-      setUploadResult(result);
-      
-      // Notify parent component
-      onUploadComplete(result.url);
-      
-      // Show success message
-      setValidationMessage({
-        type: 'success',
-        message: 'Archivo SVG subido exitosamente',
-      });
-    } catch (err: any) {
-      setValidationMessage({
-        type: 'error',
-        message: err.message || 'Error al subir el archivo',
-      });
-      onUploadError?.(err.message || 'Error al subir el archivo');
-    }
-  }, [disabled, validateSVG, uploadSVG, onUploadComplete, onUploadError, clearError]);
+      setSelectedFile(file);
+
+      try {
+        // Upload file
+        const result = await uploadSVG(file);
+        setUploadResult(result);
+
+        // Notify parent component
+        onUploadComplete(result.url);
+
+        // Show success message
+        setValidationMessage({
+          type: 'success',
+          message: 'Archivo SVG subido exitosamente',
+        });
+      } catch (err: any) {
+        setValidationMessage({
+          type: 'error',
+          message: err.message || 'Error al subir el archivo',
+        });
+        onUploadError?.(err.message || 'Error al subir el archivo');
+      }
+    },
+    [
+      disabled,
+      validateSVG,
+      uploadSVG,
+      onUploadComplete,
+      onUploadError,
+      clearError,
+    ]
+  );
 
   // Handle drag and drop
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    if (!disabled) {
-      setIsDragOver(true);
-    }
-  }, [disabled]);
+  const handleDragOver = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      if (!disabled) {
+        setIsDragOver(true);
+      }
+    },
+    [disabled]
+  );
 
   const handleDragLeave = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    
-    if (disabled) return;
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragOver(false);
 
-    const files = Array.from(e.dataTransfer.files);
-    const svgFile = files.find(file => 
-      file.name.toLowerCase().endsWith('.svg') || 
-      allowedTypes.includes(file.type as any)
-    );
+      if (disabled) return;
 
-    if (svgFile) {
-      handleFileSelect(svgFile);
-    } else {
-      setValidationMessage({
-        type: 'error',
-        message: 'Solo se permiten archivos SVG (.svg). Por favor selecciona un archivo SVG válido.',
-      });
-    }
-  }, [disabled, allowedTypes, handleFileSelect]);
+      const files = Array.from(e.dataTransfer.files);
+      const svgFile = files.find(
+        file =>
+          file.name.toLowerCase().endsWith('.svg') ||
+          allowedTypes.includes(file.type as any)
+      );
+
+      if (svgFile) {
+        handleFileSelect(svgFile);
+      } else {
+        setValidationMessage({
+          type: 'error',
+          message:
+            'Solo se permiten archivos SVG (.svg). Por favor selecciona un archivo SVG válido.',
+        });
+      }
+    },
+    [disabled, allowedTypes, handleFileSelect]
+  );
 
   // Handle file input change
-  const handleFileInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleFileSelect(file);
-    }
-  }, [handleFileSelect]);
+  const handleFileInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        handleFileSelect(file);
+      }
+    },
+    [handleFileSelect]
+  );
 
   // Handle click to select file
   const handleClick = useCallback(() => {
@@ -229,12 +256,12 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
       >
         <SVGFileInput
           ref={fileInputRef}
-          type="file"
-          accept=".svg,image/svg+xml"
+          type='file'
+          accept='.svg,image/svg+xml'
           onChange={handleFileInputChange}
           disabled={disabled}
         />
-        
+
         <SVGUploadContent>
           {loading ? (
             <SVGLoadingSpinner />
@@ -243,15 +270,16 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
               <ImageIcon />
             </SVGUploadIcon>
           )}
-          
+
           <SVGUploadText>
             {loading ? 'Subiendo archivo...' : placeholder}
           </SVGUploadText>
-          
+
           <SVGUploadSubtext>
-            Solo archivos SVG • Máximo {formatFileSize(maxSize)} • Sin scripts ni elementos inseguros
+            Solo archivos SVG • Máximo {formatFileSize(maxSize)} • Sin scripts
+            ni elementos inseguros
           </SVGUploadSubtext>
-          
+
           {!loading && (
             <SVGUploadButton disabled={disabled}>
               Seleccionar archivo SVG
@@ -273,11 +301,7 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
       )}
 
       {/* Error Message */}
-      {error && (
-        <SVGErrorMessage>
-          {error.message}
-        </SVGErrorMessage>
-      )}
+      {error && <SVGErrorMessage>{error.message}</SVGErrorMessage>}
 
       {/* Validation Message */}
       {validationMessage && (
@@ -305,16 +329,23 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
       )}
 
       {/* SVG Specifications Info */}
-      <div style={{ 
-        marginTop: theme.spacing[4], 
-        padding: theme.spacing[3], 
-        background: theme.colors.background.light,
-        borderRadius: theme.borderRadius.md,
-        fontSize: theme.fontSizes.sm,
-        color: theme.colors.text.secondary
-      }}>
+      <div
+        style={{
+          marginTop: theme.spacing[4],
+          padding: theme.spacing[3],
+          background: theme.colors.background.light,
+          borderRadius: theme.borderRadius.md,
+          fontSize: theme.fontSizes.sm,
+          color: theme.colors.text.secondary,
+        }}
+      >
         <strong>Especificaciones para archivos SVG:</strong>
-        <ul style={{ margin: `${theme.spacing[2]} 0 0 0`, paddingLeft: theme.spacing[4] }}>
+        <ul
+          style={{
+            margin: `${theme.spacing[2]} 0 0 0`,
+            paddingLeft: theme.spacing[4],
+          }}
+        >
           <li>Formato: SVG (Scalable Vector Graphics)</li>
           <li>Tamaño máximo: {formatFileSize(maxSize)}</li>
           <li>Elementos permitidos: formas, texto, gradientes</li>
@@ -328,9 +359,9 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
         <SVGPreview>
           <SVGPreviewContent>
             <SVGPreviewImg>
-              <img 
-                src={uploadResult.url} 
-                alt="Preview" 
+              <img
+                src={uploadResult.url}
+                alt='Preview'
                 style={{ maxWidth: '100%', maxHeight: '100%' }}
               />
             </SVGPreviewImg>

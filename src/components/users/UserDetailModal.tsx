@@ -12,7 +12,7 @@ import { useUserSessions } from '@/hooks/useAuthManagement';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { AuthProvider } from '@/types';
 import { theme } from '@/styles/theme';
-import { 
+import {
   X,
   Mail,
   Phone,
@@ -26,7 +26,7 @@ import {
   Activity,
   AtSign,
   Edit,
-  Save
+  Save,
 } from 'lucide-react';
 
 interface UserDetailModalProps {
@@ -91,7 +91,7 @@ const ContentGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: ${theme.spacing[6]};
-  
+
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
@@ -119,7 +119,7 @@ const InfoItem = styled.div`
   align-items: center;
   gap: ${theme.spacing[3]};
   margin-bottom: ${theme.spacing[3]};
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -146,7 +146,9 @@ const InfoValue = styled.div`
   font-weight: ${theme.fontWeights.medium};
 `;
 
-const StatusBadge = styled.span<{ status: 'active' | 'inactive' | 'verified' | 'unverified' }>`
+const StatusBadge = styled.span<{
+  status: 'active' | 'inactive' | 'verified' | 'unverified';
+}>`
   display: inline-flex;
   align-items: center;
   padding: ${theme.spacing[1]} ${theme.spacing[2]};
@@ -154,7 +156,7 @@ const StatusBadge = styled.span<{ status: 'active' | 'inactive' | 'verified' | '
   font-size: ${theme.fontSizes.xs};
   font-weight: ${theme.fontWeights.medium};
   background: ${theme.colors.background.secondary};
-  
+
   ${({ status }) => {
     switch (status) {
       case 'active':
@@ -192,7 +194,7 @@ const AddressItem = styled.div`
   padding: ${theme.spacing[3]};
   margin-bottom: ${theme.spacing[2]};
   border-left: 3px solid ${theme.colors.primaryPurple};
-  
+
   &:last-child {
     margin-bottom: 0;
   }
@@ -227,11 +229,14 @@ const Tab = styled.button<{ active: boolean }>`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[2]};
-  
-  ${({ active }) => active ? `
+
+  ${({ active }) =>
+    active
+      ? `
     color: ${theme.colors.primaryPurple};
     border-bottom: 2px solid ${theme.colors.primaryPurple};
-  ` : `
+  `
+      : `
     color: ${theme.colors.text.secondary};
     
     &:hover {
@@ -244,10 +249,20 @@ const TabContent = styled.div`
   min-height: 200px;
 `;
 
-export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, onClose }) => {
-  const [activeTab, setActiveTab] = useState<'general' | 'auth' | 'sessions' | 'google-features'>('general');
-  const { sessions, loading: sessionsLoading, refetch: refetchSessions } = useUserSessions(user.id);
-  
+export const UserDetailModal: React.FC<UserDetailModalProps> = ({
+  user,
+  isOpen,
+  onClose,
+}) => {
+  const [activeTab, setActiveTab] = useState<
+    'general' | 'auth' | 'sessions' | 'google-features'
+  >('general');
+  const {
+    sessions,
+    loading: sessionsLoading,
+    refetch: refetchSessions,
+  } = useUserSessions(user.id);
+
   // Hook para manejar el perfil del usuario
   const {
     profile,
@@ -266,20 +281,26 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
     updateAddress,
     deleteAddress,
     setDefaultAddress,
-    refetch: refetchProfile
+    refetch: refetchProfile,
   } = useUserProfile({ userId: user.id, skip: !isOpen });
-  
+
   // Verificar si el usuario tiene cuenta de Google
-  const hasGoogleAccount = user.accounts?.some(account => account.provider === AuthProvider.google);
-  
+  const hasGoogleAccount = user.accounts?.some(
+    account => account.provider === AuthProvider.google
+  );
+
   if (!isOpen) return null;
 
   const getRoleLabel = (role: string) => {
     switch (role) {
-      case 'admin': return 'Administrador';
-      case 'staff': return 'Personal';
-      case 'customer': return 'Cliente';
-      default: return role;
+      case 'admin':
+        return 'Administrador';
+      case 'staff':
+        return 'Personal';
+      case 'customer':
+        return 'Cliente';
+      default:
+        return role;
     }
   };
 
@@ -287,59 +308,58 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
     return new Date(date).toLocaleDateString('es-ES', {
       day: '2-digit',
       month: '2-digit',
-      year: 'numeric'
+      year: 'numeric',
     });
   };
 
   return (
     <Modal onClick={onClose}>
-      <ModalContent onClick={(e) => e.stopPropagation()}>
+      <ModalContent onClick={e => e.stopPropagation()}>
         <ModalHeader>
           <ModalTitle>
             <UserAvatar>
-              {user.profile?.firstName?.[0]}{user.profile?.lastName?.[0]}
+              {user.profile?.firstName?.[0]}
+              {user.profile?.lastName?.[0]}
             </UserAvatar>
             Detalles del Usuario
           </ModalTitle>
           <Button
-            variant="ghost"
-            size="small"
+            variant='ghost'
+            size='small'
             onClick={onClose}
             icon={<X size={20} />}
-          >
-          </Button>
+          ></Button>
         </ModalHeader>
 
         {/* Tabs Navigation */}
         <TabsContainer>
-          <Tab 
-            active={activeTab === 'general'} 
+          <Tab
+            active={activeTab === 'general'}
             onClick={() => setActiveTab('general')}
           >
             <UserIcon size={16} />
             Información General
           </Tab>
-          <Tab 
-            active={activeTab === 'auth'} 
+          <Tab
+            active={activeTab === 'auth'}
             onClick={() => setActiveTab('auth')}
           >
             <Key size={16} />
             Autenticación
           </Tab>
-          <Tab 
-            active={activeTab === 'sessions'} 
+          <Tab
+            active={activeTab === 'sessions'}
             onClick={() => setActiveTab('sessions')}
           >
             <Activity size={16} />
             Sesiones
           </Tab>
           {hasGoogleAccount && (
-            <Tab 
-              active={activeTab === 'google-features'} 
+            <Tab
+              active={activeTab === 'google-features'}
               onClick={() => setActiveTab('google-features')}
             >
-              🔍
-              Google
+              🔍 Google
             </Tab>
           )}
         </TabsContainer>
@@ -356,8 +376,8 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
                     Información Personal
                     {!isEditing && (
                       <Button
-                        variant="ghost"
-                        size="small"
+                        variant='ghost'
+                        size='small'
                         onClick={startEditing}
                         icon={<Edit size={16} />}
                         style={{ marginLeft: 'auto' }}
@@ -366,11 +386,11 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
                       </Button>
                     )}
                   </SectionTitle>
-                  
+
                   {isEditing ? (
                     <UserProfileEditForm
                       profile={(profile || user.profile) as any}
-                      onSave={async (input) => {
+                      onSave={async input => {
                         await updateProfile(input);
                       }}
                       onCancel={cancelEditing}
@@ -385,10 +405,9 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
                         <InfoContent>
                           <InfoLabel>Nombre Completo</InfoLabel>
                           <InfoValue>
-                            {user.profile?.firstName && user.profile?.lastName 
+                            {user.profile?.firstName && user.profile?.lastName
                               ? `${user.profile.firstName} ${user.profile.lastName}`
-                              : 'No especificado'
-                            }
+                              : 'No especificado'}
                           </InfoValue>
                         </InfoContent>
                       </InfoItem>
@@ -422,7 +441,9 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
                           </InfoIcon>
                           <InfoContent>
                             <InfoLabel>Fecha de Nacimiento</InfoLabel>
-                            <InfoValue>{formatDate(user.profile.dateOfBirth)}</InfoValue>
+                            <InfoValue>
+                              {formatDate(user.profile.dateOfBirth)}
+                            </InfoValue>
                           </InfoContent>
                         </InfoItem>
                       )}
@@ -444,7 +465,9 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
                           </InfoIcon>
                           <InfoContent>
                             <InfoLabel>Último Acceso</InfoLabel>
-                            <InfoValue>{formatDate(user.lastLoginAt)}</InfoValue>
+                            <InfoValue>
+                              {formatDate(user.lastLoginAt)}
+                            </InfoValue>
                           </InfoContent>
                         </InfoItem>
                       )}
@@ -458,7 +481,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
                     <Shield size={20} />
                     Estado de la Cuenta
                   </SectionTitle>
-                  
+
                   <InfoItem>
                     <InfoIcon>
                       <Shield size={16} />
@@ -475,13 +498,23 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
 
                   <InfoItem>
                     <InfoIcon>
-                      {user.isActive ? <CheckCircle size={16} /> : <XCircle size={16} />}
+                      {user.isActive ? (
+                        <CheckCircle size={16} />
+                      ) : (
+                        <XCircle size={16} />
+                      )}
                     </InfoIcon>
                     <InfoContent>
                       <InfoLabel>Estado</InfoLabel>
                       <InfoValue>
-                        <StatusBadge status={user.isActive ? 'active' : 'inactive'}>
-                          {user.isActive ? <CheckCircle size={12} /> : <XCircle size={12} />}
+                        <StatusBadge
+                          status={user.isActive ? 'active' : 'inactive'}
+                        >
+                          {user.isActive ? (
+                            <CheckCircle size={12} />
+                          ) : (
+                            <XCircle size={12} />
+                          )}
                           {user.isActive ? 'Activo' : 'Inactivo'}
                         </StatusBadge>
                       </InfoValue>
@@ -490,13 +523,25 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
 
                   <InfoItem>
                     <InfoIcon>
-                      {user.emailVerified ? <CheckCircle size={16} /> : <XCircle size={16} />}
+                      {user.emailVerified ? (
+                        <CheckCircle size={16} />
+                      ) : (
+                        <XCircle size={16} />
+                      )}
                     </InfoIcon>
                     <InfoContent>
                       <InfoLabel>Email Verificado</InfoLabel>
                       <InfoValue>
-                        <StatusBadge status={user.emailVerified ? 'verified' : 'unverified'}>
-                          {user.emailVerified ? <CheckCircle size={12} /> : <XCircle size={12} />}
+                        <StatusBadge
+                          status={
+                            user.emailVerified ? 'verified' : 'unverified'
+                          }
+                        >
+                          {user.emailVerified ? (
+                            <CheckCircle size={12} />
+                          ) : (
+                            <XCircle size={12} />
+                          )}
                           {user.emailVerified ? 'Verificado' : 'No Verificado'}
                         </StatusBadge>
                       </InfoValue>
@@ -521,7 +566,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
                   <MapPin size={20} />
                   Direcciones
                 </SectionTitle>
-                
+
                 <UserAddressManager
                   addresses={user.addresses || []}
                   userId={user.id}
@@ -529,7 +574,12 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
                   onUpdateAddress={updateAddress}
                   onDeleteAddress={deleteAddress}
                   onSetDefaultAddress={setDefaultAddress}
-                  loading={creatingAddress || updatingAddress || deletingAddress || settingDefault}
+                  loading={
+                    creatingAddress ||
+                    updatingAddress ||
+                    deletingAddress ||
+                    settingDefault
+                  }
                 />
               </Section>
             </>
@@ -541,11 +591,11 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
                 <Key size={20} />
                 Cuentas de Autenticación
               </SectionTitle>
-              <UserAuthAccounts 
-                accounts={user.accounts || []} 
+              <UserAuthAccounts
+                accounts={user.accounts || []}
                 onAccountUnlinked={() => {
                   // Refresh user data when account is unlinked
-                }} 
+                }}
               />
             </Section>
           )}
@@ -556,7 +606,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
                 <Activity size={20} />
                 Gestión de Sesiones
               </SectionTitle>
-              <UserSessionsManager 
+              <UserSessionsManager
                 userId={user.id}
                 sessions={sessions}
                 onSessionRevoked={refetchSessions}
@@ -565,7 +615,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({ user, isOpen, 
           )}
 
           {activeTab === 'google-features' && hasGoogleAccount && (
-            <GoogleUserFeatures 
+            <GoogleUserFeatures
               user={user}
               onUserUpdated={() => {
                 // Refresh user data when needed

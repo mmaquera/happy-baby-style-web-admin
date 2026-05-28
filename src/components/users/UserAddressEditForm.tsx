@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { theme } from '@/styles/theme';
 
-
 interface UserAddressEditFormProps {
   address?: UserAddress;
   userId: string;
@@ -88,7 +87,7 @@ const Select = styled.select`
   background: ${theme.colors.white};
   color: ${theme.colors.text.primary};
   transition: border-color ${theme.transitions.fast};
-  
+
   &:focus {
     outline: none;
     border-color: ${theme.colors.primary};
@@ -120,7 +119,7 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
   onSave,
   onCancel,
   loading = false,
-  isEditing = false
+  isEditing = false,
 }) => {
   // Helper function to get error message or empty string
   const getErrorMessage = (fieldName: keyof FormErrors): string => {
@@ -138,7 +137,7 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
     postalCode: address?.postalCode || '',
     country: address?.country || 'España',
     phone: address?.phone || '',
-    isDefault: address?.isDefault || false
+    isDefault: address?.isDefault || false,
   });
 
   const [errors, setErrors] = useState<Partial<FormErrors>>({});
@@ -158,52 +157,70 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
       postalCode: address?.postalCode || '',
       country: address?.country || 'España',
       phone: address?.phone || '',
-      isDefault: address?.isDefault || false
+      isDefault: address?.isDefault || false,
     });
     setErrors({});
     setTouched({});
   }, [address]);
 
-  const validateField = (name: keyof FormData, value: string | boolean): string => {
+  const validateField = (
+    name: keyof FormData,
+    value: string | boolean
+  ): string => {
     switch (name) {
       case 'firstName':
-        if (!value || typeof value !== 'string' || !value.trim()) return 'El nombre es requerido';
-        if (value.trim().length < 2) return 'El nombre debe tener al menos 2 caracteres';
+        if (!value || typeof value !== 'string' || !value.trim())
+          return 'El nombre es requerido';
+        if (value.trim().length < 2)
+          return 'El nombre debe tener al menos 2 caracteres';
         return '';
-      
+
       case 'lastName':
-        if (!value || typeof value !== 'string' || !value.trim()) return 'El apellido es requerido';
-        if (value.trim().length < 2) return 'El apellido debe tener al menos 2 caracteres';
+        if (!value || typeof value !== 'string' || !value.trim())
+          return 'El apellido es requerido';
+        if (value.trim().length < 2)
+          return 'El apellido debe tener al menos 2 caracteres';
         return '';
-      
+
       case 'address1':
-        if (!value || typeof value !== 'string' || !value.trim()) return 'La dirección es requerida';
-        if (value.trim().length < 5) return 'La dirección debe tener al menos 5 caracteres';
+        if (!value || typeof value !== 'string' || !value.trim())
+          return 'La dirección es requerida';
+        if (value.trim().length < 5)
+          return 'La dirección debe tener al menos 5 caracteres';
         return '';
-      
+
       case 'city':
-        if (!value || typeof value !== 'string' || !value.trim()) return 'La ciudad es requerida';
+        if (!value || typeof value !== 'string' || !value.trim())
+          return 'La ciudad es requerida';
         return '';
-      
+
       case 'state':
-        if (!value || typeof value !== 'string' || !value.trim()) return 'La provincia es requerida';
+        if (!value || typeof value !== 'string' || !value.trim())
+          return 'La provincia es requerida';
         return '';
-      
+
       case 'postalCode':
-        if (!value || typeof value !== 'string' || !value.trim()) return 'El código postal es requerido';
-        if (!/^\d{5}$/.test(value.trim())) return 'El código postal debe tener 5 dígitos';
+        if (!value || typeof value !== 'string' || !value.trim())
+          return 'El código postal es requerido';
+        if (!/^\d{5}$/.test(value.trim()))
+          return 'El código postal debe tener 5 dígitos';
         return '';
-      
+
       case 'country':
-        if (!value || typeof value !== 'string' || !value.trim()) return 'El país es requerido';
+        if (!value || typeof value !== 'string' || !value.trim())
+          return 'El país es requerido';
         return '';
-      
+
       case 'phone':
-        if (value && typeof value === 'string' && !/^[\+]?[1-9][\d]{0,15}$/.test(value.replace(/\s/g, ''))) {
+        if (
+          value &&
+          typeof value === 'string' &&
+          !/^[\+]?[1-9][\d]{0,15}$/.test(value.replace(/\s/g, ''))
+        ) {
           return 'El teléfono debe tener un formato válido';
         }
         return '';
-      
+
       default:
         return '';
     }
@@ -211,7 +228,7 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
 
   const handleChange = (name: keyof FormData, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [name]: value }));
-    
+
     // Validate field on change if it has been touched
     if (touched[name]) {
       const error = validateField(name, value);
@@ -227,8 +244,8 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
 
   const validateForm = (): boolean => {
     const newErrors: Partial<FormErrors> = {};
-    
-    Object.keys(formData).forEach((key) => {
+
+    Object.keys(formData).forEach(key => {
       const fieldName = key as keyof FormData;
       if (fieldName !== 'isDefault') {
         const error = validateField(fieldName, formData[fieldName]);
@@ -244,7 +261,7 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -263,7 +280,7 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
         postalCode: formData.postalCode.trim(),
         country: formData.country.trim(),
         phone: formData.phone.trim() || undefined,
-        isDefault: formData.isDefault
+        isDefault: formData.isDefault,
       };
 
       await onSave(input);
@@ -274,11 +291,16 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
 
   const getTypeLabel = (type: string) => {
     switch (type) {
-      case 'home': return 'Casa';
-      case 'work': return 'Trabajo';
-      case 'billing': return 'Facturación';
-      case 'shipping': return 'Envío';
-      default: return type;
+      case 'home':
+        return 'Casa';
+      case 'work':
+        return 'Trabajo';
+      case 'billing':
+        return 'Facturación';
+      case 'shipping':
+        return 'Envío';
+      default:
+        return type;
     }
   };
 
@@ -289,23 +311,25 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
           <Label>Tipo de Dirección</Label>
           <Select
             value={formData.type}
-            onChange={(e) => handleChange('type', e.target.value)}
+            onChange={e => handleChange('type', e.target.value)}
           >
-            <option value="home">Casa</option>
-            <option value="work">Trabajo</option>
-            <option value="billing">Facturación</option>
-            <option value="shipping">Envío</option>
+            <option value='home'>Casa</option>
+            <option value='work'>Trabajo</option>
+            <option value='billing'>Facturación</option>
+            <option value='shipping'>Envío</option>
           </Select>
         </FormGroup>
 
         <FormGroup>
-          <Label>Nombre <Required>*</Required></Label>
+          <Label>
+            Nombre <Required>*</Required>
+          </Label>
           <Input
-            type="text"
+            type='text'
             value={formData.firstName}
-            onChange={(e) => handleChange('firstName', e.target.value)}
+            onChange={e => handleChange('firstName', e.target.value)}
             onBlur={() => handleBlur('firstName')}
-            placeholder="Nombre"
+            placeholder='Nombre'
             error={getErrorMessage('firstName')}
           />
           {errors.firstName && <ErrorMessage>{errors.firstName}</ErrorMessage>}
@@ -314,13 +338,15 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
 
       <FormRow>
         <FormGroup>
-          <Label>Apellido <Required>*</Required></Label>
+          <Label>
+            Apellido <Required>*</Required>
+          </Label>
           <Input
-            type="text"
+            type='text'
             value={formData.lastName}
-            onChange={(e) => handleChange('lastName', e.target.value)}
+            onChange={e => handleChange('lastName', e.target.value)}
             onBlur={() => handleBlur('lastName')}
-            placeholder="Apellido"
+            placeholder='Apellido'
             error={getErrorMessage('lastName')}
           />
           {errors.lastName && <ErrorMessage>{errors.lastName}</ErrorMessage>}
@@ -329,23 +355,25 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
         <FormGroup>
           <Label>Empresa</Label>
           <Input
-            type="text"
+            type='text'
             value={formData.company}
-            onChange={(e) => handleChange('company', e.target.value)}
-            placeholder="Empresa (opcional)"
+            onChange={e => handleChange('company', e.target.value)}
+            placeholder='Empresa (opcional)'
           />
         </FormGroup>
       </FormRow>
 
       <FullWidthFormGroup>
-        <Label>Dirección <Required>*</Required></Label>
+        <Label>
+          Dirección <Required>*</Required>
+        </Label>
         <Input
-          type="text"
+          type='text'
           value={formData.address1}
-          onChange={(e) => handleChange('address1', e.target.value)}
+          onChange={e => handleChange('address1', e.target.value)}
           onBlur={() => handleBlur('address1')}
-          placeholder="Dirección principal"
-                      error={getErrorMessage('address1')}
+          placeholder='Dirección principal'
+          error={getErrorMessage('address1')}
         />
         {errors.address1 && <ErrorMessage>{errors.address1}</ErrorMessage>}
       </FullWidthFormGroup>
@@ -353,35 +381,39 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
       <FullWidthFormGroup>
         <Label>Dirección Adicional</Label>
         <Input
-          type="text"
+          type='text'
           value={formData.address2}
-          onChange={(e) => handleChange('address2', e.target.value)}
-          placeholder="Apartamento, suite, etc. (opcional)"
+          onChange={e => handleChange('address2', e.target.value)}
+          placeholder='Apartamento, suite, etc. (opcional)'
         />
       </FullWidthFormGroup>
 
       <FormRow>
         <FormGroup>
-                  <Label>Ciudad <Required>*</Required></Label>
+          <Label>
+            Ciudad <Required>*</Required>
+          </Label>
           <Input
-            type="text"
+            type='text'
             value={formData.city}
-            onChange={(e) => handleChange('city', e.target.value)}
+            onChange={e => handleChange('city', e.target.value)}
             onBlur={() => handleBlur('city')}
-            placeholder="Ciudad"
+            placeholder='Ciudad'
             error={getErrorMessage('city')}
           />
           {errors.city && <ErrorMessage>{errors.city}</ErrorMessage>}
         </FormGroup>
 
         <FormGroup>
-                  <Label>Provincia <Required>*</Required></Label>
+          <Label>
+            Provincia <Required>*</Required>
+          </Label>
           <Input
-            type="text"
+            type='text'
             value={formData.state}
-            onChange={(e) => handleChange('state', e.target.value)}
+            onChange={e => handleChange('state', e.target.value)}
             onBlur={() => handleBlur('state')}
-            placeholder="Provincia"
+            placeholder='Provincia'
             error={getErrorMessage('state')}
           />
           {errors.state && <ErrorMessage>{errors.state}</ErrorMessage>}
@@ -390,26 +422,32 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
 
       <FormRow>
         <FormGroup>
-                  <Label>Código Postal <Required>*</Required></Label>
+          <Label>
+            Código Postal <Required>*</Required>
+          </Label>
           <Input
-            type="text"
+            type='text'
             value={formData.postalCode}
-            onChange={(e) => handleChange('postalCode', e.target.value)}
+            onChange={e => handleChange('postalCode', e.target.value)}
             onBlur={() => handleBlur('postalCode')}
-            placeholder="12345"
+            placeholder='12345'
             error={getErrorMessage('postalCode')}
           />
-          {errors.postalCode && <ErrorMessage>{errors.postalCode}</ErrorMessage>}
+          {errors.postalCode && (
+            <ErrorMessage>{errors.postalCode}</ErrorMessage>
+          )}
         </FormGroup>
 
         <FormGroup>
-                  <Label>País <Required>*</Required></Label>
+          <Label>
+            País <Required>*</Required>
+          </Label>
           <Input
-            type="text"
+            type='text'
             value={formData.country}
-            onChange={(e) => handleChange('country', e.target.value)}
+            onChange={e => handleChange('country', e.target.value)}
             onBlur={() => handleBlur('country')}
-            placeholder="País"
+            placeholder='País'
             error={getErrorMessage('country')}
           />
           {errors.country && <ErrorMessage>{errors.country}</ErrorMessage>}
@@ -420,11 +458,11 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
         <FormGroup>
           <Label>Teléfono</Label>
           <Input
-            type="tel"
+            type='tel'
             value={formData.phone}
-            onChange={(e) => handleChange('phone', e.target.value)}
+            onChange={e => handleChange('phone', e.target.value)}
             onBlur={() => handleBlur('phone')}
-            placeholder="+1 234 567 890"
+            placeholder='+1 234 567 890'
             error={getErrorMessage('phone')}
           />
           {errors.phone && <ErrorMessage>{errors.phone}</ErrorMessage>}
@@ -433,12 +471,12 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
         <FormGroup>
           <CheckboxContainer>
             <Checkbox
-              type="checkbox"
-              id="isDefault"
+              type='checkbox'
+              id='isDefault'
               checked={formData.isDefault}
-              onChange={(e) => handleChange('isDefault', e.target.checked)}
+              onChange={e => handleChange('isDefault', e.target.checked)}
             />
-            <CheckboxLabel htmlFor="isDefault">
+            <CheckboxLabel htmlFor='isDefault'>
               Establecer como dirección predeterminada
             </CheckboxLabel>
           </CheckboxContainer>
@@ -447,17 +485,17 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
 
       <ButtonGroup>
         <Button
-          type="button"
-          variant="ghost"
+          type='button'
+          variant='ghost'
           onClick={onCancel}
           disabled={loading}
         >
           Cancelar
         </Button>
-        
+
         <Button
-          type="submit"
-          variant="primary"
+          type='submit'
+          variant='primary'
           disabled={loading}
           isLoading={loading}
         >

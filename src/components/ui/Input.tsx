@@ -17,15 +17,17 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 const InputContainer = styled.div.withConfig({
-  shouldForwardProp: (prop) => prop !== 'fullWidth',
+  shouldForwardProp: prop => prop !== 'fullWidth',
 })<{ fullWidth?: boolean }>`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing[2]};
 
-  ${({ fullWidth }) => fullWidth && css`
-    width: 100%;
-  `}
+  ${({ fullWidth }) =>
+    fullWidth &&
+    css`
+      width: 100%;
+    `}
 `;
 
 const Label = styled.label`
@@ -41,30 +43,41 @@ const InputWrapper = styled.div`
 `;
 
 const StyledInput = styled.input.withConfig({
-  shouldForwardProp: (prop) => !['hasLeftIcon', 'hasRightIcon', 'hasError'].includes(prop),
+  shouldForwardProp: prop =>
+    !['hasLeftIcon', 'hasRightIcon', 'hasError'].includes(prop),
 })<{ hasLeftIcon?: boolean; hasRightIcon?: boolean; hasError?: boolean }>`
   width: 100%;
   padding: ${theme.spacing[3]} ${theme.spacing[4]};
   font-size: ${theme.fontSizes.base};
   font-family: ${theme.fonts.primary};
   background: ${theme.colors.white};
-  border: 2px solid ${({ hasError }) => hasError ? theme.colors.error : theme.colors.border.light};
+  border: 2px solid
+    ${({ hasError }) =>
+      hasError ? theme.colors.error : theme.colors.border.light};
   border-radius: ${theme.borderRadius.md};
   transition: all ${theme.transitions.base};
   outline: none;
 
-  ${({ hasLeftIcon }) => hasLeftIcon && css`
-    padding-left: ${theme.spacing[10]};
-  `}
+  ${({ hasLeftIcon }) =>
+    hasLeftIcon &&
+    css`
+      padding-left: ${theme.spacing[10]};
+    `}
 
-  ${({ hasRightIcon }) => hasRightIcon && css`
-    padding-right: ${theme.spacing[10]};
-  `}
+  ${({ hasRightIcon }) =>
+    hasRightIcon &&
+    css`
+      padding-right: ${theme.spacing[10]};
+    `}
 
   &:focus {
-    border-color: ${({ hasError }) => hasError ? theme.colors.error : theme.colors.primaryPurple};
-    box-shadow: 0 0 0 3px ${({ hasError }) => 
-      hasError ? `${theme.colors.error}20` : `${theme.colors.primaryPurple}20`};
+    border-color: ${({ hasError }) =>
+      hasError ? theme.colors.error : theme.colors.primaryPurple};
+    box-shadow: 0 0 0 3px
+      ${({ hasError }) =>
+        hasError
+          ? `${theme.colors.error}20`
+          : `${theme.colors.primaryPurple}20`};
   }
 
   &:disabled {
@@ -79,7 +92,7 @@ const StyledInput = styled.input.withConfig({
 `;
 
 const IconWrapper = styled.div.withConfig({
-  shouldForwardProp: (prop) => !['position', 'clickable'].includes(prop),
+  shouldForwardProp: prop => !['position', 'clickable'].includes(prop),
 })<{ position: 'left' | 'right'; clickable?: boolean }>`
   position: absolute;
   top: 50%;
@@ -90,102 +103,113 @@ const IconWrapper = styled.div.withConfig({
   width: ${theme.spacing[6]};
   height: ${theme.spacing[6]};
   color: ${theme.colors.warmGray};
-  pointer-events: ${({ clickable }) => clickable ? 'auto' : 'none'};
-  cursor: ${({ clickable }) => clickable ? 'pointer' : 'default'};
+  pointer-events: ${({ clickable }) => (clickable ? 'auto' : 'none')};
+  cursor: ${({ clickable }) => (clickable ? 'pointer' : 'default')};
   border-radius: ${theme.borderRadius.sm};
   transition: all ${theme.transitions.fast};
 
-  ${({ position }) => position === 'left' ? css`
-    left: ${theme.spacing[2]};
-  ` : css`
-    right: ${theme.spacing[2]};
-  `}
+  ${({ position }) =>
+    position === 'left'
+      ? css`
+          left: ${theme.spacing[2]};
+        `
+      : css`
+          right: ${theme.spacing[2]};
+        `}
 
-  ${({ clickable }) => clickable && css`
-    &:hover {
-      color: ${theme.colors.primaryPurple};
-      background: ${theme.colors.background.accent};
-    }
+  ${({ clickable }) =>
+    clickable &&
+    css`
+      &:hover {
+        color: ${theme.colors.primaryPurple};
+        background: ${theme.colors.background.accent};
+      }
 
-    &:active {
-      transform: translateY(-50%) scale(0.95);
-    }
-  `}
+      &:active {
+        transform: translateY(-50%) scale(0.95);
+      }
+    `}
 `;
 
 const HelperText = styled.span.withConfig({
-  shouldForwardProp: (prop) => prop !== 'isError',
+  shouldForwardProp: prop => prop !== 'isError',
 })<{ isError?: boolean }>`
   font-size: ${theme.fontSizes.sm};
-  color: ${({ isError }) => isError ? theme.colors.error : theme.colors.warmGray};
+  color: ${({ isError }) =>
+    isError ? theme.colors.error : theme.colors.warmGray};
   line-height: 1.4;
 `;
 
-export const Input = React.forwardRef<HTMLInputElement, InputProps>(({
-  label,
-  error,
-  helperText,
-  leftIcon,
-  rightIcon,
-  icon,
-  fullWidth = false,
-  className,
-  onRightIconClick,
-  rightIconClickable = false,
-  rightIconAriaLabel,
-  isError,
-  ...domProps
-}, ref) => {
-  // Use icon as leftIcon if provided
-  const finalLeftIcon = leftIcon || icon;
-  
-  // Determine if there's an error (support both error and isError props)
-  const hasError = !!(error || isError);
-  
-  // No need for second destructuring - domProps already contains all remaining props
-  
-  const handleRightIconClick = () => {
-    if (rightIconClickable && onRightIconClick) {
-      onRightIconClick();
-    }
-  };
+export const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  (
+    {
+      label,
+      error,
+      helperText,
+      leftIcon,
+      rightIcon,
+      icon,
+      fullWidth = false,
+      className,
+      onRightIconClick,
+      rightIconClickable = false,
+      rightIconAriaLabel,
+      isError,
+      ...domProps
+    },
+    ref
+  ) => {
+    // Use icon as leftIcon if provided
+    const finalLeftIcon = leftIcon || icon;
 
-  return (
-    <InputContainer fullWidth={fullWidth} className={className}>
-      {label && <Label>{label}</Label>}
-      
-      <InputWrapper>
-        {finalLeftIcon && <IconWrapper position="left">{finalLeftIcon}</IconWrapper>}
-        
-        <StyledInput
-          ref={ref}
-          hasLeftIcon={!!finalLeftIcon}
-          hasRightIcon={!!rightIcon}
-          hasError={hasError}
-          {...domProps}
-        />
-        
-        {rightIcon && (
-          <IconWrapper 
-            position="right" 
-            clickable={rightIconClickable}
-            onClick={handleRightIconClick}
-            role={rightIconClickable ? 'button' : undefined}
-            aria-label={rightIconAriaLabel}
-            tabIndex={rightIconClickable ? 0 : undefined}
-          >
-            {rightIcon}
-          </IconWrapper>
+    // Determine if there's an error (support both error and isError props)
+    const hasError = !!(error || isError);
+
+    // No need for second destructuring - domProps already contains all remaining props
+
+    const handleRightIconClick = () => {
+      if (rightIconClickable && onRightIconClick) {
+        onRightIconClick();
+      }
+    };
+
+    return (
+      <InputContainer fullWidth={fullWidth} className={className}>
+        {label && <Label>{label}</Label>}
+
+        <InputWrapper>
+          {finalLeftIcon && (
+            <IconWrapper position='left'>{finalLeftIcon}</IconWrapper>
+          )}
+
+          <StyledInput
+            ref={ref}
+            hasLeftIcon={!!finalLeftIcon}
+            hasRightIcon={!!rightIcon}
+            hasError={hasError}
+            {...domProps}
+          />
+
+          {rightIcon && (
+            <IconWrapper
+              position='right'
+              clickable={rightIconClickable}
+              onClick={handleRightIconClick}
+              role={rightIconClickable ? 'button' : undefined}
+              aria-label={rightIconAriaLabel}
+              tabIndex={rightIconClickable ? 0 : undefined}
+            >
+              {rightIcon}
+            </IconWrapper>
+          )}
+        </InputWrapper>
+
+        {(error || helperText) && (
+          <HelperText isError={hasError}>{error || helperText}</HelperText>
         )}
-      </InputWrapper>
-      
-      {(error || helperText) && (
-        <HelperText isError={hasError}>
-          {error || helperText}
-        </HelperText>
-      )}
-    </InputContainer>
-  );
-});
+      </InputContainer>
+    );
+  }
+);
 
 Input.displayName = 'Input';
