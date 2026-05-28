@@ -6,12 +6,14 @@ import { ListProductsUseCase } from '@/core/application/product/ListProductsUseC
 import { CreateProductUseCase } from '@/core/application/product/CreateProductUseCase';
 import { UpdateProductUseCase } from '@/core/application/product/UpdateProductUseCase';
 import { DeleteProductUseCase } from '@/core/application/product/DeleteProductUseCase';
+import { UploadProductImageUseCase } from '@/core/application/product/UploadProductImageUseCase';
 
 export interface ProductUseCases {
   list: ListProductsUseCase;
   create: CreateProductUseCase;
   update: UpdateProductUseCase;
   delete: DeleteProductUseCase;
+  uploadImage: UploadProductImageUseCase;
 }
 
 const ProductContext = createContext<ProductUseCases | null>(null);
@@ -25,6 +27,7 @@ function buildProductUseCases(
     create: new CreateProductUseCase(repository),
     update: new UpdateProductUseCase(repository),
     delete: new DeleteProductUseCase(repository),
+    uploadImage: new UploadProductImageUseCase(repository),
   };
 }
 
