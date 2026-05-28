@@ -9,17 +9,10 @@ dist/
 build/
 *.tsbuildinfo
 
-# Environment files (keep examples, ignore local overrides)
+# Environment files (ignore all real envs, keep only the example template)
 .env
-.env.local
-.env.*.local
-
-# Keep environment templates
+.env.*
 !.env.example
-!env.development
-!env.production
-!env.staging
-!env.template
 
 # Logs
 logs/

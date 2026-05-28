@@ -16,6 +16,9 @@
 
     /* Linting */
     "strict": true,
+    // TODO(fase2): re-enable once God components are refactored — currently ~181
+    // unused-import errors, mostly in files slated for rewrite. ESLint no-unused-vars
+    // enforces this in the meantime.
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
@@ -38,38 +41,33 @@
     /* Performance optimizations */
     "incremental": true,
     "tsBuildInfoFile": "./node_modules/.cache/.tsbuildinfo",
-    
+
     /* Advanced type checking */
     "exactOptionalPropertyTypes": true,
     "noImplicitReturns": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noUncheckedIndexedAccess": true,
-    
+
     /* Module resolution */
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    
+
     /* Source maps */
     "sourceMap": true,
     "inlineSourceMap": false,
     "inlineSources": false,
-    
+
     /* Declaration files */
     "declaration": false,
     "declarationMap": false,
-    
+
     /* Experimental features */
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
-  "include": [
-    "src/**/*",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.d.ts"
-  ],
+  "include": ["src/**/*", "src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],
   "exclude": [
     "node_modules",
     "dist",
@@ -80,7 +78,5 @@
     "**/*.spec.ts",
     "**/*.spec.tsx"
   ],
-  "references": [
-    { "path": "./tsconfig.node.json" }
-  ]
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

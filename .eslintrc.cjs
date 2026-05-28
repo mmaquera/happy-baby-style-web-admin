@@ -8,7 +8,7 @@ module.exports = {
   },
   extends: [
     'eslint:recommended',
-    '@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/recommended',
     'plugin:react-hooks/recommended',
     'plugin:react/recommended',
     'plugin:react/jsx-runtime',
@@ -40,12 +40,11 @@ module.exports = {
     
     // Naming conventions
     'camelcase': ['error', { properties: 'never' }],
-    'naming-convention': [
+    '@typescript-eslint/naming-convention': [
       'error',
       {
         selector: 'interface',
-        format: ['PascalCase'],
-        prefix: ['I']
+        format: ['PascalCase']
       },
       {
         selector: 'typeAlias',

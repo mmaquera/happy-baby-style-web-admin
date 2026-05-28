@@ -11,29 +11,35 @@ export default defineConfig(({ command, mode }) => {
   // Environment validation
   const requiredEnvVars = ['VITE_GRAPHQL_URL', 'VITE_APP_NAME'];
   const missingVars = requiredEnvVars.filter(varName => !env[varName]);
-  
+
   if (missingVars.length > 0) {
-    console.warn(`⚠️  Missing required environment variables: ${missingVars.join(', ')}`);
-    
+    console.warn(
+      `⚠️  Missing required environment variables: ${missingVars.join(', ')}`
+    );
+
     if (mode === 'production') {
-      throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
+      throw new Error(
+        `Missing required environment variables: ${missingVars.join(', ')}`
+      );
     }
   }
 
   // Log environment info
   console.log(`🚀 Building for environment: ${mode}`);
   console.log(`📡 GraphQL URL: ${env.VITE_GRAPHQL_URL}`);
-  console.log(`🔧 Debug Mode: ${env.VITE_ENABLE_DEBUG_MODE === 'true' ? 'ON' : 'OFF'}`);
+  console.log(
+    `🔧 Debug Mode: ${env.VITE_ENABLE_DEBUG_MODE === 'true' ? 'ON' : 'OFF'}`
+  );
 
   return {
     plugins: [react()],
-    
+
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
       },
     },
-    
+
     server: {
       port: parseInt(env.VITE_PORT || '3000'),
       host: true,
@@ -45,11 +51,16 @@ export default defineConfig(({ command, mode }) => {
         },
       },
     },
-    
+
     build: {
       outDir: 'dist',
       assetsDir: 'assets',
-      sourcemap: env.VITE_ENABLE_SOURCE_MAPS === 'true',
+      // Never emit source maps for staging/production bundles (avoids shipping
+      // readable source to the browser). Switch to 'hidden' once Sentry uploads them.
+      sourcemap:
+        mode !== 'production' &&
+        mode !== 'staging' &&
+        env.VITE_ENABLE_SOURCE_MAPS === 'true',
       minify: mode === 'production',
       rollupOptions: {
         output: {
@@ -66,12 +77,12 @@ export default defineConfig(({ command, mode }) => {
       // Optimize bundle size
       chunkSizeWarningLimit: 1000,
     },
-    
+
     preview: {
       port: parseInt(env.VITE_PORT || '3000'),
       host: true,
     },
-    
+
     // Optimize dependencies
     optimizeDeps: {
       include: [
@@ -86,12 +97,12 @@ export default defineConfig(({ command, mode }) => {
         'react-hot-toast',
       ],
     },
-    
+
     // CSS optimization
     css: {
       devSourcemap: env.VITE_ENABLE_SOURCE_MAPS === 'true',
     },
-    
+
     // Environment variables
     define: {
       __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
