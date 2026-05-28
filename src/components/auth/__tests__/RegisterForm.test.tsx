@@ -8,9 +8,10 @@ import { RegisterForm } from '../RegisterForm';
 import { RegisterUserDocument } from '@/generated/graphql';
 
 // Mock react-hot-toast
-jest.mock('react-hot-toast', () => ({
-  success: jest.fn(),
-  error: jest.fn(),
+vi.mock('react-hot-toast', () => ({
+  default: { success: vi.fn(), error: vi.fn() },
+  success: vi.fn(),
+  error: vi.fn(),
 }));
 
 const mockRegisterUserMutation = {
@@ -98,7 +99,7 @@ const mockErrorMutation = {
 };
 
 describe('RegisterForm', () => {
-  const mockOnSuccess = jest.fn();
+  const mockOnSuccess = vi.fn();
 
   beforeEach(() => {
     mockOnSuccess.mockClear();

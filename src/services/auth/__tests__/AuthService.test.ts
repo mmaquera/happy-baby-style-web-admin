@@ -1,6 +1,3 @@
-// AuthService Tests - Following testing best practices
-// Tests the authentication service functionality
-
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 import {
   AuthServiceFactory,
@@ -12,27 +9,27 @@ import { UserRole } from '../../../types/unified';
 
 // Mock Apollo Client
 const mockApolloClient = {
-  query: jest.fn(),
-  mutate: jest.fn(),
-  watchQuery: jest.fn(),
-  subscribe: jest.fn(),
-  readQuery: jest.fn(),
-  readFragment: jest.fn(),
-  writeQuery: jest.fn(),
-  writeFragment: jest.fn(),
-  resetStore: jest.fn(),
-  clearStore: jest.fn(),
-  onClearStore: jest.fn(),
-  onResetStore: jest.fn(),
+  query: vi.fn(),
+  mutate: vi.fn(),
+  watchQuery: vi.fn(),
+  subscribe: vi.fn(),
+  readQuery: vi.fn(),
+  readFragment: vi.fn(),
+  writeQuery: vi.fn(),
+  writeFragment: vi.fn(),
+  resetStore: vi.fn(),
+  clearStore: vi.fn(),
+  onClearStore: vi.fn(),
+  onResetStore: vi.fn(),
   cache: new InMemoryCache(),
-} as unknown as ApolloClient<any>;
+} as unknown as ApolloClient<unknown>;
 
 // Mock localStorage
 const localStorageMock = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn(),
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
 };
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
@@ -41,7 +38,7 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     authService = new GraphQLAuthService(mockApolloClient);
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('GraphQLAuthService', () => {
@@ -75,7 +72,7 @@ describe('AuthService', () => {
           },
         };
 
-        (mockApolloClient.mutate as jest.Mock).mockResolvedValue(mockResponse);
+        vi.mocked(mockApolloClient.mutate).mockResolvedValue(mockResponse);
 
         const result = await authService.login(credentials);
 
@@ -99,7 +96,7 @@ describe('AuthService', () => {
           password: 'wrongpassword',
         };
 
-        (mockApolloClient.mutate as jest.Mock).mockRejectedValue(
+        vi.mocked(mockApolloClient.mutate).mockRejectedValue(
           new Error('Invalid credentials')
         );
 
@@ -114,7 +111,7 @@ describe('AuthService', () => {
           password: 'password123',
         };
 
-        (mockApolloClient.mutate as jest.Mock).mockRejectedValue(
+        vi.mocked(mockApolloClient.mutate).mockRejectedValue(
           new Error('Network error')
         );
 
@@ -126,7 +123,7 @@ describe('AuthService', () => {
 
     describe('logout', () => {
       it('should successfully logout', async () => {
-        (mockApolloClient.mutate as jest.Mock).mockResolvedValue({
+        vi.mocked(mockApolloClient.mutate).mockResolvedValue({
           data: { logout: true },
         });
 
@@ -142,7 +139,7 @@ describe('AuthService', () => {
       });
 
       it('should clear tokens even if server logout fails', async () => {
-        (mockApolloClient.mutate as jest.Mock).mockRejectedValue(
+        vi.mocked(mockApolloClient.mutate).mockRejectedValue(
           new Error('Server error')
         );
 
@@ -170,7 +167,7 @@ describe('AuthService', () => {
           },
         };
 
-        (mockApolloClient.mutate as jest.Mock).mockResolvedValue(mockResponse);
+        vi.mocked(mockApolloClient.mutate).mockResolvedValue(mockResponse);
 
         const result = await authService.refreshToken('old-refresh-token');
 
@@ -187,7 +184,7 @@ describe('AuthService', () => {
       });
 
       it('should throw AuthError when refresh fails', async () => {
-        (mockApolloClient.mutate as jest.Mock).mockResolvedValue({
+        vi.mocked(mockApolloClient.mutate).mockResolvedValue({
           data: { refreshToken: null },
           errors: [{ message: 'Invalid refresh token' }],
         });
@@ -212,7 +209,7 @@ describe('AuthService', () => {
 
         localStorageMock.getItem.mockReturnValue('valid-token');
 
-        (mockApolloClient.query as jest.Mock).mockResolvedValue({
+        vi.mocked(mockApolloClient.query).mockResolvedValue({
           data: { me: mockUser },
         });
 
@@ -230,10 +227,9 @@ describe('AuthService', () => {
       });
 
       it('should return null when token is expired', async () => {
-        const expiredToken = 'expired-token';
-        localStorageMock.getItem.mockReturnValue(expiredToken);
+        localStorageMock.getItem.mockReturnValue('expired-token');
 
-        (mockApolloClient.query as jest.Mock).mockRejectedValue(
+        vi.mocked(mockApolloClient.query).mockRejectedValue(
           new Error('Token expired')
         );
 
@@ -245,7 +241,7 @@ describe('AuthService', () => {
       it('should return null when query fails', async () => {
         localStorageMock.getItem.mockReturnValue('valid-token');
 
-        (mockApolloClient.query as jest.Mock).mockRejectedValue(
+        vi.mocked(mockApolloClient.query).mockRejectedValue(
           new Error('Query failed')
         );
 
@@ -273,8 +269,7 @@ describe('AuthService', () => {
       });
 
       it('should return false when token is expired', () => {
-        const expiredToken = 'expired-token';
-        localStorageMock.getItem.mockReturnValue(expiredToken);
+        localStorageMock.getItem.mockReturnValue('expired-token');
 
         const result = authService.isAuthenticated();
 

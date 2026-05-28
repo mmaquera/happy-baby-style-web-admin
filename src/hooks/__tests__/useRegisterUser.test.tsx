@@ -7,9 +7,10 @@ import { useRegisterUser } from '../useRegisterUser';
 import { RegisterUserDocument } from '@/generated/graphql';
 
 // Mock react-hot-toast
-jest.mock('react-hot-toast', () => ({
-  success: jest.fn(),
-  error: jest.fn(),
+vi.mock('react-hot-toast', () => ({
+  default: { success: vi.fn(), error: vi.fn() },
+  success: vi.fn(),
+  error: vi.fn(),
 }));
 
 const mockRegisterUserMutation = {
@@ -24,9 +25,9 @@ const mockRegisterUserMutation = {
         lastName: 'Doe',
         isActive: true,
         phone: '',
-        dateOfBirth: null
-      }
-    }
+        dateOfBirth: null,
+      },
+    },
   },
   result: {
     data: {
@@ -49,21 +50,21 @@ const mockRegisterUserMutation = {
               lastName: 'Doe',
               phone: null,
               dateOfBirth: null,
-              avatar: null
-            }
+              avatar: null,
+            },
           },
           accessToken: 'access-token',
-          refreshToken: 'refresh-token'
+          refreshToken: 'refresh-token',
         },
         metadata: {
           requestId: 'req-123',
           traceId: 'trace-123',
           duration: 100,
-          timestamp: '2025-01-01T00:00:00Z'
-        }
-      }
-    }
-  }
+          timestamp: '2025-01-01T00:00:00Z',
+        },
+      },
+    },
+  },
 };
 
 const mockErrorMutation = {
@@ -78,9 +79,9 @@ const mockErrorMutation = {
         lastName: 'Doe',
         isActive: true,
         phone: '',
-        dateOfBirth: null
-      }
-    }
+        dateOfBirth: null,
+      },
+    },
   },
   result: {
     data: {
@@ -90,10 +91,10 @@ const mockErrorMutation = {
         code: 'EMAIL_EXISTS',
         timestamp: '2025-01-01T00:00:00Z',
         data: null,
-        metadata: null
-      }
-    }
-  }
+        metadata: null,
+      },
+    },
+  },
 };
 
 describe('useRegisterUser', () => {
@@ -120,7 +121,7 @@ describe('useRegisterUser', () => {
         lastName: 'Doe',
         isActive: true,
         phone: '',
-        dateOfBirth: null
+        dateOfBirth: null,
       });
 
       expect(success).toBe(true);
@@ -147,7 +148,7 @@ describe('useRegisterUser', () => {
         lastName: 'Doe',
         isActive: true,
         phone: '',
-        dateOfBirth: null
+        dateOfBirth: null,
       });
 
       expect(success).toBe(false);
@@ -172,7 +173,7 @@ describe('useRegisterUser', () => {
         lastName: '',
         isActive: true,
         phone: '',
-        dateOfBirth: null
+        dateOfBirth: null,
       });
 
       expect(success).toBe(false);

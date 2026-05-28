@@ -1,0 +1,37 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "defaultProject": "admin",
+  "targetDefaults": {
+    "build": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
+    },
+    "test": {
+      "cache": true,
+      "inputs": ["default", "^production", "{workspaceRoot}/vitest.config.ts"]
+    },
+    "lint": {
+      "cache": true,
+      "inputs": ["default", "{workspaceRoot}/.eslintrc.cjs"]
+    },
+    "type-check": {
+      "cache": true,
+      "inputs": ["default", "{workspaceRoot}/tsconfig.json"]
+    }
+  },
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "production": [
+      "default",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)",
+      "!{projectRoot}/__tests__/**/*",
+      "!{projectRoot}/jest.config.[jt]s",
+      "!{projectRoot}/.eslintrc.cjs"
+    ],
+    "sharedGlobals": [
+      "{workspaceRoot}/tsconfig.json",
+      "{workspaceRoot}/vite.config.ts"
+    ]
+  }
+}

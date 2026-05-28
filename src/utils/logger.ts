@@ -1,3 +1,4 @@
+/* eslint-disable no-console -- this IS the console abstraction layer */
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 const isDev = import.meta.env.DEV;

@@ -1,6 +1,7 @@
 import type { Product } from '@/core/domain/product/Product';
 import type { ProductRepository } from '@/core/domain/product/ProductRepository';
 import { ok } from '@/core/shared/Result';
+import { vi, type Mocked } from 'vitest';
 
 export const MOCK_PRODUCT: Product = {
   id: 'prod-1',
@@ -21,15 +22,13 @@ export const MOCK_PRODUCT: Product = {
   updatedAt: new Date('2024-01-01T00:00:00Z'),
 };
 
-export const createMockRepository = (): jest.Mocked<ProductRepository> => ({
-  findAll: jest
+export const createMockRepository = (): Mocked<ProductRepository> => ({
+  findAll: vi
     .fn()
     .mockResolvedValue(ok({ items: [], total: 0, hasMore: false })),
-  findById: jest.fn().mockResolvedValue(ok(MOCK_PRODUCT)),
-  create: jest.fn().mockResolvedValue(ok(MOCK_PRODUCT)),
-  update: jest.fn().mockResolvedValue(ok(MOCK_PRODUCT)),
-  delete: jest.fn().mockResolvedValue(ok(true)),
-  uploadImage: jest
-    .fn()
-    .mockResolvedValue(ok('https://cdn.example.com/img.jpg')),
+  findById: vi.fn().mockResolvedValue(ok(MOCK_PRODUCT)),
+  create: vi.fn().mockResolvedValue(ok(MOCK_PRODUCT)),
+  update: vi.fn().mockResolvedValue(ok(MOCK_PRODUCT)),
+  delete: vi.fn().mockResolvedValue(ok(true)),
+  uploadImage: vi.fn().mockResolvedValue(ok('https://cdn.example.com/img.jpg')),
 });

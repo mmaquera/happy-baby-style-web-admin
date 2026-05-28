@@ -48,15 +48,15 @@ const mockProduct: Product = {
 };
 
 const mockHandlers = {
-  onEdit: jest.fn(),
-  onDelete: jest.fn(),
-  onToggleStatus: jest.fn(),
-  onViewDetails: jest.fn(),
+  onEdit: vi.fn(),
+  onDelete: vi.fn(),
+  onToggleStatus: vi.fn(),
+  onViewDetails: vi.fn(),
 };
 
 describe('ProductCard', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders product information correctly', () => {

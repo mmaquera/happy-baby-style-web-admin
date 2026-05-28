@@ -1,0 +1,61 @@
+{
+  "$schema": "./node_modules/nx/schemas/project-schema.json",
+  "name": "admin",
+  "projectType": "application",
+  "sourceRoot": "src",
+  "targets": {
+    "build": {
+      "executor": "@nx/vite:build",
+      "options": {
+        "outputPath": "dist"
+      },
+      "configurations": {
+        "production": {
+          "mode": "production"
+        },
+        "staging": {
+          "mode": "staging"
+        },
+        "development": {
+          "mode": "development"
+        }
+      }
+    },
+    "dev": {
+      "executor": "@nx/vite:dev-server",
+      "options": {
+        "buildTarget": "admin:build:development"
+      }
+    },
+    "preview": {
+      "executor": "@nx/vite:preview-server",
+      "options": {
+        "buildTarget": "admin:build"
+      }
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+      "options": {
+        "configFile": "vitest.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": ["src/**/*.ts", "src/**/*.tsx"]
+      }
+    },
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit"
+      }
+    },
+    "codegen": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "graphql-codegen --config codegen.yml"
+      }
+    }
+  }
+}

@@ -1,10 +1,9 @@
 module.exports = {
   root: true,
-  env: { 
-    browser: true, 
+  env: {
+    browser: true,
     es2020: true,
     node: true,
-    jest: true
   },
   extends: [
     'eslint:recommended',
@@ -264,9 +263,6 @@ module.exports = {
     },
     {
       files: ['*.test.ts', '*.test.tsx', '*.spec.ts', '*.spec.tsx'],
-      env: {
-        jest: true
-      },
       rules: {
         '@typescript-eslint/no-explicit-any': 'off',
         'no-console': 'off',

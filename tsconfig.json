@@ -6,6 +6,9 @@
     "module": "ESNext",
     "skipLibCheck": true,
 
+    /* Test globals — exposes vi, describe, it, expect etc. without imports */
+    "types": ["vitest/globals"],
+
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
