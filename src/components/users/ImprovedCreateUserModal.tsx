@@ -18,6 +18,7 @@ import {
   Lock,
   User as UserIcon,
 } from 'lucide-react';
+import { logger } from '@/utils/logger';
 
 interface CreateUserModalProps {
   isOpen: boolean;
@@ -629,7 +630,7 @@ export const ImprovedCreateUserModal: React.FC<CreateUserModalProps> = ({
         await onSubmit(formattedData);
       } catch (error) {
         // Los errores se manejan en el hook, pero podemos mostrar errores específicos aquí si es necesario
-        console.error('Error en el modal:', error);
+        logger.error('Error en el modal:', error);
       }
     }
   };

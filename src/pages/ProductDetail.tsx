@@ -19,6 +19,7 @@ import {
   Upload,
   Printer,
 } from 'lucide-react';
+import { logger } from '@/utils/logger';
 
 // Mock product data - in real app this would come from GraphQL
 const mockProduct = {
@@ -418,7 +419,7 @@ export const ProductDetail: React.FC = () => {
 
   const handleEdit = useCallback(() => {
     // TODO: Implement edit functionality
-    console.log('Edit product:', product.id);
+    logger.debug('Edit product:', product.id);
   }, [product.id]);
 
   const handleDelete = useCallback(() => {
@@ -426,14 +427,14 @@ export const ProductDetail: React.FC = () => {
       window.confirm('¿Estás seguro de que quieres eliminar este producto?')
     ) {
       // TODO: Implement delete functionality
-      console.log('Delete product:', product.id);
+      logger.debug('Delete product:', product.id);
       navigate('/products');
     }
   }, [product.id, navigate]);
 
   const handleToggleStatus = useCallback(() => {
     // TODO: Implement status toggle
-    console.log('Toggle status:', product.id, !product.isActive);
+    logger.debug('Toggle status:', product.id, !product.isActive);
   }, [product.id, product.isActive]);
 
   const renderRating = (rating: number) => {

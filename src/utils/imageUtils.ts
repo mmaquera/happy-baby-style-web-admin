@@ -1,3 +1,5 @@
+import { logger } from '@/utils/logger';
+
 /**
  * Utility functions for handling image URLs and paths
  * Centralizes the logic for converting absolute URLs to relative paths
@@ -23,7 +25,7 @@ export const convertToRelativePath = (
     // Convert absolute URL to relative path
     return new URL(url).pathname;
   } catch (error) {
-    console.warn('Invalid URL provided to convertToRelativePath:', url);
+    logger.warn('Invalid URL provided to convertToRelativePath:', url);
     return null;
   }
 };

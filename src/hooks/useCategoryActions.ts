@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useCategoriesGraphQL } from './useCategoriesGraphQL';
 import { UpdateCategoryInput } from '@/generated/graphql';
+import { logger } from '@/utils/logger';
 
 export interface UseCategoryActionsReturn {
   // Actions
@@ -70,7 +71,7 @@ export const useCategoryActions = (): UseCategoryActionsReturn => {
   // Edit category
   const handleEditCategory = useCallback((categoryId: string) => {
     // This will be handled by the parent component to open edit modal
-    console.log('Edit category:', categoryId);
+    logger.debug('Edit category:', categoryId);
   }, []);
 
   // Delete category
@@ -141,7 +142,7 @@ export const useCategoryActions = (): UseCategoryActionsReturn => {
   // View category details
   const handleViewDetails = useCallback((categoryId: string) => {
     // This will be handled by the parent component to open details modal
-    console.log('View category details:', categoryId);
+    logger.debug('View category details:', categoryId);
   }, []);
 
   // Bulk delete categories

@@ -13,6 +13,7 @@ import {
   PaginationInput,
 } from '../generated/graphql';
 import toast from 'react-hot-toast';
+import { logger } from '@/utils/logger';
 
 // Helper functions to map TypeScript types to GraphQL types
 const mapToGraphQLFilter = (
@@ -99,7 +100,10 @@ export const useCreateProduct = () => {
     },
     onError: error => {
       // ❌ Solo se ejecuta en caso de error de red/GraphQL, no errores de negocio
-      console.log('🚨 useCreateProduct - Error de GraphQL/Red:', error.message);
+      logger.debug(
+        '🚨 useCreateProduct - Error de GraphQL/Red:',
+        error.message
+      );
       // No mostrar toast aquí - useProductActions maneja todos los casos
     },
   });
@@ -125,7 +129,10 @@ export const useUpdateProduct = () => {
     },
     onError: error => {
       // ❌ Solo se ejecuta en caso de error de red/GraphQL, no errores de negocio
-      console.log('🚨 useUpdateProduct - Error de GraphQL/Red:', error.message);
+      logger.debug(
+        '🚨 useUpdateProduct - Error de GraphQL/Red:',
+        error.message
+      );
       // No mostrar toast aquí - useProductActions maneja todos los casos
     },
   });
@@ -152,7 +159,10 @@ export const useDeleteProduct = () => {
     },
     onError: error => {
       // ❌ Solo se ejecuta en caso de error de red/GraphQL, no errores de negocio
-      console.log('🚨 useDeleteProduct - Error de GraphQL/Red:', error.message);
+      logger.debug(
+        '🚨 useDeleteProduct - Error de GraphQL/Red:',
+        error.message
+      );
       // No mostrar toast aquí - useProductActions maneja todos los casos
     },
   });
@@ -172,9 +182,9 @@ export const useUploadProductImage = () => {
 
   const upload = (file: File, productId: string) => {
     // ✅ VERIFICACIÓN: Logs para diagnosticar el problema
-    console.log('📁 useUploadProductImage - Archivo recibido:', file);
-    console.log('📁 useUploadProductImage - ProductId recibido:', productId);
-    console.log('📁 useUploadProductImage - Variables a enviar:', {
+    logger.debug('📁 useUploadProductImage - Archivo recibido:', file);
+    logger.debug('📁 useUploadProductImage - ProductId recibido:', productId);
+    logger.debug('📁 useUploadProductImage - Variables a enviar:', {
       file,
       entityId: productId,
       entityType: 'product',
@@ -209,7 +219,7 @@ export const useProductSearch = () => {
       // This would need to be implemented based on your search requirements
       setSearchQuery(query);
     } catch (error) {
-      console.error('Search error:', error);
+      logger.error('Search error:', error);
       toast.error('Error al buscar productos');
     } finally {
       setSearchLoading(false);

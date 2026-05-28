@@ -10,6 +10,7 @@ import {
   LogoutUserMutation,
   UserRole,
 } from '@/generated/graphql';
+import { logger } from '@/utils/logger';
 
 export interface LoginCredentials {
   email: string;
@@ -128,7 +129,7 @@ export const useAuthGraphQL = () => {
         message: 'No se recibió respuesta del servidor',
       };
     } catch (error: any) {
-      console.error('Login error:', error);
+      logger.error('Login error:', error);
 
       // Handle GraphQL errors
       if (error.graphQLErrors && error.graphQLErrors.length > 0) {
@@ -214,7 +215,7 @@ export const useAuthGraphQL = () => {
         message: 'No se pudo renovar el token',
       };
     } catch (error: any) {
-      console.error('Refresh token error:', error);
+      logger.error('Refresh token error:', error);
       return {
         success: false,
         message: error.message || 'Error al renovar el token',
@@ -241,7 +242,7 @@ export const useAuthGraphQL = () => {
         message: 'Error al cerrar sesión',
       };
     } catch (error: any) {
-      console.error('Logout error:', error);
+      logger.error('Logout error:', error);
 
       // Manejar errores específicos de GraphQL
       if (error?.graphQLErrors?.length > 0) {

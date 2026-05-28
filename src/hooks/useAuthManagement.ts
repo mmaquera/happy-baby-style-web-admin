@@ -15,6 +15,7 @@ import {
 } from '@/generated/graphql';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { logger } from '@/utils/logger';
 
 interface AuthStats {
   totalUsers: number;
@@ -325,7 +326,7 @@ export const useUserImpersonation = () => {
         // En una implementación real, aquí se manejaría la redirección
         // o cambio de contexto de usuario
         const { accessToken } = result.data.impersonateUser.data || {};
-        console.log('Impersonation token:', accessToken);
+        logger.debug('Impersonation token:', accessToken);
       } else {
         toast.error('Error al impersonar usuario');
       }

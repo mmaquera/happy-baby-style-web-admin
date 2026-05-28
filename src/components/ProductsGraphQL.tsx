@@ -12,6 +12,7 @@ import {
 } from '../generated/graphql';
 import { theme } from '@/styles/theme';
 import { CURRENCY_SYMBOL } from '@/config';
+import { logger } from '@/utils/logger';
 
 const ProductsGraphQL: React.FC = () => {
   const [filters, setFilters] = useState<ProductFilterInput>({
@@ -48,7 +49,7 @@ const ProductsGraphQL: React.FC = () => {
     try {
       await createProduct(newProduct);
     } catch (err) {
-      console.error('Error creating product:', err);
+      logger.error('Error creating product:', err);
     }
   };
 
@@ -57,7 +58,7 @@ const ProductsGraphQL: React.FC = () => {
       try {
         await deleteProduct(productId);
       } catch (err) {
-        console.error('Error deleting product:', err);
+        logger.error('Error deleting product:', err);
       }
     }
   };

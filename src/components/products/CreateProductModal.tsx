@@ -36,6 +36,7 @@ import {
   convertImageUrlsToRelativePaths,
   validateBackendImageUrls,
 } from '@/utils/imageUtils';
+import { logger } from '@/utils/logger';
 
 interface CreateProductModalProps {
   isOpen: boolean;
@@ -515,7 +516,7 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
   // Log para debugging - verificar que el sessionId se genera correctamente
   useEffect(() => {
     if (isOpen) {
-      console.log('🔗 CreateProductModal - Session ID generado:', sessionId);
+      logger.debug('🔗 CreateProductModal - Session ID generado:', sessionId);
     }
   }, [isOpen, sessionId]);
 

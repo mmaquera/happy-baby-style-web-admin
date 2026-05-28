@@ -22,6 +22,7 @@ import {
 } from '../services/auth/UnifiedAuthService';
 import { IAuthUser } from '../types/auth';
 import { UserRole } from '../types/unified';
+import { logger } from '@/utils/logger';
 
 // Types following Interface Segregation Principle
 interface AuthState {
@@ -166,7 +167,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
               return;
             }
           } catch (error) {
-            console.log('Failed to get current user, trying token refresh...');
+            logger.debug('Failed to get current user, trying token refresh...');
           }
 
           // If getCurrentUser failed, try to refresh the token
@@ -183,7 +184,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
                 return;
               }
             } catch (refreshError) {
-              console.log('Token refresh failed, clearing tokens');
+              logger.debug('Token refresh failed, clearing tokens');
               // Use the logout method which handles token clearing
               await authService.logout();
             }
@@ -196,7 +197,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           payload: { user: null, isAuthenticated: false },
         });
       } catch (error) {
-        console.error('Auth initialization failed:', error);
+        logger.error('Auth initialization failed:', error);
         dispatch({
           type: 'AUTH_INIT_FAILURE',
           payload:
@@ -297,7 +298,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         const processedError = processLoginError(errorMessage);
 
         // Log error for debugging (following development standards)
-        console.error('Login error:', {
+        logger.error('Login error:', {
           code: errorCode,
           message: errorMessage,
           processedError,
@@ -330,7 +331,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       dispatch({ type: 'LOGOUT_SUCCESS' });
     } catch (error) {
-      console.error('Logout failed:', error);
+      logger.error('Logout failed:', error);
 
       // Evaluar si debemos limpiar el estado local basado en el tipo de error
       if (error instanceof AuthError) {
@@ -348,7 +349,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       } else {
         // Para errores de red o servidor, limpiar estado local como fallback
         // pero registrar el error para debugging
-        console.warn(
+        logger.warn(
           'Server logout failed, clearing local state as fallback:',
           error
         );
@@ -409,7 +410,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         payload: { user: user! },
       });
     } catch (error) {
-      console.error('Token refresh failed:', error);
+      logger.error('Token refresh failed:', error);
       // If refresh fails, logout user
       await logout();
     }
@@ -430,11 +431,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           const tokens = authService.getStoredTokens();
           if (tokens?.refreshToken) {
             await authService.refreshToken(tokens.refreshToken);
-            console.log('Token refreshed automatically');
+            logger.debug('Token refreshed automatically');
           }
         }
       } catch (error) {
-        console.error('Auto token refresh failed:', error);
+        logger.error('Auto token refresh failed:', error);
         // If refresh fails, logout the user
         await logout();
       }

@@ -11,6 +11,7 @@ import {
 } from '../services/auth/UnifiedAuthService';
 import { UserRole } from '../types/unified';
 import { IAuthUser, IAuthError } from '../types/auth';
+import { logger } from '@/utils/logger';
 
 // Hook state interface
 interface AuthState {
@@ -84,7 +85,7 @@ export const useUnifiedAuth = (): UseUnifiedAuthReturn => {
           });
         }
       } catch (error) {
-        console.error('Auth initialization failed:', error);
+        logger.error('Auth initialization failed:', error);
         setState({
           user: null,
           isAuthenticated: false,
@@ -199,7 +200,7 @@ export const useUnifiedAuth = (): UseUnifiedAuthReturn => {
         isInitialized: true,
       });
     } catch (error) {
-      console.error('Logout failed:', error);
+      logger.error('Logout failed:', error);
       // Still clear local state even if server logout fails
       setState({
         user: null,
@@ -229,7 +230,7 @@ export const useUnifiedAuth = (): UseUnifiedAuthReturn => {
         isAuthenticated: !!user,
       }));
     } catch (error) {
-      console.error('Token refresh failed:', error);
+      logger.error('Token refresh failed:', error);
       // If refresh fails, logout user
       await logout();
     }

@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
+import { logger } from '@/utils/logger';
 
 // Types
 interface UseLogoutReturn {
@@ -40,7 +41,7 @@ export const useLogout = (): UseLogoutReturn => {
       // Cerrar modal
       setIsLogoutModalOpen(false);
     } catch (error) {
-      console.error('Error during logout:', error);
+      logger.error('Error during logout:', error);
       toast.error('Error al cerrar sesión');
     } finally {
       setIsLoggingOut(false);

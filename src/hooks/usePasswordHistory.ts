@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useGetUserPasswordHistoryQuery } from '@/generated/graphql';
 import toast from 'react-hot-toast';
+import { logger } from '@/utils/logger';
 
 export interface PasswordAction {
   id: string;
@@ -126,7 +127,7 @@ const transformSecurityEventToPasswordAction = (
       status: mapStatusFromMetadata(metadata),
     };
   } catch (error) {
-    console.error('Error transforming security event:', error);
+    logger.error('Error transforming security event:', error);
     return null;
   }
 };
@@ -189,7 +190,7 @@ export const usePasswordHistory = (
           : 'Error inesperado al procesar historial';
       setLocalError(errorMessage);
       setPasswordHistory([]);
-      console.error('Error processing password history:', error);
+      logger.error('Error processing password history:', error);
     }
   }, [data]);
 

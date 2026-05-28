@@ -14,6 +14,7 @@ import {
   SVGValidationResult,
   SVG_VALIDATION_RULES,
 } from '@/components/categories/SVGUpload/SVGUpload.types';
+import { logger } from '@/utils/logger';
 
 export const useSVGUpload = (): UseSVGUploadReturn => {
   // GraphQL mutation for SVG upload
@@ -166,7 +167,7 @@ export const useSVGUpload = (): UseSVGUploadReturn => {
 
       return optimized;
     } catch (err) {
-      console.warn('Error optimizing SVG:', err);
+      logger.warn('Error optimizing SVG:', err);
       return svgContent;
     }
   }, []);
@@ -192,7 +193,7 @@ export const useSVGUpload = (): UseSVGUploadReturn => {
 
         // Show warnings if any
         if (validation.warnings.length > 0) {
-          console.warn('SVG Upload Warnings:', validation.warnings);
+          logger.warn('SVG Upload Warnings:', validation.warnings);
         }
 
         // Validate SVG content

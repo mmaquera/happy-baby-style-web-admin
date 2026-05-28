@@ -11,6 +11,7 @@ import {
   GetCurrentUserDocument,
 } from '@/generated/graphql';
 import { UserRole } from '../../types/unified';
+import { logger } from '@/utils/logger';
 
 // Interfaces following Interface Segregation Principle
 export interface IAuthToken {
@@ -152,7 +153,7 @@ export class GraphQLAuthService extends BaseAuthService {
       });
     } catch (error: any) {
       // Continue with logout even if server call fails
-      console.warn('Logout server call failed:', error);
+      logger.warn('Logout server call failed:', error);
 
       // Lanzar error específico para mejor manejo en capas superiores
       if (

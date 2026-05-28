@@ -13,6 +13,7 @@ import type {
   ProductFilterInput,
   BulkProductOperation,
 } from '@/components/products/types';
+import { logger } from '@/utils/logger';
 
 interface UseProductActionsReturn {
   // State
@@ -130,7 +131,7 @@ export const useProductActions = (): UseProductActionsReturn => {
         const result = await createProductMutation(input);
 
         // 🔍 Log para debugging - verificar respuesta del servidor
-        console.log('🔍 useProductActions - Respuesta del servidor:', {
+        logger.debug('🔍 useProductActions - Respuesta del servidor:', {
           success: result.data?.createProduct?.success,
           message: result.data?.createProduct?.message,
           code: result.data?.createProduct?.code,
@@ -141,7 +142,7 @@ export const useProductActions = (): UseProductActionsReturn => {
         if (result.data?.createProduct?.success === false) {
           const serverMessage =
             result.data.createProduct.message || 'Error del servidor';
-          console.log(
+          logger.debug(
             '❌ useProductActions - Servidor reportó error:',
             serverMessage
           );
@@ -444,12 +445,12 @@ export const useProductActions = (): UseProductActionsReturn => {
 
       try {
         // ✅ VERIFICACIÓN: Logs para diagnosticar el problema
-        console.log('📁 uploadProductImage - Archivo recibido:', file);
-        console.log('📁 uploadProductImage - Tipo MIME:', file?.type);
-        console.log('📁 uploadProductImage - Tamaño:', file?.size);
-        console.log('📁 uploadProductImage - Nombre:', file?.name);
-        console.log('📁 uploadProductImage - Es File?:', file instanceof File);
-        console.log('📁 uploadProductImage - Es Blob?:', file instanceof Blob);
+        logger.debug('📁 uploadProductImage - Archivo recibido:', file);
+        logger.debug('📁 uploadProductImage - Tipo MIME:', file?.type);
+        logger.debug('📁 uploadProductImage - Tamaño:', file?.size);
+        logger.debug('📁 uploadProductImage - Nombre:', file?.name);
+        logger.debug('📁 uploadProductImage - Es File?:', file instanceof File);
+        logger.debug('📁 uploadProductImage - Es Blob?:', file instanceof Blob);
 
         // ✅ Validación de archivo antes de intentar upload
         if (!file) {

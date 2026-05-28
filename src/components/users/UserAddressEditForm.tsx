@@ -4,6 +4,7 @@ import { UserAddress } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { theme } from '@/styles/theme';
+import { logger } from '@/utils/logger';
 
 interface UserAddressEditFormProps {
   address?: UserAddress;
@@ -285,7 +286,7 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
 
       await onSave(input);
     } catch (error) {
-      console.error('Error saving address:', error);
+      logger.error('Error saving address:', error);
     }
   };
 

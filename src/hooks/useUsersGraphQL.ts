@@ -12,6 +12,7 @@ import {
   useUpdateUserOptimizedMutation,
 } from '../generated/graphql';
 import toast from 'react-hot-toast';
+import { logger } from '@/utils/logger';
 
 interface UseUsersOptions {
   filter?: UserFilterInput;
@@ -23,7 +24,7 @@ export const useUsers = (options: UseUsersOptions = {}) => {
   const { filter, limit = 20, skip = false } = options;
 
   // 🔍 DEBUGGING: Log de parámetros recibidos
-  console.log('🔍 DEBUG useUsers hook - Parámetros recibidos:', {
+  logger.debug('🔍 DEBUG useUsers hook - Parámetros recibidos:', {
     options,
     filter,
     limit,
@@ -55,7 +56,7 @@ export const useUsers = (options: UseUsersOptions = {}) => {
   };
 
   // 🔍 DEBUGGING: Log de respuesta de la query
-  console.log('🔍 DEBUG useUsers hook - Respuesta de la query:', {
+  logger.debug('🔍 DEBUG useUsers hook - Respuesta de la query:', {
     data,
     users: data?.users?.data?.items || [],
     total: data?.users?.data?.pagination?.total || 0,
@@ -165,7 +166,7 @@ export const useUpdateUserOptimized = () => {
       });
       return result;
     } catch (error) {
-      console.error('Error updating user:', error);
+      logger.error('Error updating user:', error);
       throw error;
     }
   };

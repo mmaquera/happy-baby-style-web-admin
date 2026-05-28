@@ -12,6 +12,7 @@ import {
 } from '@/components/categories';
 import { useCategories } from '@/hooks/useCategories';
 import { toast } from 'react-hot-toast';
+import { logger } from '@/utils/logger';
 
 const CategoriesContainer = styled.div`
   padding: ${theme.spacing[6]};
@@ -187,17 +188,17 @@ export const Categories: React.FC = () => {
 
   const handleBulkActions = useCallback(() => {
     // TODO: Implement bulk actions modal
-    console.log('Bulk actions clicked');
+    logger.debug('Bulk actions clicked');
   }, []);
 
   const handleExport = useCallback(() => {
     // TODO: Implement export functionality
-    console.log('Export clicked');
+    logger.debug('Export clicked');
   }, []);
 
   const handleImport = useCallback(() => {
     // TODO: Implement import functionality
-    console.log('Import clicked');
+    logger.debug('Import clicked');
   }, []);
 
   const handleEditCategory = useCallback(
@@ -237,7 +238,7 @@ export const Categories: React.FC = () => {
           setTimeout(() => setIsUpdating(false), 1000);
         } catch (error) {
           setIsUpdating(false);
-          console.error('Error deleting category:', error);
+          logger.error('Error deleting category:', error);
         }
       }
     },
@@ -253,7 +254,7 @@ export const Categories: React.FC = () => {
         setTimeout(() => setIsUpdating(false), 1000);
       } catch (error) {
         setIsUpdating(false);
-        console.error('Error toggling status:', error);
+        logger.error('Error toggling status:', error);
       }
     },
     [toggleStatus]

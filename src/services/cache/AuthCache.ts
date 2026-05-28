@@ -1,3 +1,5 @@
+import { logger } from '@/utils/logger';
+
 // AuthCache Service - Following SOLID principles and Clean Architecture
 // Single Responsibility: Manages authentication cache only
 // Open/Closed: Extensible for new cache strategies
@@ -86,7 +88,7 @@ export class LocalStorageAuthCache implements IAuthCache {
 
       return JSON.parse(userData);
     } catch (error) {
-      console.error('Error reading user from cache:', error);
+      logger.error('Error reading user from cache:', error);
       this.clearUser();
       return null;
     }
@@ -104,7 +106,7 @@ export class LocalStorageAuthCache implements IAuthCache {
         expiry.toString()
       );
     } catch (error) {
-      console.error('Error setting user in cache:', error);
+      logger.error('Error setting user in cache:', error);
     }
   }
 
@@ -113,7 +115,7 @@ export class LocalStorageAuthCache implements IAuthCache {
       localStorage.removeItem(LocalStorageAuthCache.USER_KEY);
       localStorage.removeItem(LocalStorageAuthCache.CACHE_EXPIRY_KEY);
     } catch (error) {
-      console.error('Error clearing user from cache:', error);
+      logger.error('Error clearing user from cache:', error);
     }
   }
 

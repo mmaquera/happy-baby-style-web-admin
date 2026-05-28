@@ -5,6 +5,7 @@ import type {
   UploadProgress,
   UploadResult,
 } from '@/types/upload';
+import { logger } from '@/utils/logger';
 
 export const useImageUpload = (): UseImageUploadReturn => {
   const [uploadImage] = useUploadImageMutation();
@@ -43,7 +44,7 @@ export const useImageUpload = (): UseImageUploadReturn => {
           const finalEntityId = entityId || `temp-${Date.now()}-${i}`;
           const finalEntityType = entityType || 'product';
 
-          console.log(`🔗 useImageUpload - Archivo ${i + 1}/${totalFiles}:`, {
+          logger.debug(`🔗 useImageUpload - Archivo ${i + 1}/${totalFiles}:`, {
             fileName: file.name,
             entityId: finalEntityId,
             entityType: finalEntityType,
@@ -67,7 +68,7 @@ export const useImageUpload = (): UseImageUploadReturn => {
               },
             });
 
-            console.log('🔍 useImageUpload - Respuesta del servidor:', result);
+            logger.debug('🔍 useImageUpload - Respuesta del servidor:', result);
 
             if (
               result.data?.uploadImage?.success &&

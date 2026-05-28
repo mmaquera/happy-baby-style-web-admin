@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { theme } from '@/styles/theme';
 import { Save, X, User, Mail, Phone, Calendar, Shield } from 'lucide-react';
+import { logger } from '@/utils/logger';
 
 interface UserProfileEditFormProps {
   profile: UserProfile;
@@ -214,7 +215,7 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
 
       await onSave(input);
     } catch (error) {
-      console.error('Error saving profile:', error);
+      logger.error('Error saving profile:', error);
     }
   };
 

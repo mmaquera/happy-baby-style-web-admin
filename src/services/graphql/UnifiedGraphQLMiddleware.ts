@@ -19,8 +19,7 @@ import {
   LocalTokenStorage,
 } from '../auth/UnifiedAuthService';
 import { GraphQLMiddlewareConfig, ITokenStorage } from '../../types/auth';
-
-// Configuration interface is now imported from types
+import { logger } from '../../utils/logger';
 
 export class UnifiedGraphQLMiddleware {
   private tokenStorage: ITokenStorage;
@@ -43,15 +42,15 @@ export class UnifiedGraphQLMiddleware {
               ...headers,
               Authorization: `Bearer ${tokens.accessToken}`,
             };
-            console.log(
+            logger.debug(
               '✅ AuthLink: Token válido, agregando header Authorization'
             );
             return { headers: newHeaders };
           } else {
-            console.warn(
+            logger.warn(
               '⚠️ AuthLink: Token expirado, no se agrega header Authorization'
             );
-            console.warn(
+            logger.warn(
               'Token expires at:',
               tokens.expiresAt,
               'Current time:',
@@ -59,12 +58,12 @@ export class UnifiedGraphQLMiddleware {
             );
           }
         } else {
-          console.warn(
+          logger.warn(
             '⚠️ AuthLink: No hay tokens almacenados, no se agrega header Authorization'
           );
         }
       } catch (error) {
-        console.error('❌ AuthLink: Error al obtener tokens:', error);
+        logger.error('❌ AuthLink: Error al obtener tokens:', error);
       }
 
       return { headers };
@@ -78,7 +77,7 @@ export class UnifiedGraphQLMiddleware {
       if (graphQLErrors) {
         graphQLErrors.forEach(({ message, extensions, locations, path }) => {
           // Enhanced logging for debugging
-          console.error('GraphQL Error:', {
+          logger.error('GraphQL Error:', {
             message,
             code: extensions?.['code'],
             locations,
@@ -88,20 +87,20 @@ export class UnifiedGraphQLMiddleware {
 
           // Handle authentication errors specifically
           if (extensions?.['code'] === 'UNAUTHENTICATED') {
-            console.warn('Authentication error detected:', message);
+            logger.warn('Authentication error detected:', message);
             // Don't clear tokens immediately - let the auth context handle it
             return;
           }
 
           // Handle authorization errors
           if (extensions?.['code'] === 'FORBIDDEN') {
-            console.warn('Authorization error detected:', message);
+            logger.warn('Authorization error detected:', message);
             return;
           }
 
           // Handle validation errors
           if (extensions?.['code'] === 'VALIDATION_ERROR') {
-            console.warn('Validation error detected:', message);
+            logger.warn('Validation error detected:', message);
             return;
           }
         });
@@ -109,7 +108,7 @@ export class UnifiedGraphQLMiddleware {
 
       // Handle network errors following development standards
       if (networkError) {
-        console.error('Network Error:', {
+        logger.error('Network Error:', {
           message: networkError.message,
           statusCode:
             'statusCode' in networkError ? networkError.statusCode : undefined,
@@ -118,7 +117,7 @@ export class UnifiedGraphQLMiddleware {
 
         // Don't clear tokens for network errors
         if ('statusCode' in networkError && networkError.statusCode === 401) {
-          console.warn('Unauthorized network error - may need token refresh');
+          logger.warn('Unauthorized network error - may need token refresh');
         }
       }
     });
@@ -156,7 +155,7 @@ export class UnifiedGraphQLMiddleware {
       // ✅ Logs de debug para verificar el envío
       isExtractableFile: (value: any) => {
         const isFile = value instanceof File || value instanceof Blob;
-        console.log('🔍 UploadLink - isExtractableFile:', {
+        logger.debug('🔍 UploadLink - isExtractableFile:', {
           value,
           isFile,
           type: typeof value,
@@ -169,7 +168,7 @@ export class UnifiedGraphQLMiddleware {
         fieldName: string,
         file: any
       ) => {
-        console.log('🔍 UploadLink - formDataAppendFile:', {
+        logger.debug('🔍 UploadLink - formDataAppendFile:', {
           fieldName,
           file,
           formDataEntries: Array.from(formData.entries()),
@@ -237,7 +236,7 @@ export class UnifiedGraphQLMiddleware {
   private handleAuthError(): void {
     // Don't clear tokens immediately - let the auth system handle token validation
     // Only clear tokens if they are definitely invalid after refresh attempt
-    console.warn('Authentication error detected - tokens may need refresh');
+    logger.warn('Authentication error detected - tokens may need refresh');
 
     // Don't redirect automatically - let the auth context handle it
   }

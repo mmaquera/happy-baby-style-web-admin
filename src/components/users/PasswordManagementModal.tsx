@@ -24,6 +24,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { logger } from '@/utils/logger';
 
 interface PasswordManagementModalProps {
   user: User;
@@ -444,7 +445,7 @@ export const PasswordManagementModal: React.FC<
       refetchHistory();
     } catch (error) {
       // Error ya manejado por forcePasswordReset
-      console.error('Error al forzar reset:', error);
+      logger.error('Error al forzar reset:', error);
     }
   };
 

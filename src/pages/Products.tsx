@@ -41,6 +41,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
+import { logger } from '@/utils/logger';
 
 // =====================================================
 // PRODUCTS PAGE - GraphQL Integration
@@ -281,7 +282,7 @@ export const Products: React.FC = () => {
 
   const handleCreateProductSuccess = useCallback(
     (product: Product) => {
-      console.log('Producto creado exitosamente:', product);
+      logger.debug('Producto creado exitosamente:', product);
       refetchProducts(); // Refresh products list
       setIsCreateModalOpen(false);
     },
@@ -305,7 +306,7 @@ export const Products: React.FC = () => {
 
   const handleEditProductSuccess = useCallback(
     (product: Product) => {
-      console.log('Producto editado exitosamente:', product);
+      logger.debug('Producto editado exitosamente:', product);
       refetchProducts(); // Refresh products list
       setIsEditModalOpen(false);
       setEditingProduct(null);
@@ -327,7 +328,7 @@ export const Products: React.FC = () => {
           await deleteProduct(productId);
           // Product will be automatically removed from list via Apollo cache
         } catch (error) {
-          console.error('Error deleting product:', error);
+          logger.error('Error deleting product:', error);
         }
       }
     },
@@ -343,7 +344,7 @@ export const Products: React.FC = () => {
         await updateProduct(productId, { isActive });
         // Product will be automatically updated via Apollo cache
       } catch (error) {
-        console.error('Error updating product status:', error);
+        logger.error('Error updating product status:', error);
       }
     },
     [products, updateProduct]
@@ -470,9 +471,9 @@ export const Products: React.FC = () => {
         stats={productStats}
         viewMode={viewMode}
         onAddProduct={handleAddProduct}
-        onBulkActions={() => console.log('Bulk actions clicked')}
-        onExport={() => console.log('Export clicked')}
-        onImport={() => console.log('Import clicked')}
+        onBulkActions={() => logger.debug('Bulk actions clicked')}
+        onExport={() => logger.debug('Export clicked')}
+        onImport={() => logger.debug('Import clicked')}
         onViewModeChange={handleViewModeChange}
       />
 

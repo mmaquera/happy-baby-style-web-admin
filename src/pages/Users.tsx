@@ -40,6 +40,7 @@ import {
   Key,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { logger } from '@/utils/logger';
 
 // Styled Components
 const Container = styled.div`
@@ -485,7 +486,7 @@ export const UsersPage: React.FC = () => {
   };
 
   // 🔍 DEBUGGING: Logs para diagnosticar el problema
-  console.log('🔍 DEBUG Users.tsx - Estado actual:', {
+  logger.debug('🔍 DEBUG Users.tsx - Estado actual:', {
     filters,
     effectiveFilters,
     filtersString: JSON.stringify(filters),
@@ -500,7 +501,7 @@ export const UsersPage: React.FC = () => {
   } = useUsers({ filter: effectiveFilters });
 
   // 🔍 DEBUGGING: Logs del hook useUsers
-  console.log('🔍 DEBUG Users.tsx - Hook useUsers:', {
+  logger.debug('🔍 DEBUG Users.tsx - Hook useUsers:', {
     users,
     usersLength: users.length,
     loading: usersLoading,
@@ -518,19 +519,19 @@ export const UsersPage: React.FC = () => {
 
   // Sincronización automática de filtros con GraphQL
   const stableRefetch = useCallback(() => {
-    console.log('🔍 DEBUG Users.tsx - stableRefetch ejecutándose');
+    logger.debug('🔍 DEBUG Users.tsx - stableRefetch ejecutándose');
     refetch();
   }, [refetch]);
 
   // Carga inicial de usuarios al montar el componente
   useEffect(() => {
-    console.log('🔍 DEBUG Users.tsx - useEffect inicial ejecutándose');
+    logger.debug('🔍 DEBUG Users.tsx - useEffect inicial ejecutándose');
     stableRefetch();
   }, [stableRefetch]);
 
   // Sincronización automática cuando cambian los filtros
   useEffect(() => {
-    console.log('🔍 DEBUG Users.tsx - useEffect de filtros ejecutándose', {
+    logger.debug('🔍 DEBUG Users.tsx - useEffect de filtros ejecutándose', {
       filters,
       shouldRefetch:
         filters.search || filters.role !== null || filters.isActive !== null,
@@ -567,7 +568,7 @@ export const UsersPage: React.FC = () => {
       }
     } catch (error) {
       // El error ya se maneja en el hook, solo cerrar el modal si es necesario
-      console.error('Error en handleCreateUser:', error);
+      logger.error('Error en handleCreateUser:', error);
     }
   };
 
@@ -910,7 +911,7 @@ export const UsersPage: React.FC = () => {
 
             {/* 🔍 DEBUGGING: Log del render final */}
             {(() => {
-              console.log('🔍 DEBUG Users.tsx - Render final:', {
+              logger.debug('🔍 DEBUG Users.tsx - Render final:', {
                 usersLength: users.length,
                 loading: usersLoading,
                 error: usersError,
@@ -933,7 +934,7 @@ export const UsersPage: React.FC = () => {
                 {users.map((user: any) => {
                   // Determinar el proveedor principal del usuario
                   const primaryProvider = AuthProvider.email;
-                  console.log(user);
+                  logger.debug(user);
                   return (
                     <UserCard
                       key={user.id}

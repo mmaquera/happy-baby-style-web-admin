@@ -18,6 +18,7 @@ import {
   MapPin,
   RefreshCw,
 } from 'lucide-react';
+import { logger } from '@/utils/logger';
 
 // Styled Components
 const DashboardContainer = styled.div`
@@ -340,7 +341,7 @@ export const AuthProviderDashboard: React.FC = () => {
     try {
       await refetch();
     } catch (error) {
-      console.error('Error al refrescar estadísticas:', error);
+      logger.error('Error al refrescar estadísticas:', error);
     }
   };
 

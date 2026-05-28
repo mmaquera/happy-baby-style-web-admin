@@ -19,6 +19,7 @@ import {
   IAuthError,
   ITokenStorage,
 } from '@/types/auth';
+import { logger } from '@/utils/logger';
 
 // Local storage implementation
 export class LocalTokenStorage implements ITokenStorage {
@@ -248,7 +249,7 @@ export class UnifiedAuthService {
         mutation: LogoutUserDocument,
       });
     } catch (error: any) {
-      console.warn('Logout server call failed:', error);
+      logger.warn('Logout server call failed:', error);
 
       // Lanzar error específico para mejor manejo en capas superiores
       if (
@@ -326,7 +327,7 @@ export class UnifiedAuthService {
         ? this.mapGraphQLUserToAuthUser(data.currentUser)
         : null;
     } catch (error) {
-      console.error('Failed to get current user:', error);
+      logger.error('Failed to get current user:', error);
       return null;
     }
   }

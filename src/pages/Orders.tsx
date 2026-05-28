@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/Input';
 import { useOrders } from '@/hooks/useOrdersGraphQL';
 import { OrderStatus } from '@/types';
 import { theme } from '@/styles/theme';
+import { logger } from '@/utils/logger';
 
 // These interfaces are already defined in the hook, so we don't need them here
 
@@ -112,9 +113,9 @@ export const Orders: React.FC = () => {
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     try {
       // TODO: Implement status change
-      console.log('Status change:', orderId, newStatus);
+      logger.debug('Status change:', orderId, newStatus);
     } catch (error) {
-      console.error('Error changing status:', error);
+      logger.error('Error changing status:', error);
     }
   };
 

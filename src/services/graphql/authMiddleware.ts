@@ -16,6 +16,7 @@ import {
   GraphQLAuthService,
   IAuthToken,
 } from '../auth/AuthService';
+import { logger } from '@/utils/logger';
 
 export interface AuthMiddlewareConfig {
   uri: string;
@@ -79,7 +80,7 @@ export class AuthMiddleware {
             err.extensions?.['code'] === 'UNAUTHENTICATED' ||
             err.message.includes('jwt')
           ) {
-            console.warn('Authentication error detected:', err.message);
+            logger.warn('Authentication error detected:', err.message);
 
             // Clear tokens and redirect to login
             this.clearTokens();
@@ -89,7 +90,7 @@ export class AuthMiddleware {
 
           // Handle authorization errors
           if (err.extensions?.['code'] === 'FORBIDDEN') {
-            console.warn('Authorization error detected:', err.message);
+            logger.warn('Authorization error detected:', err.message);
             // Could redirect to unauthorized page or show error
             return;
           }
@@ -97,7 +98,7 @@ export class AuthMiddleware {
       }
 
       if (networkError) {
-        console.error('Network error:', networkError);
+        logger.error('Network error:', networkError);
 
         // Handle network errors that might be auth-related
         if ('statusCode' in networkError && networkError.statusCode === 401) {

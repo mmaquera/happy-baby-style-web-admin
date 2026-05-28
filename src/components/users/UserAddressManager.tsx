@@ -4,6 +4,7 @@ import { UserAddress } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { UserAddressEditForm } from './UserAddressEditForm';
 import { theme } from '@/styles/theme';
+import { logger } from '@/utils/logger';
 
 interface UserAddressManagerProps {
   addresses: UserAddress[];
@@ -182,7 +183,7 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
       await onCreateAddress(input);
       setShowCreateForm(false);
     } catch (error) {
-      console.error('Error creating address:', error);
+      logger.error('Error creating address:', error);
     }
   };
 
@@ -193,7 +194,7 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
       await onUpdateAddress(editingAddress.id, input);
       setEditingAddress(null);
     } catch (error) {
-      console.error('Error updating address:', error);
+      logger.error('Error updating address:', error);
     }
   };
 
@@ -202,7 +203,7 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
       try {
         await onDeleteAddress(addressId);
       } catch (error) {
-        console.error('Error deleting address:', error);
+        logger.error('Error deleting address:', error);
       }
     }
   };
@@ -211,7 +212,7 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
     try {
       await onSetDefaultAddress(addressId);
     } catch (error) {
-      console.error('Error setting default address:', error);
+      logger.error('Error setting default address:', error);
     }
   };
 

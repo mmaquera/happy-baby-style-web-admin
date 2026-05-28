@@ -38,6 +38,7 @@ import {
   convertImageUrlsToRelativePaths,
   validateBackendImageUrls,
 } from '@/utils/imageUtils';
+import { logger } from '@/utils/logger';
 
 interface EditProductModalProps {
   isOpen: boolean;
@@ -472,7 +473,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
       setErrors({});
       setSuccessMessage('');
 
-      console.log('🔗 EditProductModal - Product loaded:', product);
+      logger.debug('🔗 EditProductModal - Product loaded:', product);
     }
   }, [product, isOpen]);
 

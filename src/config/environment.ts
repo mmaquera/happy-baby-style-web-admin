@@ -1,3 +1,5 @@
+import { logger } from '@/utils/logger';
+
 // Environment Configuration - Following SOLID principles and Clean Architecture
 // Single Responsibility: Manages environment configuration only
 // Open/Closed: Extensible for new environment variables
@@ -258,7 +260,7 @@ export const validateEnvironment = (): void => {
   const missingVars = requiredVars.filter(varName => !import.meta.env[varName]);
 
   if (missingVars.length > 0) {
-    console.warn('⚠️  Missing environment variables:', missingVars);
+    logger.warn('⚠️  Missing environment variables:', missingVars);
 
     if (isProduction()) {
       throw new Error(

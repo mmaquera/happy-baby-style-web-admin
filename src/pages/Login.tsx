@@ -13,6 +13,7 @@ import { Card } from '@/components/ui/Card';
 import { LoginLogo } from '@/components/auth/LoginLogo';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { useAuth } from '@/contexts/AuthContext';
+import { logger } from '@/utils/logger';
 
 // Styled Components following Single Responsibility Principle
 const LoginContainer = styled.div`
@@ -68,14 +69,14 @@ export const Login: React.FC = () => {
           localStorage.removeItem('authToken');
           localStorage.removeItem('refreshToken');
           localStorage.removeItem('user');
-          console.log('Cleared invalid tokens');
+          logger.debug('Cleared invalid tokens');
         }
       } catch (error) {
         // Error parsing token, clear all auth data
         localStorage.removeItem('authToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('user');
-        console.log('Cleared malformed tokens');
+        logger.debug('Cleared malformed tokens');
       }
     }
   }, []);
