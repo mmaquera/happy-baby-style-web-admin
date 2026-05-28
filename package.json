@@ -24,6 +24,7 @@
     "test:unit": "jest --testPathPattern=src/services/auth/__tests__",
     "test:integration": "jest --testPathPattern=src/__tests__/integration",
     "codegen": "graphql-codegen --config codegen.yml",
+    "codegen:check": "graphql-codegen --config codegen.yml && git diff --exit-code src/generated/graphql.ts || (echo '\\nERROR: src/generated/graphql.ts is out of sync. Run npm run codegen and commit the result.' && exit 1)",
     "graphql:download-schema": "rover graph introspect http://localhost:3001/graphql --output src/graphql/schema.graphql",
     "graphql:generate": "npm run graphql:download-schema && npm run codegen",
     "prepare": "husky"
@@ -61,6 +62,8 @@
     "@vitejs/plugin-react": "^4.2.1",
     "eslint": "^8.55.0",
     "eslint-config-prettier": "^9.1.2",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-boundaries": "^6.0.2",
     "eslint-plugin-prettier": "^5.5.6",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^4.6.0",

@@ -55,6 +55,7 @@ export const productMapper = {
     };
   },
 
+  // eslint-disable-next-line complexity -- each optional field is one conditional spread; complexity is structural, not logical
   toUpdateDTO(input: UpdateProductInput): GQLUpdateInput {
     return {
       ...(input.name !== undefined && { name: input.name }),

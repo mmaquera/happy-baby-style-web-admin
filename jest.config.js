@@ -8,12 +8,10 @@ export default {
   // File extensions to test
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   
-  // Test file patterns
+  // Test file patterns — only match *.test.* and *.spec.* to exclude fixtures/helpers
   testMatch: [
-    '<rootDir>/src/**/__tests__/**/*.{ts,tsx}',
+    '<rootDir>/src/**/__tests__/**/*.{test,spec}.{ts,tsx}',
     '<rootDir>/src/**/*.{test,spec}.{ts,tsx}',
-    '<rootDir>/src/**/*.test.{ts,tsx}',
-    '<rootDir>/src/**/*.spec.{ts,tsx}'
   ],
   
   // Test coverage
