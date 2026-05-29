@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import styled from 'styled-components';
 import { Card } from '@/components/ui/Card';
 import { theme } from '@/styles/theme';

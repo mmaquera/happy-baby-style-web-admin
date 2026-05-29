@@ -120,7 +120,12 @@ describe('orderMapper.toDomain', () => {
           quantity: 2,
           unitPrice: '40000',
           totalPrice: '80000',
-          product: { id: 'prod-1', name: 'Body Orgánico', sku: 'BODY-001', images: ['img.jpg'] },
+          product: {
+            id: 'prod-1',
+            name: 'Body Orgánico',
+            sku: 'BODY-001',
+            images: ['img.jpg'],
+          },
         },
       ],
     };
@@ -139,7 +144,13 @@ describe('orderMapper.toDomain', () => {
     const dto: OrderDTO = {
       ...BASE_DTO,
       items: [
-        { id: 'item-1', quantity: 1, unitPrice: 10000, totalPrice: 10000, product: null },
+        {
+          id: 'item-1',
+          quantity: 1,
+          unitPrice: 10000,
+          totalPrice: 10000,
+          product: null,
+        },
       ],
     };
 

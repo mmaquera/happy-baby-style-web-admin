@@ -25,7 +25,12 @@ export const MOCK_ORDER: Order = {
       quantity: 2,
       unitPrice: 40000,
       totalPrice: 80000,
-      product: { id: 'prod-1', name: 'Body Orgánico', sku: 'BODY-001', images: [] },
+      product: {
+        id: 'prod-1',
+        name: 'Body Orgánico',
+        sku: 'BODY-001',
+        images: [],
+      },
     },
   ],
   shippingAddress: {
@@ -50,6 +55,10 @@ export const createMockRepository = (): Mocked<OrderRepository> => ({
     .fn()
     .mockResolvedValue(ok({ items: [MOCK_ORDER], total: 1, hasMore: false })),
   findById: vi.fn().mockResolvedValue(ok(MOCK_ORDER)),
-  updateStatus: vi.fn().mockResolvedValue(ok({ ...MOCK_ORDER, status: 'confirmed' as const })),
-  cancel: vi.fn().mockResolvedValue(ok({ ...MOCK_ORDER, status: 'cancelled' as const })),
+  updateStatus: vi
+    .fn()
+    .mockResolvedValue(ok({ ...MOCK_ORDER, status: 'confirmed' as const })),
+  cancel: vi
+    .fn()
+    .mockResolvedValue(ok({ ...MOCK_ORDER, status: 'cancelled' as const })),
 });

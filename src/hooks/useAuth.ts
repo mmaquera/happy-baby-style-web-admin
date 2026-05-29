@@ -2,12 +2,16 @@
 // Uses the AuthService for authentication logic
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useApolloClient, type ApolloClient, type NormalizedCacheObject } from '@apollo/client';
+import {
+  useApolloClient,
+  type ApolloClient,
+  type NormalizedCacheObject,
+} from '@apollo/client';
 import {
   AuthServiceFactory,
-  LoginCredentials,
-  RegisterCredentials,
-  IAuthUser,
+  type LoginCredentials,
+  type RegisterCredentials,
+  type IAuthUser,
   AuthError,
 } from '../services/auth/AuthService';
 import { UserRole } from '../types/unified';

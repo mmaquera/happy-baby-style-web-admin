@@ -1,8 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useCategoriesGraphQL } from './useCategoriesGraphQL';
 import { useCategoryFilters } from './useCategoryFilters';
-import { type Category, type CreateCategoryInput, type UpdateCategoryInput } from '@/generated/graphql';
-import { CategoryFilters } from '@/components/categories/types';
+import {
+  type Category,
+  type CreateCategoryInput,
+  type UpdateCategoryInput,
+} from '@/generated/graphql';
+import { type CategoryFilters } from '@/components/categories/types';
 
 export interface UseCategoriesReturn {
   // Data
@@ -30,7 +34,10 @@ export interface UseCategoriesReturn {
 
   // Actions
   createCategory: (input: CreateCategoryInput) => Promise<Category | null>;
-  updateCategory: (id: string, input: UpdateCategoryInput) => Promise<Category | null>;
+  updateCategory: (
+    id: string,
+    input: UpdateCategoryInput
+  ) => Promise<Category | null>;
   deleteCategory: (id: string) => Promise<boolean>;
   toggleStatus: (categoryId: string, isActive: boolean) => Promise<boolean>;
   bulkDelete: (categoryIds: string[]) => Promise<boolean>;
@@ -41,7 +48,10 @@ export interface UseCategoriesReturn {
 
   // Filter actions
   setFilters: (filters: CategoryFilters) => void;
-  updateFilter: (key: keyof CategoryFilters, value: CategoryFilters[keyof CategoryFilters]) => void;
+  updateFilter: (
+    key: keyof CategoryFilters,
+    value: CategoryFilters[keyof CategoryFilters]
+  ) => void;
   clearFilters: () => void;
 
   // Sorting actions
@@ -204,7 +214,13 @@ export const useCategories = (): UseCategoriesReturn => {
         throw error;
       }
     },
-    [updateCategoryGraphQL, fetchCategories, mapFiltersToGraphQL, filters, localPagination]
+    [
+      updateCategoryGraphQL,
+      fetchCategories,
+      mapFiltersToGraphQL,
+      filters,
+      localPagination,
+    ]
   );
 
   // Wrapper for bulk delete
@@ -213,7 +229,9 @@ export const useCategories = (): UseCategoriesReturn => {
       try {
         const graphqlFilters = mapFiltersToGraphQL(filters);
         const results = await Promise.all(
-          categoryIds.map(id => deleteCategoryGraphQL(id, graphqlFilters, localPagination))
+          categoryIds.map(id =>
+            deleteCategoryGraphQL(id, graphqlFilters, localPagination)
+          )
         );
         await fetchCategories(graphqlFilters, localPagination);
         return results.every(Boolean);
@@ -221,7 +239,13 @@ export const useCategories = (): UseCategoriesReturn => {
         throw error;
       }
     },
-    [deleteCategoryGraphQL, fetchCategories, mapFiltersToGraphQL, filters, localPagination]
+    [
+      deleteCategoryGraphQL,
+      fetchCategories,
+      mapFiltersToGraphQL,
+      filters,
+      localPagination,
+    ]
   );
 
   // Wrapper for bulk toggle status
@@ -231,7 +255,12 @@ export const useCategories = (): UseCategoriesReturn => {
         const graphqlFilters = mapFiltersToGraphQL(filters);
         const results = await Promise.all(
           categoryIds.map(id =>
-            updateCategoryGraphQL(id, { isActive }, graphqlFilters, localPagination)
+            updateCategoryGraphQL(
+              id,
+              { isActive },
+              graphqlFilters,
+              localPagination
+            )
           )
         );
         await fetchCategories(graphqlFilters, localPagination);
@@ -240,7 +269,13 @@ export const useCategories = (): UseCategoriesReturn => {
         throw error;
       }
     },
-    [updateCategoryGraphQL, fetchCategories, mapFiltersToGraphQL, filters, localPagination]
+    [
+      updateCategoryGraphQL,
+      fetchCategories,
+      mapFiltersToGraphQL,
+      filters,
+      localPagination,
+    ]
   );
 
   // Wrapper for set filters
@@ -253,7 +288,10 @@ export const useCategories = (): UseCategoriesReturn => {
 
   // Wrapper for update filter
   const updateFilter = useCallback(
-    (key: keyof CategoryFilters, value: CategoryFilters[keyof CategoryFilters]) => {
+    (
+      key: keyof CategoryFilters,
+      value: CategoryFilters[keyof CategoryFilters]
+    ) => {
       updateFilterLocal(key, value);
     },
     [updateFilterLocal]

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
-import { UserAddress } from '@/types';
+import { type UserAddress } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { UserAddressEditForm } from './UserAddressEditForm';
 import { theme } from '@/styles/theme';
@@ -280,25 +281,25 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
                   <AddressText>
                     {address.address1}
                     <br />
-                    {address.address2 && (
+                    {address.address2 ? (
                       <>
                         {address.address2}
                         <br />
                       </>
-                    )}
+                    ) : null}
                     {address.city}, {address.state} {address.postalCode}
                     <br />
                     {address.country}
                   </AddressText>
 
                   <AddressMeta>
-                    {address.company && <span>{address.company}</span>}
-                    {address.phone && <span>{address.phone}</span>}
+                    {address.company ? <span>{address.company}</span> : null}
+                    {address.phone ? <span>{address.phone}</span> : null}
                   </AddressMeta>
 
-                  {address.isDefault && (
+                  {address.isDefault ? (
                     <DefaultBadge>Predeterminada</DefaultBadge>
-                  )}
+                  ) : null}
                 </AddressInfo>
 
                 <ActionButtons>
@@ -338,7 +339,7 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
       )}
 
       {/* Create Address Modal */}
-      {showCreateForm && (
+      {showCreateForm ? (
         <Modal onClick={() => setShowCreateForm(false)}>
           <ModalContent onClick={e => e.stopPropagation()}>
             <ModalHeader>
@@ -360,10 +361,10 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
             />
           </ModalContent>
         </Modal>
-      )}
+      ) : null}
 
       {/* Edit Address Modal */}
-      {editingAddress && (
+      {editingAddress ? (
         <Modal onClick={() => setEditingAddress(null)}>
           <ModalContent onClick={e => e.stopPropagation()}>
             <ModalHeader>
@@ -387,7 +388,7 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
             />
           </ModalContent>
         </Modal>
-      )}
+      ) : null}
     </Container>
   );
 };

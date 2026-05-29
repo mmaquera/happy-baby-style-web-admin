@@ -4,17 +4,14 @@
 // Following Clean Architecture principles and React best practices
 // Specific component for SVG upload functionality in categories
 
-import React, { useState, useCallback, useRef, useEffect } from 'react';
-import {
-  FileText,
-  X,
-  Image as ImageIcon,
-} from 'lucide-react';
+import type React from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { FileText, X, Image as ImageIcon } from 'lucide-react';
 import { theme } from '@/styles/theme';
 import { useSVGUpload } from '@/hooks/useSVGUpload';
 import {
-  SVGUploadProps,
-  SVGUploadResult,
+  type SVGUploadProps,
+  type SVGUploadResult,
   SVG_UPLOAD_DEFAULTS,
 } from './SVGUpload.types';
 import {
@@ -140,7 +137,8 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
           message: 'Archivo SVG subido exitosamente',
         });
       } catch (err: unknown) {
-        const errMsg = err instanceof Error ? err.message : 'Error al subir el archivo';
+        const errMsg =
+          err instanceof Error ? err.message : 'Error al subir el archivo';
         setValidationMessage({
           type: 'error',
           message: errMsg,
@@ -236,7 +234,7 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
   }, []);
 
   return (
@@ -285,7 +283,7 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
       </SVGUploadZone>
 
       {/* Progress Bar */}
-      {progress && (
+      {progress ? (
         <div>
           <SVGProgressBar>
             <SVGProgressFill progress={progress.percentage} />
@@ -294,20 +292,20 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
             Subiendo {progress.filename}... {progress.percentage}%
           </SVGProgressText>
         </div>
-      )}
+      ) : null}
 
       {/* Error Message */}
-      {error && <SVGErrorMessage>{error.message}</SVGErrorMessage>}
+      {error ? <SVGErrorMessage>{error.message}</SVGErrorMessage> : null}
 
       {/* Validation Message */}
-      {validationMessage && (
+      {validationMessage ? (
         <SVGValidationMessage type={validationMessage.type}>
           {validationMessage.message}
         </SVGValidationMessage>
-      )}
+      ) : null}
 
       {/* File List */}
-      {selectedFile && (
+      {selectedFile ? (
         <SVGFileList>
           <SVGFileItem>
             <SVGFileInfo>
@@ -322,7 +320,7 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
             </SVGRemoveButton>
           </SVGFileItem>
         </SVGFileList>
-      )}
+      ) : null}
 
       {/* SVG Specifications Info */}
       <div
@@ -351,7 +349,7 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
       </div>
 
       {/* SVG Preview */}
-      {showPreview && uploadResult && (
+      {showPreview && uploadResult ? (
         <SVGPreview>
           <SVGPreviewContent>
             <SVGPreviewImg>
@@ -371,7 +369,7 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
             </SVGPreviewActions>
           </SVGPreviewOverlay>
         </SVGPreview>
-      )}
+      ) : null}
     </SVGUploadContainer>
   );
 };

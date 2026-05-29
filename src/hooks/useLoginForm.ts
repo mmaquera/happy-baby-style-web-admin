@@ -9,7 +9,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { loginSchema, type LoginFormData } from '@/core/shared/validation/authSchema';
+import {
+  loginSchema,
+  type LoginFormData,
+} from '@/core/shared/validation/authSchema';
 
 interface UseLoginFormReturn {
   form: ReturnType<typeof useForm<LoginFormData>>;
@@ -38,7 +41,10 @@ export const useLoginForm = (): UseLoginFormReturn => {
 
   // Memoized redirect path
   const redirectPath = useMemo(() => {
-    return (location.state as { from?: { pathname?: string } })?.from?.pathname || '/';
+    return (
+      (location.state as { from?: { pathname?: string } })?.from?.pathname ||
+      '/'
+    );
   }, [location.state]);
 
   // ✅ PASO 1: Función para procesar errores del servidor

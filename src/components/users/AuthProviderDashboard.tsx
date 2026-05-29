@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import styled from 'styled-components';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -6,7 +6,7 @@ import { theme } from '@/styles/theme';
 import {
   useAuthProviderStats,
   useProviderUtils,
-  AuthProviderStats,
+  type AuthProviderStats,
 } from '@/hooks/useAuthManagement';
 import {
   TrendingUp,
@@ -420,7 +420,7 @@ export const AuthProviderDashboard: React.FC = () => {
       </div>
 
       {/* Banner informativo minimalista cuando se usan datos de fallback */}
-      {isUsingFallbackData && (
+      {isUsingFallbackData ? (
         <div
           style={{
             backgroundColor: theme.colors.background.accent,
@@ -472,7 +472,7 @@ export const AuthProviderDashboard: React.FC = () => {
             </div>
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* Estadísticas Generales */}
       <StatsGrid>
@@ -593,19 +593,19 @@ export const AuthProviderDashboard: React.FC = () => {
                             <span>{getProviderLabel(login.provider)}</span>
                             <Clock size={12} />
                             <span>{formatDate(login.loginAt)}</span>
-                            {login.ipAddress && login.ipAddress !== 'N/A' && (
+                            {login.ipAddress && login.ipAddress !== 'N/A' ? (
                               <>
                                 <MapPin size={12} />
                                 <span>{login.ipAddress}</span>
                               </>
-                            )}
-                            {login.userAgent && login.userAgent !== 'N/A' && (
+                            ) : null}
+                            {login.userAgent && login.userAgent !== 'N/A' ? (
                               <span style={{ fontSize: '11px', opacity: 0.7 }}>
                                 {login.userAgent.length > 30
                                   ? `${login.userAgent.substring(0, 30)}...`
                                   : login.userAgent}
                               </span>
-                            )}
+                            ) : null}
                           </ActivityDetails>
                         </ActivityInfo>
                       </ActivityItem>

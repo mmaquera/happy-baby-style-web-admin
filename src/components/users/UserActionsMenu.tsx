@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import type React from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 import type { User } from '@/core/domain/user/User';
@@ -354,14 +355,14 @@ export const UserActionsMenu: React.FC<UserActionsMenuProps> = ({
           {/* Security Actions */}
           <MenuSection>
             <MenuLabel>Seguridad</MenuLabel>
-            {onResetPassword && (
+            {onResetPassword ? (
               <MenuItem
                 onClick={() => handleItemClick(() => onResetPassword(user))}
               >
                 <Key size={16} />
                 Restablecer Contraseña
               </MenuItem>
-            )}
+            ) : null}
 
             {user.role !== 'admin'
               ? onPromoteToAdmin && (
@@ -389,7 +390,7 @@ export const UserActionsMenu: React.FC<UserActionsMenuProps> = ({
           </MenuSection>
 
           {/* Danger Actions */}
-          {onDelete && (
+          {onDelete ? (
             <MenuSection>
               <MenuLabel>Zona Peligrosa</MenuLabel>
               <MenuItem
@@ -400,7 +401,7 @@ export const UserActionsMenu: React.FC<UserActionsMenuProps> = ({
                 Eliminar Usuario
               </MenuItem>
             </MenuSection>
-          )}
+          ) : null}
         </MenuDropdown>,
         document.body // Render directly to body to bypass any container overflow issues
       )}

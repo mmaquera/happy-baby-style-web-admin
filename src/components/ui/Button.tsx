@@ -1,4 +1,4 @@
-import * as React from 'react';
+import type * as React from 'react';
 import { Button as ButtonPrimitive } from '@base-ui/react/button';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Loader2 } from 'lucide-react';
@@ -74,10 +74,10 @@ function Button({
       disabled={disabled ?? isLoading}
       {...props}
     >
-      {isLoading && <Loader2 className='animate-spin size-4' />}
-      {!isLoading && icon && iconPosition === 'left' && icon}
+      {isLoading ? <Loader2 className='animate-spin size-4' /> : null}
+      {!isLoading && icon && iconPosition === 'left' ? icon : null}
       {children}
-      {!isLoading && icon && iconPosition === 'right' && icon}
+      {!isLoading && icon && iconPosition === 'right' ? icon : null}
     </ButtonPrimitive>
   );
 }

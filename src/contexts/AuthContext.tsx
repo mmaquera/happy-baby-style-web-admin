@@ -5,7 +5,8 @@
 // Interface Segregation: Specific interfaces for different concerns
 // Dependency Inversion: Depends on abstractions
 
-import React, {
+import type React from 'react';
+import {
   createContext,
   useContext,
   useReducer,
@@ -20,7 +21,7 @@ import {
   AuthError,
   AuthServiceFactory,
 } from '../services/auth/UnifiedAuthService';
-import { IAuthUser } from '../types/auth';
+import { type IAuthUser } from '../types/auth';
 import { UserRole } from '../types/unified';
 import { logger } from '@/utils/logger';
 

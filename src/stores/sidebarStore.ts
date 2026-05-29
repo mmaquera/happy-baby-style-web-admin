@@ -16,6 +16,9 @@ export const useSidebarStore = create<SidebarStore>()(
       collapseSidebar: () => set({ isCollapsed: true }),
       expandSidebar: () => set({ isCollapsed: false }),
     }),
-    { name: 'sidebar-collapsed', partialize: state => ({ isCollapsed: state.isCollapsed }) }
+    {
+      name: 'sidebar-collapsed',
+      partialize: state => ({ isCollapsed: state.isCollapsed }),
+    }
   )
 );

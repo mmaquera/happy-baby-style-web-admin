@@ -57,7 +57,10 @@ describe('CreateUserUseCase', () => {
 
   it('propagates repository errors', async () => {
     const { useCase, repo } = makeUseCase();
-    repo.create.mockResolvedValueOnce({ ok: false, error: new Error('Email already exists') });
+    repo.create.mockResolvedValueOnce({
+      ok: false,
+      error: new Error('Email already exists'),
+    });
     const result = await useCase.execute(VALID_INPUT);
     expect(isErr(result)).toBe(true);
   });

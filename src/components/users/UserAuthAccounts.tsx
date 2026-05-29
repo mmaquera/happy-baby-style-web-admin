@@ -1,6 +1,6 @@
-import React from 'react';
+import type React from 'react';
 import styled from 'styled-components';
-import { UserAccount, AuthProvider } from '@/types/unified';
+import { type UserAccount, AuthProvider } from '@/types/unified';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { theme } from '@/styles/theme';
@@ -252,7 +252,7 @@ export const UserAuthAccounts: React.FC<UserAuthAccountsProps> = ({
               <DetailValue>{formatDate(account.createdAt)}</DetailValue>
             </DetailItem>
 
-            {account.expiresAt && (
+            {account.expiresAt ? (
               <DetailItem>
                 <DetailLabel>Expira</DetailLabel>
                 <DetailValue>
@@ -268,7 +268,7 @@ export const UserAuthAccounts: React.FC<UserAuthAccountsProps> = ({
                   </div>
                 </DetailValue>
               </DetailItem>
-            )}
+            ) : null}
 
             <DetailItem>
               <DetailLabel>Tipo de Token</DetailLabel>
@@ -276,7 +276,7 @@ export const UserAuthAccounts: React.FC<UserAuthAccountsProps> = ({
             </DetailItem>
           </AccountDetails>
 
-          {account.scope && (
+          {account.scope ? (
             <DetailItem>
               <DetailLabel>Permisos</DetailLabel>
               <DetailValue>
@@ -305,7 +305,7 @@ export const UserAuthAccounts: React.FC<UserAuthAccountsProps> = ({
                 </div>
               </DetailValue>
             </DetailItem>
-          )}
+          ) : null}
 
           {isTokenExpired(account.expiresAt) && (
             <div
@@ -314,7 +314,7 @@ export const UserAuthAccounts: React.FC<UserAuthAccountsProps> = ({
                 alignItems: 'center',
                 gap: theme.spacing[2],
                 padding: theme.spacing[2],
-                background: theme.colors.warning + '20',
+                background: `${theme.colors.warning}20`,
                 borderRadius: theme.borderRadius.md,
                 marginTop: theme.spacing[2],
               }}

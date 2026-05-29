@@ -1,10 +1,5 @@
 import type { Result } from '@/core/shared/Result';
-import type {
-  Order,
-  OrderFilter,
-  OrderPage,
-  OrderStatus,
-} from './Order';
+import type { Order, OrderFilter, OrderPage, OrderStatus } from './Order';
 
 export interface OrderRepository {
   findAll(

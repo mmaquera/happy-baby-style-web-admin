@@ -43,7 +43,10 @@ describe('GetOrderUseCase', () => {
 
   it('propagates repository errors', async () => {
     const { useCase, repo } = makeUseCase();
-    repo.findById.mockResolvedValueOnce({ ok: false, error: new Error('Not found') });
+    repo.findById.mockResolvedValueOnce({
+      ok: false,
+      error: new Error('Not found'),
+    });
 
     const result = await useCase.execute('order-1');
 

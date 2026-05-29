@@ -1,6 +1,7 @@
-import React, { useMemo } from 'react';
+import type React from 'react';
+import { useMemo } from 'react';
 import styled from 'styled-components';
-import { UserSession } from '@/types/unified';
+import { type UserSession } from '@/types/unified';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { theme } from '@/styles/theme';
@@ -469,20 +470,21 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
         </SecurityGrid>
 
         {/* Alertas de Seguridad */}
-        {securityAnalysis.hasSecurityIssues && (
+        {securityAnalysis.hasSecurityIssues ? (
           <SecurityAlert type='warning'>
             <AlertTriangle size={16} />
             <div>
               <strong>⚠️ Alertas de Seguridad:</strong>
               {securityAnalysis.suspiciousSessions > 0 &&
                 ` ${securityAnalysis.suspiciousSessions} sesión(es) sospechosa(s) detectada(s)`}
-              {securityAnalysis.multipleLocations &&
-                ` • Múltiples ubicaciones detectadas (${securityAnalysis.uniqueIPs} IPs únicas)`}
+              {securityAnalysis.multipleLocations
+                ? ` • Múltiples ubicaciones detectadas (${securityAnalysis.uniqueIPs} IPs únicas)`
+                : null}
             </div>
           </SecurityAlert>
-        )}
+        ) : null}
 
-        {securityAnalysis.multipleLocations && (
+        {securityAnalysis.multipleLocations ? (
           <SecurityAlert type='info'>
             <Globe size={16} />
             <div>
@@ -493,7 +495,7 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
                 ' Esto podría indicar un uso compartido de la cuenta.'}
             </div>
           </SecurityAlert>
-        )}
+        ) : null}
 
         {!securityAnalysis.hasSecurityIssues &&
           securityAnalysis.activeSessions > 0 && (
@@ -562,60 +564,60 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
                     >
                       Sesión activa
                       {securityAnalysis.suspiciousSessions > 0 &&
-                        sessions.find(s => s.id === session.id) &&
-                        ((sessions.find(s => s.id === session.id)?.ipAddress &&
-                          !sessions
-                            .find(s => s.id === session.id)
-                            ?.ipAddress?.match(
-                              /^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/
-                            )) ||
-                          sessions
-                            .find(s => s.id === session.id)
-                            ?.userAgent?.includes('bot') ||
-                          sessions
-                            .find(s => s.id === session.id)
-                            ?.userAgent?.includes('crawler')) && (
-                          <span
-                            style={{
-                              color: theme.colors.warning,
-                              marginLeft: theme.spacing[1],
-                              fontWeight: theme.fontWeights.medium,
-                            }}
-                          >
-                            ⚠️ Sospechosa
-                          </span>
-                        )}
+                      sessions.find(s => s.id === session.id) &&
+                      ((sessions.find(s => s.id === session.id)?.ipAddress &&
+                        !sessions
+                          .find(s => s.id === session.id)
+                          ?.ipAddress?.match(
+                            /^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/
+                          )) ||
+                        sessions
+                          .find(s => s.id === session.id)
+                          ?.userAgent?.includes('bot') ||
+                        sessions
+                          .find(s => s.id === session.id)
+                          ?.userAgent?.includes('crawler')) ? (
+                        <span
+                          style={{
+                            color: theme.colors.warning,
+                            marginLeft: theme.spacing[1],
+                            fontWeight: theme.fontWeights.medium,
+                          }}
+                        >
+                          ⚠️ Sospechosa
+                        </span>
+                      ) : null}
                     </div>
                   </div>
                 </SessionInfo>
 
                 <SessionActions>
                   {securityAnalysis.suspiciousSessions > 0 &&
-                    sessions.find(s => s.id === session.id) &&
-                    ((sessions.find(s => s.id === session.id)?.ipAddress &&
-                      !sessions
-                        .find(s => s.id === session.id)
-                        ?.ipAddress?.match(
-                          /^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/
-                        )) ||
-                      sessions
-                        .find(s => s.id === session.id)
-                        ?.userAgent?.includes('bot') ||
-                      sessions
-                        .find(s => s.id === session.id)
-                        ?.userAgent?.includes('crawler')) && (
-                      <Button
-                        variant='ghost'
-                        size='small'
-                        icon={<Info size={14} />}
-                        style={{
-                          color: theme.colors.warning,
-                          border: `1px solid ${theme.colors.warning}40`,
-                        }}
-                      >
-                        Info
-                      </Button>
-                    )}
+                  sessions.find(s => s.id === session.id) &&
+                  ((sessions.find(s => s.id === session.id)?.ipAddress &&
+                    !sessions
+                      .find(s => s.id === session.id)
+                      ?.ipAddress?.match(
+                        /^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/
+                      )) ||
+                    sessions
+                      .find(s => s.id === session.id)
+                      ?.userAgent?.includes('bot') ||
+                    sessions
+                      .find(s => s.id === session.id)
+                      ?.userAgent?.includes('crawler')) ? (
+                    <Button
+                      variant='ghost'
+                      size='small'
+                      icon={<Info size={14} />}
+                      style={{
+                        color: theme.colors.warning,
+                        border: `1px solid ${theme.colors.warning}40`,
+                      }}
+                    >
+                      Info
+                    </Button>
+                  ) : null}
                   <Button
                     variant='outline'
                     size='small'
@@ -645,19 +647,19 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
                     <MapPin size={12} />
                     {session.ipAddress || 'No disponible'}
                     {session.ipAddress &&
-                      !session.ipAddress.match(
-                        /^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/
-                      ) && (
-                        <span
-                          style={{
-                            color: theme.colors.warning,
-                            fontSize: theme.fontSizes.xs,
-                            marginLeft: theme.spacing[1],
-                          }}
-                        >
-                          (Externa)
-                        </span>
-                      )}
+                    !session.ipAddress.match(
+                      /^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/
+                    ) ? (
+                      <span
+                        style={{
+                          color: theme.colors.warning,
+                          fontSize: theme.fontSizes.xs,
+                          marginLeft: theme.spacing[1],
+                        }}
+                      >
+                        (Externa)
+                      </span>
+                    ) : null}
                   </DetailValue>
                 </DetailItem>
 
@@ -765,19 +767,19 @@ export const UserSessionsManager: React.FC<UserSessionsManagerProps> = ({
                       <MapPin size={12} />
                       {session.ipAddress || 'No disponible'}
                       {session.ipAddress &&
-                        !session.ipAddress.match(
-                          /^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/
-                        ) && (
-                          <span
-                            style={{
-                              color: theme.colors.warning,
-                              fontSize: theme.fontSizes.xs,
-                              marginLeft: theme.spacing[1],
-                            }}
-                          >
-                            (Externa)
-                          </span>
-                        )}
+                      !session.ipAddress.match(
+                        /^(192\.168\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/
+                      ) ? (
+                        <span
+                          style={{
+                            color: theme.colors.warning,
+                            fontSize: theme.fontSizes.xs,
+                            marginLeft: theme.spacing[1],
+                          }}
+                        >
+                          (Externa)
+                        </span>
+                      ) : null}
                     </DetailValue>
                   </DetailItem>
 

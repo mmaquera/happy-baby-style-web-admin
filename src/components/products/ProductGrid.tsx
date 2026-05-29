@@ -1,15 +1,10 @@
-import React from 'react';
+import type React from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { ProductCard } from './ProductCard';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import {
-  Grid3X3,
-  List,
-  Package,
-  AlertTriangle,
-} from 'lucide-react';
+import { Grid3X3, List, Package, AlertTriangle } from 'lucide-react';
 
 interface Product {
   id: string;
@@ -299,7 +294,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
         ))}
       </GridContainer>
 
-      {hasMore && onLoadMore && (
+      {hasMore && onLoadMore ? (
         <LoadMoreContainer>
           <LoadMoreButton
             variant='outline'
@@ -310,7 +305,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
             {loading ? 'Cargando...' : 'Cargar Más Productos'}
           </LoadMoreButton>
         </LoadMoreContainer>
-      )}
+      ) : null}
     </>
   );
 };

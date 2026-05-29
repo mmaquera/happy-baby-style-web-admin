@@ -6,7 +6,7 @@
 
 import { useState, useCallback } from 'react';
 import { useRegisterUserMutation } from '@/generated/graphql';
-import { CreateUserProfileInput } from '@/generated/graphql';
+import { type CreateUserProfileInput } from '@/generated/graphql';
 import toast from 'react-hot-toast';
 
 // Types following Interface Segregation Principle

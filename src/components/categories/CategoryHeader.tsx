@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
@@ -195,7 +195,7 @@ export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
         </HeaderLeft>
 
         <HeaderActions>
-          {onViewModeChange && (
+          {onViewModeChange ? (
             <div style={{ display: 'flex', gap: theme.spacing[2] }}>
               <Button
                 variant={viewMode === 'list' ? 'primary' : 'outline'}
@@ -214,39 +214,39 @@ export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
                 Grid
               </Button>
             </div>
-          )}
+          ) : null}
 
-          {onImport && (
+          {onImport ? (
             <Button variant='ghost' size='medium' onClick={onImport}>
               <Upload size={16} />
               Importar
             </Button>
-          )}
+          ) : null}
 
-          {onExport && (
+          {onExport ? (
             <Button variant='ghost' size='medium' onClick={onExport}>
               <Download size={16} />
               Exportar
             </Button>
-          )}
+          ) : null}
 
-          {onBulkActions && (
+          {onBulkActions ? (
             <Button variant='secondary' size='medium' onClick={onBulkActions}>
               <Settings size={16} />
               Acciones Masivas
             </Button>
-          )}
+          ) : null}
 
-          {onAddCategory && (
+          {onAddCategory ? (
             <Button variant='primary' size='medium' onClick={onAddCategory}>
               <Plus size={16} />
               Nueva Categoría
             </Button>
-          )}
+          ) : null}
         </HeaderActions>
       </MainHeader>
 
-      {hasStats && (
+      {hasStats ? (
         <StatsGrid>
           {stats.totalCategories !== undefined && (
             <StatCard>
@@ -281,13 +281,13 @@ export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
             </StatCard>
           )}
         </StatsGrid>
-      )}
+      ) : null}
 
-      {showActions && (
+      {showActions ? (
         <QuickActionsContainer>
           <QuickActionsLabel>Acciones rápidas:</QuickActionsLabel>
 
-          {onAddCategory && (
+          {onAddCategory ? (
             <QuickActionButton
               variant='outline'
               size='small'
@@ -296,9 +296,9 @@ export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
               <Plus size={14} />
               Agregar Categoría
             </QuickActionButton>
-          )}
+          ) : null}
 
-          {onBulkActions && (
+          {onBulkActions ? (
             <QuickActionButton
               variant='outline'
               size='small'
@@ -307,14 +307,14 @@ export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
               <Settings size={14} />
               Acciones Masivas
             </QuickActionButton>
-          )}
+          ) : null}
 
-          {onExport && (
+          {onExport ? (
             <QuickActionButton variant='ghost' size='small' onClick={onExport}>
               <Download size={14} />
               Exportar Lista
             </QuickActionButton>
-          )}
+          ) : null}
 
           <QuickActionButton
             variant='ghost'
@@ -325,7 +325,7 @@ export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
             Imprimir
           </QuickActionButton>
         </QuickActionsContainer>
-      )}
+      ) : null}
     </HeaderContainer>
   );
 };

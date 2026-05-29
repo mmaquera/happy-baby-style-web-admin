@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import type React from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { type UserRole } from '@/generated/graphql';
 // Minimal profile shape this form needs — avoids coupling to full GQL type
@@ -223,7 +224,9 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
         ...(formData.phone.trim() ? { phone: formData.phone.trim() } : {}),
-        ...(formData.dateOfBirth ? { dateOfBirth: new Date(formData.dateOfBirth).toISOString() } : {}),
+        ...(formData.dateOfBirth
+          ? { dateOfBirth: new Date(formData.dateOfBirth).toISOString() }
+          : {}),
         ...(formData.role ? { role: formData.role as UserRole } : {}),
       };
 
@@ -248,7 +251,9 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
             placeholder='Nombre'
             error={getErrorMessage('firstName')}
           />
-          {errors.firstName && <ErrorMessage>{errors.firstName}</ErrorMessage>}
+          {errors.firstName ? (
+            <ErrorMessage>{errors.firstName}</ErrorMessage>
+          ) : null}
         </FormGroup>
 
         <FormGroup>
@@ -263,7 +268,9 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
             placeholder='Apellido'
             error={getErrorMessage('lastName')}
           />
-          {errors.lastName && <ErrorMessage>{errors.lastName}</ErrorMessage>}
+          {errors.lastName ? (
+            <ErrorMessage>{errors.lastName}</ErrorMessage>
+          ) : null}
         </FormGroup>
       </FormRow>
 
@@ -278,7 +285,7 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
             placeholder='+1 234 567 890'
             error={getErrorMessage('phone')}
           />
-          {errors.phone && <ErrorMessage>{errors.phone}</ErrorMessage>}
+          {errors.phone ? <ErrorMessage>{errors.phone}</ErrorMessage> : null}
         </FormGroup>
 
         <FormGroup>
@@ -290,9 +297,9 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
             onBlur={() => handleBlur('dateOfBirth')}
             error={getErrorMessage('dateOfBirth')}
           />
-          {errors.dateOfBirth && (
+          {errors.dateOfBirth ? (
             <ErrorMessage>{errors.dateOfBirth}</ErrorMessage>
-          )}
+          ) : null}
         </FormGroup>
       </FormRow>
 

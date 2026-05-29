@@ -1,4 +1,5 @@
-import React, { useState, useCallback } from 'react';
+import type React from 'react';
+import { useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Card } from '@/components/ui/Card';
@@ -523,12 +524,12 @@ export const ProductDetail: React.FC = () => {
         <InfoSection>
           <PriceSection>
             <CurrentPrice>S/ {product.salePrice || product.price}</CurrentPrice>
-            {hasDiscount && (
+            {hasDiscount ? (
               <>
                 <OriginalPrice>S/ {product.price}</OriginalPrice>
                 <DiscountBadge>-{discountPercentage}%</DiscountBadge>
               </>
-            )}
+            ) : null}
           </PriceSection>
 
           <StockStatus isLowStock={isLowStock} isOutOfStock={isOutOfStock}>
@@ -644,11 +645,11 @@ export const ProductDetail: React.FC = () => {
             <p>
               <strong>Precio base:</strong> S/ {product.price}
             </p>
-            {hasDiscount && (
+            {hasDiscount ? (
               <p>
                 <strong>Precio de oferta:</strong> S/ {product.salePrice}
               </p>
-            )}
+            ) : null}
             <p>
               <strong>Descuento:</strong>{' '}
               {hasDiscount ? `${discountPercentage}%` : 'Sin descuento'}

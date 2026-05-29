@@ -1,13 +1,13 @@
 // Product Types - Using GraphQL generated types as base
 import {
-  Product as GraphQLProduct,
-  ProductVariant as GraphQLProductVariant,
-  Category as GraphQLCategory,
-  Order as GraphQLOrder,
-  OrderItem as GraphQLOrderItem,
-  User as GraphQLUser,
-  UserProfile as GraphQLUserProfile,
-  UserAddress as GraphQLUserAddress,
+  type Product as GraphQLProduct,
+  type ProductVariant as GraphQLProductVariant,
+  type Category as GraphQLCategory,
+  type Order as GraphQLOrder,
+  type OrderItem as GraphQLOrderItem,
+  type User as GraphQLUser,
+  type UserProfile as GraphQLUserProfile,
+  type UserAddress as GraphQLUserAddress,
 } from '../generated/graphql';
 
 // Re-export GraphQL types for direct use

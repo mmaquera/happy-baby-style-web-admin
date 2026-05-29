@@ -5,7 +5,9 @@ import {
 } from '@/generated/graphql';
 
 type PasswordHistoryEvent = NonNullable<
-  NonNullable<GetUserPasswordHistoryQuery['userSecurityEvents']['data']>['items'][number]
+  NonNullable<
+    GetUserPasswordHistoryQuery['userSecurityEvents']['data']
+  >['items'][number]
 >;
 import toast from 'react-hot-toast';
 import { logger } from '@/utils/logger';
@@ -60,13 +62,16 @@ const mapEventTypeToActionType = (
 /**
  * Maps SecurityEvent status from metadata to PasswordAction status
  */
-const mapStatusFromMetadata = (metadata: Record<string, unknown>): PasswordAction['status'] => {
+const mapStatusFromMetadata = (
+  metadata: Record<string, unknown>
+): PasswordAction['status'] => {
   if (!metadata || typeof metadata !== 'object') {
     return 'completed'; // Default status
   }
 
   const rawStatus = metadata['status'];
-  const status = typeof rawStatus === 'string' ? rawStatus.toLowerCase() : undefined;
+  const status =
+    typeof rawStatus === 'string' ? rawStatus.toLowerCase() : undefined;
   if (status === 'pending') return 'pending';
   if (status === 'failed' || status === 'error') return 'failed';
   return 'completed';
@@ -122,9 +127,11 @@ const transformSecurityEventToPasswordAction = (
     const rawMetadata: unknown =
       typeof event.metadata === 'string'
         ? JSON.parse(event.metadata)
-        : event.metadata ?? {};
+        : (event.metadata ?? {});
     const metadata: Record<string, unknown> =
-      rawMetadata && typeof rawMetadata === 'object' && !Array.isArray(rawMetadata)
+      rawMetadata &&
+      typeof rawMetadata === 'object' &&
+      !Array.isArray(rawMetadata)
         ? (rawMetadata as Record<string, unknown>)
         : {};
 

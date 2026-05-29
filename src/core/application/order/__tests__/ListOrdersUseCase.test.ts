@@ -20,7 +20,11 @@ describe('ListOrdersUseCase', () => {
   it('passes filter and pagination to repository', async () => {
     const { useCase, repo } = makeUseCase();
 
-    await useCase.execute({ filter: { status: 'pending' }, limit: 10, offset: 20 });
+    await useCase.execute({
+      filter: { status: 'pending' },
+      limit: 10,
+      offset: 20,
+    });
 
     expect(repo.findAll).toHaveBeenCalledWith({ status: 'pending' }, 10, 20);
   });
@@ -40,7 +44,10 @@ describe('ListOrdersUseCase', () => {
 
   it('propagates repository errors', async () => {
     const { useCase, repo } = makeUseCase();
-    repo.findAll.mockResolvedValueOnce({ ok: false, error: new Error('DB error') });
+    repo.findAll.mockResolvedValueOnce({
+      ok: false,
+      error: new Error('DB error'),
+    });
 
     const result = await useCase.execute();
 

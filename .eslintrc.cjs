@@ -102,9 +102,11 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'warn',
     '@typescript-eslint/no-var-requires': 'error',
-    // Disabled: autofix converts value imports to `import type`, breaking enums/runtime values.
-    // Re-enable manually once God components are refactored and all imports are audited.
-    '@typescript-eslint/consistent-type-imports': 'off',
+    '@typescript-eslint/consistent-type-imports': ['error', {
+      prefer: 'type-imports',
+      fixStyle: 'inline-type-imports',
+      disallowTypeAnnotations: false,
+    }],
     
     // React specific rules
     'react/prop-types': 'off', // Using TypeScript instead

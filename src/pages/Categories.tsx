@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import type React from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import {
@@ -136,7 +137,9 @@ export const Categories: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null
+  );
   const [showFilters, _setShowFilters] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [filters, setFilters] = useState<CategoryFiltersType>({});
@@ -169,7 +172,11 @@ export const Categories: React.FC = () => {
   );
 
   useEffect(() => {
-    void loadCategories(buildDomainFilter(), PAGE_SIZE, (currentPage - 1) * PAGE_SIZE);
+    void loadCategories(
+      buildDomainFilter(),
+      PAGE_SIZE,
+      (currentPage - 1) * PAGE_SIZE
+    );
   }, [loadCategories, buildDomainFilter, currentPage]);
 
   const stats = {
@@ -180,13 +187,16 @@ export const Categories: React.FC = () => {
 
   const handleAddCategory = useCallback(() => setIsCreateModalOpen(true), []);
 
-  const handleCreateCategorySuccess = useCallback((_result: unknown) => {
-    setIsCreateModalOpen(false);
-    setIsUpdating(true);
-    void loadCategories(buildDomainFilter(), PAGE_SIZE, 0).then(() =>
-      setTimeout(() => setIsUpdating(false), 800)
-    );
-  }, [loadCategories, buildDomainFilter]);
+  const handleCreateCategorySuccess = useCallback(
+    (_result: unknown) => {
+      setIsCreateModalOpen(false);
+      setIsUpdating(true);
+      void loadCategories(buildDomainFilter(), PAGE_SIZE, 0).then(() =>
+        setTimeout(() => setIsUpdating(false), 800)
+      );
+    },
+    [loadCategories, buildDomainFilter]
+  );
 
   const handleEditCategory = useCallback(
     (categoryId: string) => {
@@ -199,14 +209,17 @@ export const Categories: React.FC = () => {
     [categories]
   );
 
-  const handleEditCategorySuccess = useCallback((_result: unknown) => {
-    setIsEditModalOpen(false);
-    setSelectedCategory(null);
-    setIsUpdating(true);
-    void loadCategories(buildDomainFilter(), PAGE_SIZE, 0).then(() =>
-      setTimeout(() => setIsUpdating(false), 800)
-    );
-  }, [loadCategories, buildDomainFilter]);
+  const handleEditCategorySuccess = useCallback(
+    (_result: unknown) => {
+      setIsEditModalOpen(false);
+      setSelectedCategory(null);
+      setIsUpdating(true);
+      void loadCategories(buildDomainFilter(), PAGE_SIZE, 0).then(() =>
+        setTimeout(() => setIsUpdating(false), 800)
+      );
+    },
+    [loadCategories, buildDomainFilter]
+  );
 
   const handleDeleteCategory = useCallback(
     async (categoryId: string) => {
@@ -254,9 +267,12 @@ export const Categories: React.FC = () => {
     setCurrentPage(1);
   }, []);
 
-  const handleSortChange = useCallback((_field: string, _direction: 'asc' | 'desc') => {
-    logger.debug('Sort change — not yet implemented in domain layer');
-  }, []);
+  const handleSortChange = useCallback(
+    (_field: string, _direction: 'asc' | 'desc') => {
+      logger.debug('Sort change — not yet implemented in domain layer');
+    },
+    []
+  );
 
   const handleBulkActions = useCallback(() => {
     logger.debug('Bulk actions — not yet implemented');
@@ -285,12 +301,12 @@ export const Categories: React.FC = () => {
 
   return (
     <CategoriesContainer>
-      {isUpdating && (
+      {isUpdating ? (
         <UpdateIndicator>
           <UpdateSpinner />
           Actualizando categorías...
         </UpdateIndicator>
-      )}
+      ) : null}
 
       <CategoryHeader
         title='Categorías Happy Baby Style'
@@ -303,22 +319,22 @@ export const Categories: React.FC = () => {
         onImport={handleImport}
       />
 
-      {showFilters && (
+      {showFilters ? (
         <CategoryFilters
           filters={filters}
           onFiltersChange={handleFiltersChange}
           onClearFilters={handleClearFilters}
           loading={loading}
         />
-      )}
+      ) : null}
 
-      {error && (
+      {error ? (
         <ErrorContainer>
           <ErrorTitle>Error al cargar categorías</ErrorTitle>
           <ErrorMessage>{error}</ErrorMessage>
           <button onClick={clearError}>Reintentar</button>
         </ErrorContainer>
-      )}
+      ) : null}
 
       {viewMode === 'grid' ? (
         <CategoryGrid

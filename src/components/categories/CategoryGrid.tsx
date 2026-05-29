@@ -1,10 +1,10 @@
-import React from 'react';
+import type React from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { CategoryCard } from './CategoryCard';
 import { Folder, AlertTriangle } from 'lucide-react';
 
-import { Category } from './types';
+import { type Category } from './types';
 
 interface CategoryGridProps {
   categories: Category[];

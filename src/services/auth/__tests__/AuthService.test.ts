@@ -1,8 +1,8 @@
-import { ApolloClient, InMemoryCache } from '@apollo/client';
+import { type ApolloClient, InMemoryCache } from '@apollo/client';
 import {
   AuthServiceFactory,
   GraphQLAuthService,
-  LoginCredentials,
+  type LoginCredentials,
   AuthError,
 } from '../AuthService';
 import { UserRole } from '../../../types/unified';

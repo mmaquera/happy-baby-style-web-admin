@@ -5,7 +5,7 @@
 // Interface Segregation: Specific props interface
 // Dependency Inversion: Depends on component abstraction
 
-import React from 'react';
+import type React from 'react';
 import styled from 'styled-components';
 import { X, UserPlus } from 'lucide-react';
 import { theme } from '@/styles/theme';

@@ -1,10 +1,10 @@
-import React from 'react';
+import type React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { Loader2 } from 'lucide-react';
 import { theme } from '@/styles/theme';
 import { useAuth } from '@/contexts/AuthContext';
-import { UserRole } from '@/types/unified';
+import { type UserRole } from '@/types/unified';
 
 // Types
 interface ProtectedRouteProps {

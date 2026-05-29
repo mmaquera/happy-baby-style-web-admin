@@ -16,7 +16,9 @@ export interface OrderUseCases {
 
 const OrderContext = createContext<OrderUseCases | null>(null);
 
-function buildOrderUseCases(client: ApolloClient<NormalizedCacheObject>): OrderUseCases {
+function buildOrderUseCases(
+  client: ApolloClient<NormalizedCacheObject>
+): OrderUseCases {
   const repository = new ApolloOrderRepository(client);
   return {
     list: new ListOrdersUseCase(repository),
@@ -29,7 +31,9 @@ function buildOrderUseCases(client: ApolloClient<NormalizedCacheObject>): OrderU
 export function OrderProvider({ children }: { children: ReactNode }) {
   const client = useApolloClient() as ApolloClient<NormalizedCacheObject>;
   const useCases = useMemo(() => buildOrderUseCases(client), [client]);
-  return <OrderContext.Provider value={useCases}>{children}</OrderContext.Provider>;
+  return (
+    <OrderContext.Provider value={useCases}>{children}</OrderContext.Provider>
+  );
 }
 
 export function useOrderUseCases(): OrderUseCases {

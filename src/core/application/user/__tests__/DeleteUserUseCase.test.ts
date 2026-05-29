@@ -20,7 +20,10 @@ describe('DeleteUserUseCase', () => {
 
   it('propagates repository errors', async () => {
     const { useCase, repo } = makeUseCase();
-    repo.delete.mockResolvedValueOnce({ ok: false, error: new Error('User not found') });
+    repo.delete.mockResolvedValueOnce({
+      ok: false,
+      error: new Error('User not found'),
+    });
     const result = await useCase.execute(MOCK_USER.id);
     expect(isErr(result)).toBe(true);
   });

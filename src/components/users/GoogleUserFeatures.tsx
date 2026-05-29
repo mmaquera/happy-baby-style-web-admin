@@ -1,6 +1,6 @@
-import React from 'react';
+import type React from 'react';
 import styled from 'styled-components';
-import { User, AuthProvider } from '@/types/unified';
+import { type User, AuthProvider } from '@/types/unified';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { theme } from '@/styles/theme';
@@ -301,7 +301,7 @@ export const GoogleUserFeatures: React.FC<GoogleUserFeaturesProps> = ({
             </InfoValue>
           </InfoItem>
 
-          {googleAccount.expiresAt && (
+          {googleAccount.expiresAt ? (
             <InfoItem>
               <InfoLabel>Expiración del Token</InfoLabel>
               <InfoValue>
@@ -309,7 +309,7 @@ export const GoogleUserFeatures: React.FC<GoogleUserFeaturesProps> = ({
                 {formatDate(new Date(googleAccount.expiresAt))}
               </InfoValue>
             </InfoItem>
-          )}
+          ) : null}
 
           <InfoItem>
             <InfoLabel>Tipo de Token</InfoLabel>
@@ -408,7 +408,7 @@ export const GoogleUserFeatures: React.FC<GoogleUserFeaturesProps> = ({
         </PrivacyFeatures>
 
         {/* Información de Permisos Detallada */}
-        {googleAccount.scope && (
+        {googleAccount.scope ? (
           <PrivacyFeatures>
             <PrivacyTitle>
               <Lock size={16} />
@@ -439,11 +439,11 @@ export const GoogleUserFeatures: React.FC<GoogleUserFeaturesProps> = ({
               ))}
             </div>
           </PrivacyFeatures>
-        )}
+        ) : null}
       </FeatureCard>
 
       {/* Recomendaciones de Seguridad */}
-      {googleAccount.expiresAt && isTokenExpired(googleAccount.expiresAt) && (
+      {googleAccount.expiresAt && isTokenExpired(googleAccount.expiresAt) ? (
         <FeatureCard>
           <FeatureTitle>
             <AlertTriangle size={20} color={theme.colors.warning} />
@@ -451,7 +451,7 @@ export const GoogleUserFeatures: React.FC<GoogleUserFeaturesProps> = ({
           </FeatureTitle>
           <div
             style={{
-              background: theme.colors.warning + '20',
+              background: `${theme.colors.warning}20`,
               padding: theme.spacing[3],
               borderRadius: theme.borderRadius.md,
               marginBottom: theme.spacing[3],
@@ -484,7 +484,7 @@ export const GoogleUserFeatures: React.FC<GoogleUserFeaturesProps> = ({
             </Button>
           </ActionsList>
         </FeatureCard>
-      )}
+      ) : null}
     </FeaturesContainer>
   );
 };

@@ -2,7 +2,7 @@ import {
   useUpdateCategoryMutation,
   useUploadSvgMutation,
 } from '@/generated/graphql';
-import { UpdateCategoryInput } from '@/generated/graphql';
+import { type UpdateCategoryInput } from '@/generated/graphql';
 import { toast } from 'react-hot-toast';
 import { useState, useCallback } from 'react';
 
@@ -74,7 +74,7 @@ export const useUpdateCategory = (): UseUpdateCategoryReturn => {
         // ✅ PASO 3: Ejecutar mutación de upload SVG
         const result = await uploadSvgMutation({
           variables: {
-            file: file,
+            file,
             entityType: 'category',
             entityId: categoryId,
             optimize: true, // ✅ Optimizar el SVG

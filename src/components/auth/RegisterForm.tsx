@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import styled from 'styled-components';
 import {
   Eye,
@@ -221,13 +221,13 @@ export const RegisterForm: React.FC<{ onSuccess?: () => void }> = ({
         Completa la información para crear tu cuenta de usuario
       </FormSubtitle>
 
-      {success && (
+      {success ? (
         <SuccessMessage>
           ¡Usuario registrado exitosamente! Ya puedes iniciar sesión.
         </SuccessMessage>
-      )}
+      ) : null}
 
-      {error && <ErrorMessage>{error}</ErrorMessage>}
+      {error ? <ErrorMessage>{error}</ErrorMessage> : null}
 
       <FormContainer onSubmit={onSubmit} noValidate>
         <FormGrid>

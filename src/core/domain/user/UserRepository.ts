@@ -8,7 +8,11 @@ import type {
 } from './User';
 
 export interface UserRepository {
-  findAll(filter?: UserFilter, limit?: number, offset?: number): Promise<Result<UserPage>>;
+  findAll(
+    filter?: UserFilter,
+    limit?: number,
+    offset?: number
+  ): Promise<Result<UserPage>>;
   findById(id: string): Promise<Result<User>>;
   create(input: CreateUserInput): Promise<Result<User>>;
   update(id: string, input: UpdateUserInput): Promise<Result<User>>;

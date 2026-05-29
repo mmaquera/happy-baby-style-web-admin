@@ -37,7 +37,11 @@ import {
 export class ApolloUserRepository implements UserRepository {
   constructor(private readonly client: ApolloClient<NormalizedCacheObject>) {}
 
-  async findAll(filter?: UserFilter, limit = 20, offset = 0): Promise<Result<UserPage>> {
+  async findAll(
+    filter?: UserFilter,
+    limit = 20,
+    offset = 0
+  ): Promise<Result<UserPage>> {
     try {
       const variables: GetUsersQueryVariables = {
         filter: filter
@@ -49,7 +53,10 @@ export class ApolloUserRepository implements UserRepository {
         pagination: { limit, offset },
       };
 
-      const { data } = await this.client.query<GetUsersQuery, GetUsersQueryVariables>({
+      const { data } = await this.client.query<
+        GetUsersQuery,
+        GetUsersQueryVariables
+      >({
         query: GetUsersDocument,
         variables,
         fetchPolicy: 'network-only',
@@ -72,7 +79,10 @@ export class ApolloUserRepository implements UserRepository {
 
   async findById(id: string): Promise<Result<User>> {
     try {
-      const { data } = await this.client.query<GetUserQuery, GetUserQueryVariables>({
+      const { data } = await this.client.query<
+        GetUserQuery,
+        GetUserQueryVariables
+      >({
         query: GetUserDocument,
         variables: { id },
         fetchPolicy: 'cache-first',
@@ -141,7 +151,9 @@ export class ApolloUserRepository implements UserRepository {
       });
 
       if (!data?.deleteUser?.success) {
-        return err(new Error(data?.deleteUser?.message ?? 'Error al eliminar usuario'));
+        return err(
+          new Error(data?.deleteUser?.message ?? 'Error al eliminar usuario')
+        );
       }
 
       return ok(true);

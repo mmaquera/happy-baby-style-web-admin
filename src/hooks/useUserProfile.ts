@@ -7,9 +7,9 @@ import {
   useDeleteUserAddressMutation,
   useSetDefaultAddressMutation,
   GetUserProfileDocument,
-  CreateUserAddressInput,
-  UpdateUserAddressInput,
-  UpdateUserProfileInput,
+  type CreateUserAddressInput,
+  type UpdateUserAddressInput,
+  type UpdateUserProfileInput,
 } from '../generated/graphql';
 import toast from 'react-hot-toast';
 

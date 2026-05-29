@@ -15,7 +15,10 @@ describe('UpdateCategoryUseCase', () => {
   it('actualiza categoría con datos válidos', async () => {
     const result = await useCase.execute('cat-1', { name: 'Nuevo Nombre' });
     expect(isOk(result)).toBe(true);
-    expect(repo.update).toHaveBeenCalledWith('cat-1', expect.objectContaining({ name: 'Nuevo Nombre' }));
+    expect(repo.update).toHaveBeenCalledWith(
+      'cat-1',
+      expect.objectContaining({ name: 'Nuevo Nombre' })
+    );
   });
 
   it('falla si el id está vacío', async () => {

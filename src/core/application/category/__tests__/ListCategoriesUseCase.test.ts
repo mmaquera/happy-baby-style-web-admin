@@ -25,14 +25,18 @@ describe('ListCategoriesUseCase', () => {
   });
 
   it('pasa filtro, limit y offset al repositorio', async () => {
-    repo.findAll.mockResolvedValueOnce(ok({ items: [], total: 0, hasMore: false }));
+    repo.findAll.mockResolvedValueOnce(
+      ok({ items: [], total: 0, hasMore: false })
+    );
     const filter = { search: 'ropa', isActive: true };
     await useCase.execute({ filter, limit: 10, offset: 5 });
     expect(repo.findAll).toHaveBeenCalledWith(filter, 10, 5);
   });
 
   it('devuelve lista vacía cuando no hay categorías', async () => {
-    repo.findAll.mockResolvedValueOnce(ok({ items: [], total: 0, hasMore: false }));
+    repo.findAll.mockResolvedValueOnce(
+      ok({ items: [], total: 0, hasMore: false })
+    );
     const result = await useCase.execute();
     expect(isOk(result)).toBe(true);
     if (isOk(result)) expect(result.value.items).toHaveLength(0);

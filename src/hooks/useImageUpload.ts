@@ -124,7 +124,8 @@ export const useImageUpload = (): UseImageUploadReturn => {
           );
         }
       } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : 'Error desconocido en el upload';
+        const errorMessage =
+          err instanceof Error ? err.message : 'Error desconocido en el upload';
         setError(errorMessage);
         return {
           success: false,

@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
@@ -252,10 +252,10 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
           </HeaderContent>
         </HeaderLeft>
 
-        {showActions && (
+        {showActions ? (
           <HeaderActions>
             {/* View Mode Toggle - Consolidated */}
-            {onViewModeChange && (
+            {onViewModeChange ? (
               <ViewToggleContainer>
                 <ViewToggleButton
                   isActive={viewMode === 'list'}
@@ -274,10 +274,10 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
                   Grid
                 </ViewToggleButton>
               </ViewToggleContainer>
-            )}
+            ) : null}
 
             {/* Primary Actions */}
-            {onImport && (
+            {onImport ? (
               <Button
                 variant='ghost'
                 size='medium'
@@ -287,9 +287,9 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
                 <Upload size={16} />
                 Importar
               </Button>
-            )}
+            ) : null}
 
-            {onExport && (
+            {onExport ? (
               <Button
                 variant='ghost'
                 size='medium'
@@ -299,9 +299,9 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
                 <Download size={16} />
                 Exportar
               </Button>
-            )}
+            ) : null}
 
-            {onBulkActions && (
+            {onBulkActions ? (
               <Button
                 variant='secondary'
                 size='medium'
@@ -311,9 +311,9 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
                 <Settings size={16} />
                 Acciones Masivas
               </Button>
-            )}
+            ) : null}
 
-            {onAddProduct && (
+            {onAddProduct ? (
               <Button
                 variant='primary'
                 size='medium'
@@ -323,13 +323,13 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
                 <Plus size={16} />
                 Nuevo Producto
               </Button>
-            )}
+            ) : null}
           </HeaderActions>
-        )}
+        ) : null}
       </MainHeader>
 
       {/* Statistics - Clean and Informative */}
-      {hasStats && (
+      {hasStats ? (
         <StatsGrid>
           {stats.totalProducts !== undefined && (
             <StatCard>
@@ -375,7 +375,7 @@ export const ProductHeader: React.FC<ProductHeaderProps> = ({
             </StatCard>
           )}
         </StatsGrid>
-      )}
+      ) : null}
     </HeaderContainer>
   );
 };

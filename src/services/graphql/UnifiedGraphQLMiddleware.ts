@@ -4,7 +4,7 @@
 
 import {
   ApolloClient,
-  ApolloLink,
+  type ApolloLink,
   InMemoryCache,
   type NormalizedCacheObject,
   type TypePolicies,
@@ -14,10 +14,11 @@ import { createUploadLink } from 'apollo-upload-client';
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { RetryLink } from '@apollo/client/link/retry';
+import { LocalTokenStorage } from '../auth/UnifiedAuthService';
 import {
-  LocalTokenStorage,
-} from '../auth/UnifiedAuthService';
-import { GraphQLMiddlewareConfig, ITokenStorage } from '../../types/auth';
+  type GraphQLMiddlewareConfig,
+  type ITokenStorage,
+} from '../../types/auth';
 import { logger } from '../../utils/logger';
 
 export class UnifiedGraphQLMiddleware {
@@ -71,55 +72,59 @@ export class UnifiedGraphQLMiddleware {
 
   // Create error link that handles authentication errors - Following SOLID principles
   private createErrorLink(): ApolloLink {
-    return onError(({ graphQLErrors, networkError, operation, forward: _forward }) => {
-      // Handle GraphQL errors following development standards
-      if (graphQLErrors) {
-        graphQLErrors.forEach(({ message, extensions, locations, path }) => {
-          // Enhanced logging for debugging
-          logger.error('GraphQL Error:', {
-            message,
-            code: extensions?.['code'],
-            locations,
-            path,
+    return onError(
+      ({ graphQLErrors, networkError, operation, forward: _forward }) => {
+        // Handle GraphQL errors following development standards
+        if (graphQLErrors) {
+          graphQLErrors.forEach(({ message, extensions, locations, path }) => {
+            // Enhanced logging for debugging
+            logger.error('GraphQL Error:', {
+              message,
+              code: extensions?.['code'],
+              locations,
+              path,
+              operation: operation.operationName,
+            });
+
+            // Handle authentication errors specifically
+            if (extensions?.['code'] === 'UNAUTHENTICATED') {
+              logger.warn('Authentication error detected:', message);
+              // Don't clear tokens immediately - let the auth context handle it
+              return;
+            }
+
+            // Handle authorization errors
+            if (extensions?.['code'] === 'FORBIDDEN') {
+              logger.warn('Authorization error detected:', message);
+              return;
+            }
+
+            // Handle validation errors
+            if (extensions?.['code'] === 'VALIDATION_ERROR') {
+              logger.warn('Validation error detected:', message);
+              return;
+            }
+          });
+        }
+
+        // Handle network errors following development standards
+        if (networkError) {
+          logger.error('Network Error:', {
+            message: networkError.message,
+            statusCode:
+              'statusCode' in networkError
+                ? networkError.statusCode
+                : undefined,
             operation: operation.operationName,
           });
 
-          // Handle authentication errors specifically
-          if (extensions?.['code'] === 'UNAUTHENTICATED') {
-            logger.warn('Authentication error detected:', message);
-            // Don't clear tokens immediately - let the auth context handle it
-            return;
+          // Don't clear tokens for network errors
+          if ('statusCode' in networkError && networkError.statusCode === 401) {
+            logger.warn('Unauthorized network error - may need token refresh');
           }
-
-          // Handle authorization errors
-          if (extensions?.['code'] === 'FORBIDDEN') {
-            logger.warn('Authorization error detected:', message);
-            return;
-          }
-
-          // Handle validation errors
-          if (extensions?.['code'] === 'VALIDATION_ERROR') {
-            logger.warn('Validation error detected:', message);
-            return;
-          }
-        });
-      }
-
-      // Handle network errors following development standards
-      if (networkError) {
-        logger.error('Network Error:', {
-          message: networkError.message,
-          statusCode:
-            'statusCode' in networkError ? networkError.statusCode : undefined,
-          operation: operation.operationName,
-        });
-
-        // Don't clear tokens for network errors
-        if ('statusCode' in networkError && networkError.statusCode === 401) {
-          logger.warn('Unauthorized network error - may need token refresh');
         }
       }
-    });
+    );
   }
 
   // Create upload link using apollo-upload-client (configuración estándar)
@@ -188,7 +193,8 @@ export class UnifiedGraphQLMiddleware {
           // Don't retry on authentication errors
           if (
             error?.graphQLErrors?.some(
-              (err: { extensions?: { code?: string } }) => err.extensions?.['code'] === 'UNAUTHENTICATED'
+              (err: { extensions?: { code?: string } }) =>
+                err.extensions?.['code'] === 'UNAUTHENTICATED'
             )
           ) {
             return false;

@@ -5,7 +5,8 @@
 // Interface Segregation: Specific props interface
 // Dependency Inversion: Depends on hook abstraction
 
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Eye, EyeOff, Lock, Mail, AlertCircle, RefreshCw } from 'lucide-react';
 import { theme } from '@/styles/theme';
@@ -209,7 +210,7 @@ export const LoginForm: React.FC = () => {
         </ForgotPasswordLink>
 
         {/* ✅ Banner de error mejorado siguiendo estándares */}
-        {error && (
+        {error ? (
           <EnhancedErrorMessage role='alert' aria-live='polite'>
             <ErrorIcon>
               <AlertCircle size={20} />
@@ -237,7 +238,7 @@ export const LoginForm: React.FC = () => {
               </Button>
             </ErrorActions>
           </EnhancedErrorMessage>
-        )}
+        ) : null}
 
         {/* ✅ Botón con estados mejorados siguiendo estándares */}
         <Button

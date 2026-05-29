@@ -71,9 +71,7 @@ export const useCategoryActions = () => {
           toast.error(result.error.message ?? 'Error al actualizar categoría');
           return false;
         }
-        setCategories(prev =>
-          prev.map(c => (c.id === id ? result.value : c))
-        );
+        setCategories(prev => prev.map(c => (c.id === id ? result.value : c)));
         toast.success('Categoría actualizada exitosamente');
         return true;
       } finally {

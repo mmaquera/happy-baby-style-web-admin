@@ -14,8 +14,8 @@ import { onError } from '@apollo/client/link/error';
 import { RetryLink } from '@apollo/client/link/retry';
 import {
   AuthServiceFactory,
-  GraphQLAuthService,
-  IAuthToken,
+  type GraphQLAuthService,
+  type IAuthToken,
 } from '../auth/AuthService';
 import { logger } from '@/utils/logger';
 
@@ -136,12 +136,16 @@ export class AuthMiddleware {
   }
 
   // Create the complete Apollo Client with auth middleware
-  static createClient(config: AuthMiddlewareConfig): ApolloClient<NormalizedCacheObject> {
+  static createClient(
+    config: AuthMiddlewareConfig
+  ): ApolloClient<NormalizedCacheObject> {
     const httpLink = createHttpLink({
       uri: config.uri,
     });
 
-    const authMiddleware = new AuthMiddleware({} as ApolloClient<NormalizedCacheObject>);
+    const authMiddleware = new AuthMiddleware(
+      {} as ApolloClient<NormalizedCacheObject>
+    );
 
     const authLink = authMiddleware.createAuthLink();
     const errorLink = authMiddleware.createErrorLink();

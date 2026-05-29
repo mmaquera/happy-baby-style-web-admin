@@ -26,7 +26,10 @@ describe('GetUserUseCase', () => {
 
   it('propagates repository errors', async () => {
     const { useCase, repo } = makeUseCase();
-    repo.findById.mockResolvedValueOnce({ ok: false, error: new Error('Not found') });
+    repo.findById.mockResolvedValueOnce({
+      ok: false,
+      error: new Error('Not found'),
+    });
     const result = await useCase.execute('user-1');
     expect(isErr(result)).toBe(true);
   });

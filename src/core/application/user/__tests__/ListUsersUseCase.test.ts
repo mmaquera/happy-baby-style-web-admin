@@ -34,7 +34,10 @@ describe('ListUsersUseCase', () => {
 
   it('propagates repository errors', async () => {
     const { useCase, repo } = makeUseCase();
-    repo.findAll.mockResolvedValueOnce({ ok: false, error: new Error('DB error') });
+    repo.findAll.mockResolvedValueOnce({
+      ok: false,
+      error: new Error('DB error'),
+    });
     const result = await useCase.execute();
     expect(isErr(result)).toBe(true);
   });

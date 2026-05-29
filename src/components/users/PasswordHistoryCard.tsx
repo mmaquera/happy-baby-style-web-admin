@@ -1,7 +1,7 @@
-import React from 'react';
+import type React from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
-import { PasswordAction } from '@/hooks/usePasswordHistory';
+import { type PasswordAction } from '@/hooks/usePasswordHistory';
 import {
   Key,
   RefreshCw,
@@ -213,7 +213,9 @@ export const PasswordHistoryCard: React.FC<PasswordHistoryCardProps> = ({
                 <ActionMeta>
                   <Clock size={12} />
                   {formatTimestamp(action.timestamp)}
-                  {action.adminUser && <>• Administrador: {action.adminUser}</>}
+                  {action.adminUser ? (
+                    <>• Administrador: {action.adminUser}</>
+                  ) : null}
                 </ActionMeta>
               </ActionContent>
 

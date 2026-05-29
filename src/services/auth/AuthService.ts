@@ -3,14 +3,14 @@
 // Open/Closed: Extensible for new auth providers
 // Dependency Inversion: Depends on abstractions
 
-import { ApolloClient, type NormalizedCacheObject } from '@apollo/client';
+import { type ApolloClient, type NormalizedCacheObject } from '@apollo/client';
 import {
   LoginUserDocument,
   RefreshTokenDocument,
   LogoutUserDocument,
   GetCurrentUserDocument,
 } from '@/generated/graphql';
-import { UserRole } from '../../types/unified';
+import { type UserRole } from '../../types/unified';
 import { logger } from '@/utils/logger';
 
 // Interfaces following Interface Segregation Principle
@@ -68,13 +68,19 @@ export abstract class BaseAuthService {
     user?: unknown;
   }): Promise<IAuthResponse> {
     if (!response.success) {
-      throw new Error(typeof response.message === 'string' ? response.message : 'Authentication failed');
+      throw new Error(
+        typeof response.message === 'string'
+          ? response.message
+          : 'Authentication failed'
+      );
     }
 
     const rawExpiresAt = response.expiresAt;
     const tokens: IAuthToken = {
       accessToken: String(response.accessToken ?? response.token ?? ''),
-      ...(typeof response.refreshToken === 'string' ? { refreshToken: response.refreshToken } : {}),
+      ...(typeof response.refreshToken === 'string'
+        ? { refreshToken: response.refreshToken }
+        : {}),
       expiresAt: rawExpiresAt
         ? new Date(rawExpiresAt as string | number)
         : new Date(Date.now() + 3600000),
@@ -87,7 +93,10 @@ export abstract class BaseAuthService {
       success: true,
       user: response.user as IAuthUser,
       tokens,
-      message: typeof response.message === 'string' ? response.message : 'Authentication successful',
+      message:
+        typeof response.message === 'string'
+          ? response.message
+          : 'Authentication successful',
     };
   }
 
@@ -164,13 +173,26 @@ export class GraphQLAuthService extends BaseAuthService {
     } catch (error: unknown) {
       // Continue with logout even if server call fails
       logger.warn('Logout server call failed:', error);
-      const gqlError = error as { graphQLErrors?: { extensions?: { code?: string } }[]; networkError?: unknown };
-      if (gqlError.graphQLErrors?.some(e => e.extensions?.code === 'UNAUTHENTICATED')) {
+      const gqlError = error as {
+        graphQLErrors?: { extensions?: { code?: string } }[];
+        networkError?: unknown;
+      };
+      if (
+        gqlError.graphQLErrors?.some(
+          e => e.extensions?.code === 'UNAUTHENTICATED'
+        )
+      ) {
         throw new AuthError('UNAUTHENTICATED', 'Usuario no autenticado');
       } else if (gqlError.networkError) {
-        throw new AuthError('NETWORK_ERROR', 'Error de conexión al cerrar sesión');
+        throw new AuthError(
+          'NETWORK_ERROR',
+          'Error de conexión al cerrar sesión'
+        );
       } else {
-        throw new AuthError('LOGOUT_FAILED', 'Error al cerrar sesión en el servidor');
+        throw new AuthError(
+          'LOGOUT_FAILED',
+          'Error al cerrar sesión en el servidor'
+        );
       }
     } finally {
       await this.clearTokens();
@@ -197,7 +219,8 @@ export class GraphQLAuthService extends BaseAuthService {
       await this.storeTokens(tokens);
       return tokens;
     } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : 'Token refresh failed';
+      const msg =
+        error instanceof Error ? error.message : 'Token refresh failed';
       throw new AuthError('REFRESH_FAILED', msg);
     }
   }

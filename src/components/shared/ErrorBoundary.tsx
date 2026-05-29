@@ -54,7 +54,7 @@ export class ErrorBoundary extends Component<Props, State> {
           >
             Reintentar
           </button>
-          {import.meta.env.DEV && this.state.error && (
+          {import.meta.env.DEV && this.state.error ? (
             <pre
               style={{
                 marginTop: '1rem',
@@ -72,7 +72,7 @@ export class ErrorBoundary extends Component<Props, State> {
               {'\n'}
               {this.state.error.stack}
             </pre>
-          )}
+          ) : null}
         </div>
       );
     }

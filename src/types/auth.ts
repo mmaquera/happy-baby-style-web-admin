@@ -1,7 +1,7 @@
 // Unified Authentication Types - Following Clean Architecture
 // Single source of truth for all authentication-related types
 
-import { UserRole } from './unified';
+import { type UserRole } from './unified';
 
 // Core authentication interfaces
 export interface IAuthToken {

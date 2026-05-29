@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import {
   useProducts,
   useCreateProduct,
@@ -6,8 +7,8 @@ import {
   useProductSearch,
 } from '../hooks/useProductsGraphQL';
 import {
-  CreateProductInput,
-  ProductFilterInput,
+  type CreateProductInput,
+  type ProductFilterInput,
 } from '../generated/graphql';
 import { theme } from '@/styles/theme';
 import { logger } from '@/utils/logger';
@@ -68,7 +69,7 @@ const ProductsGraphQL: React.FC = () => {
   if (loading) {
     return (
       <div className='flex items-center justify-center p-8'>
-        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600'></div>
+        <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600' />
         <span className='ml-2'>Cargando productos...</span>
       </div>
     );
@@ -106,11 +107,11 @@ const ProductsGraphQL: React.FC = () => {
           onChange={e => search(e.target.value)}
           className='w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
         />
-        {searchResults && (
+        {searchResults ? (
           <div className='mt-2 text-sm text-gray-600'>
             Se encontraron {searchResults.length} productos
           </div>
-        )}
+        ) : null}
       </div>
 
       {/* Filters */}
@@ -174,7 +175,7 @@ const ProductsGraphQL: React.FC = () => {
                   >
                     S/ {product.currentPrice}
                   </span>
-                  {product.hasDiscount && (
+                  {product.hasDiscount ? (
                     <span
                       style={{
                         textDecoration: 'line-through',
@@ -184,7 +185,7 @@ const ProductsGraphQL: React.FC = () => {
                     >
                       S/ {product.price}
                     </span>
-                  )}
+                  ) : null}
                 </div>
               </div>
 
@@ -208,7 +209,7 @@ const ProductsGraphQL: React.FC = () => {
             </div>
 
             {/* Tags */}
-            {product.tags && product.tags.length > 0 && (
+            {product.tags && product.tags.length > 0 ? (
               <div className='mt-4'>
                 <div className='flex flex-wrap gap-1'>
                   {product.tags.map((tag: string, index: number) => (
@@ -221,21 +222,21 @@ const ProductsGraphQL: React.FC = () => {
                   ))}
                 </div>
               </div>
-            )}
+            ) : null}
 
             {/* Category */}
-            {product.category && (
+            {product.category ? (
               <div className='mt-4 text-sm text-gray-500'>
                 Categoría:{' '}
                 <span className='font-medium'>{product.category.name}</span>
               </div>
-            )}
+            ) : null}
           </div>
         ))}
       </div>
 
       {/* Load More */}
-      {hasMore && (
+      {hasMore ? (
         <div className='mt-8 text-center'>
           <button
             onClick={loadMore}
@@ -244,7 +245,7 @@ const ProductsGraphQL: React.FC = () => {
             Cargar más productos
           </button>
         </div>
-      )}
+      ) : null}
 
       {/* Empty State */}
       {products.length === 0 && !loading && (

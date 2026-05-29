@@ -1,10 +1,10 @@
-import React from 'react';
+import type React from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Card } from '@/components/ui/Card';
 import { Folder, Edit, Trash2, Eye, CheckCircle, XCircle } from 'lucide-react';
 
-import { Category } from './types';
+import { type Category } from './types';
 
 interface CategoryCardProps {
   category: Category;
@@ -142,9 +142,9 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
       <CategoryContent>
         <CategoryName>{category.name}</CategoryName>
 
-        {category.description && (
+        {category.description ? (
           <CategoryDescription>{category.description}</CategoryDescription>
-        )}
+        ) : null}
 
         <CategoryMeta>
           <CategorySlug>{category.slug}</CategorySlug>

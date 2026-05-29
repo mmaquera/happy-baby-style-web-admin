@@ -44,7 +44,10 @@ describe('CancelOrderUseCase', () => {
 
   it('propagates repository errors', async () => {
     const { useCase, repo } = makeUseCase();
-    repo.cancel.mockResolvedValueOnce({ ok: false, error: new Error('Order already cancelled') });
+    repo.cancel.mockResolvedValueOnce({
+      ok: false,
+      error: new Error('Order already cancelled'),
+    });
 
     const result = await useCase.execute(MOCK_ORDER.id);
 

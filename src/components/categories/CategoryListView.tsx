@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
@@ -16,7 +16,7 @@ import {
   Settings,
 } from 'lucide-react';
 
-import { Category } from './types';
+import { type Category } from './types';
 
 interface CategoryListViewProps {
   categories: Category[];
@@ -400,11 +400,11 @@ export const CategoryListView: React.FC<CategoryListViewProps> = ({
 
             <CategoryInfo>
               <CategoryName>{category.name}</CategoryName>
-              {category.description && (
+              {category.description ? (
                 <CategoryDescription>
                   {category.description}
                 </CategoryDescription>
-              )}
+              ) : null}
             </CategoryInfo>
 
             <CategorySlug>{category.slug}</CategorySlug>

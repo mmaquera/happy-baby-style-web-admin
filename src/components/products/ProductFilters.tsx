@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Card } from '@/components/ui/Card';
@@ -240,12 +240,12 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
           <Filter size={16} />
           Filtros de Productos
         </FiltersTitle>
-        {hasActiveFilters && (
+        {hasActiveFilters ? (
           <ClearButton variant='ghost' size='small' onClick={onClearFilters}>
             <X size={14} />
             Limpiar Filtros
           </ClearButton>
-        )}
+        ) : null}
       </FiltersHeader>
 
       <FiltersGrid>
@@ -353,7 +353,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
         </FilterGroup>
       )}
 
-      {hasActiveFilters && (
+      {hasActiveFilters ? (
         <ActiveFiltersContainer>
           <span
             style={{
@@ -364,7 +364,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
             Filtros activos:
           </span>
 
-          {filters.search && (
+          {filters.search ? (
             <ActiveFilterTag>
               Búsqueda: "{filters.search}"
               <RemoveFilterButton
@@ -373,9 +373,9 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                 <X size={12} />
               </RemoveFilterButton>
             </ActiveFilterTag>
-          )}
+          ) : null}
 
-          {filters.categoryId && (
+          {filters.categoryId ? (
             <ActiveFilterTag>
               Categoría:{' '}
               {categories.find(c => c.id === filters.categoryId)?.name}
@@ -385,9 +385,9 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                 <X size={12} />
               </RemoveFilterButton>
             </ActiveFilterTag>
-          )}
+          ) : null}
 
-          {filters.minPrice && (
+          {filters.minPrice ? (
             <ActiveFilterTag>
               Precio mínimo: S/ {filters.minPrice}
               <RemoveFilterButton
@@ -396,9 +396,9 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                 <X size={12} />
               </RemoveFilterButton>
             </ActiveFilterTag>
-          )}
+          ) : null}
 
-          {filters.maxPrice && (
+          {filters.maxPrice ? (
             <ActiveFilterTag>
               Precio máximo: S/ {filters.maxPrice}
               <RemoveFilterButton
@@ -407,7 +407,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
                 <X size={12} />
               </RemoveFilterButton>
             </ActiveFilterTag>
-          )}
+          ) : null}
 
           {filters.tags?.map(tag => (
             <ActiveFilterTag key={tag}>
@@ -418,7 +418,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
             </ActiveFilterTag>
           ))}
         </ActiveFiltersContainer>
-      )}
+      ) : null}
     </FiltersContainer>
   );
 };

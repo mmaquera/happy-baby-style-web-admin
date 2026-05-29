@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import type * as Apollo from '@apollo/client';
 import * as ApolloReactHooks from '@apollo/client';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
@@ -3741,7 +3741,7 @@ export type GetCurrentUserLazyQueryHookResult = ReturnType<typeof useGetCurrentU
 export type GetCurrentUserSuspenseQueryHookResult = ReturnType<typeof useGetCurrentUserSuspenseQuery>;
 export type GetCurrentUserQueryResult = Apollo.QueryResult<GetCurrentUserQuery, GetCurrentUserQueryVariables>;
 export function refetchGetCurrentUserQuery(variables?: GetCurrentUserQueryVariables) {
-      return { query: GetCurrentUserDocument, variables: variables }
+      return { query: GetCurrentUserDocument, variables }
     }
 export const GetCategoriesDocument = gql`
     query GetCategories($filters: CategoryFilterInput, $pagination: PaginationInput) {
@@ -3824,7 +3824,7 @@ export type GetCategoriesLazyQueryHookResult = ReturnType<typeof useGetCategorie
 export type GetCategoriesSuspenseQueryHookResult = ReturnType<typeof useGetCategoriesSuspenseQuery>;
 export type GetCategoriesQueryResult = Apollo.QueryResult<GetCategoriesQuery, GetCategoriesQueryVariables>;
 export function refetchGetCategoriesQuery(variables?: GetCategoriesQueryVariables) {
-      return { query: GetCategoriesDocument, variables: variables }
+      return { query: GetCategoriesDocument, variables }
     }
 export const GetCategoryDocument = gql`
     query GetCategory($id: ID!) {
@@ -3912,7 +3912,7 @@ export type GetCategoryLazyQueryHookResult = ReturnType<typeof useGetCategoryLaz
 export type GetCategorySuspenseQueryHookResult = ReturnType<typeof useGetCategorySuspenseQuery>;
 export type GetCategoryQueryResult = Apollo.QueryResult<GetCategoryQuery, GetCategoryQueryVariables>;
 export function refetchGetCategoryQuery(variables: GetCategoryQueryVariables) {
-      return { query: GetCategoryDocument, variables: variables }
+      return { query: GetCategoryDocument, variables }
     }
 export const GetCategoryBySlugDocument = gql`
     query GetCategoryBySlug($slug: String!) {
@@ -4000,7 +4000,7 @@ export type GetCategoryBySlugLazyQueryHookResult = ReturnType<typeof useGetCateg
 export type GetCategoryBySlugSuspenseQueryHookResult = ReturnType<typeof useGetCategoryBySlugSuspenseQuery>;
 export type GetCategoryBySlugQueryResult = Apollo.QueryResult<GetCategoryBySlugQuery, GetCategoryBySlugQueryVariables>;
 export function refetchGetCategoryBySlugQuery(variables: GetCategoryBySlugQueryVariables) {
-      return { query: GetCategoryBySlugDocument, variables: variables }
+      return { query: GetCategoryBySlugDocument, variables }
     }
 export const CreateCategoryDocument = gql`
     mutation CreateCategory($input: CreateCategoryInput!) {
@@ -4257,7 +4257,7 @@ export type GetOrdersLazyQueryHookResult = ReturnType<typeof useGetOrdersLazyQue
 export type GetOrdersSuspenseQueryHookResult = ReturnType<typeof useGetOrdersSuspenseQuery>;
 export type GetOrdersQueryResult = Apollo.QueryResult<GetOrdersQuery, GetOrdersQueryVariables>;
 export function refetchGetOrdersQuery(variables?: GetOrdersQueryVariables) {
-      return { query: GetOrdersDocument, variables: variables }
+      return { query: GetOrdersDocument, variables }
     }
 export const GetOrderDocument = gql`
     query GetOrder($id: ID!) {
@@ -4350,7 +4350,7 @@ export type GetOrderLazyQueryHookResult = ReturnType<typeof useGetOrderLazyQuery
 export type GetOrderSuspenseQueryHookResult = ReturnType<typeof useGetOrderSuspenseQuery>;
 export type GetOrderQueryResult = Apollo.QueryResult<GetOrderQuery, GetOrderQueryVariables>;
 export function refetchGetOrderQuery(variables: GetOrderQueryVariables) {
-      return { query: GetOrderDocument, variables: variables }
+      return { query: GetOrderDocument, variables }
     }
 export const GetOrderByNumberDocument = gql`
     query GetOrderByNumber($orderNumber: String!) {
@@ -4443,7 +4443,7 @@ export type GetOrderByNumberLazyQueryHookResult = ReturnType<typeof useGetOrderB
 export type GetOrderByNumberSuspenseQueryHookResult = ReturnType<typeof useGetOrderByNumberSuspenseQuery>;
 export type GetOrderByNumberQueryResult = Apollo.QueryResult<GetOrderByNumberQuery, GetOrderByNumberQueryVariables>;
 export function refetchGetOrderByNumberQuery(variables: GetOrderByNumberQueryVariables) {
-      return { query: GetOrderByNumberDocument, variables: variables }
+      return { query: GetOrderByNumberDocument, variables }
     }
 export const GetOrderItemsDocument = gql`
     query GetOrderItems($orderId: ID!) {
@@ -4507,7 +4507,7 @@ export type GetOrderItemsLazyQueryHookResult = ReturnType<typeof useGetOrderItem
 export type GetOrderItemsSuspenseQueryHookResult = ReturnType<typeof useGetOrderItemsSuspenseQuery>;
 export type GetOrderItemsQueryResult = Apollo.QueryResult<GetOrderItemsQuery, GetOrderItemsQueryVariables>;
 export function refetchGetOrderItemsQuery(variables: GetOrderItemsQueryVariables) {
-      return { query: GetOrderItemsDocument, variables: variables }
+      return { query: GetOrderItemsDocument, variables }
     }
 export const GetOrderStatsDocument = gql`
     query GetOrderStats {
@@ -4571,7 +4571,7 @@ export type GetOrderStatsLazyQueryHookResult = ReturnType<typeof useGetOrderStat
 export type GetOrderStatsSuspenseQueryHookResult = ReturnType<typeof useGetOrderStatsSuspenseQuery>;
 export type GetOrderStatsQueryResult = Apollo.QueryResult<GetOrderStatsQuery, GetOrderStatsQueryVariables>;
 export function refetchGetOrderStatsQuery(variables?: GetOrderStatsQueryVariables) {
-      return { query: GetOrderStatsDocument, variables: variables }
+      return { query: GetOrderStatsDocument, variables }
     }
 export const CreateOrderDocument = gql`
     mutation CreateOrder($input: CreateOrderInput!) {
@@ -5158,7 +5158,7 @@ export type GetProductsLazyQueryHookResult = ReturnType<typeof useGetProductsLaz
 export type GetProductsSuspenseQueryHookResult = ReturnType<typeof useGetProductsSuspenseQuery>;
 export type GetProductsQueryResult = Apollo.QueryResult<GetProductsQuery, GetProductsQueryVariables>;
 export function refetchGetProductsQuery(variables?: GetProductsQueryVariables) {
-      return { query: GetProductsDocument, variables: variables }
+      return { query: GetProductsDocument, variables }
     }
 export const GetProductDocument = gql`
     query GetProduct($id: ID!) {
@@ -5255,7 +5255,7 @@ export type GetProductLazyQueryHookResult = ReturnType<typeof useGetProductLazyQ
 export type GetProductSuspenseQueryHookResult = ReturnType<typeof useGetProductSuspenseQuery>;
 export type GetProductQueryResult = Apollo.QueryResult<GetProductQuery, GetProductQueryVariables>;
 export function refetchGetProductQuery(variables: GetProductQueryVariables) {
-      return { query: GetProductDocument, variables: variables }
+      return { query: GetProductDocument, variables }
     }
 export const GetProductBySkuDocument = gql`
     query GetProductBySku($sku: String!) {
@@ -5340,7 +5340,7 @@ export type GetProductBySkuLazyQueryHookResult = ReturnType<typeof useGetProduct
 export type GetProductBySkuSuspenseQueryHookResult = ReturnType<typeof useGetProductBySkuSuspenseQuery>;
 export type GetProductBySkuQueryResult = Apollo.QueryResult<GetProductBySkuQuery, GetProductBySkuQueryVariables>;
 export function refetchGetProductBySkuQuery(variables: GetProductBySkuQueryVariables) {
-      return { query: GetProductBySkuDocument, variables: variables }
+      return { query: GetProductBySkuDocument, variables }
     }
 export const SearchProductsDocument = gql`
     query SearchProducts($query: String!, $filter: ProductFilterInput, $pagination: PaginationInput) {
@@ -5417,7 +5417,7 @@ export type SearchProductsLazyQueryHookResult = ReturnType<typeof useSearchProdu
 export type SearchProductsSuspenseQueryHookResult = ReturnType<typeof useSearchProductsSuspenseQuery>;
 export type SearchProductsQueryResult = Apollo.QueryResult<SearchProductsQuery, SearchProductsQueryVariables>;
 export function refetchSearchProductsQuery(variables: SearchProductsQueryVariables) {
-      return { query: SearchProductsDocument, variables: variables }
+      return { query: SearchProductsDocument, variables }
     }
 export const CreateProductDocument = gql`
     mutation CreateProduct($input: CreateProductInput!) {
@@ -5967,7 +5967,7 @@ export type GetUsersLazyQueryHookResult = ReturnType<typeof useGetUsersLazyQuery
 export type GetUsersSuspenseQueryHookResult = ReturnType<typeof useGetUsersSuspenseQuery>;
 export type GetUsersQueryResult = Apollo.QueryResult<GetUsersQuery, GetUsersQueryVariables>;
 export function refetchGetUsersQuery(variables?: GetUsersQueryVariables) {
-      return { query: GetUsersDocument, variables: variables }
+      return { query: GetUsersDocument, variables }
     }
 export const GetUserDocument = gql`
     query GetUser($id: ID!) {
@@ -6079,7 +6079,7 @@ export type GetUserLazyQueryHookResult = ReturnType<typeof useGetUserLazyQuery>;
 export type GetUserSuspenseQueryHookResult = ReturnType<typeof useGetUserSuspenseQuery>;
 export type GetUserQueryResult = Apollo.QueryResult<GetUserQuery, GetUserQueryVariables>;
 export function refetchGetUserQuery(variables: GetUserQueryVariables) {
-      return { query: GetUserDocument, variables: variables }
+      return { query: GetUserDocument, variables }
     }
 export const GetUserProfileDocument = gql`
     query GetUserProfile($userId: ID!) {
@@ -6164,7 +6164,7 @@ export type GetUserProfileLazyQueryHookResult = ReturnType<typeof useGetUserProf
 export type GetUserProfileSuspenseQueryHookResult = ReturnType<typeof useGetUserProfileSuspenseQuery>;
 export type GetUserProfileQueryResult = Apollo.QueryResult<GetUserProfileQuery, GetUserProfileQueryVariables>;
 export function refetchGetUserProfileQuery(variables: GetUserProfileQueryVariables) {
-      return { query: GetUserProfileDocument, variables: variables }
+      return { query: GetUserProfileDocument, variables }
     }
 export const GetUserStatsDocument = gql`
     query GetUserStats {
@@ -6224,7 +6224,7 @@ export type GetUserStatsLazyQueryHookResult = ReturnType<typeof useGetUserStatsL
 export type GetUserStatsSuspenseQueryHookResult = ReturnType<typeof useGetUserStatsSuspenseQuery>;
 export type GetUserStatsQueryResult = Apollo.QueryResult<GetUserStatsQuery, GetUserStatsQueryVariables>;
 export function refetchGetUserStatsQuery(variables?: GetUserStatsQueryVariables) {
-      return { query: GetUserStatsDocument, variables: variables }
+      return { query: GetUserStatsDocument, variables }
     }
 export const GetUsersWithRecentActivityDocument = gql`
     query GetUsersWithRecentActivity($limit: Int = 10) {
@@ -6310,7 +6310,7 @@ export type GetUsersWithRecentActivityLazyQueryHookResult = ReturnType<typeof us
 export type GetUsersWithRecentActivitySuspenseQueryHookResult = ReturnType<typeof useGetUsersWithRecentActivitySuspenseQuery>;
 export type GetUsersWithRecentActivityQueryResult = Apollo.QueryResult<GetUsersWithRecentActivityQuery, GetUsersWithRecentActivityQueryVariables>;
 export function refetchGetUsersWithRecentActivityQuery(variables?: GetUsersWithRecentActivityQueryVariables) {
-      return { query: GetUsersWithRecentActivityDocument, variables: variables }
+      return { query: GetUsersWithRecentActivityDocument, variables }
     }
 export const GetActiveSessionsCountDocument = gql`
     query GetActiveSessionsCount {
@@ -6383,7 +6383,7 @@ export type GetActiveSessionsCountLazyQueryHookResult = ReturnType<typeof useGet
 export type GetActiveSessionsCountSuspenseQueryHookResult = ReturnType<typeof useGetActiveSessionsCountSuspenseQuery>;
 export type GetActiveSessionsCountQueryResult = Apollo.QueryResult<GetActiveSessionsCountQuery, GetActiveSessionsCountQueryVariables>;
 export function refetchGetActiveSessionsCountQuery(variables?: GetActiveSessionsCountQueryVariables) {
-      return { query: GetActiveSessionsCountDocument, variables: variables }
+      return { query: GetActiveSessionsCountDocument, variables }
     }
 export const GetUserAddressesDocument = gql`
     query GetUserAddresses($userId: ID!) {
@@ -6459,7 +6459,7 @@ export type GetUserAddressesLazyQueryHookResult = ReturnType<typeof useGetUserAd
 export type GetUserAddressesSuspenseQueryHookResult = ReturnType<typeof useGetUserAddressesSuspenseQuery>;
 export type GetUserAddressesQueryResult = Apollo.QueryResult<GetUserAddressesQuery, GetUserAddressesQueryVariables>;
 export function refetchGetUserAddressesQuery(variables: GetUserAddressesQueryVariables) {
-      return { query: GetUserAddressesDocument, variables: variables }
+      return { query: GetUserAddressesDocument, variables }
     }
 export const GetUserAddressDocument = gql`
     query GetUserAddress($id: ID!) {
@@ -6541,7 +6541,7 @@ export type GetUserAddressLazyQueryHookResult = ReturnType<typeof useGetUserAddr
 export type GetUserAddressSuspenseQueryHookResult = ReturnType<typeof useGetUserAddressSuspenseQuery>;
 export type GetUserAddressQueryResult = Apollo.QueryResult<GetUserAddressQuery, GetUserAddressQueryVariables>;
 export function refetchGetUserAddressQuery(variables: GetUserAddressQueryVariables) {
-      return { query: GetUserAddressDocument, variables: variables }
+      return { query: GetUserAddressDocument, variables }
     }
 export const SearchUsersDocument = gql`
     query SearchUsers($query: String!) {
@@ -6609,7 +6609,7 @@ export type SearchUsersLazyQueryHookResult = ReturnType<typeof useSearchUsersLaz
 export type SearchUsersSuspenseQueryHookResult = ReturnType<typeof useSearchUsersSuspenseQuery>;
 export type SearchUsersQueryResult = Apollo.QueryResult<SearchUsersQuery, SearchUsersQueryVariables>;
 export function refetchSearchUsersQuery(variables: SearchUsersQueryVariables) {
-      return { query: SearchUsersDocument, variables: variables }
+      return { query: SearchUsersDocument, variables }
     }
 export const GetActiveUsersDocument = gql`
     query GetActiveUsers {
@@ -6676,7 +6676,7 @@ export type GetActiveUsersLazyQueryHookResult = ReturnType<typeof useGetActiveUs
 export type GetActiveUsersSuspenseQueryHookResult = ReturnType<typeof useGetActiveUsersSuspenseQuery>;
 export type GetActiveUsersQueryResult = Apollo.QueryResult<GetActiveUsersQuery, GetActiveUsersQueryVariables>;
 export function refetchGetActiveUsersQuery(variables?: GetActiveUsersQueryVariables) {
-      return { query: GetActiveUsersDocument, variables: variables }
+      return { query: GetActiveUsersDocument, variables }
     }
 export const GetUsersByRoleDocument = gql`
     query GetUsersByRole($role: UserRole!) {
@@ -6744,7 +6744,7 @@ export type GetUsersByRoleLazyQueryHookResult = ReturnType<typeof useGetUsersByR
 export type GetUsersByRoleSuspenseQueryHookResult = ReturnType<typeof useGetUsersByRoleSuspenseQuery>;
 export type GetUsersByRoleQueryResult = Apollo.QueryResult<GetUsersByRoleQuery, GetUsersByRoleQueryVariables>;
 export function refetchGetUsersByRoleQuery(variables: GetUsersByRoleQueryVariables) {
-      return { query: GetUsersByRoleDocument, variables: variables }
+      return { query: GetUsersByRoleDocument, variables }
     }
 export const GetUsersByProviderDocument = gql`
     query GetUsersByProvider($provider: AuthProvider!) {
@@ -6824,7 +6824,7 @@ export type GetUsersByProviderLazyQueryHookResult = ReturnType<typeof useGetUser
 export type GetUsersByProviderSuspenseQueryHookResult = ReturnType<typeof useGetUsersByProviderSuspenseQuery>;
 export type GetUsersByProviderQueryResult = Apollo.QueryResult<GetUsersByProviderQuery, GetUsersByProviderQueryVariables>;
 export function refetchGetUsersByProviderQuery(variables: GetUsersByProviderQueryVariables) {
-      return { query: GetUsersByProviderDocument, variables: variables }
+      return { query: GetUsersByProviderDocument, variables }
     }
 export const GetUserOrderHistoryDocument = gql`
     query GetUserOrderHistory($userId: ID!, $filter: UserOrderHistoryFilter, $pagination: PaginationInput) {
@@ -6891,7 +6891,7 @@ export type GetUserOrderHistoryLazyQueryHookResult = ReturnType<typeof useGetUse
 export type GetUserOrderHistorySuspenseQueryHookResult = ReturnType<typeof useGetUserOrderHistorySuspenseQuery>;
 export type GetUserOrderHistoryQueryResult = Apollo.QueryResult<GetUserOrderHistoryQuery, GetUserOrderHistoryQueryVariables>;
 export function refetchGetUserOrderHistoryQuery(variables: GetUserOrderHistoryQueryVariables) {
-      return { query: GetUserOrderHistoryDocument, variables: variables }
+      return { query: GetUserOrderHistoryDocument, variables }
     }
 export const GetUserFavoriteStatsDocument = gql`
     query GetUserFavoriteStats($userId: ID!) {
@@ -6948,7 +6948,7 @@ export type GetUserFavoriteStatsLazyQueryHookResult = ReturnType<typeof useGetUs
 export type GetUserFavoriteStatsSuspenseQueryHookResult = ReturnType<typeof useGetUserFavoriteStatsSuspenseQuery>;
 export type GetUserFavoriteStatsQueryResult = Apollo.QueryResult<GetUserFavoriteStatsQuery, GetUserFavoriteStatsQueryVariables>;
 export function refetchGetUserFavoriteStatsQuery(variables: GetUserFavoriteStatsQueryVariables) {
-      return { query: GetUserFavoriteStatsDocument, variables: variables }
+      return { query: GetUserFavoriteStatsDocument, variables }
     }
 export const GetUserActivitySummaryDocument = gql`
     query GetUserActivitySummary($userId: ID!) {
@@ -7010,7 +7010,7 @@ export type GetUserActivitySummaryLazyQueryHookResult = ReturnType<typeof useGet
 export type GetUserActivitySummarySuspenseQueryHookResult = ReturnType<typeof useGetUserActivitySummarySuspenseQuery>;
 export type GetUserActivitySummaryQueryResult = Apollo.QueryResult<GetUserActivitySummaryQuery, GetUserActivitySummaryQueryVariables>;
 export function refetchGetUserActivitySummaryQuery(variables: GetUserActivitySummaryQueryVariables) {
-      return { query: GetUserActivitySummaryDocument, variables: variables }
+      return { query: GetUserActivitySummaryDocument, variables }
     }
 export const GetUserAccountsDocument = gql`
     query GetUserAccounts($userId: ID!) {
@@ -7066,7 +7066,7 @@ export type GetUserAccountsLazyQueryHookResult = ReturnType<typeof useGetUserAcc
 export type GetUserAccountsSuspenseQueryHookResult = ReturnType<typeof useGetUserAccountsSuspenseQuery>;
 export type GetUserAccountsQueryResult = Apollo.QueryResult<GetUserAccountsQuery, GetUserAccountsQueryVariables>;
 export function refetchGetUserAccountsQuery(variables: GetUserAccountsQueryVariables) {
-      return { query: GetUserAccountsDocument, variables: variables }
+      return { query: GetUserAccountsDocument, variables }
     }
 export const GetUserSessionsDocument = gql`
     query GetUserSessions($userId: ID!) {
@@ -7122,7 +7122,7 @@ export type GetUserSessionsLazyQueryHookResult = ReturnType<typeof useGetUserSes
 export type GetUserSessionsSuspenseQueryHookResult = ReturnType<typeof useGetUserSessionsSuspenseQuery>;
 export type GetUserSessionsQueryResult = Apollo.QueryResult<GetUserSessionsQuery, GetUserSessionsQueryVariables>;
 export function refetchGetUserSessionsQuery(variables: GetUserSessionsQueryVariables) {
-      return { query: GetUserSessionsDocument, variables: variables }
+      return { query: GetUserSessionsDocument, variables }
     }
 export const GetActiveSessionsDocument = gql`
     query GetActiveSessions($userId: ID!) {
@@ -7178,7 +7178,7 @@ export type GetActiveSessionsLazyQueryHookResult = ReturnType<typeof useGetActiv
 export type GetActiveSessionsSuspenseQueryHookResult = ReturnType<typeof useGetActiveSessionsSuspenseQuery>;
 export type GetActiveSessionsQueryResult = Apollo.QueryResult<GetActiveSessionsQuery, GetActiveSessionsQueryVariables>;
 export function refetchGetActiveSessionsQuery(variables: GetActiveSessionsQueryVariables) {
-      return { query: GetActiveSessionsDocument, variables: variables }
+      return { query: GetActiveSessionsDocument, variables }
     }
 export const GetUserPasswordHistoryDocument = gql`
     query GetUserPasswordHistory($userId: ID!) {
@@ -7246,7 +7246,7 @@ export type GetUserPasswordHistoryLazyQueryHookResult = ReturnType<typeof useGet
 export type GetUserPasswordHistorySuspenseQueryHookResult = ReturnType<typeof useGetUserPasswordHistorySuspenseQuery>;
 export type GetUserPasswordHistoryQueryResult = Apollo.QueryResult<GetUserPasswordHistoryQuery, GetUserPasswordHistoryQueryVariables>;
 export function refetchGetUserPasswordHistoryQuery(variables: GetUserPasswordHistoryQueryVariables) {
-      return { query: GetUserPasswordHistoryDocument, variables: variables }
+      return { query: GetUserPasswordHistoryDocument, variables }
     }
 export const CreateUserDocument = gql`
     mutation CreateUser($input: CreateUserProfileInput!) {

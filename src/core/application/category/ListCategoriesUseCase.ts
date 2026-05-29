@@ -1,5 +1,8 @@
 import type { CategoryRepository } from '@/core/domain/category/CategoryRepository';
-import type { CategoryFilter, CategoryPage } from '@/core/domain/category/Category';
+import type {
+  CategoryFilter,
+  CategoryPage,
+} from '@/core/domain/category/Category';
 import type { Result } from '@/core/shared/Result';
 
 export interface ListCategoriesParams {

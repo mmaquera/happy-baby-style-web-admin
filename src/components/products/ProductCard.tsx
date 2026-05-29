@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Card } from '@/components/ui/Card';
@@ -285,22 +285,24 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       </ProductImageContainer>
 
       <ProductInfo>
-        {product.category && <CategoryTag>{product.category.name}</CategoryTag>}
+        {product.category ? (
+          <CategoryTag>{product.category.name}</CategoryTag>
+        ) : null}
 
         <ProductName>{product.name}</ProductName>
 
-        {product.description && (
+        {product.description ? (
           <ProductDescription>{product.description}</ProductDescription>
-        )}
+        ) : null}
 
         <PriceContainer>
           <CurrentPrice>S/ {safeCurrentPrice.toFixed(2)}</CurrentPrice>
-          {hasDiscount && (
+          {hasDiscount ? (
             <>
               <OriginalPrice>S/ {product.price.toFixed(2)}</OriginalPrice>
               <DiscountBadge>-{discountPercentage}%</DiscountBadge>
             </>
-          )}
+          ) : null}
         </PriceContainer>
 
         <ProductMeta>
@@ -322,7 +324,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         )}
 
         <ActionsContainer>
-          {onViewDetails && (
+          {onViewDetails ? (
             <Button
               variant='primary'
               size='small'
@@ -333,9 +335,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               <Eye size={14} />
               Ver Detalles
             </Button>
-          )}
+          ) : null}
 
-          {onEdit && (
+          {onEdit ? (
             <Button
               variant='outline'
               size='small'
@@ -345,9 +347,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               <Edit size={14} />
               Editar
             </Button>
-          )}
+          ) : null}
 
-          {onToggleStatus && (
+          {onToggleStatus ? (
             <Button
               variant={product.isActive ? 'ghost' : 'secondary'}
               size='small'
@@ -356,9 +358,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             >
               {product.isActive ? 'Desactivar' : 'Activar'}
             </Button>
-          )}
+          ) : null}
 
-          {onDelete && (
+          {onDelete ? (
             <Button
               variant='danger'
               size='small'
@@ -368,7 +370,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               <Trash2 size={14} />
               Eliminar
             </Button>
-          )}
+          ) : null}
         </ActionsContainer>
       </ProductInfo>
     </Card>

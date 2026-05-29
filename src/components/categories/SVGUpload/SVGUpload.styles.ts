@@ -52,7 +52,7 @@ export const SVGUploadZone = styled.div<{
       disabled
         ? theme.colors.background.light
         : hasError
-          ? theme.colors.error + '10'
+          ? `${theme.colors.error}10`
           : theme.colors.background.accent};
   }
 `;

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
-import { User } from '@/types';
+import { type User } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { UserAuthAccounts } from './UserAuthAccounts';
@@ -298,7 +299,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
             size='small'
             onClick={onClose}
             icon={<X size={20} />}
-          ></Button>
+          />
         </ModalHeader>
 
         {/* Tabs Navigation */}
@@ -324,14 +325,14 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
             <Activity size={16} />
             Sesiones
           </Tab>
-          {hasGoogleAccount && (
+          {hasGoogleAccount ? (
             <Tab
               active={activeTab === 'google-features'}
               onClick={() => setActiveTab('google-features')}
             >
               🔍 Google
             </Tab>
-          )}
+          ) : null}
         </TabsContainer>
 
         {/* Tab Content */}
@@ -361,7 +362,11 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                     <UserProfileEditForm
                       profile={profile ?? user.profile ?? {}}
                       onSave={async input => {
-                        await updateProfile(input as unknown as Parameters<typeof updateProfile>[0]);
+                        await updateProfile(
+                          input as unknown as Parameters<
+                            typeof updateProfile
+                          >[0]
+                        );
                       }}
                       onCancel={cancelEditing}
                       loading={updatingProfile}
@@ -392,7 +397,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                         </InfoContent>
                       </InfoItem>
 
-                      {user.profile?.phone && (
+                      {user.profile?.phone ? (
                         <InfoItem>
                           <InfoIcon>
                             <Phone size={16} />
@@ -402,9 +407,9 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                             <InfoValue>{user.profile.phone}</InfoValue>
                           </InfoContent>
                         </InfoItem>
-                      )}
+                      ) : null}
 
-                      {user.profile?.dateOfBirth && (
+                      {user.profile?.dateOfBirth ? (
                         <InfoItem>
                           <InfoIcon>
                             <Calendar size={16} />
@@ -416,7 +421,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                             </InfoValue>
                           </InfoContent>
                         </InfoItem>
-                      )}
+                      ) : null}
 
                       <InfoItem>
                         <InfoIcon>
@@ -428,7 +433,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                         </InfoContent>
                       </InfoItem>
 
-                      {user.lastLoginAt && (
+                      {user.lastLoginAt ? (
                         <InfoItem>
                           <InfoIcon>
                             <Activity size={16} />
@@ -440,7 +445,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                             </InfoValue>
                           </InfoContent>
                         </InfoItem>
-                      )}
+                      ) : null}
                     </>
                   )}
                 </Section>
@@ -540,8 +545,10 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                 <UserAddressManager
                   addresses={user.addresses || []}
                   userId={user.id}
-                  onCreateAddress={(input) => createAddress(input as never)}
-                  onUpdateAddress={(id, input) => updateAddress(id, input as never)}
+                  onCreateAddress={input => createAddress(input as never)}
+                  onUpdateAddress={(id, input) =>
+                    updateAddress(id, input as never)
+                  }
                   onDeleteAddress={deleteAddress}
                   onSetDefaultAddress={setDefaultAddress}
                   loading={
@@ -584,14 +591,14 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
             </Section>
           )}
 
-          {activeTab === 'google-features' && hasGoogleAccount && (
+          {activeTab === 'google-features' && hasGoogleAccount ? (
             <GoogleUserFeatures
               user={user}
               onUserUpdated={() => {
                 // Refresh user data when needed
               }}
             />
-          )}
+          ) : null}
         </TabContent>
       </ModalContent>
     </Modal>

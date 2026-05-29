@@ -2,7 +2,10 @@ import { useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRegisterUser } from './useRegisterUser';
-import { registerSchema, type RegisterFormData } from '@/core/shared/validation/authSchema';
+import {
+  registerSchema,
+  type RegisterFormData,
+} from '@/core/shared/validation/authSchema';
 import { UserRole } from '@/generated/graphql';
 
 export interface UseRegisterFormReturn {
@@ -33,8 +36,15 @@ const defaultValues: RegisterFormData = {
   phone: '',
 };
 
-export const useRegisterForm = (onSuccess?: () => void): UseRegisterFormReturn => {
-  const { register: registerUser, isLoading, error, clearError } = useRegisterUser();
+export const useRegisterForm = (
+  onSuccess?: () => void
+): UseRegisterFormReturn => {
+  const {
+    register: registerUser,
+    isLoading,
+    error,
+    clearError,
+  } = useRegisterUser();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -74,7 +84,10 @@ export const useRegisterForm = (onSuccess?: () => void): UseRegisterFormReturn =
   );
 
   const togglePassword = useCallback(() => setShowPassword(prev => !prev), []);
-  const toggleConfirmPassword = useCallback(() => setShowConfirmPassword(prev => !prev), []);
+  const toggleConfirmPassword = useCallback(
+    () => setShowConfirmPassword(prev => !prev),
+    []
+  );
 
   return {
     form,

@@ -7,11 +7,11 @@
 import { useState, useCallback } from 'react';
 import { useUploadSvgMutation } from '@/generated/graphql';
 import {
-  UseSVGUploadReturn,
-  SVGUploadResult,
-  SVGUploadProgress,
-  SVGUploadError,
-  SVGValidationResult,
+  type UseSVGUploadReturn,
+  type SVGUploadResult,
+  type SVGUploadProgress,
+  type SVGUploadError,
+  type SVGValidationResult,
   SVG_VALIDATION_RULES,
 } from '@/components/categories/SVGUpload/SVGUpload.types';
 import { logger } from '@/utils/logger';
@@ -55,7 +55,9 @@ export const useSVGUpload = (): UseSVGUploadReturn => {
 
     // Check MIME type (some browsers may not set this correctly for SVG)
     const hasValidMimeType =
-      (SVG_VALIDATION_RULES.allowedTypes as unknown as string[]).includes(file.type) ||
+      (SVG_VALIDATION_RULES.allowedTypes as unknown as string[]).includes(
+        file.type
+      ) ||
       file.type === '' || // Some browsers don't set MIME type for SVG
       file.type === 'application/octet-stream'; // Fallback MIME type
 
@@ -213,7 +215,7 @@ export const useSVGUpload = (): UseSVGUploadReturn => {
         // Upload with progress tracking
         const result = await uploadSvgMutation({
           variables: {
-            file: file,
+            file,
             entityType: 'category',
             entityId: 'temp',
             optimize: true, // ✅ Optimizar el SVG
@@ -221,7 +223,11 @@ export const useSVGUpload = (): UseSVGUploadReturn => {
           },
           context: {
             // Add progress tracking if supported by Apollo
-            onUploadProgress: (progressEvent: { loaded: number; total: number; lengthComputable?: boolean }) => {
+            onUploadProgress: (progressEvent: {
+              loaded: number;
+              total: number;
+              lengthComputable?: boolean;
+            }) => {
               if (progressEvent.lengthComputable) {
                 const percentage = Math.round(
                   (progressEvent.loaded * 100) / progressEvent.total
@@ -270,7 +276,10 @@ export const useSVGUpload = (): UseSVGUploadReturn => {
       } catch (err: unknown) {
         const uploadError: SVGUploadError = {
           code: 'UPLOAD_ERROR',
-          message: err instanceof Error ? err.message : 'Error al subir el archivo SVG',
+          message:
+            err instanceof Error
+              ? err.message
+              : 'Error al subir el archivo SVG',
           filename: file.name,
           details: err,
         };

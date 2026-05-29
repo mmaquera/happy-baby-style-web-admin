@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import type React from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
@@ -17,7 +18,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
-import { CategoryFilters as CategoryFiltersType } from './types';
+import { type CategoryFilters as CategoryFiltersType } from './types';
 
 interface CategoryFiltersProps {
   filters: CategoryFiltersType;
@@ -98,8 +99,8 @@ const StatusToggleButton = styled.button<{
   background: ${({ isSelected, isActive }) =>
     isSelected
       ? isActive
-        ? theme.colors.success + '15'
-        : theme.colors.warning + '15'
+        ? `${theme.colors.success}15`
+        : `${theme.colors.warning}15`
       : theme.colors.white};
   color: ${({ isSelected, isActive }) =>
     isSelected
@@ -117,8 +118,8 @@ const StatusToggleButton = styled.button<{
     background: ${({ isSelected, isActive }) =>
       isSelected
         ? isActive
-          ? theme.colors.success + '25'
-          : theme.colors.warning + '25'
+          ? `${theme.colors.success}25`
+          : `${theme.colors.warning}25`
         : theme.colors.background.accent};
     border-color: ${({ isActive }) =>
       isActive ? theme.colors.success : theme.colors.warning};
@@ -233,8 +234,8 @@ const ActiveFilterTag = styled.div`
   align-items: center;
   gap: ${theme.spacing[2]};
   padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  background: ${theme.colors.primaryPurple + '15'};
-  border: 1px solid ${theme.colors.primaryPurple + '30'};
+  background: ${`${theme.colors.primaryPurple}15`};
+  border: 1px solid ${`${theme.colors.primaryPurple}30`};
   border-radius: ${theme.borderRadius.md};
   font-size: ${theme.fontSizes.sm};
   color: ${theme.colors.primaryPurple};
@@ -253,7 +254,7 @@ const RemoveFilterButton = styled.button`
   transition: all ${theme.transitions.base};
 
   &:hover {
-    background: ${theme.colors.primaryPurple + '25'};
+    background: ${`${theme.colors.primaryPurple}25`};
   }
 
   svg {
@@ -289,7 +290,10 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
 
   // Handle input changes with immediate application
   const handleInputChange = useCallback(
-    (key: keyof CategoryFiltersType, value: CategoryFiltersType[typeof key]) => {
+    (
+      key: keyof CategoryFiltersType,
+      value: CategoryFiltersType[typeof key]
+    ) => {
       const newFilters = { ...filters, [key]: value };
       onFiltersChange(newFilters);
     },
@@ -597,14 +601,14 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
       {/* Active Filters Display */}
       {activeFiltersCount > 0 && (
         <ActiveFilters>
-          {filters.search && (
+          {filters.search ? (
             <ActiveFilterTag>
               Búsqueda: "{filters.search}"
               <RemoveFilterButton onClick={() => handleRemoveFilter('search')}>
                 <X size={14} />
               </RemoveFilterButton>
             </ActiveFilterTag>
-          )}
+          ) : null}
 
           {filters.isActive === true && (
             <ActiveFilterTag>
@@ -628,7 +632,7 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
             </ActiveFilterTag>
           )}
 
-          {filters.hasImage && (
+          {filters.hasImage ? (
             <ActiveFilterTag>
               Con imagen
               <RemoveFilterButton
@@ -637,9 +641,9 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
                 <X size={14} />
               </RemoveFilterButton>
             </ActiveFilterTag>
-          )}
+          ) : null}
 
-          {filters.hasDescription && (
+          {filters.hasDescription ? (
             <ActiveFilterTag>
               Con descripción
               <RemoveFilterButton
@@ -648,9 +652,9 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
                 <X size={14} />
               </RemoveFilterButton>
             </ActiveFilterTag>
-          )}
+          ) : null}
 
-          {filters.hasProducts && (
+          {filters.hasProducts ? (
             <ActiveFilterTag>
               Con productos
               <RemoveFilterButton
@@ -659,9 +663,9 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
                 <X size={14} />
               </RemoveFilterButton>
             </ActiveFilterTag>
-          )}
+          ) : null}
 
-          {filters.minProducts && (
+          {filters.minProducts ? (
             <ActiveFilterTag>
               Min. productos: {filters.minProducts}
               <RemoveFilterButton
@@ -670,9 +674,9 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
                 <X size={14} />
               </RemoveFilterButton>
             </ActiveFilterTag>
-          )}
+          ) : null}
 
-          {filters.maxProducts && (
+          {filters.maxProducts ? (
             <ActiveFilterTag>
               Max. productos: {filters.maxProducts}
               <RemoveFilterButton
@@ -681,9 +685,9 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
                 <X size={14} />
               </RemoveFilterButton>
             </ActiveFilterTag>
-          )}
+          ) : null}
 
-          {filters.createdAfter && (
+          {filters.createdAfter ? (
             <ActiveFilterTag>
               Creado después: {filters.createdAfter}
               <RemoveFilterButton
@@ -692,9 +696,9 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
                 <X size={14} />
               </RemoveFilterButton>
             </ActiveFilterTag>
-          )}
+          ) : null}
 
-          {filters.createdBefore && (
+          {filters.createdBefore ? (
             <ActiveFilterTag>
               Creado antes: {filters.createdBefore}
               <RemoveFilterButton
@@ -703,9 +707,9 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
                 <X size={14} />
               </RemoveFilterButton>
             </ActiveFilterTag>
-          )}
+          ) : null}
 
-          {filters.sortOrder && (
+          {filters.sortOrder ? (
             <ActiveFilterTag>
               Orden: {filters.sortOrder}
               <RemoveFilterButton
@@ -714,7 +718,7 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
                 <X size={14} />
               </RemoveFilterButton>
             </ActiveFilterTag>
-          )}
+          ) : null}
         </ActiveFilters>
       )}
     </FiltersContainer>

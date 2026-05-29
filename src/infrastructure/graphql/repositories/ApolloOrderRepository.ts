@@ -1,6 +1,11 @@
 import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import type { OrderRepository } from '@/core/domain/order/OrderRepository';
-import type { Order, OrderFilter, OrderPage, OrderStatus } from '@/core/domain/order/Order';
+import type {
+  Order,
+  OrderFilter,
+  OrderPage,
+  OrderStatus,
+} from '@/core/domain/order/Order';
 import type { Result } from '@/core/shared/Result';
 import { ok, err } from '@/core/shared/Result';
 import { orderMapper } from '../mappers/orderMapper';
@@ -33,7 +38,11 @@ const domainStatusToGQL: Record<OrderStatus, GQLOrderStatus> = {
 export class ApolloOrderRepository implements OrderRepository {
   constructor(private readonly client: ApolloClient<NormalizedCacheObject>) {}
 
-  async findAll(filter?: OrderFilter, limit = 20, offset = 0): Promise<Result<OrderPage>> {
+  async findAll(
+    filter?: OrderFilter,
+    limit = 20,
+    offset = 0
+  ): Promise<Result<OrderPage>> {
     try {
       const variables: GetOrdersQueryVariables = {
         filter: filter?.status
@@ -42,7 +51,10 @@ export class ApolloOrderRepository implements OrderRepository {
         pagination: { limit, offset },
       };
 
-      const { data } = await this.client.query<GetOrdersQuery, GetOrdersQueryVariables>({
+      const { data } = await this.client.query<
+        GetOrdersQuery,
+        GetOrdersQueryVariables
+      >({
         query: GetOrdersDocument,
         variables,
         fetchPolicy: 'network-only',
@@ -60,7 +72,10 @@ export class ApolloOrderRepository implements OrderRepository {
 
   async findById(id: string): Promise<Result<Order>> {
     try {
-      const { data } = await this.client.query<GetOrderQuery, GetOrderQueryVariables>({
+      const { data } = await this.client.query<
+        GetOrderQuery,
+        GetOrderQueryVariables
+      >({
         query: GetOrderDocument,
         variables: { id },
         fetchPolicy: 'cache-first',

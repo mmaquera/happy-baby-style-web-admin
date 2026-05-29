@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import type React from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { UserAddress } from '@/types';
+import { type UserAddress } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { theme } from '@/styles/theme';
@@ -334,7 +335,9 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
             placeholder='Nombre'
             error={getErrorMessage('firstName')}
           />
-          {errors.firstName && <ErrorMessage>{errors.firstName}</ErrorMessage>}
+          {errors.firstName ? (
+            <ErrorMessage>{errors.firstName}</ErrorMessage>
+          ) : null}
         </FormGroup>
       </FormRow>
 
@@ -351,7 +354,9 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
             placeholder='Apellido'
             error={getErrorMessage('lastName')}
           />
-          {errors.lastName && <ErrorMessage>{errors.lastName}</ErrorMessage>}
+          {errors.lastName ? (
+            <ErrorMessage>{errors.lastName}</ErrorMessage>
+          ) : null}
         </FormGroup>
 
         <FormGroup>
@@ -377,7 +382,9 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
           placeholder='Dirección principal'
           error={getErrorMessage('address1')}
         />
-        {errors.address1 && <ErrorMessage>{errors.address1}</ErrorMessage>}
+        {errors.address1 ? (
+          <ErrorMessage>{errors.address1}</ErrorMessage>
+        ) : null}
       </FullWidthFormGroup>
 
       <FullWidthFormGroup>
@@ -403,7 +410,7 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
             placeholder='Ciudad'
             error={getErrorMessage('city')}
           />
-          {errors.city && <ErrorMessage>{errors.city}</ErrorMessage>}
+          {errors.city ? <ErrorMessage>{errors.city}</ErrorMessage> : null}
         </FormGroup>
 
         <FormGroup>
@@ -418,7 +425,7 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
             placeholder='Provincia'
             error={getErrorMessage('state')}
           />
-          {errors.state && <ErrorMessage>{errors.state}</ErrorMessage>}
+          {errors.state ? <ErrorMessage>{errors.state}</ErrorMessage> : null}
         </FormGroup>
       </FormRow>
 
@@ -435,9 +442,9 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
             placeholder='12345'
             error={getErrorMessage('postalCode')}
           />
-          {errors.postalCode && (
+          {errors.postalCode ? (
             <ErrorMessage>{errors.postalCode}</ErrorMessage>
-          )}
+          ) : null}
         </FormGroup>
 
         <FormGroup>
@@ -452,7 +459,9 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
             placeholder='País'
             error={getErrorMessage('country')}
           />
-          {errors.country && <ErrorMessage>{errors.country}</ErrorMessage>}
+          {errors.country ? (
+            <ErrorMessage>{errors.country}</ErrorMessage>
+          ) : null}
         </FormGroup>
       </FormRow>
 
@@ -467,7 +476,7 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
             placeholder='+1 234 567 890'
             error={getErrorMessage('phone')}
           />
-          {errors.phone && <ErrorMessage>{errors.phone}</ErrorMessage>}
+          {errors.phone ? <ErrorMessage>{errors.phone}</ErrorMessage> : null}
         </FormGroup>
 
         <FormGroup>

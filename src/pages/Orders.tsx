@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import type React from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import {
@@ -24,43 +25,43 @@ const statusConfig = {
     label: 'Pendiente',
     color: theme.colors.warning,
     icon: Clock,
-    bgColor: theme.colors.warning + '20',
+    bgColor: `${theme.colors.warning}20`,
   },
   confirmed: {
     label: 'Confirmado',
     color: theme.colors.info,
     icon: CheckCircle,
-    bgColor: theme.colors.info + '20',
+    bgColor: `${theme.colors.info}20`,
   },
   processing: {
     label: 'En Proceso',
     color: theme.colors.primary,
     icon: Package,
-    bgColor: theme.colors.primary + '20',
+    bgColor: `${theme.colors.primary}20`,
   },
   shipped: {
     label: 'Enviado',
     color: theme.colors.secondary,
     icon: Truck,
-    bgColor: theme.colors.secondary + '20',
+    bgColor: `${theme.colors.secondary}20`,
   },
   delivered: {
     label: 'Entregado',
     color: theme.colors.success,
     icon: CheckCircle,
-    bgColor: theme.colors.success + '20',
+    bgColor: `${theme.colors.success}20`,
   },
   cancelled: {
     label: 'Cancelado',
     color: theme.colors.error,
     icon: XCircle,
-    bgColor: theme.colors.error + '20',
+    bgColor: `${theme.colors.error}20`,
   },
   refunded: {
     label: 'Reembolsado',
     color: theme.colors.text.secondary,
     icon: XCircle,
-    bgColor: theme.colors.text.secondary + '20',
+    bgColor: `${theme.colors.text.secondary}20`,
   },
 };
 
@@ -69,8 +70,13 @@ export const Orders: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<OrderStatus | ''>('');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-  const { orders, loading: isLoading, error, loadOrders, updateStatus } =
-    useOrderActions();
+  const {
+    orders,
+    loading: isLoading,
+    error,
+    loadOrders,
+    updateStatus,
+  } = useOrderActions();
 
   useEffect(() => {
     void loadOrders(statusFilter ? { status: statusFilter } : undefined);
@@ -318,7 +324,7 @@ export const Orders: React.FC = () => {
                       {order.customer?.firstName} {order.customer?.lastName}
                     </h3>
 
-                    {order.customer?.email && (
+                    {order.customer?.email ? (
                       <p
                         style={{
                           color: theme.colors.text.secondary,
@@ -327,7 +333,7 @@ export const Orders: React.FC = () => {
                       >
                         {order.customer.email}
                       </p>
-                    )}
+                    ) : null}
 
                     <p
                       style={{
@@ -416,7 +422,7 @@ export const Orders: React.FC = () => {
       </div>
 
       {/* Order Details Modal */}
-      {selectedOrder && (
+      {selectedOrder ? (
         <div
           style={{
             position: 'fixed',
@@ -482,19 +488,19 @@ export const Orders: React.FC = () => {
                 <strong>Nombre:</strong> {selectedOrder.customer?.firstName}{' '}
                 {selectedOrder.customer?.lastName}
               </p>
-              {selectedOrder.customer?.email && (
+              {selectedOrder.customer?.email ? (
                 <p>
                   <strong>Email:</strong> {selectedOrder.customer.email}
                 </p>
-              )}
-              {selectedOrder.customer?.phone && (
+              ) : null}
+              {selectedOrder.customer?.phone ? (
                 <p>
                   <strong>Teléfono:</strong> {selectedOrder.customer.phone}
                 </p>
-              )}
+              ) : null}
             </div>
 
-            {selectedOrder.shippingAddress && (
+            {selectedOrder.shippingAddress ? (
               <div style={{ marginBottom: '1.5rem' }}>
                 <h3
                   style={{
@@ -506,9 +512,9 @@ export const Orders: React.FC = () => {
                   Dirección de Envío
                 </h3>
                 <p>{selectedOrder.shippingAddress.address1}</p>
-                {selectedOrder.shippingAddress.address2 && (
+                {selectedOrder.shippingAddress.address2 ? (
                   <p>{selectedOrder.shippingAddress.address2}</p>
-                )}
+                ) : null}
                 <p>
                   {selectedOrder.shippingAddress.city},{' '}
                   {selectedOrder.shippingAddress.state}
@@ -518,7 +524,7 @@ export const Orders: React.FC = () => {
                   {selectedOrder.shippingAddress.country}
                 </p>
               </div>
-            )}
+            ) : null}
 
             {selectedOrder.items.length > 0 && (
               <div style={{ marginBottom: '1.5rem' }}>
@@ -545,7 +551,8 @@ export const Orders: React.FC = () => {
                     >
                       <div>
                         <p style={{ fontWeight: theme.fontWeights.medium }}>
-                          {item.product?.name ?? `Producto ${item.id.slice(0, 8)}`}
+                          {item.product?.name ??
+                            `Producto ${item.id.slice(0, 8)}`}
                         </p>
                         <p
                           style={{
@@ -598,7 +605,7 @@ export const Orders: React.FC = () => {
             </div>
           </Card>
         </div>
-      )}
+      ) : null}
     </div>
   );
 };

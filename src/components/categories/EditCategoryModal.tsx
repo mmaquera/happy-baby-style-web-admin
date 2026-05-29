@@ -1,11 +1,12 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import type React from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { useUpdateCategory } from '@/hooks/useUpdateCategory';
-import { UpdateCategoryInput } from '@/generated/graphql';
+import { type UpdateCategoryInput } from '@/generated/graphql';
 import { SVGUpload } from './SVGUpload/SVGUpload';
 import type { Category } from './types';
 import {
@@ -566,7 +567,9 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
         };
 
         const rawResult = await update(category.id, categoryData);
-        const result = rawResult as { success?: boolean; message?: string } | false;
+        const result = rawResult as
+          | { success?: boolean; message?: string }
+          | false;
 
         if (result && result.success) {
           setSuccessMessage('Categoría actualizada exitosamente');
@@ -607,11 +610,11 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
   return (
     <ModalOverlay isOpen={isOpen}>
       <ModalContainer>
-        {loading && (
+        {loading ? (
           <LoadingOverlay>
             <LoadingSpinner />
           </LoadingOverlay>
-        )}
+        ) : null}
 
         <ModalHeader>
           <ModalTitle>
@@ -625,19 +628,19 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
 
         <form onSubmit={handleSubmit}>
           <ModalBody>
-            {errors['submit'] && (
+            {errors['submit'] ? (
               <ErrorMessage>
                 <AlertTriangle size={16} />
                 {errors['submit']}
               </ErrorMessage>
-            )}
+            ) : null}
 
-            {successMessage && (
+            {successMessage ? (
               <SuccessMessage>
                 <CheckCircle size={16} />
                 {successMessage}
               </SuccessMessage>
-            )}
+            ) : null}
 
             {/* Información del Sistema */}
             <InfoSection>
@@ -680,14 +683,14 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
                   placeholder='Ej: Ropa para Bebés'
                   value={formData['name']}
                   onChange={e => handleInputChange('name', e.target.value)}
-                  error={!!errors['name'] ? errors['name'] : ''}
+                  error={errors['name'] ? errors['name'] : ''}
                   disabled={loading}
                 />
-                {errors['name'] && (
+                {errors['name'] ? (
                   <small style={{ color: theme.colors.error }}>
                     {errors['name']}
                   </small>
-                )}
+                ) : null}
               </FormField>
 
               <FormField>
@@ -712,14 +715,14 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
                   placeholder='ropa-para-bebes'
                   value={formData['slug']}
                   onChange={e => handleInputChange('slug', e.target.value)}
-                  error={!!errors['slug'] ? errors['slug'] : ''}
+                  error={errors['slug'] ? errors['slug'] : ''}
                   disabled={loading}
                 />
-                {errors['slug'] && (
+                {errors['slug'] ? (
                   <small style={{ color: theme.colors.error }}>
                     {errors['slug']}
                   </small>
-                )}
+                ) : null}
                 <small
                   style={{
                     color: theme.colors.text.secondary,
@@ -746,14 +749,14 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
                   placeholder='0'
                   value={formData['sortOrder']}
                   onChange={e => handleInputChange('sortOrder', e.target.value)}
-                  error={!!errors['sortOrder'] ? errors['sortOrder'] : ''}
+                  error={errors['sortOrder'] ? errors['sortOrder'] : ''}
                   disabled={loading}
                 />
-                {errors['sortOrder'] && (
+                {errors['sortOrder'] ? (
                   <small style={{ color: theme.colors.error }}>
                     {errors['sortOrder']}
                   </small>
-                )}
+                ) : null}
                 <small
                   style={{
                     color: theme.colors.text.secondary,
@@ -812,14 +815,14 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
                     </PreviewContainer>
 
                     {/* Success indicator similar to products */}
-                    {formData['image'] && (
+                    {formData['image'] ? (
                       <SuccessIndicator>
                         <SuccessText>
                           <SuccessDot />
                           <span>Imagen SVG configurada correctamente</span>
                         </SuccessText>
                       </SuccessIndicator>
-                    )}
+                    ) : null}
 
                     {/* Action button */}
                     <div style={{ marginTop: theme.spacing[3] }}>
@@ -864,7 +867,7 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
                   </div>
                 )}
 
-                {errors['image'] && (
+                {errors['image'] ? (
                   <small
                     style={{
                       color: theme.colors.error,
@@ -874,7 +877,7 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
                   >
                     {errors['image']}
                   </small>
-                )}
+                ) : null}
               </FormField>
 
               <SwitchContainer>

@@ -5,7 +5,8 @@
 // Interface Segregation: Specific props interface
 // Dependency Inversion: Depends on hook abstraction
 
-import React, { useEffect } from 'react';
+import type React from 'react';
+import { useEffect } from 'react';
 import styled from 'styled-components';
 import { X, Mail, CheckCircle, AlertCircle } from 'lucide-react';
 import { theme } from '@/styles/theme';
@@ -244,12 +245,12 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                   disabled={isLoading}
                 />
 
-                {error && (
+                {error ? (
                   <ErrorMessage>
                     <AlertCircle size={20} />
                     {error}
                   </ErrorMessage>
-                )}
+                ) : null}
 
                 <Button
                   type='submit'
@@ -266,7 +267,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
           )}
         </ModalBody>
 
-        {isSuccess && (
+        {isSuccess ? (
           <ModalFooter>
             <Button
               variant='outline'
@@ -277,7 +278,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
               Cerrar
             </Button>
           </ModalFooter>
-        )}
+        ) : null}
       </ModalContainer>
     </ModalOverlay>
   );

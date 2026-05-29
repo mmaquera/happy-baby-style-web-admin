@@ -11,7 +11,10 @@ const GQL_CATEGORY: GQLCategory = {
   image: 'https://cdn.example.com/cat.jpg',
   isActive: true,
   sortOrder: 1,
-  products: [{ __typename: 'Product', id: 'p1' }, { __typename: 'Product', id: 'p2' }] as GQLCategory['products'],
+  products: [
+    { __typename: 'Product', id: 'p1' },
+    { __typename: 'Product', id: 'p2' },
+  ] as GQLCategory['products'],
   createdAt: '2024-01-01T00:00:00Z',
   updatedAt: '2024-06-01T00:00:00Z',
 };
@@ -34,7 +37,10 @@ describe('categoryMapper.toDomain', () => {
   });
 
   it('productCount es 0 si products es undefined', () => {
-    const domain = categoryMapper.toDomain({ ...GQL_CATEGORY, products: undefined });
+    const domain = categoryMapper.toDomain({
+      ...GQL_CATEGORY,
+      products: undefined,
+    });
     expect(domain.productCount).toBe(0);
   });
 
@@ -56,7 +62,10 @@ describe('categoryMapper.toDomain', () => {
   });
 
   it('normaliza description null a null', () => {
-    const domain = categoryMapper.toDomain({ ...GQL_CATEGORY, description: null });
+    const domain = categoryMapper.toDomain({
+      ...GQL_CATEGORY,
+      description: null,
+    });
     expect(domain.description).toBeNull();
   });
 
@@ -66,7 +75,10 @@ describe('categoryMapper.toDomain', () => {
   });
 
   it('normaliza description undefined a null', () => {
-    const domain = categoryMapper.toDomain({ ...GQL_CATEGORY, description: undefined });
+    const domain = categoryMapper.toDomain({
+      ...GQL_CATEGORY,
+      description: undefined,
+    });
     expect(domain.description).toBeNull();
   });
 });
@@ -84,7 +96,10 @@ describe('categoryMapper.toCreateDTO', () => {
   });
 
   it('incluye description si se pasa', () => {
-    const dto = categoryMapper.toCreateDTO({ name: 'Test', description: 'Desc' });
+    const dto = categoryMapper.toCreateDTO({
+      name: 'Test',
+      description: 'Desc',
+    });
     expect(dto.description).toBe('Desc');
   });
 
@@ -94,7 +109,10 @@ describe('categoryMapper.toCreateDTO', () => {
   });
 
   it('incluye image si se pasa', () => {
-    const dto = categoryMapper.toCreateDTO({ name: 'Test', image: 'https://img.com/a.jpg' });
+    const dto = categoryMapper.toCreateDTO({
+      name: 'Test',
+      image: 'https://img.com/a.jpg',
+    });
     expect(dto.image).toBe('https://img.com/a.jpg');
   });
 

@@ -111,7 +111,9 @@ describe('RegisterForm', () => {
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/nombre/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/apellido/i)).toBeInTheDocument();
-    expect(screen.getByLabelText('Contraseña', { exact: true })).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('Contraseña', { exact: true })
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/confirmar contraseña/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/teléfono/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/fecha de nacimiento/i)).toBeInTheDocument();
@@ -131,7 +133,9 @@ describe('RegisterForm', () => {
       expect(screen.getByText(/email es requerido/i)).toBeInTheDocument();
       expect(screen.getByText(/nombre es requerido/i)).toBeInTheDocument();
       expect(screen.getByText(/apellido es requerido/i)).toBeInTheDocument();
-      expect(screen.getByText('Contraseña es requerida', { exact: true })).toBeInTheDocument();
+      expect(
+        screen.getByText('Contraseña es requerida', { exact: true })
+      ).toBeInTheDocument();
       expect(
         screen.getByText(/confirmar contraseña es requerida/i)
       ).toBeInTheDocument();
@@ -282,7 +286,8 @@ describe('RegisterForm', () => {
     expect(passwordInput).toHaveAttribute('type', 'password');
     expect(confirmPasswordInput).toHaveAttribute('type', 'password');
 
-    const [passwordToggle, confirmPasswordToggle] = screen.getAllByRole('button');
+    const [passwordToggle, confirmPasswordToggle] =
+      screen.getAllByRole('button');
 
     fireEvent.click(passwordToggle);
     fireEvent.click(confirmPasswordToggle);

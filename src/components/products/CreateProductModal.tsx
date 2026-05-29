@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect } from 'react';
+import type React from 'react';
+import { useCallback, useEffect } from 'react';
 import { Package, X, Plus, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import type { Category, Product } from './types';

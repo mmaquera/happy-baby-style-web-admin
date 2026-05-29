@@ -4,12 +4,12 @@ import {
   useCreateUserMutation,
   useUpdateUserMutation,
   GetUsersDocument,
-  UserFilterInput,
-  CreateUserProfileInput,
-  UpdateUserInput,
-  UpdateUserProfileInput,
-  InputMaybe,
-  UserRole,
+  type UserFilterInput,
+  type CreateUserProfileInput,
+  type UpdateUserInput,
+  type UpdateUserProfileInput,
+  type InputMaybe,
+  type UserRole,
   useUpdateUserOptimizedMutation,
 } from '../generated/graphql';
 import toast from 'react-hot-toast';

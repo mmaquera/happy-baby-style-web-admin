@@ -31,7 +31,7 @@ export const UploadZone = styled.div<{
     border-color: ${({ hasError }) =>
       hasError ? theme.colors.error : theme.colors.primary};
     background: ${({ hasError }) =>
-      hasError ? theme.colors.error + '10' : theme.colors.background.accent};
+      hasError ? `${theme.colors.error}10` : theme.colors.background.accent};
   }
 `;
 

@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import type React from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import { useImageUpload } from '@/hooks/useImageUpload';
@@ -38,9 +39,19 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { upload, loading: _loading, progress, error, clearError: _clearError } = useImageUpload();
-  const { showSuccess, showError, showProgress: _showProgress, dismiss: _dismiss } =
-    useUploadNotifications();
+  const {
+    upload,
+    loading: _loading,
+    progress,
+    error,
+    clearError: _clearError,
+  } = useImageUpload();
+  const {
+    showSuccess,
+    showError,
+    showProgress: _showProgress,
+    dismiss: _dismiss,
+  } = useUploadNotifications();
 
   const {
     register,
@@ -120,7 +131,9 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
             showError(result.error || 'Error al subir la imagen');
           }
         } catch (err: unknown) {
-          showError(`Error inesperado: ${err instanceof Error ? err.message : 'desconocido'}`);
+          showError(
+            `Error inesperado: ${err instanceof Error ? err.message : 'desconocido'}`
+          );
         } finally {
           setIsUploading(false);
         }
@@ -171,7 +184,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
   }, []);
 
   // Función para manejar cambio en input de archivos
@@ -262,7 +275,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       </UploadZone>
 
       {/* Barra de progreso minimalista */}
-      {isUploading && progress.total > 0 && (
+      {isUploading && progress.total > 0 ? (
         <div style={{ marginTop: '16px' }}>
           <div
             style={{
@@ -294,7 +307,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
             Subiendo imagen... {progress.percentage}%
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* Preview único minimalista */}
       {(selectedFiles.length > 0 || uploadedImages.length > 0) && (
@@ -415,9 +428,11 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
       )}
 
       {/* Mensajes de error */}
-      {errors.files && <ErrorMessage>{errors.files.message}</ErrorMessage>}
+      {errors.files ? (
+        <ErrorMessage>{errors.files.message}</ErrorMessage>
+      ) : null}
 
-      {error && <ErrorMessage>{error}</ErrorMessage>}
+      {error ? <ErrorMessage>{error}</ErrorMessage> : null}
     </UploadContainer>
   );
 };

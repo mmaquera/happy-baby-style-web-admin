@@ -49,7 +49,10 @@ describe('UpdateOrderStatusUseCase', () => {
 
   it('propagates repository errors', async () => {
     const { useCase, repo } = makeUseCase();
-    repo.updateStatus.mockResolvedValueOnce({ ok: false, error: new Error('DB error') });
+    repo.updateStatus.mockResolvedValueOnce({
+      ok: false,
+      error: new Error('DB error'),
+    });
 
     const result = await useCase.execute(MOCK_ORDER.id, 'processing');
 
@@ -57,7 +60,15 @@ describe('UpdateOrderStatusUseCase', () => {
   });
 
   it('allows all valid status transitions', async () => {
-    const statuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'] as const;
+    const statuses = [
+      'pending',
+      'confirmed',
+      'processing',
+      'shipped',
+      'delivered',
+      'cancelled',
+      'refunded',
+    ] as const;
     for (const status of statuses) {
       const { useCase } = makeUseCase();
       const result = await useCase.execute('order-1', status);

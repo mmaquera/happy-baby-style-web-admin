@@ -10,7 +10,10 @@ import type {
 import type { Result } from '@/core/shared/Result';
 import { ok, err } from '@/core/shared/Result';
 import { categoryMapper } from '../mappers/categoryMapper';
-import type { Category as GQLCategory, CategoryFilterInput } from '@/generated/graphql';
+import type {
+  Category as GQLCategory,
+  CategoryFilterInput,
+} from '@/generated/graphql';
 import {
   GetCategoriesDocument,
   GetCategoryDocument,
@@ -101,9 +104,7 @@ export class ApolloCategoryRepository implements CategoryRepository {
       const entity = data?.createCategory?.data?.entity;
       if (!entity || !data?.createCategory?.success) {
         return err(
-          new Error(
-            data?.createCategory?.message ?? 'Error al crear categoría'
-          )
+          new Error(data?.createCategory?.message ?? 'Error al crear categoría')
         );
       }
       return ok(categoryMapper.toDomain(entity as GQLCategory));

@@ -3,12 +3,12 @@ import {
   LoginUserDocument,
   RefreshTokenDocument,
   LogoutUserDocument,
-  LoginUserMutation,
-  LoginUserMutationVariables,
-  RefreshTokenMutation,
-  RefreshTokenMutationVariables,
-  LogoutUserMutation,
-  UserRole,
+  type LoginUserMutation,
+  type LoginUserMutationVariables,
+  type RefreshTokenMutation,
+  type RefreshTokenMutationVariables,
+  type LogoutUserMutation,
+  type UserRole,
 } from '@/generated/graphql';
 import { logger } from '@/utils/logger';
 
@@ -150,7 +150,11 @@ export const useAuthGraphQL = () => {
 
       return {
         success: false,
-        message: error?.message ?? (err instanceof Error ? err.message : 'Error inesperado durante el login'),
+        message:
+          error?.message ??
+          (err instanceof Error
+            ? err.message
+            : 'Error inesperado durante el login'),
       };
     }
   };
@@ -218,7 +222,8 @@ export const useAuthGraphQL = () => {
       logger.error('Refresh token error:', err);
       return {
         success: false,
-        message: err instanceof Error ? err.message : 'Error al renovar el token',
+        message:
+          err instanceof Error ? err.message : 'Error al renovar el token',
       };
     }
   };
@@ -279,7 +284,11 @@ export const useAuthGraphQL = () => {
 
       return {
         success: false,
-        message: apolloErr?.message ?? (err instanceof Error ? err.message : 'Error inesperado al cerrar sesión'),
+        message:
+          apolloErr?.message ??
+          (err instanceof Error
+            ? err.message
+            : 'Error inesperado al cerrar sesión'),
       };
     }
   };

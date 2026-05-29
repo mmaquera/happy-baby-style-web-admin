@@ -24,7 +24,10 @@ describe('userMapper.toDomain', () => {
   it('maps GQL role enum to domain string', () => {
     const admin = userMapper.toDomain({ ...BASE_DTO, role: GQLUserRole.admin });
     const staff = userMapper.toDomain({ ...BASE_DTO, role: GQLUserRole.staff });
-    const customer = userMapper.toDomain({ ...BASE_DTO, role: GQLUserRole.customer });
+    const customer = userMapper.toDomain({
+      ...BASE_DTO,
+      role: GQLUserRole.customer,
+    });
 
     expect(admin.role).toBe('admin');
     expect(staff.role).toBe('staff');
@@ -81,7 +84,13 @@ describe('userMapper.toDomain', () => {
   it('maps profile.phone to null when missing', () => {
     const dto: UserDTO = {
       ...BASE_DTO,
-      profile: { id: 'p-1', firstName: 'X', lastName: 'Y', fullName: 'X Y', isDefault: false },
+      profile: {
+        id: 'p-1',
+        firstName: 'X',
+        lastName: 'Y',
+        fullName: 'X Y',
+        isDefault: false,
+      },
     };
     const user = userMapper.toDomain(dto);
     expect(user.profile?.phone).toBeNull();
@@ -154,7 +163,11 @@ describe('userMapper.toCreateDTO', () => {
   });
 
   it('sets role to null when absent', () => {
-    const dto = userMapper.toCreateDTO({ email: 'x@x.com', firstName: 'X', lastName: 'Y' });
+    const dto = userMapper.toCreateDTO({
+      email: 'x@x.com',
+      firstName: 'X',
+      lastName: 'Y',
+    });
     expect(dto.role).toBeNull();
   });
 });

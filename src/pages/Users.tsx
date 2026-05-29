@@ -1,7 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import type React from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import type { User, UserRole, CreateUserInput } from '@/core/domain/user/User';
-import type { CreateUserProfileInput, User as GQLUser } from '@/generated/graphql';
+import type {
+  CreateUserProfileInput,
+  User as GQLUser,
+} from '@/generated/graphql';
 import { useUserActions } from '@/hooks/useUserActions';
 import { useUserStats } from '@/hooks/useUsersGraphQL';
 import { Card } from '@/components/ui/Card';
@@ -559,9 +563,7 @@ export const UsersPage: React.FC = () => {
   };
 
   const handleDemoteFromAdmin = async (user: User) => {
-    if (
-      !window.confirm(`¿Remover permisos de administrador de ${user.email}?`)
-    )
+    if (!window.confirm(`¿Remover permisos de administrador de ${user.email}?`))
       return;
     await updateUser(user.id, { role: 'customer' });
   };
@@ -720,9 +722,7 @@ export const UsersPage: React.FC = () => {
                   }
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                     setIsActiveFilter(
-                      e.target.value === ''
-                        ? null
-                        : e.target.value === 'true'
+                      e.target.value === '' ? null : e.target.value === 'true'
                     )
                   }
                 >
@@ -741,10 +741,7 @@ export const UsersPage: React.FC = () => {
                 {users.map(user => {
                   const primaryProvider = AuthProvider.email;
                   return (
-                    <UserCard
-                      key={user.id}
-                      onClick={() => openEditModal(user)}
-                    >
+                    <UserCard key={user.id} onClick={() => openEditModal(user)}>
                       <AuthProviderIndicator provider={primaryProvider}>
                         {getProviderIcon(primaryProvider)}
                       </AuthProviderIndicator>
@@ -765,20 +762,20 @@ export const UsersPage: React.FC = () => {
                             {user.isActive ? 'Activo' : 'Inactivo'}
                           </UserStatus>
                         </UserDetails>
-                        {user.profile?.phone && (
+                        {user.profile?.phone ? (
                           <UserPhone>
                             <Phone size={12} />
                             {user.profile.phone}
                           </UserPhone>
-                        )}
-                        {user.profile?.dateOfBirth && (
+                        ) : null}
+                        {user.profile?.dateOfBirth ? (
                           <UserBirthDate>
                             <Calendar size={12} />
                             {new Date(
                               user.profile.dateOfBirth
                             ).toLocaleDateString()}
                           </UserBirthDate>
-                        )}
+                        ) : null}
                       </UserInfo>
                       <UserActions>
                         <div
@@ -831,7 +828,7 @@ export const UsersPage: React.FC = () => {
       />
 
       {/* Edit User Modal */}
-      {showEditModal && selectedUser && (
+      {showEditModal && selectedUser ? (
         <Modal onClick={() => setShowEditModal(false)}>
           <ModalContent onClick={(e: React.MouseEvent) => e.stopPropagation()}>
             <ModalHeader>
@@ -967,10 +964,10 @@ export const UsersPage: React.FC = () => {
             </FormActions>
           </ModalContent>
         </Modal>
-      )}
+      ) : null}
 
       {/* User Detail Modal */}
-      {selectedUser && (
+      {selectedUser ? (
         <UserDetailModal
           user={selectedUser as unknown as GQLUser}
           isOpen={showDetailModal}
@@ -979,10 +976,10 @@ export const UsersPage: React.FC = () => {
             setSelectedUser(null);
           }}
         />
-      )}
+      ) : null}
 
       {/* Password Management Modal */}
-      {selectedUser && (
+      {selectedUser ? (
         <PasswordManagementModal
           user={selectedUser}
           isOpen={showPasswordModal}
@@ -991,7 +988,7 @@ export const UsersPage: React.FC = () => {
             setSelectedUser(null);
           }}
         />
-      )}
+      ) : null}
     </Container>
   );
 };

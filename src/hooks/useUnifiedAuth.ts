@@ -3,13 +3,17 @@
 // Dependency Inversion: Depends on UnifiedAuthService abstraction
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useApolloClient, type ApolloClient, type NormalizedCacheObject } from '@apollo/client';
+import {
+  useApolloClient,
+  type ApolloClient,
+  type NormalizedCacheObject,
+} from '@apollo/client';
 import {
   AuthServiceFactory,
   AuthError,
 } from '../services/auth/UnifiedAuthService';
 import { UserRole } from '../types/unified';
-import { IAuthUser } from '../types/auth';
+import { type IAuthUser } from '../types/auth';
 import { logger } from '@/utils/logger';
 
 // Hook state interface

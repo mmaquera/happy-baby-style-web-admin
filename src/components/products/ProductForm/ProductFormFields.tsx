@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -169,7 +169,9 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
             <Select
               value={formData.categoryId}
               onChange={e => handleInputChange('categoryId', e.target.value)}
-              disabled={categoriesLoading && availableCategories.length === 0}
+              disabled={
+                categoriesLoading ? availableCategories.length === 0 : undefined
+              }
             >
               <option value=''>
                 {categoriesLoading && availableCategories.length === 0

@@ -9,11 +9,11 @@ import {
   useDeliverOrderMutation,
   useGetOrderStatsQuery,
   GetOrdersDocument,
-  OrderFilterInput,
-  CreateOrderInput,
-  UpdateOrderInput,
-  OrderStatus,
-  PaginationInput,
+  type OrderFilterInput,
+  type CreateOrderInput,
+  type UpdateOrderInput,
+  type OrderStatus,
+  type PaginationInput,
 } from '../generated/graphql';
 import toast from 'react-hot-toast';
 

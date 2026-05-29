@@ -3,7 +3,7 @@
 // Open/Closed: Extensible for new auth providers
 // Dependency Inversion: Depends on abstractions
 
-import { ApolloClient, type NormalizedCacheObject } from '@apollo/client';
+import { type ApolloClient, type NormalizedCacheObject } from '@apollo/client';
 import {
   LoginUserDocument,
   RefreshTokenDocument,
@@ -13,11 +13,11 @@ import {
 } from '@/generated/graphql';
 import { UserRole } from '@/types/unified';
 import {
-  IAuthToken,
-  IAuthUser,
-  IAuthResponse,
-  IAuthError,
-  ITokenStorage,
+  type IAuthToken,
+  type IAuthUser,
+  type IAuthResponse,
+  type IAuthError,
+  type ITokenStorage,
 } from '@/types/auth';
 import { logger } from '@/utils/logger';
 
@@ -134,7 +134,8 @@ export class UnifiedAuthService {
       };
     } catch (error: unknown) {
       if (error instanceof AuthError) throw error;
-      const msg = error instanceof Error ? error.message : 'Registration failed';
+      const msg =
+        error instanceof Error ? error.message : 'Registration failed';
       throw new AuthError('REGISTRATION_FAILED', msg);
     }
   }
@@ -214,15 +215,28 @@ export class UnifiedAuthService {
       };
     } catch (error: unknown) {
       if (error instanceof AuthError) throw error;
-      const gqlError = error as { graphQLErrors?: { message?: string; extensions?: { code?: string } }[]; networkError?: unknown; message?: string };
+      const gqlError = error as {
+        graphQLErrors?: { message?: string; extensions?: { code?: string } }[];
+        networkError?: unknown;
+        message?: string;
+      };
       if (gqlError.graphQLErrors?.length) {
         const e = gqlError.graphQLErrors[0];
-        throw new AuthError(e?.extensions?.code ?? 'LOGIN_FAILED', e?.message ?? 'Login failed');
+        throw new AuthError(
+          e?.extensions?.code ?? 'LOGIN_FAILED',
+          e?.message ?? 'Login failed'
+        );
       }
       if (gqlError.networkError) {
-        throw new AuthError('NETWORK_ERROR', 'Unable to connect to server. Please check your internet connection.');
+        throw new AuthError(
+          'NETWORK_ERROR',
+          'Unable to connect to server. Please check your internet connection.'
+        );
       }
-      const msg = error instanceof Error ? error.message : 'An unexpected error occurred during login';
+      const msg =
+        error instanceof Error
+          ? error.message
+          : 'An unexpected error occurred during login';
       throw new AuthError('LOGIN_FAILED', msg);
     }
   }
@@ -235,13 +249,26 @@ export class UnifiedAuthService {
       });
     } catch (error: unknown) {
       logger.warn('Logout server call failed:', error);
-      const gqlError = error as { graphQLErrors?: { extensions?: { code?: string } }[]; networkError?: unknown };
-      if (gqlError.graphQLErrors?.some(e => e.extensions?.code === 'UNAUTHENTICATED')) {
+      const gqlError = error as {
+        graphQLErrors?: { extensions?: { code?: string } }[];
+        networkError?: unknown;
+      };
+      if (
+        gqlError.graphQLErrors?.some(
+          e => e.extensions?.code === 'UNAUTHENTICATED'
+        )
+      ) {
         throw new AuthError('UNAUTHENTICATED', 'Usuario no autenticado');
       } else if (gqlError.networkError) {
-        throw new AuthError('NETWORK_ERROR', 'Error de conexión al cerrar sesión');
+        throw new AuthError(
+          'NETWORK_ERROR',
+          'Error de conexión al cerrar sesión'
+        );
       } else {
-        throw new AuthError('LOGOUT_FAILED', 'Error al cerrar sesión en el servidor');
+        throw new AuthError(
+          'LOGOUT_FAILED',
+          'Error al cerrar sesión en el servidor'
+        );
       }
     } finally {
       await this.tokenStorage.clearTokens();
@@ -274,7 +301,8 @@ export class UnifiedAuthService {
       return tokens;
     } catch (error: unknown) {
       if (error instanceof AuthError) throw error;
-      const msg = error instanceof Error ? error.message : 'Token refresh failed';
+      const msg =
+        error instanceof Error ? error.message : 'Token refresh failed';
       throw new AuthError('REFRESH_FAILED', msg);
     }
   }
@@ -351,22 +379,38 @@ export class UnifiedAuthService {
   }
 
   // Map GraphQL user to internal user format
-  private mapGraphQLUserToAuthUser(graphqlUser: Record<string, unknown> & { profile?: Record<string, unknown> | null }): IAuthUser {
+  private mapGraphQLUserToAuthUser(
+    graphqlUser: Record<string, unknown> & {
+      profile?: Record<string, unknown> | null;
+    }
+  ): IAuthUser {
     return {
       id: graphqlUser['id'] as string,
       email: graphqlUser['email'] as string,
       role: this.mapGraphQLRoleToUserRole(graphqlUser['role'] as string),
       isActive: graphqlUser['isActive'] as boolean,
       emailVerified: graphqlUser['emailVerified'] as boolean,
-      ...(typeof graphqlUser['lastLoginAt'] === 'string' ? { lastLoginAt: graphqlUser['lastLoginAt'] } : {}),
+      ...(typeof graphqlUser['lastLoginAt'] === 'string'
+        ? { lastLoginAt: graphqlUser['lastLoginAt'] }
+        : {}),
       profile: graphqlUser.profile
         ? {
             id: graphqlUser.profile['id'] as string,
-            ...(typeof graphqlUser.profile['firstName'] === 'string' ? { firstName: graphqlUser.profile['firstName'] } : {}),
-            ...(typeof graphqlUser.profile['lastName'] === 'string' ? { lastName: graphqlUser.profile['lastName'] } : {}),
-            ...(typeof graphqlUser.profile['phone'] === 'string' ? { phone: graphqlUser.profile['phone'] } : {}),
-            ...(typeof graphqlUser.profile['birthDate'] === 'string' ? { birthDate: graphqlUser.profile['birthDate'] } : {}),
-            ...(typeof graphqlUser.profile['avatar'] === 'string' ? { avatar: graphqlUser.profile['avatar'] } : {}),
+            ...(typeof graphqlUser.profile['firstName'] === 'string'
+              ? { firstName: graphqlUser.profile['firstName'] }
+              : {}),
+            ...(typeof graphqlUser.profile['lastName'] === 'string'
+              ? { lastName: graphqlUser.profile['lastName'] }
+              : {}),
+            ...(typeof graphqlUser.profile['phone'] === 'string'
+              ? { phone: graphqlUser.profile['phone'] }
+              : {}),
+            ...(typeof graphqlUser.profile['birthDate'] === 'string'
+              ? { birthDate: graphqlUser.profile['birthDate'] }
+              : {}),
+            ...(typeof graphqlUser.profile['avatar'] === 'string'
+              ? { avatar: graphqlUser.profile['avatar'] }
+              : {}),
           }
         : undefined,
     };

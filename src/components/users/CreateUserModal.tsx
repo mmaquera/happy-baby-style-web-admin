@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import type React from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { CreateUserProfileInput, UserRole } from '@/generated/graphql';
+import { type CreateUserProfileInput, UserRole } from '@/generated/graphql';
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -708,12 +709,12 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
 
         <ModalContent>
           {/* Server Error Banner */}
-          {serverError && (
+          {serverError ? (
             <ServerErrorBanner>
               <Shield size={16} />
               {serverError}
             </ServerErrorBanner>
-          )}
+          ) : null}
 
           {/* Account Information Section */}
           <Section>
@@ -774,7 +775,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                     showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
                   }
                 />
-                {formData.password && (
+                {formData.password ? (
                   <PasswordStrength>
                     <StrengthBar>
                       <StrengthFill strength={passwordStrength} />
@@ -783,7 +784,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                       Contraseña {getPasswordStrengthText(passwordStrength)}
                     </StrengthText>
                   </PasswordStrength>
-                )}
+                ) : null}
                 <FieldHint>
                   <Lock size={12} />
                   Debe contener mayúsculas, minúsculas, números y símbolos

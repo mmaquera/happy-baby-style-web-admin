@@ -7,10 +7,10 @@ import {
   useDeleteProductMutation,
   useUploadImageMutation,
   GetProductsDocument,
-  ProductFilterInput,
-  CreateProductInput,
-  UpdateProductInput,
-  PaginationInput,
+  type ProductFilterInput,
+  type CreateProductInput,
+  type UpdateProductInput,
+  type PaginationInput,
 } from '../generated/graphql';
 import toast from 'react-hot-toast';
 import { logger } from '@/utils/logger';

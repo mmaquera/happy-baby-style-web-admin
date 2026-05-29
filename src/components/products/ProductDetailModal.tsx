@@ -26,7 +26,13 @@ import {
   Database,
   ShoppingBag,
 } from 'lucide-react';
-import type { Product, ProductReview, InventoryTransaction, StockAlert, AppEvent } from './types';
+import type {
+  Product,
+  ProductReview,
+  InventoryTransaction,
+  StockAlert,
+  AppEvent,
+} from './types';
 
 interface ProductDetailModalProps {
   isOpen: boolean;
@@ -489,12 +495,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
               <PriceSection>
                 <CurrentPrice>S/ {currentPrice.toFixed(2)}</CurrentPrice>
-                {hasDiscount && (
+                {hasDiscount ? (
                   <>
                     <OriginalPrice>S/ {originalPrice.toFixed(2)}</OriginalPrice>
                     <DiscountBadge>-{discountPercentage}%</DiscountBadge>
                   </>
-                )}
+                ) : null}
               </PriceSection>
 
               <div style={{ display: 'flex', gap: theme.spacing[2] }}>
@@ -518,7 +524,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 Stock disponible: {product.stockQuantity} unidades
               </StockInfo>
 
-              {product.rating && (
+              {product.rating ? (
                 <RatingSection>
                   <Stars>
                     {renderStars(
@@ -529,7 +535,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     ({product.reviewCount} reseñas)
                   </span>
                 </RatingSection>
-              )}
+              ) : null}
             </ProductInfo>
           </ProductHeader>
 
@@ -587,40 +593,38 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
               {/* Attributes */}
               {product.attributes &&
-                Object.keys(product.attributes).length > 0 && (
-                  <Section>
-                    <SectionTitle>
-                      <Settings size={20} />
-                      Atributos
-                    </SectionTitle>
-                    <div
-                      style={{
-                        display: 'grid',
-                        gridTemplateColumns:
-                          'repeat(auto-fill, minmax(200px, 1fr))',
-                        gap: theme.spacing[3],
-                      }}
-                    >
-                      {Object.entries(product.attributes).map(
-                        ([key, value]) => (
-                          <div
-                            key={key}
-                            style={{
-                              padding: theme.spacing[2],
-                              background: theme.colors.white,
-                              borderRadius: theme.borderRadius.md,
-                            }}
-                          >
-                            <strong>{key}:</strong> {String(value)}
-                          </div>
-                        )
-                      )}
-                    </div>
-                  </Section>
-                )}
+              Object.keys(product.attributes).length > 0 ? (
+                <Section>
+                  <SectionTitle>
+                    <Settings size={20} />
+                    Atributos
+                  </SectionTitle>
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns:
+                        'repeat(auto-fill, minmax(200px, 1fr))',
+                      gap: theme.spacing[3],
+                    }}
+                  >
+                    {Object.entries(product.attributes).map(([key, value]) => (
+                      <div
+                        key={key}
+                        style={{
+                          padding: theme.spacing[2],
+                          background: theme.colors.white,
+                          borderRadius: theme.borderRadius.md,
+                        }}
+                      >
+                        <strong>{key}:</strong> {String(value)}
+                      </div>
+                    ))}
+                  </div>
+                </Section>
+              ) : null}
 
               {/* Reviews Section */}
-              {product.reviews && product.reviews.length > 0 && (
+              {product.reviews && product.reviews.length > 0 ? (
                 <Section>
                   <SectionTitle>
                     <MessageSquare size={20} />
@@ -633,114 +637,118 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                       gap: theme.spacing[3],
                     }}
                   >
-                    {product.reviews.slice(0, 5).map((review: ProductReview) => (
-                      <div
-                        key={review.id}
-                        style={{
-                          padding: theme.spacing[3],
-                          background: theme.colors.white,
-                          borderRadius: theme.borderRadius.md,
-                          border: '1px solid ' + theme.colors.border.light,
-                        }}
-                      >
+                    {product.reviews
+                      .slice(0, 5)
+                      .map((review: ProductReview) => (
                         <div
+                          key={review.id}
                           style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            marginBottom: theme.spacing[2],
+                            padding: theme.spacing[3],
+                            background: theme.colors.white,
+                            borderRadius: theme.borderRadius.md,
+                            border: `1px solid ${theme.colors.border.light}`,
                           }}
                         >
                           <div
                             style={{
                               display: 'flex',
+                              justifyContent: 'space-between',
                               alignItems: 'center',
-                              gap: theme.spacing[2],
+                              marginBottom: theme.spacing[2],
                             }}
                           >
-                            <User size={16} />
-                            <span
-                              style={{ fontWeight: theme.fontWeights.medium }}
-                            >
-                              {review.user?.firstName || 'Usuario'}{' '}
-                              {review.user?.lastName || ''}
-                            </span>
-                          </div>
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: theme.spacing[1],
-                            }}
-                          >
-                            {renderStars(review.rating)}
-                            <span
+                            <div
                               style={{
-                                fontSize: theme.fontSizes.sm,
-                                color: theme.colors.text.secondary,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: theme.spacing[2],
                               }}
                             >
-                              {new Date(review.createdAt).toLocaleDateString()}
-                            </span>
-                          </div>
-                        </div>
-                        {review.title && (
-                          <div
-                            style={{
-                              fontWeight: theme.fontWeights.medium,
-                              marginBottom: theme.spacing[1],
-                            }}
-                          >
-                            {review.title}
-                          </div>
-                        )}
-                        {review.comment && (
-                          <div
-                            style={{
-                              color: theme.colors.text.secondary,
-                              lineHeight: 1.5,
-                            }}
-                          >
-                            {review.comment}
-                          </div>
-                        )}
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: theme.spacing[2],
-                            marginTop: theme.spacing[2],
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: theme.spacing[1],
-                            }}
-                          >
-                            <ThumbsUp size={14} />
-                            <span style={{ fontSize: theme.fontSizes.sm }}>
-                              {review.helpfulCount} útil
-                            </span>
-                          </div>
-                          {review.isVerified && (
+                              <User size={16} />
+                              <span
+                                style={{ fontWeight: theme.fontWeights.medium }}
+                              >
+                                {review.user?.firstName || 'Usuario'}{' '}
+                                {review.user?.lastName || ''}
+                              </span>
+                            </div>
                             <div
                               style={{
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: theme.spacing[1],
-                                color: theme.colors.success,
-                                fontSize: theme.fontSizes.sm,
                               }}
                             >
-                              <CheckCircle size={14} />
-                              Verificado
+                              {renderStars(review.rating)}
+                              <span
+                                style={{
+                                  fontSize: theme.fontSizes.sm,
+                                  color: theme.colors.text.secondary,
+                                }}
+                              >
+                                {new Date(
+                                  review.createdAt
+                                ).toLocaleDateString()}
+                              </span>
                             </div>
-                          )}
+                          </div>
+                          {review.title ? (
+                            <div
+                              style={{
+                                fontWeight: theme.fontWeights.medium,
+                                marginBottom: theme.spacing[1],
+                              }}
+                            >
+                              {review.title}
+                            </div>
+                          ) : null}
+                          {review.comment ? (
+                            <div
+                              style={{
+                                color: theme.colors.text.secondary,
+                                lineHeight: 1.5,
+                              }}
+                            >
+                              {review.comment}
+                            </div>
+                          ) : null}
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: theme.spacing[2],
+                              marginTop: theme.spacing[2],
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: theme.spacing[1],
+                              }}
+                            >
+                              <ThumbsUp size={14} />
+                              <span style={{ fontSize: theme.fontSizes.sm }}>
+                                {review.helpfulCount} útil
+                              </span>
+                            </div>
+                            {review.isVerified ? (
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: theme.spacing[1],
+                                  color: theme.colors.success,
+                                  fontSize: theme.fontSizes.sm,
+                                }}
+                              >
+                                <CheckCircle size={14} />
+                                Verificado
+                              </div>
+                            ) : null}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
                     {product.reviews.length > 5 && (
                       <div
                         style={{
@@ -754,107 +762,107 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     )}
                   </div>
                 </Section>
-              )}
+              ) : null}
 
               {/* Inventory Transactions */}
               {product.inventoryTransactions &&
-                product.inventoryTransactions.length > 0 && (
-                  <Section>
-                    <SectionTitle>
-                      <Activity size={20} />
-                      Transacciones de Inventario (
-                      {product.inventoryTransactions.length})
-                    </SectionTitle>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: theme.spacing[2],
-                      }}
-                    >
-                      {product.inventoryTransactions
-                        .slice(0, 10)
-                        .map((transaction: InventoryTransaction) => (
+              product.inventoryTransactions.length > 0 ? (
+                <Section>
+                  <SectionTitle>
+                    <Activity size={20} />
+                    Transacciones de Inventario (
+                    {product.inventoryTransactions.length})
+                  </SectionTitle>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: theme.spacing[2],
+                    }}
+                  >
+                    {product.inventoryTransactions
+                      .slice(0, 10)
+                      .map((transaction: InventoryTransaction) => (
+                        <div
+                          key={transaction.id}
+                          style={{
+                            padding: theme.spacing[2],
+                            background: theme.colors.white,
+                            borderRadius: theme.borderRadius.md,
+                            border: `1px solid ${theme.colors.border.light}`,
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                          }}
+                        >
                           <div
-                            key={transaction.id}
                             style={{
-                              padding: theme.spacing[2],
-                              background: theme.colors.white,
-                              borderRadius: theme.borderRadius.md,
-                              border: '1px solid ' + theme.colors.border.light,
                               display: 'flex',
-                              justifyContent: 'space-between',
                               alignItems: 'center',
+                              gap: theme.spacing[2],
                             }}
                           >
-                            <div
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: theme.spacing[2],
-                              }}
-                            >
-                              <Database size={16} />
-                              <div>
-                                <div
-                                  style={{
-                                    fontWeight: theme.fontWeights.medium,
-                                  }}
-                                >
-                                  {transaction.type}
-                                </div>
-                                <div
-                                  style={{
-                                    fontSize: theme.fontSizes.sm,
-                                    color: theme.colors.text.secondary,
-                                  }}
-                                >
-                                  {transaction.quantity} unidades
-                                </div>
+                            <Database size={16} />
+                            <div>
+                              <div
+                                style={{
+                                  fontWeight: theme.fontWeights.medium,
+                                }}
+                              >
+                                {transaction.type}
                               </div>
-                            </div>
-                            <div style={{ textAlign: 'right' }}>
                               <div
                                 style={{
                                   fontSize: theme.fontSizes.sm,
                                   color: theme.colors.text.secondary,
                                 }}
                               >
-                                {new Date(
-                                  transaction.createdAt
-                                ).toLocaleDateString()}
+                                {transaction.quantity} unidades
                               </div>
-                              {transaction.reference && (
-                                <div
-                                  style={{
-                                    fontSize: theme.fontSizes.xs,
-                                    color: theme.colors.text.secondary,
-                                  }}
-                                >
-                                  Ref: {transaction.reference}
-                                </div>
-                              )}
                             </div>
                           </div>
-                        ))}
-                      {product.inventoryTransactions.length > 10 && (
-                        <div
-                          style={{
-                            textAlign: 'center',
-                            padding: theme.spacing[2],
-                            color: theme.colors.text.secondary,
-                          }}
-                        >
-                          Mostrando 10 de {product.inventoryTransactions.length}{' '}
-                          transacciones
+                          <div style={{ textAlign: 'right' }}>
+                            <div
+                              style={{
+                                fontSize: theme.fontSizes.sm,
+                                color: theme.colors.text.secondary,
+                              }}
+                            >
+                              {new Date(
+                                transaction.createdAt
+                              ).toLocaleDateString()}
+                            </div>
+                            {transaction.reference ? (
+                              <div
+                                style={{
+                                  fontSize: theme.fontSizes.xs,
+                                  color: theme.colors.text.secondary,
+                                }}
+                              >
+                                Ref: {transaction.reference}
+                              </div>
+                            ) : null}
+                          </div>
                         </div>
-                      )}
-                    </div>
-                  </Section>
-                )}
+                      ))}
+                    {product.inventoryTransactions.length > 10 && (
+                      <div
+                        style={{
+                          textAlign: 'center',
+                          padding: theme.spacing[2],
+                          color: theme.colors.text.secondary,
+                        }}
+                      >
+                        Mostrando 10 de {product.inventoryTransactions.length}{' '}
+                        transacciones
+                      </div>
+                    )}
+                  </div>
+                </Section>
+              ) : null}
 
               {/* Stock Alerts */}
-              {product.stockAlerts && product.stockAlerts.length > 0 && (
+              {product.stockAlerts && product.stockAlerts.length > 0 ? (
                 <Section>
                   <SectionTitle>
                     <AlertCircle size={20} />
@@ -873,14 +881,14 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                         style={{
                           padding: theme.spacing[3],
                           background: alert.isActive
-                            ? theme.colors.warning + '20'
+                            ? `${theme.colors.warning}20`
                             : theme.colors.background.light,
                           borderRadius: theme.borderRadius.md,
-                          border:
-                            '1px solid ' +
-                            (alert.isActive
-                              ? theme.colors.warning + '40'
-                              : theme.colors.border.light),
+                          border: `1px solid ${
+                            alert.isActive
+                              ? `${theme.colors.warning}40`
+                              : theme.colors.border.light
+                          }`,
                         }}
                       >
                         <div
@@ -944,10 +952,10 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     ))}
                   </div>
                 </Section>
-              )}
+              ) : null}
 
               {/* App Events */}
-              {product.appEvents && product.appEvents.length > 0 && (
+              {product.appEvents && product.appEvents.length > 0 ? (
                 <Section>
                   <SectionTitle>
                     <TrendingUp size={20} />
@@ -967,7 +975,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                           padding: theme.spacing[2],
                           background: theme.colors.white,
                           borderRadius: theme.borderRadius.md,
-                          border: '1px solid ' + theme.colors.border.light,
+                          border: `1px solid ${theme.colors.border.light}`,
                         }}
                       >
                         <div
@@ -1026,12 +1034,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     )}
                   </div>
                 </Section>
-              )}
+              ) : null}
             </MainContent>
 
             <Sidebar>
               {/* Category */}
-              {product.category && (
+              {product.category ? (
                 <Section>
                   <SectionTitle>
                     <MapPin size={20} />
@@ -1047,7 +1055,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     {product.category.name}
                   </div>
                 </Section>
-              )}
+              ) : null}
 
               {/* Usage Statistics */}
               <Section>
@@ -1134,8 +1142,8 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                       style={{
                         padding: theme.spacing[1],
                         background: product.isInStock
-                          ? theme.colors.success + '20'
-                          : theme.colors.error + '20',
+                          ? `${theme.colors.success}20`
+                          : `${theme.colors.error}20`,
                         color: product.isInStock
                           ? theme.colors.success
                           : theme.colors.error,

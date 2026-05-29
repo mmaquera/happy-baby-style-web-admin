@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import type React from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import type { User } from '@/core/domain/user/User';
 import { Card } from '@/components/ui/Card';
@@ -609,7 +610,7 @@ export const PasswordManagementModal: React.FC<
                 Cambio requerido en primer login
               </StatusBadge>
             </ActionContent>
-            {showTempPassword && (
+            {showTempPassword ? (
               <TempPasswordCard>
                 <TempPasswordHeader>
                   <CheckCircle size={16} />
@@ -626,7 +627,7 @@ export const PasswordManagementModal: React.FC<
                   </Button>
                 </PasswordDisplay>
               </TempPasswordCard>
-            )}
+            ) : null}
             <ActionButtons>
               <Button
                 variant='primary'
@@ -652,12 +653,12 @@ export const PasswordManagementModal: React.FC<
             </ActionHeader>
             <ActionContent>
               {/* ✅ Banner de error del servidor */}
-              {setPasswordError && (
+              {setPasswordError ? (
                 <ServerErrorBanner>
                   <AlertCircle size={16} />
                   {setPasswordError}
                 </ServerErrorBanner>
-              )}
+              ) : null}
 
               <div className='input-group'>
                 <Input
@@ -720,7 +721,7 @@ export const PasswordManagementModal: React.FC<
 
         <Section>
           {/* ✅ Display loading state */}
-          {historyLoading && passwordHistory.length === 0 && (
+          {historyLoading && passwordHistory.length === 0 ? (
             <div
               style={{
                 padding: theme.spacing[4],
@@ -730,10 +731,10 @@ export const PasswordManagementModal: React.FC<
             >
               Cargando historial de contraseñas...
             </div>
-          )}
+          ) : null}
 
           {/* ✅ Display error state */}
-          {historyError && !historyLoading && (
+          {historyError && !historyLoading ? (
             <div
               style={{
                 padding: theme.spacing[4],
@@ -753,7 +754,7 @@ export const PasswordManagementModal: React.FC<
               />
               Error al cargar historial: {historyError}
             </div>
-          )}
+          ) : null}
 
           {/* ✅ Display password history */}
           <PasswordHistoryCard actions={passwordHistory} />

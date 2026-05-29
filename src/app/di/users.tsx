@@ -22,7 +22,9 @@ export interface UserUseCases {
 
 const UserContext = createContext<UserUseCases | null>(null);
 
-function buildUserUseCases(client: ApolloClient<NormalizedCacheObject>): UserUseCases {
+function buildUserUseCases(
+  client: ApolloClient<NormalizedCacheObject>
+): UserUseCases {
   const repository = new ApolloUserRepository(client);
   return {
     list: new ListUsersUseCase(repository),
@@ -38,7 +40,9 @@ function buildUserUseCases(client: ApolloClient<NormalizedCacheObject>): UserUse
 export function UserProvider({ children }: { children: ReactNode }) {
   const client = useApolloClient() as ApolloClient<NormalizedCacheObject>;
   const useCases = useMemo(() => buildUserUseCases(client), [client]);
-  return <UserContext.Provider value={useCases}>{children}</UserContext.Provider>;
+  return (
+    <UserContext.Provider value={useCases}>{children}</UserContext.Provider>
+  );
 }
 
 export function useUserUseCases(): UserUseCases {

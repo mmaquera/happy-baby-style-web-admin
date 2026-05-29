@@ -5,7 +5,7 @@
 // Interface Segregation: No props interface needed
 // Dependency Inversion: Self-contained component
 
-import React from 'react';
+import type React from 'react';
 import styled from 'styled-components';
 import { Baby } from 'lucide-react';
 import { theme } from '@/styles/theme';

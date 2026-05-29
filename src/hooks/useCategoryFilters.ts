@@ -3,8 +3,8 @@ import { type PaginationInput, type Category } from '@/generated/graphql';
 
 type CategoryWithExtras = Category & { productsCount?: number };
 import {
-  CategoryFilters,
-  CategoryFilterInput,
+  type CategoryFilters,
+  type CategoryFilterInput,
 } from '@/components/categories/types';
 
 // Local types for internal state management
@@ -22,7 +22,10 @@ export interface UseCategoryFiltersReturn {
   // Filters
   filters: CategoryFilters;
   setFilters: (filters: CategoryFilters) => void;
-  updateFilter: (key: keyof CategoryFilters, value: CategoryFilters[keyof CategoryFilters]) => void;
+  updateFilter: (
+    key: keyof CategoryFilters,
+    value: CategoryFilters[keyof CategoryFilters]
+  ) => void;
   clearFilters: () => void;
 
   // Sorting
@@ -155,11 +158,17 @@ export const useCategoryFilters = (totalItems: number = 0) => {
   );
 
   // Update specific filter
-  const updateFilter = useCallback((key: keyof CategoryFilters, value: CategoryFilters[keyof CategoryFilters]) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-    // Reset to first page when filters change
-    setPagination(prev => ({ ...prev, offset: 0 }));
-  }, []);
+  const updateFilter = useCallback(
+    (
+      key: keyof CategoryFilters,
+      value: CategoryFilters[keyof CategoryFilters]
+    ) => {
+      setFilters(prev => ({ ...prev, [key]: value }));
+      // Reset to first page when filters change
+      setPagination(prev => ({ ...prev, offset: 0 }));
+    },
+    []
+  );
 
   // Clear all filters
   const clearFilters = useCallback(() => {
@@ -266,13 +275,17 @@ export const useCategoryFilters = (totalItems: number = 0) => {
 
       if (filters.minProducts !== undefined) {
         filtered = filtered.filter(
-          cat => ((cat as CategoryWithExtras).productsCount || 0) >= filters.minProducts!
+          cat =>
+            ((cat as CategoryWithExtras).productsCount || 0) >=
+            filters.minProducts!
         );
       }
 
       if (filters.maxProducts !== undefined) {
         filtered = filtered.filter(
-          cat => ((cat as CategoryWithExtras).productsCount || 0) <= filters.maxProducts!
+          cat =>
+            ((cat as CategoryWithExtras).productsCount || 0) <=
+            filters.maxProducts!
         );
       }
 

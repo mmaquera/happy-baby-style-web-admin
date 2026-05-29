@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import type React from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import {
@@ -85,7 +86,6 @@ const ErrorState = styled.div`
   padding: ${theme.spacing[6]};
   color: ${theme.colors.error};
 `;
-
 
 export const Products: React.FC = () => {
   // =====================================================
@@ -454,7 +454,7 @@ export const Products: React.FC = () => {
       />
 
       {/* Subtle loading indicator for category updates */}
-      {categoriesLoading && graphqlCategories.length > 0 && (
+      {categoriesLoading && graphqlCategories.length > 0 ? (
         <div
           style={{
             display: 'flex',
@@ -474,10 +474,10 @@ export const Products: React.FC = () => {
           />
           Actualizando categorías...
         </div>
-      )}
+      ) : null}
 
       {/* Subtle loading indicator for product updates */}
-      {productsLoading && products.length > 0 && (
+      {productsLoading && products.length > 0 ? (
         <div
           style={{
             display: 'flex',
@@ -497,7 +497,7 @@ export const Products: React.FC = () => {
           />
           Actualizando productos...
         </div>
-      )}
+      ) : null}
 
       {/* Product Filters - Clean and focused */}
       <ProductFilters

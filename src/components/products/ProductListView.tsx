@@ -1,4 +1,5 @@
-import React, { useState, useCallback } from 'react';
+import type React from 'react';
+import { useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 
@@ -820,14 +821,14 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
               <CurrentPrice>
                 {CURRENCY_SYMBOL} {product.currentPrice}
               </CurrentPrice>
-              {product.hasDiscount && (
+              {product.hasDiscount ? (
                 <>
                   <OriginalPrice>
                     {CURRENCY_SYMBOL} {product.price}
                   </OriginalPrice>
                   <DiscountBadge>-{product.discountPercentage}%</DiscountBadge>
                 </>
-              )}
+              ) : null}
             </PriceContainer>
 
             <StockStatus
