@@ -1,14 +1,4 @@
-export interface Category {
-  id: string;
-  name: string;
-  description?: string | null;
-  slug: string;
-  image?: string | null;
-  isActive: boolean;
-  sortOrder: number;
-  createdAt: string;
-  updatedAt: string;
-}
+export type { Category } from '@/core/domain/category/Category';
 
 // Enhanced filter types following development standards
 export interface CategoryFilterInput {

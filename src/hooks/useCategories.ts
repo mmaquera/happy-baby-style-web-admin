@@ -1,6 +1,5 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useCategoriesGraphQL } from './useCategoriesGraphQL';
-import { useCategoryActions } from './useCategoryActions';
 import { useCategoryFilters } from './useCategoryFilters';
 import { type PaginationInput, type Category, type CreateCategoryInput, type UpdateCategoryInput } from '@/generated/graphql';
 import {
@@ -180,19 +179,26 @@ export const useCategories = (): UseCategoriesReturn => {
     clearError,
   } = useCategoriesGraphQL();
 
-  // Actions
-  const {
-    handleDeleteCategory,
-    handleToggleStatus,
-    handleBulkDelete,
-    handleBulkToggleStatus,
-    selectedCategories,
-    selectCategory,
-    deselectCategory,
-    selectAllCategories,
-    clearSelection,
-    isCategorySelected,
-  } = useCategoryActions();
+  // Selection state (local — not in domain layer)
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
+  const selectCategory = useCallback(
+    (id: string) => setSelectedCategories(prev => [...new Set([...prev, id])]),
+    []
+  );
+  const deselectCategory = useCallback(
+    (id: string) => setSelectedCategories(prev => prev.filter(s => s !== id)),
+    []
+  );
+  const selectAllCategories = useCallback(
+    (ids: string[]) => setSelectedCategories(ids),
+    []
+  );
+  const clearSelection = useCallback(() => setSelectedCategories([]), []);
+  const isCategorySelected = useCallback(
+    (id: string) => selectedCategories.includes(id),
+    [selectedCategories]
+  );
 
   // Filters and pagination
   const {
@@ -283,66 +289,56 @@ export const useCategories = (): UseCategoriesReturn => {
   const toggleStatus = useCallback(
     async (categoryId: string, isActive: boolean) => {
       try {
-        const result = await handleToggleStatus(categoryId, isActive);
-        // Convert local filters to GraphQL format and refetch
         const graphqlFilters = mapFiltersToGraphQL(filters);
+        const result = await updateCategoryGraphQL(
+          categoryId,
+          { isActive },
+          graphqlFilters,
+          localPagination
+        );
         await fetchCategories(graphqlFilters, localPagination);
-        return result;
+        return result !== null;
       } catch (error) {
         throw error;
       }
     },
-    [
-      handleToggleStatus,
-      fetchCategories,
-      mapFiltersToGraphQL,
-      filters,
-      localPagination,
-    ]
+    [updateCategoryGraphQL, fetchCategories, mapFiltersToGraphQL, filters, localPagination]
   );
 
   // Wrapper for bulk delete
   const bulkDelete = useCallback(
     async (categoryIds: string[]) => {
       try {
-        const result = await handleBulkDelete(categoryIds);
-        // Convert local filters to GraphQL format and refetch
         const graphqlFilters = mapFiltersToGraphQL(filters);
+        const results = await Promise.all(
+          categoryIds.map(id => deleteCategoryGraphQL(id, graphqlFilters, localPagination))
+        );
         await fetchCategories(graphqlFilters, localPagination);
-        return result;
+        return results.every(Boolean);
       } catch (error) {
         throw error;
       }
     },
-    [
-      handleBulkDelete,
-      fetchCategories,
-      mapFiltersToGraphQL,
-      filters,
-      localPagination,
-    ]
+    [deleteCategoryGraphQL, fetchCategories, mapFiltersToGraphQL, filters, localPagination]
   );
 
   // Wrapper for bulk toggle status
   const bulkToggleStatus = useCallback(
     async (categoryIds: string[], isActive: boolean) => {
       try {
-        const result = await handleBulkToggleStatus(categoryIds, isActive);
-        // Convert local filters to GraphQL format and refetch
         const graphqlFilters = mapFiltersToGraphQL(filters);
+        const results = await Promise.all(
+          categoryIds.map(id =>
+            updateCategoryGraphQL(id, { isActive }, graphqlFilters, localPagination)
+          )
+        );
         await fetchCategories(graphqlFilters, localPagination);
-        return result;
+        return results.every(r => r !== null);
       } catch (error) {
         throw error;
       }
     },
-    [
-      handleBulkToggleStatus,
-      fetchCategories,
-      mapFiltersToGraphQL,
-      filters,
-      localPagination,
-    ]
+    [updateCategoryGraphQL, fetchCategories, mapFiltersToGraphQL, filters, localPagination]
   );
 
   // Wrapper for set filters

@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/Card';
 import { useUpdateCategory } from '@/hooks/useUpdateCategory';
 import { UpdateCategoryInput } from '@/generated/graphql';
 import { SVGUpload } from './SVGUpload/SVGUpload';
+import type { Category } from './types';
 import {
   X,
   Edit3,
@@ -21,18 +22,6 @@ import {
   Clock,
   Upload,
 } from 'lucide-react';
-
-interface Category {
-  id: string;
-  name: string;
-  description?: string | null;
-  slug: string;
-  image?: string | null;
-  isActive: boolean;
-  sortOrder: number;
-  createdAt: string;
-  updatedAt: string;
-}
 
 interface EditCategoryModalProps {
   isOpen: boolean;

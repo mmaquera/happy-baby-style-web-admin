@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import type { Category } from './types';
 import {
   X,
   Eye,
@@ -16,32 +17,6 @@ import {
   Link,
   Edit3,
 } from 'lucide-react';
-
-interface Category {
-  id: string;
-  name: string;
-  description?: string | null;
-  slug: string;
-  image?: string | null;
-  isActive: boolean;
-  sortOrder: number;
-  createdAt: string;
-  updatedAt: string;
-  products?: Array<{
-    id: string;
-    name: string;
-    description?: string | null;
-    price: number;
-    salePrice?: number | null;
-    sku: string;
-    images: string[];
-    isActive: boolean;
-    stockQuantity: number;
-    tags: string[];
-    rating?: number | null;
-    reviewCount: number;
-  }>;
-}
 
 interface CategoryDetailModalProps {
   isOpen: boolean;
@@ -216,43 +191,6 @@ const ProductsSection = styled.div`
   margin-top: ${theme.spacing[4]};
 `;
 
-const ProductGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: ${theme.spacing[3]};
-  margin-top: ${theme.spacing[3]};
-`;
-
-const ProductCard = styled.div`
-  background: ${theme.colors.background.light};
-  border: 1px solid ${theme.colors.border.light};
-  border-radius: ${theme.borderRadius.md};
-  padding: ${theme.spacing[3]};
-  transition: all 0.2s ease;
-
-  &:hover {
-    border-color: ${theme.colors.primary};
-    box-shadow: 0 4px 12px rgba(162, 133, 209, 0.15);
-  }
-`;
-
-const ProductName = styled.div`
-  font-family: ${theme.fonts.primary};
-  font-size: ${theme.fontSizes.sm};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[1]};
-`;
-
-const ProductMeta = styled.div`
-  font-family: ${theme.fonts.primary};
-  font-size: ${theme.fontSizes.xs};
-  color: ${theme.colors.text.secondary};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
 const EmptyState = styled.div`
   text-align: center;
   padding: ${theme.spacing[8]};
@@ -289,7 +227,7 @@ export const CategoryDetailModal: React.FC<CategoryDetailModalProps> = ({
 }) => {
   if (!isOpen || !category) return null;
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | Date) => {
     return new Date(dateString).toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'long',
@@ -460,40 +398,12 @@ export const CategoryDetailModal: React.FC<CategoryDetailModalProps> = ({
               <Package size={20} />
               Productos en esta Categoría
             </SectionTitle>
-            {category.products && category.products.length > 0 ? (
+            {category.productCount > 0 ? (
               <ProductsSection>
-                <InfoLabel style={{ marginBottom: theme.spacing[2] }}>
-                  Total: {category.products.length} productos
-                </InfoLabel>
-                <ProductGrid>
-                  {category.products.slice(0, 6).map(product => (
-                    <ProductCard key={product.id}>
-                      <ProductName>{product.name}</ProductName>
-                      <ProductMeta>
-                        <span>SKU: {product.sku}</span>
-                        <span>{product.stockQuantity} en stock</span>
-                      </ProductMeta>
-                      <ProductMeta>
-                        <span>{formatPrice(product.price)}</span>
-                        <StatusBadge isActive={product.isActive}>
-                          {product.isActive ? 'Activo' : 'Inactivo'}
-                        </StatusBadge>
-                      </ProductMeta>
-                    </ProductCard>
-                  ))}
-                </ProductGrid>
-                {category.products.length > 6 && (
-                  <div
-                    style={{
-                      textAlign: 'center',
-                      marginTop: theme.spacing[3],
-                      color: theme.colors.text.secondary,
-                      fontSize: theme.fontSizes.sm,
-                    }}
-                  >
-                    +{category.products.length - 6} productos más...
-                  </div>
-                )}
+                <InfoCard>
+                  <InfoLabel>Total de productos</InfoLabel>
+                  <InfoValue>{category.productCount}</InfoValue>
+                </InfoCard>
               </ProductsSection>
             ) : (
               <EmptyState>

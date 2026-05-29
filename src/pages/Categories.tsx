@@ -10,10 +10,11 @@ import {
   CategoryDetailModal,
   CategoryFilters,
 } from '@/components/categories';
-import type { CategoryFilters as CategoryFiltersType } from '@/components/categories/types';
-import type { Category } from '@/generated/graphql';
-import { useCategories } from '@/hooks/useCategories';
-import { toast } from 'react-hot-toast';
+import type {
+  CategoryFilters as CategoryFiltersType,
+  Category,
+} from '@/components/categories/types';
+import { useCategoryActions } from '@/hooks/useCategoryActions';
 import { logger } from '@/utils/logger';
 
 const CategoriesContainer = styled.div`
@@ -131,152 +132,111 @@ const ErrorMessage = styled.p`
 `;
 
 export const Categories: React.FC = () => {
-  // State for UI
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-  const [showFilters, setShowFilters] = useState(true); // Mostrar filtros por defecto
-  const [isUpdating, setIsUpdating] = useState(false); // Estado para indicar actualización
+  const [showFilters, setShowFilters] = useState(true);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [filters, setFilters] = useState<CategoryFiltersType>({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 20;
 
-  // Use the main categories hook
   const {
     categories,
+    total,
+    hasMore,
     loading,
     error,
-    pagination,
-    filters,
-    sortConfig,
-    createCategory,
-    updateCategory,
-    deleteCategory,
-    toggleStatus,
-    setFilters,
-    clearFilters,
-    handleSort,
-    goToPage,
-    selectCategory,
-    deselectCategory,
-    selectAllCategories,
-    clearSelection,
-    isCategorySelected,
     clearError,
-  } = useCategories();
+    loadCategories,
+    deleteCategory,
+    updateCategory,
+  } = useCategoryActions();
 
-  // Computed stats
+  const buildDomainFilter = useCallback(
+    () =>
+      Object.keys(filters).length > 0
+        ? {
+            ...(filters.search ? { search: filters.search } : {}),
+            ...(filters.isActive !== undefined
+              ? { isActive: filters.isActive }
+              : {}),
+          }
+        : undefined,
+    [filters]
+  );
+
+  useEffect(() => {
+    void loadCategories(buildDomainFilter(), PAGE_SIZE, (currentPage - 1) * PAGE_SIZE);
+  }, [loadCategories, buildDomainFilter, currentPage]);
+
   const stats = {
-    totalCategories: pagination.total,
-    activeCategories: categories.filter(cat => cat.isActive).length,
-    inactiveCategories: categories.filter(cat => !cat.isActive).length,
+    totalCategories: total,
+    activeCategories: categories.filter(c => c.isActive).length,
+    inactiveCategories: categories.filter(c => !c.isActive).length,
   };
 
-  // Event handlers
-  const handleAddCategory = useCallback(() => {
-    setIsCreateModalOpen(true);
-  }, []);
+  const handleAddCategory = useCallback(() => setIsCreateModalOpen(true), []);
 
-  const handleCreateModalClose = useCallback(() => {
+  const handleCreateCategorySuccess = useCallback((_result: unknown) => {
     setIsCreateModalOpen(false);
-  }, []);
-
-  const handleCreateCategorySuccess = useCallback((_newCategory: unknown) => {
     setIsUpdating(true);
-    toast.success('Categoría creada exitosamente');
-    setIsCreateModalOpen(false);
-    // La tabla se actualizará automáticamente via refetch con filtros preservados
-    setTimeout(() => setIsUpdating(false), 1000);
-  }, []);
-
-  const handleBulkActions = useCallback(() => {
-    // TODO: Implement bulk actions modal
-    logger.debug('Bulk actions clicked');
-  }, []);
-
-  const handleExport = useCallback(() => {
-    // TODO: Implement export functionality
-    logger.debug('Export clicked');
-  }, []);
-
-  const handleImport = useCallback(() => {
-    // TODO: Implement import functionality
-    logger.debug('Import clicked');
-  }, []);
+    void loadCategories(buildDomainFilter(), PAGE_SIZE, 0).then(() =>
+      setTimeout(() => setIsUpdating(false), 800)
+    );
+  }, [loadCategories, buildDomainFilter]);
 
   const handleEditCategory = useCallback(
     (categoryId: string) => {
-      const category = categories.find(cat => cat.id === categoryId);
-      if (category) {
-        setSelectedCategory(category);
+      const cat = categories.find(c => c.id === categoryId);
+      if (cat) {
+        setSelectedCategory(cat);
         setIsEditModalOpen(true);
       }
     },
     [categories]
   );
 
-  const handleEditModalClose = useCallback(() => {
+  const handleEditCategorySuccess = useCallback((_result: unknown) => {
     setIsEditModalOpen(false);
     setSelectedCategory(null);
-  }, []);
-
-  const handleEditCategorySuccess = useCallback((_updatedCategory: unknown) => {
     setIsUpdating(true);
-    toast.success('Categoría actualizada exitosamente');
-    setIsEditModalOpen(false);
-    setSelectedCategory(null);
-    // La tabla se actualizará automáticamente via refetch con filtros preservados
-    setTimeout(() => setIsUpdating(false), 1000);
-  }, []);
+    void loadCategories(buildDomainFilter(), PAGE_SIZE, 0).then(() =>
+      setTimeout(() => setIsUpdating(false), 800)
+    );
+  }, [loadCategories, buildDomainFilter]);
 
   const handleDeleteCategory = useCallback(
     async (categoryId: string) => {
-      if (
-        window.confirm('¿Estás seguro de que quieres eliminar esta categoría?')
-      ) {
-        try {
-          setIsUpdating(true);
-          await deleteCategory(categoryId);
-          // La tabla se actualizará automáticamente via refetch con filtros preservados
-          setTimeout(() => setIsUpdating(false), 1000);
-        } catch (error) {
-          setIsUpdating(false);
-          logger.error('Error deleting category:', error);
-        }
-      }
+      if (!window.confirm('¿Eliminar esta categoría?')) return;
+      setIsUpdating(true);
+      await deleteCategory(categoryId);
+      setIsUpdating(false);
     },
     [deleteCategory]
   );
 
   const handleToggleStatus = useCallback(
     async (categoryId: string, isActive: boolean) => {
-      try {
-        setIsUpdating(true);
-        await toggleStatus(categoryId, isActive);
-        // La tabla se actualizará automáticamente via refetch con filtros preservados
-        setTimeout(() => setIsUpdating(false), 1000);
-      } catch (error) {
-        setIsUpdating(false);
-        logger.error('Error toggling status:', error);
-      }
+      setIsUpdating(true);
+      await updateCategory(categoryId, { isActive });
+      setIsUpdating(false);
     },
-    [toggleStatus]
+    [updateCategory]
   );
 
   const handleViewDetails = useCallback(
     (categoryId: string) => {
-      const category = categories.find(cat => cat.id === categoryId);
-      if (category) {
-        setSelectedCategory(category);
+      const cat = categories.find(c => c.id === categoryId);
+      if (cat) {
+        setSelectedCategory(cat);
         setIsDetailModalOpen(true);
       }
     },
     [categories]
   );
-
-  const handleDetailModalClose = useCallback(() => {
-    setIsDetailModalOpen(false);
-    setSelectedCategory(null);
-  }, []);
 
   const handleEditFromDetail = useCallback((category: Category) => {
     setIsDetailModalOpen(false);
@@ -284,41 +244,34 @@ export const Categories: React.FC = () => {
     setIsEditModalOpen(true);
   }, []);
 
-  const handleViewModeChange = useCallback((mode: 'grid' | 'list') => {
-    setViewMode(mode);
+  const handleFiltersChange = useCallback((newFilters: CategoryFiltersType) => {
+    setFilters(newFilters);
+    setCurrentPage(1);
   }, []);
-
-  const handleFiltersChange = useCallback(
-    (newFilters: CategoryFiltersType) => {
-      setFilters(newFilters);
-    },
-    [setFilters]
-  );
 
   const handleClearFilters = useCallback(() => {
-    clearFilters();
-  }, [clearFilters]);
-
-  const handleSortChange = useCallback(
-    (field: string, direction: 'asc' | 'desc') => {
-      handleSort(field);
-    },
-    [handleSort]
-  );
-
-  const handlePageChange = useCallback(
-    (page: number) => {
-      goToPage(page);
-    },
-    [goToPage]
-  );
-
-  // Toggle filters visibility
-  const toggleFilters = useCallback(() => {
-    setShowFilters(prev => !prev);
+    setFilters({});
+    setCurrentPage(1);
   }, []);
 
-  // Loading state
+  const handleSortChange = useCallback((_field: string, _direction: 'asc' | 'desc') => {
+    logger.debug('Sort change — not yet implemented in domain layer');
+  }, []);
+
+  const handleBulkActions = useCallback(() => {
+    logger.debug('Bulk actions — not yet implemented');
+  }, []);
+
+  const handleExport = useCallback(() => {
+    logger.debug('Export — not yet implemented');
+  }, []);
+
+  const handleImport = useCallback(() => {
+    logger.debug('Import — not yet implemented');
+  }, []);
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
   if (loading && categories.length === 0) {
     return (
       <LoadingOverlay>
@@ -332,7 +285,6 @@ export const Categories: React.FC = () => {
 
   return (
     <CategoriesContainer>
-      {/* Update Indicator */}
       {isUpdating && (
         <UpdateIndicator>
           <UpdateSpinner />
@@ -344,14 +296,13 @@ export const Categories: React.FC = () => {
         title='Categorías Happy Baby Style'
         stats={stats}
         viewMode={viewMode}
-        onViewModeChange={handleViewModeChange}
+        onViewModeChange={setViewMode}
         onAddCategory={handleAddCategory}
         onBulkActions={handleBulkActions}
         onExport={handleExport}
         onImport={handleImport}
       />
 
-      {/* Filters Section */}
       {showFilters && (
         <CategoryFilters
           filters={filters}
@@ -361,7 +312,6 @@ export const Categories: React.FC = () => {
         />
       )}
 
-      {/* Error Display */}
       {error && (
         <ErrorContainer>
           <ErrorTitle>Error al cargar categorías</ErrorTitle>
@@ -370,7 +320,6 @@ export const Categories: React.FC = () => {
         </ErrorContainer>
       )}
 
-      {/* Categories Display */}
       {viewMode === 'grid' ? (
         <CategoryGrid
           categories={categories}
@@ -387,11 +336,11 @@ export const Categories: React.FC = () => {
           categories={categories}
           loading={loading}
           error={error}
-          total={pagination.total}
-          currentPage={pagination.currentPage}
-          totalPages={pagination.totalPages}
-          hasMore={pagination.hasMore}
-          onPageChange={handlePageChange}
+          total={total}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          hasMore={hasMore}
+          onPageChange={setCurrentPage}
           onEdit={handleEditCategory}
           onDelete={handleDeleteCategory}
           onToggleStatus={handleToggleStatus}
@@ -401,27 +350,30 @@ export const Categories: React.FC = () => {
         />
       )}
 
-      {/* Create Category Modal */}
       <CreateCategoryModal
         isOpen={isCreateModalOpen}
-        onClose={handleCreateModalClose}
+        onClose={() => setIsCreateModalOpen(false)}
         onSuccess={handleCreateCategorySuccess}
       />
 
-      {/* Edit Category Modal */}
       <EditCategoryModal
         isOpen={isEditModalOpen}
-        onClose={handleEditModalClose}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedCategory(null);
+        }}
         onSuccess={handleEditCategorySuccess}
         category={selectedCategory}
       />
 
-      {/* Category Detail Modal */}
       <CategoryDetailModal
         isOpen={isDetailModalOpen}
-        onClose={handleDetailModalClose}
+        onClose={() => {
+          setIsDetailModalOpen(false);
+          setSelectedCategory(null);
+        }}
         category={selectedCategory}
-        onEdit={(cat) => handleEditFromDetail(cat as import('@/generated/graphql').Category)}
+        onEdit={handleEditFromDetail}
       />
     </CategoriesContainer>
   );
