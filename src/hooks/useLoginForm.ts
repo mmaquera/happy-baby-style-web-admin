@@ -6,14 +6,10 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-
-// Types following Interface Segregation Principle
-interface LoginFormData {
-  email: string;
-  password: string;
-}
+import { loginSchema, type LoginFormData } from '@/core/shared/validation/authSchema';
 
 interface UseLoginFormReturn {
   form: ReturnType<typeof useForm<LoginFormData>>;
@@ -25,11 +21,7 @@ interface UseLoginFormReturn {
   clearError: () => void;
 }
 
-// Default values for the form
-const defaultValues: LoginFormData = {
-  email: '',
-  password: '',
-};
+const defaultValues: LoginFormData = { email: '', password: '' };
 
 export const useLoginForm = (): UseLoginFormReturn => {
   const navigate = useNavigate();
@@ -38,10 +30,10 @@ export const useLoginForm = (): UseLoginFormReturn => {
   const [showPassword, setShowPassword] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
 
-  // Form configuration with memoized validation rules
   const form = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
     defaultValues,
-    mode: 'onBlur', // Validate on blur for better UX
+    mode: 'onBlur',
   });
 
   // Memoized redirect path
