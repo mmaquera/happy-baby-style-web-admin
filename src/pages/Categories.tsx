@@ -1,16 +1,29 @@
 import type React from 'react';
-import { useState, useCallback, useEffect } from 'react';
+import { lazy, Suspense, useState, useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import {
   CategoryHeader,
   CategoryGrid,
   CategoryListView,
-  CreateCategoryModal,
-  EditCategoryModal,
-  CategoryDetailModal,
   CategoryFilters,
 } from '@/components/categories';
+
+const CreateCategoryModal = lazy(() =>
+  import('@/components/categories/CreateCategoryModal').then(m => ({
+    default: m.CreateCategoryModal,
+  }))
+);
+const EditCategoryModal = lazy(() =>
+  import('@/components/categories/EditCategoryModal').then(m => ({
+    default: m.EditCategoryModal,
+  }))
+);
+const CategoryDetailModal = lazy(() =>
+  import('@/components/categories/CategoryDetailModal').then(m => ({
+    default: m.CategoryDetailModal,
+  }))
+);
 import type {
   CategoryFilters as CategoryFiltersType,
   Category,
@@ -366,31 +379,43 @@ export const Categories: React.FC = () => {
         />
       )}
 
-      <CreateCategoryModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSuccess={handleCreateCategorySuccess}
-      />
+      {isCreateModalOpen && (
+        <Suspense fallback={null}>
+          <CreateCategoryModal
+            isOpen={isCreateModalOpen}
+            onClose={() => setIsCreateModalOpen(false)}
+            onSuccess={handleCreateCategorySuccess}
+          />
+        </Suspense>
+      )}
 
-      <EditCategoryModal
-        isOpen={isEditModalOpen}
-        onClose={() => {
-          setIsEditModalOpen(false);
-          setSelectedCategory(null);
-        }}
-        onSuccess={handleEditCategorySuccess}
-        category={selectedCategory}
-      />
+      {isEditModalOpen && (
+        <Suspense fallback={null}>
+          <EditCategoryModal
+            isOpen={isEditModalOpen}
+            onClose={() => {
+              setIsEditModalOpen(false);
+              setSelectedCategory(null);
+            }}
+            onSuccess={handleEditCategorySuccess}
+            category={selectedCategory}
+          />
+        </Suspense>
+      )}
 
-      <CategoryDetailModal
-        isOpen={isDetailModalOpen}
-        onClose={() => {
-          setIsDetailModalOpen(false);
-          setSelectedCategory(null);
-        }}
-        category={selectedCategory}
-        onEdit={handleEditFromDetail}
-      />
+      {isDetailModalOpen && (
+        <Suspense fallback={null}>
+          <CategoryDetailModal
+            isOpen={isDetailModalOpen}
+            onClose={() => {
+              setIsDetailModalOpen(false);
+              setSelectedCategory(null);
+            }}
+            category={selectedCategory}
+            onEdit={handleEditFromDetail}
+          />
+        </Suspense>
+      )}
     </CategoriesContainer>
   );
 };

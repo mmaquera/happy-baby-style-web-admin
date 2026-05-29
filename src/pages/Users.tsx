@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useState, useEffect, useCallback } from 'react';
+import { lazy, Suspense, useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import type { User, UserRole, CreateUserInput } from '@/core/domain/user/User';
 import type {
@@ -11,12 +11,25 @@ import { useUserStats } from '@/hooks/useUsersGraphQL';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { UserDetailModal } from '@/components/users/UserDetailModal';
 import { AuthProviderDashboard } from '@/components/users/AuthProviderDashboard';
-import { CreateUserModal } from '@/components/users';
 import { UserActionsMenu } from '@/components/users/UserActionsMenu';
-import { PasswordManagementModal } from '@/components/users/PasswordManagementModal';
 import { useProviderUtils } from '@/hooks/useAuthManagement';
+
+const UserDetailModal = lazy(() =>
+  import('@/components/users/UserDetailModal').then(m => ({
+    default: m.UserDetailModal,
+  }))
+);
+const CreateUserModal = lazy(() =>
+  import('@/components/users/CreateUserModal').then(m => ({
+    default: m.CreateUserModal,
+  }))
+);
+const PasswordManagementModal = lazy(() =>
+  import('@/components/users/PasswordManagementModal').then(m => ({
+    default: m.PasswordManagementModal,
+  }))
+);
 import { theme } from '@/styles/theme';
 import { AuthProvider } from '@/types';
 import {
@@ -820,12 +833,16 @@ export const UsersPage: React.FC = () => {
       </TabContent>
 
       {/* Create User Modal */}
-      <CreateUserModal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onSubmit={handleCreateUser}
-        isLoading={loading}
-      />
+      {showCreateModal && (
+        <Suspense fallback={null}>
+          <CreateUserModal
+            isOpen={showCreateModal}
+            onClose={() => setShowCreateModal(false)}
+            onSubmit={handleCreateUser}
+            isLoading={loading}
+          />
+        </Suspense>
+      )}
 
       {/* Edit User Modal */}
       {showEditModal && selectedUser ? (
@@ -967,27 +984,31 @@ export const UsersPage: React.FC = () => {
       ) : null}
 
       {/* User Detail Modal */}
-      {selectedUser ? (
-        <UserDetailModal
-          user={selectedUser as unknown as GQLUser}
-          isOpen={showDetailModal}
-          onClose={() => {
-            setShowDetailModal(false);
-            setSelectedUser(null);
-          }}
-        />
+      {showDetailModal && selectedUser ? (
+        <Suspense fallback={null}>
+          <UserDetailModal
+            user={selectedUser as unknown as GQLUser}
+            isOpen={showDetailModal}
+            onClose={() => {
+              setShowDetailModal(false);
+              setSelectedUser(null);
+            }}
+          />
+        </Suspense>
       ) : null}
 
       {/* Password Management Modal */}
-      {selectedUser ? (
-        <PasswordManagementModal
-          user={selectedUser}
-          isOpen={showPasswordModal}
-          onClose={() => {
-            setShowPasswordModal(false);
-            setSelectedUser(null);
-          }}
-        />
+      {showPasswordModal && selectedUser ? (
+        <Suspense fallback={null}>
+          <PasswordManagementModal
+            user={selectedUser}
+            isOpen={showPasswordModal}
+            onClose={() => {
+              setShowPasswordModal(false);
+              setSelectedUser(null);
+            }}
+          />
+        </Suspense>
       ) : null}
     </Container>
   );

@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useState, useCallback, useMemo } from 'react';
+import { lazy, Suspense, useState, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import {
@@ -7,10 +7,24 @@ import {
   ProductFilters,
   ProductGrid,
   ProductListView,
-  CreateProductModal,
-  EditProductModal,
-  ProductDetailModal,
 } from '@/components/products';
+
+// Heavy modals — lazy-loaded so they don't bloat the initial Products chunk
+const CreateProductModal = lazy(() =>
+  import('@/components/products/CreateProductModal').then(m => ({
+    default: m.CreateProductModal,
+  }))
+);
+const EditProductModal = lazy(() =>
+  import('@/components/products/EditProductModal').then(m => ({
+    default: m.EditProductModal,
+  }))
+);
+const ProductDetailModal = lazy(() =>
+  import('@/components/products/ProductDetailModal').then(m => ({
+    default: m.ProductDetailModal,
+  }))
+);
 import {
   useProducts,
   useCreateProduct,
@@ -562,32 +576,42 @@ export const Products: React.FC = () => {
         />
       )}
 
-      {/* Create Product Modal */}
-      <CreateProductModal
-        isOpen={isCreateModalOpen}
-        onClose={handleCloseCreateModal}
-        onSuccess={handleCreateProductSuccess}
-        categories={availableCategories}
-        availableTags={[]} // TODO: Implement tags from GraphQL
-      />
+      {/* Modals — lazy-loaded; only mounted when open */}
+      {isCreateModalOpen && (
+        <Suspense fallback={null}>
+          <CreateProductModal
+            isOpen={isCreateModalOpen}
+            onClose={handleCloseCreateModal}
+            onSuccess={handleCreateProductSuccess}
+            categories={availableCategories}
+            availableTags={[]}
+          />
+        </Suspense>
+      )}
 
-      {/* Edit Product Modal */}
-      <EditProductModal
-        isOpen={isEditModalOpen}
-        onClose={handleCloseEditModal}
-        onSuccess={handleEditProductSuccess}
-        product={editingProduct}
-        categories={availableCategories}
-        availableTags={[]} // TODO: Implement tags from GraphQL
-      />
+      {isEditModalOpen && (
+        <Suspense fallback={null}>
+          <EditProductModal
+            isOpen={isEditModalOpen}
+            onClose={handleCloseEditModal}
+            onSuccess={handleEditProductSuccess}
+            product={editingProduct}
+            categories={availableCategories}
+            availableTags={[]}
+          />
+        </Suspense>
+      )}
 
-      {/* Product Detail Modal */}
-      <ProductDetailModal
-        isOpen={!!selectedProduct}
-        onClose={handleCloseProductDetailModal}
-        product={selectedProduct}
-        onEdit={product => handleEditProduct(product.id)}
-      />
+      {!!selectedProduct && (
+        <Suspense fallback={null}>
+          <ProductDetailModal
+            isOpen={!!selectedProduct}
+            onClose={handleCloseProductDetailModal}
+            product={selectedProduct}
+            onEdit={product => handleEditProduct(product.id)}
+          />
+        </Suspense>
+      )}
     </ProductsContainer>
   );
 };
