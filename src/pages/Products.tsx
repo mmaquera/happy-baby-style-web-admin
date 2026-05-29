@@ -1,5 +1,6 @@
 import type React from 'react';
 import { lazy, Suspense, useState, useCallback, useMemo } from 'react';
+import { useUIPreferencesStore } from '@/stores/uiPreferencesStore';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import {
@@ -107,7 +108,8 @@ export const Products: React.FC = () => {
   // =====================================================
 
   // UI State - Local component state only
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  const { productsViewMode: viewMode, setProductsViewMode: setViewMode } =
+    useUIPreferencesStore();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);

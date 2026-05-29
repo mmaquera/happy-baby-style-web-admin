@@ -1,5 +1,6 @@
 import type React from 'react';
 import { lazy, Suspense, useState, useCallback, useEffect } from 'react';
+import { useUIPreferencesStore } from '@/stores/uiPreferencesStore';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import {
@@ -146,7 +147,8 @@ const ErrorMessage = styled.p`
 `;
 
 export const Categories: React.FC = () => {
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  const { categoriesViewMode: viewMode, setCategoriesViewMode: setViewMode } =
+    useUIPreferencesStore();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
