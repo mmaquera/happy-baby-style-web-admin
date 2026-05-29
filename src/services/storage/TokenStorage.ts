@@ -162,7 +162,7 @@ export class TokenStorageFactory {
 
   // Can be extended for other storage methods (IndexedDB, cookies, etc.)
   static createSecureStorage(): ITokenStorage {
-    // TODO: Implement secure storage (encrypted localStorage, etc.)
+    // Migración a cookies httpOnly/secure pendiente (plan de seguridad, requiere backend)
     return new LocalTokenStorage();
   }
 }

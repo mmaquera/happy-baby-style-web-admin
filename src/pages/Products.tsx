@@ -356,15 +356,13 @@ export const Products: React.FC = () => {
 
   const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
-    // TODO: Implement pagination with GraphQL
-    // This would require updating the useProducts hook to support page-based pagination
+    // Page-based GraphQL pagination: wire currentPage → offset in useProducts (Fase 2 backlog)
   }, []);
 
   const handleSort = useCallback((field: string, direction: 'asc' | 'desc') => {
     setSortField(field);
     setSortDirection(direction);
-    // TODO: Implement sorting with GraphQL
-    // This would require updating the useProducts hook to support sorting
+    // Server-side sorting: pass sort params to useProducts query (Fase 2 backlog)
   }, []);
 
   const handleLoadMore = useCallback(() => {
@@ -538,7 +536,7 @@ export const Products: React.FC = () => {
           return filterObj;
         })()}
         categories={availableCategories}
-        availableTags={[]} // TODO: Implement tags from GraphQL
+        availableTags={[]} // Tags query pendiente en Fase 2
         onFilterChange={handleFilterChange}
         onClearFilters={handleClearFilters}
       />

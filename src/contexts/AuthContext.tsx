@@ -359,7 +359,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [authService]);
 
-  // Register function - TODO: Implement when backend supports it
+  // Register es manejado por useRegisterUser (mutación GraphQL directa).
+  // Este fallback en AuthContext sólo hace login; se retirará al consolidar el flujo de auth.
   const register = useCallback(
     async (credentials: {
       email: string;
@@ -370,8 +371,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       try {
         dispatch({ type: 'SET_LOADING', payload: true });
 
-        // TODO: Implement register mutation
-        // For now, just login after registration
         const success = await login({
           email: credentials.email,
           password: credentials.password,

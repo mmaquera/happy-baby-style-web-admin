@@ -416,7 +416,8 @@ export const ProductDetail: React.FC = () => {
   }, [navigate]);
 
   const handleEdit = useCallback(() => {
-    // TODO: Implement edit functionality
+    // Pendiente: conectar al caso de uso UpdateProduct cuando la página
+    // deje de usar datos mock y reciba el producto via GraphQL
     logger.debug('Edit product:', product.id);
   }, [product.id]);
 
@@ -424,14 +425,16 @@ export const ProductDetail: React.FC = () => {
     if (
       window.confirm('¿Estás seguro de que quieres eliminar este producto?')
     ) {
-      // TODO: Implement delete functionality
+      // Pendiente: conectar al caso de uso DeleteProduct cuando la página
+      // deje de usar datos mock y reciba el producto via GraphQL
       logger.debug('Delete product:', product.id);
       navigate('/products');
     }
   }, [product.id, navigate]);
 
   const handleToggleStatus = useCallback(() => {
-    // TODO: Implement status toggle
+    // Pendiente: conectar al caso de uso UpdateProduct (isActive) cuando la
+    // página deje de usar datos mock y reciba el producto via GraphQL
     logger.debug('Toggle status:', product.id, !product.isActive);
   }, [product.id, product.isActive]);
 

@@ -83,8 +83,8 @@ export const useForgotPassword = (): UseForgotPasswordReturn => {
     }));
 
     try {
-      // TODO: Replace with actual API call
-      // This is a simulation - implement actual password reset logic
+      // Simulación: reemplazar con la mutación GraphQL de reset de contraseña
+      // cuando el backend exponga el endpoint (plan de seguridad, Fase 3)
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Simulate success
