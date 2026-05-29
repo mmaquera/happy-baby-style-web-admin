@@ -171,29 +171,8 @@ export class GraphQLAuthService extends BaseAuthService {
         mutation: LogoutUserDocument,
       });
     } catch (error: unknown) {
-      // Continue with logout even if server call fails
+      // Server logout failed — tokens are cleared in finally regardless
       logger.warn('Logout server call failed:', error);
-      const gqlError = error as {
-        graphQLErrors?: { extensions?: { code?: string } }[];
-        networkError?: unknown;
-      };
-      if (
-        gqlError.graphQLErrors?.some(
-          e => e.extensions?.code === 'UNAUTHENTICATED'
-        )
-      ) {
-        throw new AuthError('UNAUTHENTICATED', 'Usuario no autenticado');
-      } else if (gqlError.networkError) {
-        throw new AuthError(
-          'NETWORK_ERROR',
-          'Error de conexión al cerrar sesión'
-        );
-      } else {
-        throw new AuthError(
-          'LOGOUT_FAILED',
-          'Error al cerrar sesión en el servidor'
-        );
-      }
     } finally {
       await this.clearTokens();
     }

@@ -49,24 +49,23 @@ describe('AuthService', () => {
           password: 'password123',
         };
 
+        const mockUser = {
+          id: '1',
+          email: 'test@example.com',
+          role: UserRole.ADMIN,
+          isActive: true,
+          emailVerified: true,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
         const mockResponse = {
           data: {
-            login: {
+            loginUser: {
               success: true,
-              user: {
-                id: '1',
-                email: 'test@example.com',
-                role: UserRole.ADMIN,
-                isActive: true,
-                emailVerified: true,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-              },
-              tokens: {
-                accessToken: 'access-token',
-                refreshToken: 'refresh-token',
-                expiresAt: new Date(Date.now() + 3600000),
-              },
+              accessToken: 'access-token',
+              refreshToken: 'refresh-token',
+              expiresAt: new Date(Date.now() + 3600000),
+              user: mockUser,
               message: 'Login successful',
             },
           },
@@ -79,7 +78,7 @@ describe('AuthService', () => {
         expect(result.success).toBe(true);
         expect(result.tokens.accessToken).toBe('access-token');
         expect(result.tokens.refreshToken).toBe('refresh-token');
-        expect(result.user).toEqual(mockResponse.data.login.user);
+        expect(result.user).toEqual(mockUser);
         expect(localStorageMock.setItem).toHaveBeenCalledWith(
           'accessToken',
           'access-token'
@@ -160,6 +159,7 @@ describe('AuthService', () => {
         const mockResponse = {
           data: {
             refreshToken: {
+              success: true,
               accessToken: 'new-access-token',
               refreshToken: 'new-refresh-token',
               expiresAt: new Date(Date.now() + 3600000),
@@ -185,8 +185,9 @@ describe('AuthService', () => {
 
       it('should throw AuthError when refresh fails', async () => {
         vi.mocked(mockApolloClient.mutate).mockResolvedValue({
-          data: { refreshToken: null },
-          errors: [{ message: 'Invalid refresh token' }],
+          data: {
+            refreshToken: { success: false, message: 'Invalid refresh token' },
+          },
         });
 
         await expect(authService.refreshToken('invalid-token')).rejects.toThrow(
@@ -207,10 +208,15 @@ describe('AuthService', () => {
           updatedAt: new Date(),
         };
 
-        localStorageMock.getItem.mockReturnValue('valid-token');
+        const futureExpiry = new Date(Date.now() + 3600000).toISOString();
+        localStorageMock.getItem.mockImplementation((key: string) => {
+          if (key === 'accessToken') return 'valid-token';
+          if (key === 'tokenExpiresAt') return futureExpiry;
+          return null;
+        });
 
         vi.mocked(mockApolloClient.query).mockResolvedValue({
-          data: { me: mockUser },
+          data: { currentUser: mockUser },
         });
 
         const result = await authService.getCurrentUser();
@@ -269,7 +275,12 @@ describe('AuthService', () => {
       });
 
       it('should return false when token is expired', () => {
-        localStorageMock.getItem.mockReturnValue('expired-token');
+        const pastExpiry = new Date(Date.now() - 1000).toISOString();
+        localStorageMock.getItem.mockImplementation((key: string) => {
+          if (key === 'accessToken') return 'expired-token';
+          if (key === 'tokenExpiresAt') return pastExpiry;
+          return null;
+        });
 
         const result = authService.isAuthenticated();
 
