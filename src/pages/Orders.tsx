@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import {
@@ -15,53 +15,9 @@ import {
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { useOrders } from '@/hooks/useOrdersGraphQL';
-import { OrderStatus } from '@/types';
+import { useOrderActions } from '@/hooks/useOrderActions';
+import type { Order, OrderStatus } from '@/core/domain/order/Order';
 import { theme } from '@/styles/theme';
-import { logger } from '@/utils/logger';
-
-type GQLOrder = ReturnType<typeof useOrders>['orders'][number];
-
-interface SelectedOrderItem {
-  id: string;
-  orderId?: string | undefined;
-  productId?: string | undefined;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
-  product?: unknown;
-  createdAt: Date;
-}
-
-interface SelectedOrder {
-  id: string;
-  userId?: string;
-  status: OrderStatus;
-  totalAmount: number;
-  shippingAddress?: {
-    street?: string | undefined;
-    city?: string | undefined;
-    state?: string | undefined;
-    zipCode?: string | undefined;
-    country?: string | undefined;
-    address1?: string | undefined;
-    postalCode?: string | undefined;
-  } | null | undefined;
-  items: SelectedOrderItem[];
-  user?: {
-    id: string;
-    userId?: string;
-    firstName?: string;
-    lastName?: string;
-    phone?: string;
-    birthDate?: Date;
-    avatarUrl?: string;
-    createdAt?: Date;
-    updatedAt?: Date;
-  };
-  createdAt: Date;
-  updatedAt: Date;
-}
 
 const statusConfig = {
   pending: {
@@ -100,104 +56,62 @@ const statusConfig = {
     icon: XCircle,
     bgColor: theme.colors.error + '20',
   },
+  refunded: {
+    label: 'Reembolsado',
+    color: theme.colors.text.secondary,
+    icon: XCircle,
+    bgColor: theme.colors.text.secondary + '20',
+  },
 };
 
 export const Orders: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | ''>('');
-  const [selectedOrder, setSelectedOrder] = useState<SelectedOrder | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-  // Use custom hook for orders
-  const {
-    orders,
-    loading: isLoading,
-    error,
-    refetch,
-  } = useOrders(
-    statusFilter
-      ? {
-          filter: { status: statusFilter },
-        }
-      : {}
-  );
+  const { orders, loading: isLoading, error, loadOrders, updateStatus } =
+    useOrderActions();
 
-  // Filter orders based on search term
+  useEffect(() => {
+    void loadOrders(statusFilter ? { status: statusFilter } : undefined);
+  }, [loadOrders, statusFilter]);
+
   const filteredOrders = orders.filter(
     order =>
-      (order.user?.firstName || '')
+      (order.customer?.firstName ?? '')
         .toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
-      (order.user?.lastName || '')
+      (order.customer?.lastName ?? '')
         .toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
-      order.id.toLowerCase().includes(searchTerm.toLowerCase())
+      order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-CO', {
+  const formatCurrency = (amount: number) =>
+    new Intl.NumberFormat('es-CO', {
       style: 'currency',
       currency: 'COP',
     }).format(amount);
-  };
 
   const formatDate = (date: Date | string) => {
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
-    return format(dateObj, 'dd/MM/yyyy HH:mm', { locale: es });
+    const d = typeof date === 'string' ? new Date(date) : date;
+    return format(d, 'dd/MM/yyyy HH:mm', { locale: es });
   };
 
-  const getStatusConfig = (status: string) => {
-    return (
-      statusConfig[status as keyof typeof statusConfig] || statusConfig.pending
-    );
-  };
+  const getStatusConfig = (status: string) =>
+    statusConfig[status as keyof typeof statusConfig] ?? statusConfig.pending;
 
-  const handleStatusChange = async (orderId: string, newStatus: string) => {
-    try {
-      // TODO: Implement status change
-      logger.debug('Status change:', orderId, newStatus);
-    } catch (error) {
-      logger.error('Error changing status:', error);
-    }
-  };
+  const handleStatusChange = useCallback(
+    async (orderId: string, newStatus: string) => {
+      await updateStatus(orderId, newStatus as OrderStatus);
+    },
+    [updateStatus]
+  );
 
-  const handleOrderSelect = (order: GQLOrder) => {
-    // Convert GraphQL order to unified Order type
-    const unifiedOrder: SelectedOrder = {
-      id: order.id,
-      userId: order.user?.id,
-      status: order.status as OrderStatus,
-      totalAmount: order.totalAmount,
-      shippingAddress: order.shippingAddress as SelectedOrder['shippingAddress'],
-      items:
-        order.items.map((item): SelectedOrderItem => ({
-          id: item.id,
-          productId: item.product.id,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          totalPrice: item.totalPrice,
-          product: item.product,
-          createdAt: new Date(),
-        })),
-      ...(order.user
-        ? {
-            user: {
-              id: order.user.id,
-              ...(order.user.firstName ? { firstName: order.user.firstName } : {}),
-              ...(order.user.lastName ? { lastName: order.user.lastName } : {}),
-              ...(order.user.phone ? { phone: order.user.phone } : {}),
-            },
-          }
-        : {}),
-      createdAt: new Date(order.createdAt),
-      updatedAt: new Date(order.updatedAt),
-    };
-    setSelectedOrder(unifiedOrder);
-  };
-
-  if (isLoading) {
+  if (isLoading && orders.length === 0) {
     return (
       <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <div style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>🔄</div>
         <p>Cargando pedidos...</p>
       </div>
     );
@@ -206,9 +120,13 @@ export const Orders: React.FC = () => {
   if (error) {
     return (
       <div style={{ padding: '2rem', textAlign: 'center' }}>
-        <div style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>❌</div>
         <p>Error al cargar los pedidos</p>
-        <Button onClick={() => refetch()} style={{ marginTop: '1rem' }}>
+        <Button
+          onClick={() =>
+            loadOrders(statusFilter ? { status: statusFilter } : undefined)
+          }
+          style={{ marginTop: '1rem' }}
+        >
           Reintentar
         </Button>
       </div>
@@ -272,7 +190,7 @@ export const Orders: React.FC = () => {
         >
           <div style={{ flex: 1, minWidth: '300px' }}>
             <Input
-              placeholder='Buscar por cliente, email o ID...'
+              placeholder='Buscar por cliente, número de pedido o ID...'
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               icon={<Search size={16} />}
@@ -384,7 +302,7 @@ export const Orders: React.FC = () => {
                           fontSize: theme.fontSizes.sm,
                         }}
                       >
-                        #{order.id.slice(0, 8)}
+                        #{order.orderNumber}
                       </span>
                     </div>
 
@@ -397,19 +315,19 @@ export const Orders: React.FC = () => {
                         color: theme.colors.text.primary,
                       }}
                     >
-                      {order.user?.firstName} {order.user?.lastName}
+                      {order.customer?.firstName} {order.customer?.lastName}
                     </h3>
 
-                    <p
-                      style={{
-                        color: theme.colors.text.secondary,
-                        marginBottom: '0.5rem',
-                      }}
-                    >
-                      {order.user?.firstName} {order.user?.lastName}
-                    </p>
-
-                    {/* Phone is not available in the GraphQL UserProfile type for orders */}
+                    {order.customer?.email && (
+                      <p
+                        style={{
+                          color: theme.colors.text.secondary,
+                          marginBottom: '0.5rem',
+                        }}
+                      >
+                        {order.customer.email}
+                      </p>
+                    )}
 
                     <p
                       style={{
@@ -447,8 +365,8 @@ export const Orders: React.FC = () => {
                           fontSize: theme.fontSizes.sm,
                         }}
                       >
-                        {/* TODO: orderItems no está disponible en GraphQL actualmente */}
-                        0 productos
+                        {order.items.length} producto
+                        {order.items.length !== 1 ? 's' : ''}
                       </p>
                     </div>
 
@@ -456,7 +374,7 @@ export const Orders: React.FC = () => {
                       <Button
                         variant='outline'
                         size='sm'
-                        onClick={() => handleOrderSelect(order)}
+                        onClick={() => setSelectedOrder(order)}
                       >
                         <Eye size={16} style={{ marginRight: '0.25rem' }} />
                         Ver
@@ -539,7 +457,7 @@ export const Orders: React.FC = () => {
                   fontWeight: theme.fontWeights.medium,
                 }}
               >
-                Detalles del Pedido
+                Pedido #{selectedOrder.orderNumber}
               </h2>
               <Button
                 variant='outline'
@@ -561,13 +479,17 @@ export const Orders: React.FC = () => {
                 Información del Cliente
               </h3>
               <p>
-                <strong>Nombre:</strong> {selectedOrder.user?.firstName}{' '}
-                {selectedOrder.user?.lastName}
+                <strong>Nombre:</strong> {selectedOrder.customer?.firstName}{' '}
+                {selectedOrder.customer?.lastName}
               </p>
-              {/* Email is not available in the UserProfile type for orders */}
-              {selectedOrder.user?.phone && (
+              {selectedOrder.customer?.email && (
                 <p>
-                  <strong>Teléfono:</strong> {selectedOrder.user.phone}
+                  <strong>Email:</strong> {selectedOrder.customer.email}
+                </p>
+              )}
+              {selectedOrder.customer?.phone && (
+                <p>
+                  <strong>Teléfono:</strong> {selectedOrder.customer.phone}
                 </p>
               )}
             </div>
@@ -583,19 +505,22 @@ export const Orders: React.FC = () => {
                 >
                   Dirección de Envío
                 </h3>
-                <p>{selectedOrder.shippingAddress?.street}</p>
+                <p>{selectedOrder.shippingAddress.address1}</p>
+                {selectedOrder.shippingAddress.address2 && (
+                  <p>{selectedOrder.shippingAddress.address2}</p>
+                )}
                 <p>
-                  {selectedOrder.shippingAddress?.city},{' '}
-                  {selectedOrder.shippingAddress?.state}
+                  {selectedOrder.shippingAddress.city},{' '}
+                  {selectedOrder.shippingAddress.state}
                 </p>
                 <p>
-                  {selectedOrder.shippingAddress?.zipCode},{' '}
-                  {selectedOrder.shippingAddress?.country}
+                  {selectedOrder.shippingAddress.postalCode},{' '}
+                  {selectedOrder.shippingAddress.country}
                 </p>
               </div>
             )}
 
-            {selectedOrder.items && selectedOrder.items.length > 0 && (
+            {selectedOrder.items.length > 0 && (
               <div style={{ marginBottom: '1.5rem' }}>
                 <h3
                   style={{
@@ -607,7 +532,7 @@ export const Orders: React.FC = () => {
                   Productos
                 </h3>
                 <div style={{ display: 'grid', gap: '0.5rem' }}>
-                  {selectedOrder.items.map((item) => (
+                  {selectedOrder.items.map(item => (
                     <div
                       key={item.id}
                       style={{
@@ -620,7 +545,7 @@ export const Orders: React.FC = () => {
                     >
                       <div>
                         <p style={{ fontWeight: theme.fontWeights.medium }}>
-                          Producto ID: {item.productId}
+                          {item.product?.name ?? `Producto ${item.id.slice(0, 8)}`}
                         </p>
                         <p
                           style={{
