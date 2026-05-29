@@ -6,10 +6,26 @@ import { Input } from '@/components/ui/Input';
 import { theme } from '@/styles/theme';
 import { logger } from '@/utils/logger';
 
+interface AddressSaveInput {
+  userId: string;
+  type: string;
+  firstName: string;
+  lastName: string;
+  company?: string | undefined;
+  address1: string;
+  address2?: string | undefined;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  phone?: string | undefined;
+  isDefault: boolean;
+}
+
 interface UserAddressEditFormProps {
   address?: UserAddress;
   userId: string;
-  onSave: (input: any) => Promise<void>;
+  onSave: (input: AddressSaveInput) => Promise<void>;
   onCancel: () => void;
   loading?: boolean;
   isEditing?: boolean;

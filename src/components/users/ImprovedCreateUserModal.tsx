@@ -23,7 +23,7 @@ import { logger } from '@/utils/logger';
 interface CreateUserModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (userData: CreateUserProfileInput) => Promise<any>;
+  onSubmit: (userData: CreateUserProfileInput) => Promise<void>;
   isLoading: boolean;
   serverError?: string | undefined;
 }

@@ -7,17 +7,18 @@ import {
   CreateCategoryDocument,
   UpdateCategoryDocument,
   DeleteCategoryDocument,
-  CreateCategoryInput,
-  UpdateCategoryInput,
-  CategoryFilterInput,
-  PaginationInput,
+  type CreateCategoryInput,
+  type UpdateCategoryInput,
+  type CategoryFilterInput,
+  type PaginationInput,
+  type Category,
 } from '@/generated/graphql';
 import { toast } from 'react-hot-toast';
 
 export interface UseCategoriesGraphQLReturn {
   // Data
-  categories: any[];
-  category: any | null;
+  categories: Category[];
+  category: Category | null;
   loading: boolean;
   error: string | null;
 
@@ -42,13 +43,13 @@ export interface UseCategoriesGraphQLReturn {
     input: CreateCategoryInput,
     currentFilters?: CategoryFilterInput,
     currentPagination?: PaginationInput
-  ) => Promise<any>;
+  ) => Promise<Category | null>;
   updateCategory: (
     id: string,
     input: UpdateCategoryInput,
     currentFilters?: CategoryFilterInput,
     currentPagination?: PaginationInput
-  ) => Promise<any>;
+  ) => Promise<Category | null>;
   deleteCategory: (
     id: string,
     currentFilters?: CategoryFilterInput,
@@ -62,8 +63,8 @@ export interface UseCategoriesGraphQLReturn {
 
 export const useCategoriesGraphQL = (): UseCategoriesGraphQLReturn => {
   // State
-  const [categories, setCategories] = useState<any[]>([]);
-  const [category, setCategory] = useState<any | null>(null);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [category, setCategory] = useState<Category | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState({

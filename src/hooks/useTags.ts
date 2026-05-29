@@ -175,8 +175,8 @@ export const useTags = () => {
         }));
 
         return { success: true, tag: newTag };
-      } catch (err: any) {
-        const errorMessage = err.message || 'Error al crear la etiqueta';
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Error al crear la etiqueta';
         setError(errorMessage);
         return { success: false, error: errorMessage };
       } finally {
@@ -216,8 +216,8 @@ export const useTags = () => {
         }
 
         return { success: true, tag: updatedTag };
-      } catch (err: any) {
-        const errorMessage = err.message || 'Error al actualizar la etiqueta';
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Error al actualizar la etiqueta';
         setError(errorMessage);
         return { success: false, error: errorMessage };
       } finally {
@@ -245,8 +245,8 @@ export const useTags = () => {
         });
 
         return { success: true };
-      } catch (err: any) {
-        const errorMessage = err.message || 'Error al eliminar la etiqueta';
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Error al eliminar la etiqueta';
         setError(errorMessage);
         return { success: false, error: errorMessage };
       } finally {

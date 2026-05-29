@@ -35,7 +35,7 @@ import {
   Database,
   ShoppingBag,
 } from 'lucide-react';
-import type { Product, Category } from './types';
+import type { Product, Category, ProductReview, InventoryTransaction, StockAlert, AppEvent } from './types';
 
 interface ProductDetailModalProps {
   isOpen: boolean;
@@ -642,7 +642,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                       gap: theme.spacing[3],
                     }}
                   >
-                    {product.reviews.slice(0, 5).map((review: any) => (
+                    {product.reviews.slice(0, 5).map((review: ProductReview) => (
                       <div
                         key={review.id}
                         style={{
@@ -783,7 +783,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     >
                       {product.inventoryTransactions
                         .slice(0, 10)
-                        .map((transaction: any) => (
+                        .map((transaction: InventoryTransaction) => (
                           <div
                             key={transaction.id}
                             style={{
@@ -876,7 +876,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                       gap: theme.spacing[2],
                     }}
                   >
-                    {product.stockAlerts.map((alert: any) => (
+                    {product.stockAlerts.map((alert: StockAlert) => (
                       <div
                         key={alert.id}
                         style={{
@@ -969,7 +969,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                       gap: theme.spacing[2],
                     }}
                   >
-                    {product.appEvents.slice(0, 5).map((event: any) => (
+                    {product.appEvents.slice(0, 5).map((event: AppEvent) => (
                       <div
                         key={event.id}
                         style={{
@@ -1009,7 +1009,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                             {new Date(event.createdAt).toLocaleDateString()}
                           </div>
                         </div>
-                        {event.eventData && (
+                        {Boolean(event.eventData) && (
                           <div
                             style={{
                               fontSize: theme.fontSizes.sm,

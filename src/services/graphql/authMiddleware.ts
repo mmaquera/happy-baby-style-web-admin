@@ -5,6 +5,7 @@ import {
   ApolloClient,
   ApolloLink,
   InMemoryCache,
+  type NormalizedCacheObject,
   createHttpLink,
   from,
 } from '@apollo/client';
@@ -27,9 +28,9 @@ export interface AuthMiddlewareConfig {
 
 export class AuthMiddleware {
   private authService: GraphQLAuthService;
-  private client: ApolloClient<any>;
+  private client: ApolloClient<NormalizedCacheObject>;
 
-  constructor(client: ApolloClient<any>) {
+  constructor(client: ApolloClient<NormalizedCacheObject>) {
     this.client = client;
     this.authService = AuthServiceFactory.createGraphQLAuthService(client);
   }
@@ -137,12 +138,12 @@ export class AuthMiddleware {
   }
 
   // Create the complete Apollo Client with auth middleware
-  static createClient(config: AuthMiddlewareConfig): ApolloClient<any> {
+  static createClient(config: AuthMiddlewareConfig): ApolloClient<NormalizedCacheObject> {
     const httpLink = createHttpLink({
       uri: config.uri,
     });
 
-    const authMiddleware = new AuthMiddleware({} as ApolloClient<any>);
+    const authMiddleware = new AuthMiddleware({} as ApolloClient<NormalizedCacheObject>);
 
     const authLink = authMiddleware.createAuthLink();
     const errorLink = authMiddleware.createErrorLink();
@@ -211,7 +212,7 @@ export class AuthMiddleware {
 // Factory function for creating Apollo Client with auth
 export const createApolloClientWithAuth = (
   config: AuthMiddlewareConfig
-): ApolloClient<any> => {
+): ApolloClient<NormalizedCacheObject> => {
   return AuthMiddleware.createClient(config);
 };
 

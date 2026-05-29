@@ -20,7 +20,48 @@ import { OrderStatus } from '@/types';
 import { theme } from '@/styles/theme';
 import { logger } from '@/utils/logger';
 
-// These interfaces are already defined in the hook, so we don't need them here
+type GQLOrder = ReturnType<typeof useOrders>['orders'][number];
+
+interface SelectedOrderItem {
+  id: string;
+  orderId?: string | undefined;
+  productId?: string | undefined;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+  product?: unknown;
+  createdAt: Date;
+}
+
+interface SelectedOrder {
+  id: string;
+  userId?: string;
+  status: OrderStatus;
+  totalAmount: number;
+  shippingAddress?: {
+    street?: string | undefined;
+    city?: string | undefined;
+    state?: string | undefined;
+    zipCode?: string | undefined;
+    country?: string | undefined;
+    address1?: string | undefined;
+    postalCode?: string | undefined;
+  } | null | undefined;
+  items: SelectedOrderItem[];
+  user?: {
+    id: string;
+    userId?: string;
+    firstName?: string;
+    lastName?: string;
+    phone?: string;
+    birthDate?: Date;
+    avatarUrl?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 const statusConfig = {
   pending: {
@@ -64,7 +105,7 @@ const statusConfig = {
 export const Orders: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<OrderStatus | ''>('');
-  const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<SelectedOrder | null>(null);
 
   // Use custom hook for orders
   const {
@@ -119,40 +160,34 @@ export const Orders: React.FC = () => {
     }
   };
 
-  const handleOrderSelect = (order: any) => {
+  const handleOrderSelect = (order: GQLOrder) => {
     // Convert GraphQL order to unified Order type
-    const unifiedOrder: any = {
+    const unifiedOrder: SelectedOrder = {
       id: order.id,
-      userId: order.userId || undefined,
+      userId: order.user?.id,
       status: order.status as OrderStatus,
       totalAmount: order.totalAmount,
-      shippingAddress: order.shippingAddress,
+      shippingAddress: order.shippingAddress as SelectedOrder['shippingAddress'],
       items:
-        order.orderItems?.map((item: any) => ({
+        order.items.map((item): SelectedOrderItem => ({
           id: item.id,
-          orderId: item.orderId || undefined,
-          productId: item.productId || undefined,
+          productId: item.product.id,
           quantity: item.quantity,
           unitPrice: item.unitPrice,
           totalPrice: item.totalPrice,
           product: item.product,
-          createdAt: new Date(item.createdAt),
-        })) || [],
-      user: order.user
+          createdAt: new Date(),
+        })),
+      ...(order.user
         ? {
-            id: order.user.id,
-            userId: order.user.userId || order.user.id,
-            firstName: order.user.firstName || undefined,
-            lastName: order.user.lastName || undefined,
-            phone: order.user.phone || undefined,
-            birthDate: order.user.birthDate
-              ? new Date(order.user.birthDate)
-              : undefined,
-            avatarUrl: order.user.avatarUrl || undefined,
-            createdAt: new Date(order.user.createdAt),
-            updatedAt: new Date(order.user.updatedAt),
+            user: {
+              id: order.user.id,
+              ...(order.user.firstName ? { firstName: order.user.firstName } : {}),
+              ...(order.user.lastName ? { lastName: order.user.lastName } : {}),
+              ...(order.user.phone ? { phone: order.user.phone } : {}),
+            },
           }
-        : undefined,
+        : {}),
       createdAt: new Date(order.createdAt),
       updatedAt: new Date(order.updatedAt),
     };
@@ -572,7 +607,7 @@ export const Orders: React.FC = () => {
                   Productos
                 </h3>
                 <div style={{ display: 'grid', gap: '0.5rem' }}>
-                  {selectedOrder.items.map((item: any) => (
+                  {selectedOrder.items.map((item) => (
                     <div
                       key={item.id}
                       style={{

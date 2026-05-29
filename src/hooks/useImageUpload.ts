@@ -89,10 +89,10 @@ export const useImageUpload = (): UseImageUploadReturn => {
                   'Error desconocido en el upload',
               });
             }
-          } catch (fileError: any) {
+          } catch (fileError: unknown) {
             results.push({
               success: false,
-              error: `Error al subir ${file?.name || 'archivo'}: ${fileError.message}`,
+              error: `Error al subir ${file?.name || 'archivo'}: ${fileError instanceof Error ? fileError.message : 'error desconocido'}`,
             });
           }
         }
@@ -123,8 +123,8 @@ export const useImageUpload = (): UseImageUploadReturn => {
             `Ninguna imagen se pudo subir: ${failedUploads.map(r => r.error).join(', ')}`
           );
         }
-      } catch (err: any) {
-        const errorMessage = err.message || 'Error desconocido en el upload';
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Error desconocido en el upload';
         setError(errorMessage);
         return {
           success: false,

@@ -292,7 +292,7 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
 
   // Handle input changes with immediate application
   const handleInputChange = useCallback(
-    (key: keyof CategoryFiltersType, value: any) => {
+    (key: keyof CategoryFiltersType, value: CategoryFiltersType[typeof key]) => {
       const newFilters = { ...filters, [key]: value };
       onFiltersChange(newFilters);
     },
@@ -312,9 +312,8 @@ export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
   // Remove specific filter
   const handleRemoveFilter = useCallback(
     (key: keyof CategoryFiltersType) => {
-      const newFilters = { ...filters };
-      delete (newFilters as any)[key];
-      onFiltersChange(newFilters);
+      const { [key]: _removed, ...rest } = filters;
+      onFiltersChange(rest as CategoryFiltersType);
     },
     [filters, onFiltersChange]
   );

@@ -6,6 +6,7 @@ import {
   ApolloClient,
   ApolloLink,
   InMemoryCache,
+  type NormalizedCacheObject,
   from,
   createHttpLink,
 } from '@apollo/client';
@@ -153,7 +154,7 @@ export class UnifiedGraphQLMiddleware {
         credentials: 'include',
       },
       // ✅ Logs de debug para verificar el envío
-      isExtractableFile: (value: any) => {
+      isExtractableFile: (value: unknown) => {
         const isFile = value instanceof File || value instanceof Blob;
         logger.debug('🔍 UploadLink - isExtractableFile:', {
           value,
@@ -166,7 +167,7 @@ export class UnifiedGraphQLMiddleware {
       formDataAppendFile: (
         formData: FormData,
         fieldName: string,
-        file: any
+        file: File | Blob
       ) => {
         logger.debug('🔍 UploadLink - formDataAppendFile:', {
           fieldName,
@@ -209,7 +210,7 @@ export class UnifiedGraphQLMiddleware {
           // Don't retry on authentication errors
           if (
             error?.graphQLErrors?.some(
-              (err: any) => err.extensions?.['code'] === 'UNAUTHENTICATED'
+              (err: { extensions?: { code?: string } }) => err.extensions?.['code'] === 'UNAUTHENTICATED'
             )
           ) {
             return false;
@@ -260,7 +261,7 @@ export class UnifiedGraphQLMiddleware {
   }
 
   // Create the complete Apollo Client with unified middleware
-  static createClient(config: GraphQLMiddlewareConfig): ApolloClient<any> {
+  static createClient(config: GraphQLMiddlewareConfig): ApolloClient<NormalizedCacheObject> {
     // Don't clear stored tokens automatically - let the auth system handle token validation
 
     const client = new ApolloClient({
@@ -294,7 +295,7 @@ export class UnifiedGraphQLMiddleware {
 // Factory function for creating Apollo Client with unified middleware
 export const createApolloClientWithUnifiedMiddleware = (
   config: GraphQLMiddlewareConfig
-): ApolloClient<any> => {
+): ApolloClient<NormalizedCacheObject> => {
   return UnifiedGraphQLMiddleware.createClient(config);
 };
 

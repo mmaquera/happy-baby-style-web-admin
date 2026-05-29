@@ -144,12 +144,13 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
           type: 'success',
           message: 'Archivo SVG subido exitosamente',
         });
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const errMsg = err instanceof Error ? err.message : 'Error al subir el archivo';
         setValidationMessage({
           type: 'error',
-          message: err.message || 'Error al subir el archivo',
+          message: errMsg,
         });
-        onUploadError?.(err.message || 'Error al subir el archivo');
+        onUploadError?.(errMsg);
       }
     },
     [
@@ -189,7 +190,7 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
       const svgFile = files.find(
         file =>
           file.name.toLowerCase().endsWith('.svg') ||
-          allowedTypes.includes(file.type as any)
+          (allowedTypes as string[]).includes(file.type)
       );
 
       if (svgFile) {

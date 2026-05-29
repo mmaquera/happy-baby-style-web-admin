@@ -3,7 +3,7 @@
 // Open/Closed: Extensible for new auth providers
 // Dependency Inversion: Depends on abstractions
 
-import { ApolloClient, gql } from '@apollo/client';
+import { ApolloClient, type NormalizedCacheObject } from '@apollo/client';
 import {
   LoginUserDocument,
   RefreshTokenDocument,
@@ -44,12 +44,12 @@ export interface IAuthResponse {
 export interface IAuthError {
   code: string;
   message: string;
-  details?: any;
+  details?: unknown;
 }
 
 // Abstract base class following Template Method pattern
 export abstract class BaseAuthService {
-  protected abstract client: ApolloClient<any>;
+  protected abstract client: ApolloClient<NormalizedCacheObject>;
 
   abstract login(credentials: LoginCredentials): Promise<IAuthResponse>;
   abstract logout(): Promise<void>;
@@ -58,16 +58,25 @@ export abstract class BaseAuthService {
   abstract isAuthenticated(): boolean;
 
   // Template method for common auth flow
-  protected async handleAuthResponse(response: any): Promise<IAuthResponse> {
+  protected async handleAuthResponse(response: {
+    success?: unknown;
+    message?: unknown;
+    accessToken?: unknown;
+    token?: unknown;
+    refreshToken?: unknown;
+    expiresAt?: unknown;
+    user?: unknown;
+  }): Promise<IAuthResponse> {
     if (!response.success) {
-      throw new Error(response.message || 'Authentication failed');
+      throw new Error(typeof response.message === 'string' ? response.message : 'Authentication failed');
     }
 
+    const rawExpiresAt = response.expiresAt;
     const tokens: IAuthToken = {
-      accessToken: response.accessToken || response.token,
-      refreshToken: response.refreshToken,
-      expiresAt: response.expiresAt
-        ? new Date(response.expiresAt)
+      accessToken: String(response.accessToken ?? response.token ?? ''),
+      ...(typeof response.refreshToken === 'string' ? { refreshToken: response.refreshToken } : {}),
+      expiresAt: rawExpiresAt
+        ? new Date(rawExpiresAt as string | number)
         : new Date(Date.now() + 3600000),
     };
 
@@ -76,9 +85,9 @@ export abstract class BaseAuthService {
 
     return {
       success: true,
-      user: response.user,
+      user: response.user as IAuthUser,
       tokens,
-      message: response.message,
+      message: typeof response.message === 'string' ? response.message : 'Authentication successful',
     };
   }
 
@@ -126,7 +135,7 @@ export abstract class BaseAuthService {
 
 // Concrete implementation for GraphQL authentication
 export class GraphQLAuthService extends BaseAuthService {
-  constructor(protected client: ApolloClient<any>) {
+  constructor(protected client: ApolloClient<NormalizedCacheObject>) {
     super();
   }
 
@@ -141,8 +150,9 @@ export class GraphQLAuthService extends BaseAuthService {
       });
 
       return this.handleAuthResponse(data.loginUser);
-    } catch (error: any) {
-      throw new AuthError('LOGIN_FAILED', error.message || 'Login failed');
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Login failed';
+      throw new AuthError('LOGIN_FAILED', msg);
     }
   }
 
@@ -151,27 +161,16 @@ export class GraphQLAuthService extends BaseAuthService {
       await this.client.mutate({
         mutation: LogoutUserDocument,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Continue with logout even if server call fails
       logger.warn('Logout server call failed:', error);
-
-      // Lanzar error específico para mejor manejo en capas superiores
-      if (
-        error?.graphQLErrors?.some(
-          (err: any) => err.extensions?.['code'] === 'UNAUTHENTICATED'
-        )
-      ) {
+      const gqlError = error as { graphQLErrors?: { extensions?: { code?: string } }[]; networkError?: unknown };
+      if (gqlError.graphQLErrors?.some(e => e.extensions?.code === 'UNAUTHENTICATED')) {
         throw new AuthError('UNAUTHENTICATED', 'Usuario no autenticado');
-      } else if (error?.networkError) {
-        throw new AuthError(
-          'NETWORK_ERROR',
-          'Error de conexión al cerrar sesión'
-        );
+      } else if (gqlError.networkError) {
+        throw new AuthError('NETWORK_ERROR', 'Error de conexión al cerrar sesión');
       } else {
-        throw new AuthError(
-          'LOGOUT_FAILED',
-          'Error al cerrar sesión en el servidor'
-        );
+        throw new AuthError('LOGOUT_FAILED', 'Error al cerrar sesión en el servidor');
       }
     } finally {
       await this.clearTokens();
@@ -197,11 +196,9 @@ export class GraphQLAuthService extends BaseAuthService {
 
       await this.storeTokens(tokens);
       return tokens;
-    } catch (error: any) {
-      throw new AuthError(
-        'REFRESH_FAILED',
-        error.message || 'Token refresh failed'
-      );
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Token refresh failed';
+      throw new AuthError('REFRESH_FAILED', msg);
     }
   }
 
@@ -255,7 +252,7 @@ export class AuthError extends Error implements IAuthError {
   constructor(
     public code: string,
     message: string,
-    public details?: any
+    public details?: unknown
   ) {
     super(message);
     this.name = 'AuthError';
@@ -265,7 +262,7 @@ export class AuthError extends Error implements IAuthError {
 // Factory for creating auth services
 export class AuthServiceFactory {
   static createGraphQLAuthService(
-    client: ApolloClient<any>
+    client: ApolloClient<NormalizedCacheObject>
   ): GraphQLAuthService {
     return new GraphQLAuthService(client);
   }
@@ -275,7 +272,7 @@ export class AuthServiceFactory {
 let authServiceInstance: GraphQLAuthService | null = null;
 
 export const getAuthService = (
-  client?: ApolloClient<any>
+  client?: ApolloClient<NormalizedCacheObject>
 ): GraphQLAuthService => {
   if (!authServiceInstance && client) {
     authServiceInstance = AuthServiceFactory.createGraphQLAuthService(client);

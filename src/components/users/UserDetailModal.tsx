@@ -389,9 +389,9 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
 
                   {isEditing ? (
                     <UserProfileEditForm
-                      profile={(profile || user.profile) as any}
+                      profile={profile ?? user.profile ?? {}}
                       onSave={async input => {
-                        await updateProfile(input);
+                        await updateProfile(input as unknown as Parameters<typeof updateProfile>[0]);
                       }}
                       onCancel={cancelEditing}
                       loading={updatingProfile}
@@ -570,8 +570,8 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
                 <UserAddressManager
                   addresses={user.addresses || []}
                   userId={user.id}
-                  onCreateAddress={createAddress}
-                  onUpdateAddress={updateAddress}
+                  onCreateAddress={(input) => createAddress(input as never)}
+                  onUpdateAddress={(id, input) => updateAddress(id, input as never)}
                   onDeleteAddress={deleteAddress}
                   onSetDefaultAddress={setDefaultAddress}
                   loading={

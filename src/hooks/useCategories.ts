@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'react';
 import { useCategoriesGraphQL } from './useCategoriesGraphQL';
 import { useCategoryActions } from './useCategoryActions';
 import { useCategoryFilters } from './useCategoryFilters';
-import { PaginationInput } from '@/generated/graphql';
+import { type PaginationInput, type Category, type CreateCategoryInput, type UpdateCategoryInput } from '@/generated/graphql';
 import {
   CategoryFilters,
   CategoryFilterInput,
@@ -10,8 +10,8 @@ import {
 
 export interface UseCategoriesReturn {
   // Data
-  categories: any[];
-  category: any | null;
+  categories: Category[];
+  category: Category | null;
   loading: boolean;
   error: string | null;
 
@@ -33,8 +33,8 @@ export interface UseCategoriesReturn {
   };
 
   // Actions
-  createCategory: (input: any) => Promise<any>;
-  updateCategory: (id: string, input: any) => Promise<any>;
+  createCategory: (input: CreateCategoryInput) => Promise<Category | null>;
+  updateCategory: (id: string, input: UpdateCategoryInput) => Promise<Category | null>;
   deleteCategory: (id: string) => Promise<boolean>;
   toggleStatus: (categoryId: string, isActive: boolean) => Promise<boolean>;
   bulkDelete: (categoryIds: string[]) => Promise<boolean>;
@@ -45,7 +45,7 @@ export interface UseCategoriesReturn {
 
   // Filter actions
   setFilters: (filters: CategoryFilters) => void;
-  updateFilter: (key: string, value: any) => void;
+  updateFilter: (key: keyof CategoryFilters, value: CategoryFilters[keyof CategoryFilters]) => void;
   clearFilters: () => void;
 
   // Sorting actions
@@ -223,7 +223,7 @@ export const useCategories = (): UseCategoriesReturn => {
 
   // Wrapper for create category
   const createCategory = useCallback(
-    async (input: any) => {
+    async (input: CreateCategoryInput) => {
       try {
         // Convert local filters to GraphQL format
         const graphqlFilters = mapFiltersToGraphQL(filters);
@@ -242,7 +242,7 @@ export const useCategories = (): UseCategoriesReturn => {
 
   // Wrapper for update category
   const updateCategory = useCallback(
-    async (id: string, input: any) => {
+    async (id: string, input: UpdateCategoryInput) => {
       try {
         // Convert local filters to GraphQL format
         const graphqlFilters = mapFiltersToGraphQL(filters);
@@ -355,8 +355,8 @@ export const useCategories = (): UseCategoriesReturn => {
 
   // Wrapper for update filter
   const updateFilter = useCallback(
-    (key: string, value: any) => {
-      updateFilterLocal(key as any, value);
+    (key: keyof CategoryFilters, value: CategoryFilters[keyof CategoryFilters]) => {
+      updateFilterLocal(key, value);
     },
     [updateFilterLocal]
   );

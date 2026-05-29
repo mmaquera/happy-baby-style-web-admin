@@ -21,7 +21,7 @@ interface AuthStats {
   totalUsers: number;
   activeUsers: number;
   newUsersThisMonth: number;
-  usersByRole: any;
+  usersByRole: Record<string, number>;
 }
 
 // Nueva interfaz para las estadísticas del dashboard de proveedores de autenticación

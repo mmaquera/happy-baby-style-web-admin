@@ -52,7 +52,7 @@ export interface IAuthResponse {
 export interface IAuthError {
   code: string;
   message: string;
-  details?: any;
+  details?: unknown;
 }
 
 // Login credentials

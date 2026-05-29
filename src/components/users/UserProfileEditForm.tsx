@@ -1,15 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { UserProfile } from '@/types';
+import { type UserRole } from '@/generated/graphql';
+// Minimal profile shape this form needs — avoids coupling to full GQL type
+interface ProfileLike {
+  firstName?: string | null;
+  lastName?: string | null;
+  phone?: string | null;
+  dateOfBirth?: string | null;
+  role?: UserRole | string | null;
+}
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { theme } from '@/styles/theme';
 import { Save, X, User, Mail, Phone, Calendar, Shield } from 'lucide-react';
 import { logger } from '@/utils/logger';
 
+interface ProfileSaveInput {
+  firstName: string;
+  lastName: string;
+  phone?: string | undefined;
+  dateOfBirth?: string | undefined;
+  role?: UserRole | undefined;
+}
+
 interface UserProfileEditFormProps {
-  profile: UserProfile;
-  onSave: (input: any) => Promise<void>;
+  profile: ProfileLike;
+  onSave: (input: ProfileSaveInput) => Promise<void>;
   onCancel: () => void;
   loading?: boolean;
 }
@@ -203,14 +219,12 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
     }
 
     try {
-      const input = {
+      const input: ProfileSaveInput = {
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
-        phone: formData.phone.trim() || undefined,
-        dateOfBirth: formData.dateOfBirth
-          ? new Date(formData.dateOfBirth).toISOString()
-          : undefined,
-        role: formData.role as any,
+        ...(formData.phone.trim() ? { phone: formData.phone.trim() } : {}),
+        ...(formData.dateOfBirth ? { dateOfBirth: new Date(formData.dateOfBirth).toISOString() } : {}),
+        ...(formData.role ? { role: formData.role as UserRole } : {}),
       };
 
       await onSave(input);

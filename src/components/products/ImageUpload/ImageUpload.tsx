@@ -130,8 +130,8 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
           } else {
             showError(result.error || 'Error al subir la imagen');
           }
-        } catch (err: any) {
-          showError(`Error inesperado: ${err.message}`);
+        } catch (err: unknown) {
+          showError(`Error inesperado: ${err instanceof Error ? err.message : 'desconocido'}`);
         } finally {
           setIsUploading(false);
         }

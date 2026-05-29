@@ -1,4 +1,4 @@
-import { useMutation } from '@apollo/client';
+import { useMutation, ApolloError } from '@apollo/client';
 import {
   LoginUserDocument,
   RefreshTokenDocument,
@@ -128,20 +128,20 @@ export const useAuthGraphQL = () => {
         success: false,
         message: 'No se recibió respuesta del servidor',
       };
-    } catch (error: any) {
-      logger.error('Login error:', error);
+    } catch (err: unknown) {
+      logger.error('Login error:', err);
+      const error = err instanceof ApolloError ? err : null;
 
       // Handle GraphQL errors
-      if (error.graphQLErrors && error.graphQLErrors.length > 0) {
-        const graphQLError = error.graphQLErrors[0];
+      if (error?.graphQLErrors && error.graphQLErrors.length > 0) {
         return {
           success: false,
-          message: graphQLError.message || 'Error de autenticación',
+          message: error.graphQLErrors[0]?.message || 'Error de autenticación',
         };
       }
 
       // Handle network errors
-      if (error.networkError) {
+      if (error?.networkError) {
         return {
           success: false,
           message: 'Error de conexión. Verifica tu conexión a internet.',
@@ -150,7 +150,7 @@ export const useAuthGraphQL = () => {
 
       return {
         success: false,
-        message: error.message || 'Error inesperado durante el login',
+        message: error?.message ?? (err instanceof Error ? err.message : 'Error inesperado durante el login'),
       };
     }
   };
@@ -214,11 +214,11 @@ export const useAuthGraphQL = () => {
         success: false,
         message: 'No se pudo renovar el token',
       };
-    } catch (error: any) {
-      logger.error('Refresh token error:', error);
+    } catch (err: unknown) {
+      logger.error('Refresh token error:', err);
       return {
         success: false,
-        message: error.message || 'Error al renovar el token',
+        message: err instanceof Error ? err.message : 'Error al renovar el token',
       };
     }
   };
@@ -241,13 +241,14 @@ export const useAuthGraphQL = () => {
         success: false,
         message: 'Error al cerrar sesión',
       };
-    } catch (error: any) {
-      logger.error('Logout error:', error);
+    } catch (err: unknown) {
+      logger.error('Logout error:', err);
+      const apolloErr = err instanceof ApolloError ? err : null;
 
       // Manejar errores específicos de GraphQL
-      if (error?.graphQLErrors?.length > 0) {
-        const graphQLError = error.graphQLErrors[0];
-        const errorCode = graphQLError.extensions?.['code'];
+      if (apolloErr?.graphQLErrors && apolloErr.graphQLErrors.length > 0) {
+        const graphQLError = apolloErr.graphQLErrors[0];
+        const errorCode = graphQLError?.extensions?.['code'];
 
         switch (errorCode) {
           case 'UNAUTHENTICATED':
@@ -263,13 +264,13 @@ export const useAuthGraphQL = () => {
           default:
             return {
               success: false,
-              message: graphQLError.message || 'Error al cerrar sesión',
+              message: graphQLError?.message || 'Error al cerrar sesión',
             };
         }
       }
 
       // Manejar errores de red
-      if (error?.networkError) {
+      if (apolloErr?.networkError) {
         return {
           success: false,
           message: 'Error de conexión. Verifica tu conexión a internet.',
@@ -278,7 +279,7 @@ export const useAuthGraphQL = () => {
 
       return {
         success: false,
-        message: error.message || 'Error inesperado al cerrar sesión',
+        message: apolloErr?.message ?? (err instanceof Error ? err.message : 'Error inesperado al cerrar sesión'),
       };
     }
   };

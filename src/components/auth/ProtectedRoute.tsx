@@ -4,11 +4,12 @@ import styled from 'styled-components';
 import { Loader2 } from 'lucide-react';
 import { theme } from '@/styles/theme';
 import { useAuth } from '@/contexts/AuthContext';
+import { UserRole } from '@/types/unified';
 
 // Types
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRoles?: string[];
+  requiredRoles?: UserRole[];
   fallbackPath?: string;
 }
 
@@ -64,7 +65,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   // Check role requirements if specified
-  if (requiredRoles.length > 0 && !hasAnyRole(requiredRoles as any)) {
+  if (requiredRoles.length > 0 && !hasAnyRole(requiredRoles)) {
     return <Navigate to='/unauthorized' replace />;
   }
 

@@ -40,7 +40,7 @@ interface CategoryListViewProps {
   onToggleStatus: (categoryId: string, isActive: boolean) => void;
   onViewDetails: (categoryId: string) => void;
   onSort: (field: string, direction: 'asc' | 'desc') => void;
-  onFilter: (filters: any) => void;
+  onFilter: (filters: Record<string, unknown>) => void;
 }
 
 const ListViewContainer = styled.div`

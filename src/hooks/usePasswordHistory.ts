@@ -1,5 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useGetUserPasswordHistoryQuery } from '@/generated/graphql';
+import {
+  useGetUserPasswordHistoryQuery,
+  type GetUserPasswordHistoryQuery,
+} from '@/generated/graphql';
+
+type PasswordHistoryEvent = NonNullable<
+  NonNullable<GetUserPasswordHistoryQuery['userSecurityEvents']['data']>['items'][number]
+>;
 import toast from 'react-hot-toast';
 import { logger } from '@/utils/logger';
 
@@ -53,12 +60,13 @@ const mapEventTypeToActionType = (
 /**
  * Maps SecurityEvent status from metadata to PasswordAction status
  */
-const mapStatusFromMetadata = (metadata: any): PasswordAction['status'] => {
+const mapStatusFromMetadata = (metadata: Record<string, unknown>): PasswordAction['status'] => {
   if (!metadata || typeof metadata !== 'object') {
     return 'completed'; // Default status
   }
 
-  const status = metadata.status?.toLowerCase();
+  const rawStatus = metadata['status'];
+  const status = typeof rawStatus === 'string' ? rawStatus.toLowerCase() : undefined;
   if (status === 'pending') return 'pending';
   if (status === 'failed' || status === 'error') return 'failed';
   return 'completed';
@@ -68,17 +76,17 @@ const mapStatusFromMetadata = (metadata: any): PasswordAction['status'] => {
  * Extracts admin user from metadata or user object
  */
 const extractAdminUser = (
-  metadata: any,
+  metadata: Record<string, unknown>,
   userEmail?: string | null
 ): string | undefined => {
-  if (metadata?.adminUser) {
-    return metadata.adminUser;
+  if (typeof metadata?.['adminUser'] === 'string') {
+    return metadata['adminUser'];
   }
-  if (metadata?.adminEmail) {
-    return metadata.adminEmail;
+  if (typeof metadata?.['adminEmail'] === 'string') {
+    return metadata['adminEmail'];
   }
-  if (metadata?.performedBy) {
-    return metadata.performedBy;
+  if (typeof metadata?.['performedBy'] === 'string') {
+    return metadata['performedBy'];
   }
   // If eventType indicates admin action, use user email
   if (userEmail) {
@@ -103,7 +111,7 @@ const isPasswordRelatedEvent = (eventType: string): boolean => {
  * Transforms SecurityEvent to PasswordAction
  */
 const transformSecurityEventToPasswordAction = (
-  event: any
+  event: PasswordHistoryEvent
 ): PasswordAction | null => {
   try {
     // Filter only password-related events
@@ -111,10 +119,14 @@ const transformSecurityEventToPasswordAction = (
       return null;
     }
 
-    const metadata =
+    const rawMetadata: unknown =
       typeof event.metadata === 'string'
         ? JSON.parse(event.metadata)
-        : event.metadata || {};
+        : event.metadata ?? {};
+    const metadata: Record<string, unknown> =
+      rawMetadata && typeof rawMetadata === 'object' && !Array.isArray(rawMetadata)
+        ? (rawMetadata as Record<string, unknown>)
+        : {};
 
     const adminUser = extractAdminUser(metadata, event.user?.email);
 

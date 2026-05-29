@@ -64,7 +64,7 @@ export const useLoginForm = (): UseLoginFormReturn => {
 
   // Memoized redirect path
   const redirectPath = useMemo(() => {
-    return (location.state as any)?.from?.pathname || '/';
+    return (location.state as { from?: { pathname?: string } })?.from?.pathname || '/';
   }, [location.state]);
 
   // ✅ PASO 1: Función para procesar errores del servidor

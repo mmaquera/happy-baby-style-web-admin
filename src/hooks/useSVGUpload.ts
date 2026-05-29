@@ -55,7 +55,7 @@ export const useSVGUpload = (): UseSVGUploadReturn => {
 
     // Check MIME type (some browsers may not set this correctly for SVG)
     const hasValidMimeType =
-      SVG_VALIDATION_RULES.allowedTypes.includes(file.type as any) ||
+      (SVG_VALIDATION_RULES.allowedTypes as unknown as string[]).includes(file.type) ||
       file.type === '' || // Some browsers don't set MIME type for SVG
       file.type === 'application/octet-stream'; // Fallback MIME type
 
@@ -221,7 +221,7 @@ export const useSVGUpload = (): UseSVGUploadReturn => {
           },
           context: {
             // Add progress tracking if supported by Apollo
-            onUploadProgress: (progressEvent: any) => {
+            onUploadProgress: (progressEvent: { loaded: number; total: number; lengthComputable?: boolean }) => {
               if (progressEvent.lengthComputable) {
                 const percentage = Math.round(
                   (progressEvent.loaded * 100) / progressEvent.total
@@ -267,10 +267,10 @@ export const useSVGUpload = (): UseSVGUploadReturn => {
 
           throw new Error(errorMessage);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         const uploadError: SVGUploadError = {
           code: 'UPLOAD_ERROR',
-          message: err.message || 'Error al subir el archivo SVG',
+          message: err instanceof Error ? err.message : 'Error al subir el archivo SVG',
           filename: file.name,
           details: err,
         };

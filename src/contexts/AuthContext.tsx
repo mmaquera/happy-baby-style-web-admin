@@ -13,7 +13,8 @@ import React, {
   useMemo,
   useEffect,
 } from 'react';
-import { useApolloClient } from '@apollo/client';
+import { useApolloClient, type NormalizedCacheObject } from '@apollo/client';
+import type { ApolloClient } from '@apollo/client';
 import { toast } from 'react-hot-toast';
 import {
   UnifiedAuthService,
@@ -140,7 +141,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const client = useApolloClient();
+  const client = useApolloClient() as ApolloClient<NormalizedCacheObject>;
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   // Memoized auth service instance

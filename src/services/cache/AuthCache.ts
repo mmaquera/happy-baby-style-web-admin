@@ -1,4 +1,5 @@
 import { logger } from '@/utils/logger';
+import type { IAuthUser } from '@/types/auth';
 
 // AuthCache Service - Following SOLID principles and Clean Architecture
 // Single Responsibility: Manages authentication cache only
@@ -9,8 +10,8 @@ import { logger } from '@/utils/logger';
 
 // Cache interface following Interface Segregation Principle
 export interface IAuthCache {
-  getUser(): any | null;
-  setUser(user: any): void;
+  getUser(): IAuthUser | null;
+  setUser(user: IAuthUser): void;
   clearUser(): void;
   hasUser(): boolean;
   getUserRole(): string | null;
@@ -20,11 +21,11 @@ export interface IAuthCache {
 
 // Memory cache implementation
 export class MemoryAuthCache implements IAuthCache {
-  private user: any = null;
+  private user: IAuthUser | null = null;
   private cacheExpiry: number = 0;
   private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-  getUser(): any | null {
+  getUser(): IAuthUser | null {
     if (this.isExpired()) {
       this.clearUser();
       return null;
@@ -32,7 +33,7 @@ export class MemoryAuthCache implements IAuthCache {
     return this.user;
   }
 
-  setUser(user: any): void {
+  setUser(user: IAuthUser): void {
     this.user = user;
     this.cacheExpiry = Date.now() + this.CACHE_DURATION;
   }
@@ -70,7 +71,7 @@ export class LocalStorageAuthCache implements IAuthCache {
   private static readonly CACHE_EXPIRY_KEY = 'userCacheExpiry';
   private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-  getUser(): any | null {
+  getUser(): IAuthUser | null {
     try {
       const userData = localStorage.getItem(LocalStorageAuthCache.USER_KEY);
       const expiry = localStorage.getItem(
@@ -94,7 +95,7 @@ export class LocalStorageAuthCache implements IAuthCache {
     }
   }
 
-  setUser(user: any): void {
+  setUser(user: IAuthUser): void {
     try {
       const expiry = Date.now() + this.CACHE_DURATION;
       localStorage.setItem(

@@ -515,7 +515,7 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
   }, [formData]);
 
   const handleInputChange = useCallback(
-    (field: keyof CategoryFormData, value: any) => {
+    (field: keyof CategoryFormData, value: CategoryFormData[typeof field]) => {
       setFormData(prev => ({ ...prev, [field]: value }));
 
       // Clear error when user starts typing
@@ -579,9 +579,10 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
             : null,
         };
 
-        const result = await update(category.id, categoryData);
+        const rawResult = await update(category.id, categoryData);
+        const result = rawResult as { success?: boolean; message?: string } | false;
 
-        if (result?.success) {
+        if (result && result.success) {
           setSuccessMessage('Categoría actualizada exitosamente');
 
           // Wait a bit before closing to show success message
@@ -601,7 +602,7 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
           }, 1500);
         } else {
           const errorMessage =
-            result?.message || 'Error al actualizar la categoría';
+            (result && result.message) || 'Error al actualizar la categoría';
           setErrors({ submit: errorMessage });
         }
       } catch (error) {

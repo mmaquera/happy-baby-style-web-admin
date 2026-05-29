@@ -3,7 +3,7 @@
 // Open/Closed: Extensible for new auth providers
 // Dependency Inversion: Depends on abstractions
 
-import { ApolloClient, gql } from '@apollo/client';
+import { ApolloClient, type NormalizedCacheObject } from '@apollo/client';
 import {
   LoginUserDocument,
   RefreshTokenDocument,
@@ -63,7 +63,7 @@ export class UnifiedAuthService {
   private tokenStorage: ITokenStorage;
 
   constructor(
-    private client: ApolloClient<any>,
+    private client: ApolloClient<NormalizedCacheObject>,
     tokenStorage?: ITokenStorage
   ) {
     this.tokenStorage = tokenStorage || new LocalTokenStorage();
@@ -132,11 +132,10 @@ export class UnifiedAuthService {
             }
           : undefined,
       };
-    } catch (error: any) {
-      throw new AuthError(
-        'REGISTRATION_FAILED',
-        error.message || 'Registration failed'
-      );
+    } catch (error: unknown) {
+      if (error instanceof AuthError) throw error;
+      const msg = error instanceof Error ? error.message : 'Registration failed';
+      throw new AuthError('REGISTRATION_FAILED', msg);
     }
   }
 
@@ -213,32 +212,18 @@ export class UnifiedAuthService {
             }
           : undefined,
       };
-    } catch (error: any) {
-      // Enhanced error handling following SOLID principles
-      if (error instanceof AuthError) {
-        throw error; // Re-throw AuthError instances
+    } catch (error: unknown) {
+      if (error instanceof AuthError) throw error;
+      const gqlError = error as { graphQLErrors?: { message?: string; extensions?: { code?: string } }[]; networkError?: unknown; message?: string };
+      if (gqlError.graphQLErrors?.length) {
+        const e = gqlError.graphQLErrors[0];
+        throw new AuthError(e?.extensions?.code ?? 'LOGIN_FAILED', e?.message ?? 'Login failed');
       }
-
-      // Handle GraphQL errors
-      if (error?.graphQLErrors?.length > 0) {
-        const graphQLError = error.graphQLErrors[0];
-        const errorMessage = graphQLError.message || 'Login failed';
-        const errorCode = graphQLError.extensions?.code || 'LOGIN_FAILED';
-        throw new AuthError(errorCode, errorMessage);
+      if (gqlError.networkError) {
+        throw new AuthError('NETWORK_ERROR', 'Unable to connect to server. Please check your internet connection.');
       }
-
-      // Handle network errors
-      if (error?.networkError) {
-        throw new AuthError(
-          'NETWORK_ERROR',
-          'Unable to connect to server. Please check your internet connection.'
-        );
-      }
-
-      // Handle generic errors
-      const errorMessage =
-        error?.message || 'An unexpected error occurred during login';
-      throw new AuthError('LOGIN_FAILED', errorMessage);
+      const msg = error instanceof Error ? error.message : 'An unexpected error occurred during login';
+      throw new AuthError('LOGIN_FAILED', msg);
     }
   }
 
@@ -248,26 +233,15 @@ export class UnifiedAuthService {
       await this.client.mutate({
         mutation: LogoutUserDocument,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.warn('Logout server call failed:', error);
-
-      // Lanzar error específico para mejor manejo en capas superiores
-      if (
-        error?.graphQLErrors?.some(
-          (err: any) => err.extensions?.['code'] === 'UNAUTHENTICATED'
-        )
-      ) {
+      const gqlError = error as { graphQLErrors?: { extensions?: { code?: string } }[]; networkError?: unknown };
+      if (gqlError.graphQLErrors?.some(e => e.extensions?.code === 'UNAUTHENTICATED')) {
         throw new AuthError('UNAUTHENTICATED', 'Usuario no autenticado');
-      } else if (error?.networkError) {
-        throw new AuthError(
-          'NETWORK_ERROR',
-          'Error de conexión al cerrar sesión'
-        );
+      } else if (gqlError.networkError) {
+        throw new AuthError('NETWORK_ERROR', 'Error de conexión al cerrar sesión');
       } else {
-        throw new AuthError(
-          'LOGOUT_FAILED',
-          'Error al cerrar sesión en el servidor'
-        );
+        throw new AuthError('LOGOUT_FAILED', 'Error al cerrar sesión en el servidor');
       }
     } finally {
       await this.tokenStorage.clearTokens();
@@ -298,11 +272,10 @@ export class UnifiedAuthService {
 
       await this.tokenStorage.storeTokens(tokens);
       return tokens;
-    } catch (error: any) {
-      throw new AuthError(
-        'REFRESH_FAILED',
-        error.message || 'Token refresh failed'
-      );
+    } catch (error: unknown) {
+      if (error instanceof AuthError) throw error;
+      const msg = error instanceof Error ? error.message : 'Token refresh failed';
+      throw new AuthError('REFRESH_FAILED', msg);
     }
   }
 
@@ -378,32 +351,22 @@ export class UnifiedAuthService {
   }
 
   // Map GraphQL user to internal user format
-  private mapGraphQLUserToAuthUser(graphqlUser: any): IAuthUser {
+  private mapGraphQLUserToAuthUser(graphqlUser: Record<string, unknown> & { profile?: Record<string, unknown> | null }): IAuthUser {
     return {
-      id: graphqlUser.id,
-      email: graphqlUser.email,
-      role: this.mapGraphQLRoleToUserRole(graphqlUser.role),
-      isActive: graphqlUser.isActive,
-      emailVerified: graphqlUser.emailVerified,
-      ...(graphqlUser.lastLoginAt && { lastLoginAt: graphqlUser.lastLoginAt }),
+      id: graphqlUser['id'] as string,
+      email: graphqlUser['email'] as string,
+      role: this.mapGraphQLRoleToUserRole(graphqlUser['role'] as string),
+      isActive: graphqlUser['isActive'] as boolean,
+      emailVerified: graphqlUser['emailVerified'] as boolean,
+      ...(typeof graphqlUser['lastLoginAt'] === 'string' ? { lastLoginAt: graphqlUser['lastLoginAt'] } : {}),
       profile: graphqlUser.profile
         ? {
-            id: graphqlUser.profile.id,
-            ...(graphqlUser.profile.firstName && {
-              firstName: graphqlUser.profile.firstName,
-            }),
-            ...(graphqlUser.profile.lastName && {
-              lastName: graphqlUser.profile.lastName,
-            }),
-            ...(graphqlUser.profile.phone && {
-              phone: graphqlUser.profile.phone,
-            }),
-            ...(graphqlUser.profile.birthDate && {
-              birthDate: graphqlUser.profile.birthDate,
-            }),
-            ...(graphqlUser.profile.avatar && {
-              avatar: graphqlUser.profile.avatar,
-            }),
+            id: graphqlUser.profile['id'] as string,
+            ...(typeof graphqlUser.profile['firstName'] === 'string' ? { firstName: graphqlUser.profile['firstName'] } : {}),
+            ...(typeof graphqlUser.profile['lastName'] === 'string' ? { lastName: graphqlUser.profile['lastName'] } : {}),
+            ...(typeof graphqlUser.profile['phone'] === 'string' ? { phone: graphqlUser.profile['phone'] } : {}),
+            ...(typeof graphqlUser.profile['birthDate'] === 'string' ? { birthDate: graphqlUser.profile['birthDate'] } : {}),
+            ...(typeof graphqlUser.profile['avatar'] === 'string' ? { avatar: graphqlUser.profile['avatar'] } : {}),
           }
         : undefined,
     };
@@ -429,7 +392,7 @@ export class AuthError extends Error implements IAuthError {
   constructor(
     public code: string,
     message: string,
-    public details?: any
+    public details?: unknown
   ) {
     super(message);
     this.name = 'AuthError';
@@ -439,7 +402,7 @@ export class AuthError extends Error implements IAuthError {
 // Factory for creating auth service
 export class AuthServiceFactory {
   static createUnifiedAuthService(
-    client: ApolloClient<any>,
+    client: ApolloClient<NormalizedCacheObject>,
     tokenStorage?: ITokenStorage
   ): UnifiedAuthService {
     return new UnifiedAuthService(client, tokenStorage);

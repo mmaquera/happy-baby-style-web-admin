@@ -41,7 +41,7 @@ export interface SVGUploadError {
   code: string;
   message: string;
   filename?: string;
-  details?: any;
+  details?: unknown;
 }
 
 // Validation result interface

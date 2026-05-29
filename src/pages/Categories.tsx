@@ -10,6 +10,8 @@ import {
   CategoryDetailModal,
   CategoryFilters,
 } from '@/components/categories';
+import type { CategoryFilters as CategoryFiltersType } from '@/components/categories/types';
+import type { Category } from '@/generated/graphql';
 import { useCategories } from '@/hooks/useCategories';
 import { toast } from 'react-hot-toast';
 import { logger } from '@/utils/logger';
@@ -134,7 +136,7 @@ export const Categories: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<any>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [showFilters, setShowFilters] = useState(true); // Mostrar filtros por defecto
   const [isUpdating, setIsUpdating] = useState(false); // Estado para indicar actualización
 
@@ -178,7 +180,7 @@ export const Categories: React.FC = () => {
     setIsCreateModalOpen(false);
   }, []);
 
-  const handleCreateCategorySuccess = useCallback((newCategory: any) => {
+  const handleCreateCategorySuccess = useCallback((_newCategory: unknown) => {
     setIsUpdating(true);
     toast.success('Categoría creada exitosamente');
     setIsCreateModalOpen(false);
@@ -217,7 +219,7 @@ export const Categories: React.FC = () => {
     setSelectedCategory(null);
   }, []);
 
-  const handleEditCategorySuccess = useCallback((updatedCategory: any) => {
+  const handleEditCategorySuccess = useCallback((_updatedCategory: unknown) => {
     setIsUpdating(true);
     toast.success('Categoría actualizada exitosamente');
     setIsEditModalOpen(false);
@@ -276,7 +278,7 @@ export const Categories: React.FC = () => {
     setSelectedCategory(null);
   }, []);
 
-  const handleEditFromDetail = useCallback((category: any) => {
+  const handleEditFromDetail = useCallback((category: Category) => {
     setIsDetailModalOpen(false);
     setSelectedCategory(category);
     setIsEditModalOpen(true);
@@ -287,7 +289,7 @@ export const Categories: React.FC = () => {
   }, []);
 
   const handleFiltersChange = useCallback(
-    (newFilters: any) => {
+    (newFilters: CategoryFiltersType) => {
       setFilters(newFilters);
     },
     [setFilters]
@@ -419,7 +421,7 @@ export const Categories: React.FC = () => {
         isOpen={isDetailModalOpen}
         onClose={handleDetailModalClose}
         category={selectedCategory}
-        onEdit={handleEditFromDetail}
+        onEdit={(cat) => handleEditFromDetail(cat as import('@/generated/graphql').Category)}
       />
     </CategoriesContainer>
   );

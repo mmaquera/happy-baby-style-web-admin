@@ -91,7 +91,7 @@ export const useRegisterUser = (): UseRegisterUserReturn => {
         // Success
         toast.success('Usuario registrado exitosamente');
         return true;
-      } catch (error: any) {
+      } catch (error: unknown) {
         const errorMessage =
           error instanceof Error ? error.message : 'Error al registrar usuario';
         setCustomError(errorMessage);

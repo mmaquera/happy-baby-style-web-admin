@@ -80,7 +80,7 @@ export const useUserActions = () => {
 
     setLoading(true);
     try {
-      await updateUserMutation.update(user.id, { role: UserRole.admin as any });
+      await updateUserMutation.update(user.id, { role: UserRole.admin });
       toast.success(`${user.email} promovido a administrador exitosamente`);
     } catch (error) {
       toast.error('Error al promover usuario');
@@ -99,7 +99,7 @@ export const useUserActions = () => {
     setLoading(true);
     try {
       await updateUserMutation.update(user.id, {
-        role: UserRole.customer as any,
+        role: UserRole.customer,
       });
       toast.success(`Permisos de administrador removidos de ${user.email}`);
     } catch (error) {

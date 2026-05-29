@@ -6,11 +6,27 @@ import { UserAddressEditForm } from './UserAddressEditForm';
 import { theme } from '@/styles/theme';
 import { logger } from '@/utils/logger';
 
+interface AddressInput {
+  userId: string;
+  type: string;
+  firstName: string;
+  lastName: string;
+  company?: string | undefined;
+  address1: string;
+  address2?: string | undefined;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  phone?: string | undefined;
+  isDefault: boolean;
+}
+
 interface UserAddressManagerProps {
   addresses: UserAddress[];
   userId: string;
-  onCreateAddress: (input: any) => Promise<void>;
-  onUpdateAddress: (addressId: string, input: any) => Promise<void>;
+  onCreateAddress: (input: AddressInput) => Promise<void>;
+  onUpdateAddress: (addressId: string, input: AddressInput) => Promise<void>;
   onDeleteAddress: (addressId: string) => Promise<void>;
   onSetDefaultAddress: (addressId: string) => Promise<void>;
   loading?: boolean;
@@ -178,7 +194,7 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
     null
   );
 
-  const handleCreateAddress = async (input: any) => {
+  const handleCreateAddress = async (input: AddressInput) => {
     try {
       await onCreateAddress(input);
       setShowCreateForm(false);
@@ -187,7 +203,7 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
     }
   };
 
-  const handleUpdateAddress = async (input: any) => {
+  const handleUpdateAddress = async (input: AddressInput) => {
     if (!editingAddress) return;
 
     try {

@@ -9,6 +9,7 @@ import {
   GetUserProfileDocument,
   CreateUserAddressInput,
   UpdateUserAddressInput,
+  UpdateUserProfileInput,
 } from '../generated/graphql';
 import toast from 'react-hot-toast';
 
@@ -69,7 +70,7 @@ export const useUserProfile = ({
 
   // Actualizar perfil del usuario
   const updateProfile = useCallback(
-    async (input: any) => {
+    async (input: UpdateUserProfileInput) => {
       try {
         const result = await updateProfileMutation({
           variables: { userId, input },

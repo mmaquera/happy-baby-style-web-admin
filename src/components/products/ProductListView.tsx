@@ -27,7 +27,7 @@ interface Product {
   salePrice?: number | null;
   sku: string;
   images: string[];
-  attributes: any;
+  attributes: Record<string, unknown>;
   isActive: boolean;
   stockQuantity: number;
   tags: string[];
@@ -52,7 +52,7 @@ interface Product {
     price: number;
     sku: string;
     stockQuantity: number;
-    attributes: any;
+    attributes: Record<string, unknown>;
     isActive: boolean;
     isInStock: boolean;
   }>;
@@ -72,7 +72,7 @@ interface ProductListViewProps {
   onToggleStatus: (productId: string, isActive: boolean) => void;
   onViewDetails: (productId: string) => void;
   onSort: (field: string, direction: 'asc' | 'desc') => void;
-  onFilter: (filters: any) => void;
+  onFilter: (filters: Record<string, unknown>) => void;
 }
 
 // =====================================================

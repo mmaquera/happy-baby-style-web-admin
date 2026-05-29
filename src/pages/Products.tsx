@@ -526,7 +526,15 @@ export const Products: React.FC = () => {
       {/* Product Filters - Clean and focused */}
       <ProductFilters
         filters={(() => {
-          const filterObj: any = {
+          const filterObj: {
+            search?: string;
+            categoryId?: string;
+            isActive?: boolean;
+            inStock?: boolean;
+            tags?: string[];
+            minPrice?: number;
+            maxPrice?: number;
+          } = {
             search: filters.search,
             categoryId: filters.categoryId,
             isActive: filters.isActive,

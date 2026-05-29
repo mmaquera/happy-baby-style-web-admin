@@ -206,7 +206,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
 }) => {
   const handleInputChange = (
     field: keyof ProductFiltersProps['filters'],
-    value: any
+    value: ProductFiltersProps['filters'][typeof field]
   ) => {
     onFilterChange({ [field]: value });
   };

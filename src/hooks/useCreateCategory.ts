@@ -7,7 +7,7 @@ import { toast } from 'react-hot-toast';
 import { useState, useCallback } from 'react';
 
 interface UseCreateCategoryReturn {
-  create: (input: CreateCategoryInput) => Promise<any>;
+  create: (input: CreateCategoryInput) => Promise<unknown>;
   uploadSVG: (file: File, categoryId?: string) => Promise<string | null>;
   loading: boolean;
   error: string | null;

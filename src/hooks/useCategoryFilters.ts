@@ -1,5 +1,7 @@
 import { useCallback, useState, useMemo } from 'react';
-import { PaginationInput } from '@/generated/graphql';
+import { type PaginationInput, type Category } from '@/generated/graphql';
+
+type CategoryWithExtras = Category & { productsCount?: number };
 import {
   CategoryFilters,
   CategoryFilterInput,
@@ -20,7 +22,7 @@ export interface UseCategoryFiltersReturn {
   // Filters
   filters: CategoryFilters;
   setFilters: (filters: CategoryFilters) => void;
-  updateFilter: (key: keyof CategoryFilters, value: any) => void;
+  updateFilter: (key: keyof CategoryFilters, value: CategoryFilters[keyof CategoryFilters]) => void;
   clearFilters: () => void;
 
   // Sorting
@@ -44,7 +46,7 @@ export interface UseCategoryFiltersReturn {
 
   // Utilities
   resetToDefaults: () => void;
-  getFilteredAndSortedCategories: (categories: any[]) => any[];
+  getFilteredAndSortedCategories: (categories: Category[]) => Category[];
   mapFiltersToGraphQL: (filters: CategoryFilters) => CategoryFilterInput;
 }
 
@@ -153,7 +155,7 @@ export const useCategoryFilters = (totalItems: number = 0) => {
   );
 
   // Update specific filter
-  const updateFilter = useCallback((key: keyof CategoryFilters, value: any) => {
+  const updateFilter = useCallback((key: keyof CategoryFilters, value: CategoryFilters[keyof CategoryFilters]) => {
     setFilters(prev => ({ ...prev, [key]: value }));
     // Reset to first page when filters change
     setPagination(prev => ({ ...prev, offset: 0 }));
@@ -223,7 +225,7 @@ export const useCategoryFilters = (totalItems: number = 0) => {
 
   // Filter and sort categories (for client-side operations)
   const getFilteredAndSortedCategories = useCallback(
-    (categories: any[]) => {
+    (categories: Category[]) => {
       let filtered = [...categories];
 
       // Apply filters
@@ -257,20 +259,20 @@ export const useCategoryFilters = (totalItems: number = 0) => {
       if (filters.hasProducts !== undefined) {
         filtered = filtered.filter(cat =>
           filters.hasProducts
-            ? (cat.productsCount || 0) > 0
-            : (cat.productsCount || 0) === 0
+            ? ((cat as CategoryWithExtras).productsCount || 0) > 0
+            : ((cat as CategoryWithExtras).productsCount || 0) === 0
         );
       }
 
       if (filters.minProducts !== undefined) {
         filtered = filtered.filter(
-          cat => (cat.productsCount || 0) >= filters.minProducts!
+          cat => ((cat as CategoryWithExtras).productsCount || 0) >= filters.minProducts!
         );
       }
 
       if (filters.maxProducts !== undefined) {
         filtered = filtered.filter(
-          cat => (cat.productsCount || 0) <= filters.maxProducts!
+          cat => ((cat as CategoryWithExtras).productsCount || 0) <= filters.maxProducts!
         );
       }
 
@@ -304,8 +306,8 @@ export const useCategoryFilters = (totalItems: number = 0) => {
 
       // Apply sorting
       filtered.sort((a, b) => {
-        const aValue = a[sortConfig.field];
-        const bValue = b[sortConfig.field];
+        const aValue = (a as Record<string, unknown>)[sortConfig.field];
+        const bValue = (b as Record<string, unknown>)[sortConfig.field];
 
         if (aValue === bValue) return 0;
 

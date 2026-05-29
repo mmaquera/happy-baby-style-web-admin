@@ -7,7 +7,7 @@ import {
   useUpdateUserOptimized,
 } from '@/hooks/useUsersGraphQL';
 import { User, UserRole } from '@/types';
-import { InputMaybe } from '@/generated/graphql';
+import { InputMaybe, type CreateUserProfileInput } from '@/generated/graphql';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -555,7 +555,7 @@ export const UsersPage: React.FC = () => {
     },
   });
 
-  const handleCreateUser = async (userData: any) => {
+  const handleCreateUser = async (userData: CreateUserProfileInput) => {
     try {
       const result = await createUserMutation.create(userData);
 
@@ -931,14 +931,15 @@ export const UsersPage: React.FC = () => {
               </ErrorMessage>
             ) : (
               <UsersGrid>
-                {users.map((user: any) => {
+                {users.map((gqlUser) => {
+                  const user = gqlUser as unknown as User;
                   // Determinar el proveedor principal del usuario
                   const primaryProvider = AuthProvider.email;
-                  logger.debug(user);
+                  logger.debug('User data:', user);
                   return (
                     <UserCard
                       key={user.id}
-                      onClick={() => openEditModal(user as any)}
+                      onClick={() => openEditModal(user)}
                     >
                       {/* Indicador del proveedor de autenticación */}
                       <AuthProviderIndicator provider={primaryProvider}>
@@ -981,37 +982,35 @@ export const UsersPage: React.FC = () => {
                           onClick={(e: React.MouseEvent) => e.stopPropagation()}
                         >
                           <UserActionsMenu
-                            user={user as any}
+                            user={user}
                             isOpen={openMenuUserId === user.id}
                             onToggle={() => handleMenuToggle(user.id)}
                             onClose={handleMenuClose}
                             onEdit={openEditModal}
-                            onView={user => {
-                              setSelectedUser(user as any);
+                            onView={u => {
+                              setSelectedUser(u);
                               setShowDetailModal(true);
                             }}
                             onActivate={
                               user.isActive
                                 ? () => {}
-                                : (user: any) => handleActivateUser(user)
+                                : (u) => handleActivateUser(u)
                             }
                             onDeactivate={
                               user.isActive
-                                ? (user: any) => handleDeactivateUser(user)
+                                ? (u) => handleDeactivateUser(u)
                                 : () => {}
                             }
-                            onDelete={(user: any) => handleDeleteUser(user)}
-                            onResetPassword={(user: any) =>
-                              handleResetPassword(user)
-                            }
+                            onDelete={(u) => handleDeleteUser(u)}
+                            onResetPassword={(u) => handleResetPassword(u)}
                             onPromoteToAdmin={
                               user.role !== UserRole.admin
-                                ? (user: any) => handlePromoteToAdmin(user)
+                                ? (u) => handlePromoteToAdmin(u)
                                 : () => {}
                             }
                             onDemoteFromAdmin={
                               user.role === UserRole.admin
-                                ? (user: any) => handleDemoteFromAdmin(user)
+                                ? (u) => handleDemoteFromAdmin(u)
                                 : () => {}
                             }
                           />

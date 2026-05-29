@@ -6,6 +6,7 @@ import {
   GetUsersDocument,
   UserFilterInput,
   CreateUserProfileInput,
+  UpdateUserInput,
   UpdateUserProfileInput,
   InputMaybe,
   UserRole,
@@ -119,7 +120,7 @@ export const useUpdateUser = () => {
     refetchQueries: [GetUsersDocument],
   });
 
-  const update = async (id: string, input: UpdateUserProfileInput) => {
+  const update = async (id: string, input: UpdateUserInput) => {
     try {
       const result = await updateUserMutation({
         variables: { id, input },

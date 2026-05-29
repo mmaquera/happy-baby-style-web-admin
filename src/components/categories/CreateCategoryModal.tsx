@@ -23,7 +23,7 @@ import {
 interface CreateCategoryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (category: any) => void;
+  onSuccess: (category: Record<string, unknown>) => void;
 }
 
 interface CategoryFormData {
@@ -347,7 +347,7 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
   }, [formData]);
 
   const handleInputChange = useCallback(
-    (field: keyof CategoryFormData, value: any) => {
+    (field: keyof CategoryFormData, value: CategoryFormData[typeof field]) => {
       setFormData(prev => ({ ...prev, [field]: value }));
 
       // Clear error when user starts typing
@@ -389,14 +389,15 @@ export const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
           sortOrder: formData.sortOrder ? parseInt(formData.sortOrder) : null,
         };
 
-        const result = await create(categoryData);
+        const rawResult = await create(categoryData);
+        const result = rawResult as { success?: boolean; data?: { entity?: unknown } | null } | false;
 
-        if (result?.success) {
+        if (result && result.success) {
           setSuccessMessage('Categoría creada exitosamente');
 
           // Wait a bit before closing to show success message
           setTimeout(() => {
-            onSuccess(result.data?.entity || categoryData);
+            onSuccess((result.data?.entity as Record<string, unknown>) || (categoryData as unknown as Record<string, unknown>));
             onClose();
           }, 1500);
         }

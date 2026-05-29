@@ -2,7 +2,7 @@
 // Uses the AuthService for authentication logic
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useApolloClient } from '@apollo/client';
+import { useApolloClient, type ApolloClient, type NormalizedCacheObject } from '@apollo/client';
 import {
   AuthServiceFactory,
   LoginCredentials,
@@ -34,7 +34,7 @@ interface UseAuthReturn extends AuthState, AuthActions {
 }
 
 export const useAuth = (): UseAuthReturn => {
-  const client = useApolloClient();
+  const client = useApolloClient() as ApolloClient<NormalizedCacheObject>;
   const [state, setState] = useState<AuthState>({
     user: null,
     isAuthenticated: false,

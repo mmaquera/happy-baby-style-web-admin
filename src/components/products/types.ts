@@ -3,6 +3,41 @@
 // =====================================================
 // Following Clean Architecture principles and TypeScript best practices
 
+export interface ProductReview {
+  id: string;
+  rating: number;
+  title?: string | null;
+  comment?: string | null;
+  helpfulCount?: number;
+  isVerified?: boolean;
+  createdAt: string;
+  user?: { firstName?: string | null; lastName?: string | null } | null;
+}
+
+export interface InventoryTransaction {
+  id: string;
+  type: string;
+  quantity: number;
+  reference?: string | null;
+  createdAt: string;
+}
+
+export interface StockAlert {
+  id: string;
+  type: string;
+  isActive: boolean;
+  threshold: number;
+  currentStock: number;
+  createdAt: string;
+}
+
+export interface AppEvent {
+  id: string;
+  eventType: string;
+  eventData?: unknown;
+  createdAt: string;
+}
+
 // Base Product interface matching GraphQL schema
 export interface Product {
   id: string;
@@ -13,7 +48,7 @@ export interface Product {
   salePrice?: number | null;
   sku: string;
   images: string[];
-  attributes: Record<string, any>;
+  attributes: Record<string, unknown>;
   isActive: boolean;
   stockQuantity: number;
   tags: string[];
@@ -30,13 +65,13 @@ export interface Product {
   // Relations
   category?: Category | null;
   variants: ProductVariant[];
-  cartItems: any[];
-  favorites: any[];
-  orderItems: any[];
-  reviews: any[];
-  appEvents: any[];
-  inventoryTransactions: any[];
-  stockAlerts: any[];
+  cartItems: unknown[];
+  favorites: unknown[];
+  orderItems: unknown[];
+  reviews: ProductReview[];
+  appEvents: AppEvent[];
+  inventoryTransactions: InventoryTransaction[];
+  stockAlerts: StockAlert[];
 }
 
 // Product Variant interface
@@ -47,7 +82,7 @@ export interface ProductVariant {
   price: number;
   sku: string;
   stockQuantity: number;
-  attributes: Record<string, any>;
+  attributes: Record<string, unknown>;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -87,7 +122,7 @@ export interface TagWithMetadata {
 export interface ProductWithTagMetadata extends Product {
   attributes: {
     tags?: TagWithMetadata;
-    [key: string]: any;
+    [key: string]: unknown;
   };
 }
 
@@ -149,7 +184,7 @@ export interface ProductFormData {
   images: string[];
   attributes: {
     tags?: Record<string, TagMetadata>;
-    [key: string]: any;
+    [key: string]: unknown;
   };
 }
 
@@ -203,7 +238,7 @@ export interface GetProductsResponse {
   code: string;
   timestamp: string;
   data: GetProductsData;
-  metadata: any;
+  metadata: unknown;
 }
 
 // UI State types

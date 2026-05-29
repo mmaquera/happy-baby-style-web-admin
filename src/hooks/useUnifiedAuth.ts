@@ -3,7 +3,7 @@
 // Dependency Inversion: Depends on UnifiedAuthService abstraction
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useApolloClient } from '@apollo/client';
+import { useApolloClient, type ApolloClient, type NormalizedCacheObject } from '@apollo/client';
 import {
   UnifiedAuthService,
   AuthServiceFactory,
@@ -46,7 +46,7 @@ interface UseUnifiedAuthReturn extends AuthState, AuthActions {
 }
 
 export const useUnifiedAuth = (): UseUnifiedAuthReturn => {
-  const client = useApolloClient();
+  const client = useApolloClient() as ApolloClient<NormalizedCacheObject>;
   const [state, setState] = useState<AuthState>({
     user: null,
     isAuthenticated: false,
