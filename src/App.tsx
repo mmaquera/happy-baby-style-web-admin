@@ -11,6 +11,9 @@ import { theme } from '@/styles/theme';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { SidebarProvider } from '@/contexts/SidebarContext';
 import { ProductProvider } from '@/app/di/products';
+import { CategoryProvider } from '@/app/di/categories';
+import { UserProvider } from '@/app/di/users';
+import { OrderProvider } from '@/app/di/orders';
 import { Layout } from '@/components/layout/Layout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { Login } from '@/pages/Login';
@@ -29,6 +32,9 @@ function App() {
           <GlobalStyles />
           <TooltipProvider>
             <ProductProvider>
+              <CategoryProvider>
+                <OrderProvider>
+                  <UserProvider>
               <AuthProvider>
                 <SidebarProvider>
                   <Router>
@@ -157,6 +163,9 @@ function App() {
                   }}
                 />
               </AuthProvider>
+                  </UserProvider>
+                </OrderProvider>
+              </CategoryProvider>
             </ProductProvider>
           </TooltipProvider>
         </ThemeProvider>
