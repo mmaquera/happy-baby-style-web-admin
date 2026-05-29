@@ -1,10 +1,16 @@
 import type React from 'react';
 import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import styled from 'styled-components';
 import { type CreateUserProfileInput, UserRole } from '@/generated/graphql';
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import {
+  createUserFormSchema,
+  type CreateUserFormValues,
+} from '@/core/shared/validation/userSchema';
 
 import {
   UserPlus,
@@ -19,7 +25,6 @@ import {
   Lock,
   User as UserIcon,
 } from 'lucide-react';
-import { logger } from '@/utils/logger';
 
 interface CreateUserModalProps {
   isOpen: boolean;
@@ -452,11 +457,6 @@ const ModalFooter = styled.div`
 `;
 
 // Utility functions
-const isValidEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-};
-
 const calculatePasswordStrength = (password: string): number => {
   let strength = 0;
   if (password.length >= 8) strength += 25;
@@ -481,195 +481,63 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
   isLoading,
   serverError,
 }) => {
-  const [formData, setFormData] = useState<CreateUserProfileInput>({
-    email: '',
-    password: '',
-    firstName: '',
-    lastName: '',
-    phone: '',
-    dateOfBirth: null,
-    role: UserRole.customer,
-    isActive: true,
-  });
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
-
-  // Limpiar formulario cuando se abra el modal
-  useEffect(() => {
-    if (isOpen) {
-      setFormData({
-        email: '',
-        password: '',
-        firstName: '',
-        lastName: '',
-        phone: '',
-        dateOfBirth: null,
-        role: UserRole.customer,
-        isActive: true,
-      });
-      setErrors({});
-      setServerErrors({});
-      setShowPassword(false);
-    }
-  }, [isOpen]);
-
-  // Procesar errores del servidor cuando cambien
-  useEffect(() => {
-    if (serverError) {
-      processServerError(serverError);
-    } else {
-      setServerErrors({});
-    }
-  }, [serverError]);
-
-  // Función para validar y formatear fecha
-  const formatDateForAPI = (dateString: string): string | null => {
-    if (!dateString) return null;
-
-    try {
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) return null;
-
-      // Asegurar formato ISO para el backend
-      return date.toISOString();
-    } catch {
-      return null;
-    }
-  };
-
-  // Función para procesar errores del servidor y mapearlos a campos específicos
-  const processServerError = (errorMessage: string): void => {
-    const newServerErrors: Record<string, string> = {};
-
-    // Mapear errores específicos del servidor a campos del formulario
-    if (
-      errorMessage.toLowerCase().includes('birth date') ||
-      errorMessage.toLowerCase().includes('fecha de nacimiento')
-    ) {
-      newServerErrors['dateOfBirth'] = 'Fecha de nacimiento inválida';
-    } else if (errorMessage.toLowerCase().includes('email')) {
-      newServerErrors['email'] = 'Email inválido o ya existe';
-    } else if (errorMessage.toLowerCase().includes('password')) {
-      newServerErrors['password'] = 'Contraseña inválida';
-    } else if (
-      errorMessage.toLowerCase().includes('first name') ||
-      errorMessage.toLowerCase().includes('nombre')
-    ) {
-      newServerErrors['firstName'] = 'Nombre inválido';
-    } else if (
-      errorMessage.toLowerCase().includes('last name') ||
-      errorMessage.toLowerCase().includes('apellido')
-    ) {
-      newServerErrors['lastName'] = 'Apellido inválido';
-    } else if (
-      errorMessage.toLowerCase().includes('phone') ||
-      errorMessage.toLowerCase().includes('teléfono')
-    ) {
-      newServerErrors['phone'] = 'Teléfono inválido';
-    }
-
-    setServerErrors(newServerErrors);
-  };
-
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.email) {
-      newErrors['email'] = 'Email es requerido';
-    } else if (!isValidEmail(formData.email)) {
-      newErrors['email'] = 'Email no válido';
-    }
-
-    if (!formData.password) {
-      newErrors['password'] = 'Contraseña es requerida';
-    } else if (calculatePasswordStrength(formData.password) < 50) {
-      newErrors['password'] = 'Contraseña muy débil';
-    }
-
-    if (!formData.firstName) {
-      newErrors['firstName'] = 'Nombre es requerido';
-    }
-
-    if (!formData.lastName) {
-      newErrors['lastName'] = 'Apellido es requerido';
-    }
-
-    // Validar fecha de nacimiento
-    if (formData.dateOfBirth) {
-      const birthDate = new Date(formData.dateOfBirth);
-      const today = new Date();
-
-      if (isNaN(birthDate.getTime())) {
-        newErrors['dateOfBirth'] = 'Fecha de nacimiento no válida';
-      } else if (birthDate > today) {
-        newErrors['dateOfBirth'] = 'La fecha de nacimiento no puede ser futura';
-      } else if (birthDate < new Date('1900-01-01')) {
-        newErrors['dateOfBirth'] = 'Fecha de nacimiento demasiado antigua';
-      }
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async () => {
-    if (validateForm()) {
-      try {
-        // Limpiar errores del servidor antes de enviar
-        setServerErrors({});
-
-        // Formatear la fecha antes de enviar
-        const formattedData = {
-          ...formData,
-          dateOfBirth: formData.dateOfBirth
-            ? formatDateForAPI(formData.dateOfBirth as string)
-            : null,
-        };
-
-        await onSubmit(formattedData);
-      } catch (error) {
-        // Los errores se manejan en el hook, pero podemos mostrar errores específicos aquí si es necesario
-        logger.error('Error en el modal:', error);
-      }
-    }
-  };
-
-  const handleClose = () => {
-    setFormData({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors, isValid },
+  } = useForm<CreateUserFormValues>({
+    resolver: zodResolver(createUserFormSchema),
+    defaultValues: {
       email: '',
       password: '',
       firstName: '',
       lastName: '',
       phone: '',
       dateOfBirth: null,
-      role: UserRole.customer,
+      role: 'customer',
       isActive: true,
-    });
-    setErrors({});
-    setServerErrors({});
+    },
+    mode: 'onSubmit',
+  });
+
+  const [showPasswordVisible, setShowPasswordVisible] = useState(false);
+
+  const passwordValue = watch('password');
+  const roleValue = watch('role');
+  const isActiveValue = watch('isActive');
+
+  useEffect(() => {
+    if (isOpen) {
+      reset();
+      setShowPasswordVisible(false);
+    }
+  }, [isOpen, reset]);
+
+  const passwordStrength = calculatePasswordStrength(passwordValue || '');
+
+  const handleClose = () => {
+    reset();
     onClose();
   };
 
-  const isFormValid = (): boolean => {
-    const hasRequiredFields = !!(
-      formData.email &&
-      formData.password &&
-      formData.firstName &&
-      formData.lastName &&
-      isValidEmail(formData.email) &&
-      calculatePasswordStrength(formData.password) >= 50
-    );
-
-    // Solo validar que no haya errores de validación locales
-    // Los errores del servidor no deberían impedir que el usuario pueda enviar el formulario
-    const hasNoValidationErrors = Object.keys(errors).length === 0;
-
-    return hasRequiredFields && hasNoValidationErrors;
+  const onFormSubmit = async (data: CreateUserFormValues) => {
+    const payload: CreateUserProfileInput = {
+      email: data.email,
+      password: data.password,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      phone: data.phone ?? null,
+      dateOfBirth: data.dateOfBirth
+        ? new Date(data.dateOfBirth).toISOString()
+        : null,
+      role: data.role as unknown as (typeof UserRole)[keyof typeof UserRole],
+      isActive: data.isActive,
+    };
+    await onSubmit(payload);
   };
-
-  const passwordStrength = calculatePasswordStrength(formData.password || '');
 
   if (!isOpen) return null;
 
@@ -694,312 +562,233 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
         </ModalHeader>
 
         <StepsIndicator>
-          <Step active={true} completed={isFormValid()}>
-            <StepNumber active={true} completed={isFormValid()}>
+          <Step active={true} completed={isValid}>
+            <StepNumber active={true} completed={isValid}>
               1
             </StepNumber>
             <StepLabel>Datos Básicos</StepLabel>
           </Step>
           <StepLine />
-          <Step active={isFormValid()} completed={false}>
-            <StepNumber active={isFormValid()}>2</StepNumber>
+          <Step active={isValid} completed={false}>
+            <StepNumber active={isValid}>2</StepNumber>
             <StepLabel>Configuración</StepLabel>
           </Step>
         </StepsIndicator>
 
-        <ModalContent>
-          {/* Server Error Banner */}
-          {serverError ? (
-            <ServerErrorBanner>
-              <Shield size={16} />
-              {serverError}
-            </ServerErrorBanner>
-          ) : null}
+        <form onSubmit={handleSubmit(onFormSubmit)} noValidate>
+          <ModalContent>
+            {serverError ? (
+              <ServerErrorBanner>
+                <Shield size={16} />
+                {serverError}
+              </ServerErrorBanner>
+            ) : null}
 
-          {/* Account Information Section */}
-          <Section>
-            <SectionHeader>
-              <Mail size={16} style={{ color: theme.colors.primaryPurple }} />
-              <SectionTitle>Información de Cuenta</SectionTitle>
-            </SectionHeader>
+            {/* Account Information Section */}
+            <Section>
+              <SectionHeader>
+                <Mail size={16} style={{ color: theme.colors.primaryPurple }} />
+                <SectionTitle>Información de Cuenta</SectionTitle>
+              </SectionHeader>
 
-            <FormGrid>
-              <FormField>
-                <Input
-                  label='Email'
-                  type='email'
-                  value={formData.email}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setFormData(prev => ({ ...prev, email: e.target.value }));
-                    // Limpiar errores cuando el usuario empiece a corregir
-                    if (errors['email'] || serverErrors['email']) {
-                      setErrors(prev => ({ ...prev, email: '' }));
-                      setServerErrors(prev => ({ ...prev, email: '' }));
+              <FormGrid>
+                <FormField>
+                  <Input
+                    label='Email'
+                    type='email'
+                    placeholder='ejemplo@correo.com'
+                    error={errors.email?.message}
+                    {...register('email')}
+                  />
+                  <FieldHint>
+                    <Mail size={12} />
+                    Este será el email de acceso al sistema
+                  </FieldHint>
+                </FormField>
+
+                <FormField>
+                  <Input
+                    label='Contraseña'
+                    type={showPasswordVisible ? 'text' : 'password'}
+                    placeholder='Mínimo 8 caracteres'
+                    error={errors.password?.message}
+                    rightIcon={
+                      showPasswordVisible ? (
+                        <EyeOff size={16} />
+                      ) : (
+                        <Eye size={16} />
+                      )
                     }
-                  }}
-                  required
-                  placeholder='ejemplo@correo.com'
-                  error={errors['email'] || serverErrors['email'] || ''}
-                />
-                <FieldHint>
-                  <Mail size={12} />
-                  Este será el email de acceso al sistema
-                </FieldHint>
-              </FormField>
-
-              <FormField>
-                <Input
-                  label='Contraseña'
-                  type={showPassword ? 'text' : 'password'}
-                  value={formData.password || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setFormData(prev => ({
-                      ...prev,
-                      password: e.target.value,
-                    }));
-                    // Limpiar errores cuando el usuario empiece a corregir
-                    if (errors['password'] || serverErrors['password']) {
-                      setErrors(prev => ({ ...prev, password: '' }));
-                      setServerErrors(prev => ({ ...prev, password: '' }));
+                    onRightIconClick={() =>
+                      setShowPasswordVisible(v => !v)
                     }
-                  }}
-                  required
-                  placeholder='Mínimo 8 caracteres'
-                  error={errors['password'] || serverErrors['password'] || ''}
-                  rightIcon={
-                    showPassword ? <EyeOff size={16} /> : <Eye size={16} />
-                  }
-                  onRightIconClick={() => setShowPassword(!showPassword)}
-                  rightIconClickable={true}
-                  rightIconAriaLabel={
-                    showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
-                  }
-                />
-                {formData.password ? (
-                  <PasswordStrength>
-                    <StrengthBar>
-                      <StrengthFill strength={passwordStrength} />
-                    </StrengthBar>
-                    <StrengthText strength={passwordStrength}>
-                      Contraseña {getPasswordStrengthText(passwordStrength)}
-                    </StrengthText>
-                  </PasswordStrength>
-                ) : null}
-                <FieldHint>
-                  <Lock size={12} />
-                  Debe contener mayúsculas, minúsculas, números y símbolos
-                </FieldHint>
-              </FormField>
-            </FormGrid>
-          </Section>
-
-          {/* Personal Information Section */}
-          <Section>
-            <SectionHeader>
-              <UserIcon
-                size={16}
-                style={{ color: theme.colors.primaryPurple }}
-              />
-              <SectionTitle>Información Personal</SectionTitle>
-            </SectionHeader>
-
-            <FormGrid>
-              <Input
-                label='Nombre'
-                value={formData.firstName || ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setFormData(prev => ({
-                    ...prev,
-                    firstName: e.target.value,
-                  }));
-                  // Limpiar errores cuando el usuario empiece a corregir
-                  if (errors['firstName'] || serverErrors['firstName']) {
-                    setErrors(prev => ({ ...prev, firstName: '' }));
-                    setServerErrors(prev => ({ ...prev, firstName: '' }));
-                  }
-                }}
-                required
-                placeholder='Nombre del usuario'
-                error={errors['firstName'] || serverErrors['firstName'] || ''}
-              />
-
-              <Input
-                label='Apellido'
-                value={formData.lastName || ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setFormData(prev => ({
-                    ...prev,
-                    lastName: e.target.value,
-                  }));
-                  // Limpiar errores cuando el usuario empiece a corregir
-                  if (errors['lastName'] || serverErrors['lastName']) {
-                    setErrors(prev => ({ ...prev, lastName: '' }));
-                    setServerErrors(prev => ({ ...prev, lastName: '' }));
-                  }
-                }}
-                required
-                placeholder='Apellido del usuario'
-                error={errors['lastName'] || serverErrors['lastName'] || ''}
-              />
-
-              <FormField>
-                <Input
-                  label='Teléfono'
-                  value={formData.phone || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setFormData(prev => ({
-                      ...prev,
-                      phone: e.target.value,
-                    }));
-                    // Limpiar errores cuando el usuario empiece a corregir
-                    if (errors['phone'] || serverErrors['phone']) {
-                      setErrors(prev => ({ ...prev, phone: '' }));
-                      setServerErrors(prev => ({ ...prev, phone: '' }));
+                    rightIconClickable={true}
+                    rightIconAriaLabel={
+                      showPasswordVisible
+                        ? 'Ocultar contraseña'
+                        : 'Mostrar contraseña'
                     }
-                  }}
-                  placeholder='+34 600 000 000'
-                  error={errors['phone'] || serverErrors['phone'] || ''}
+                    {...register('password')}
+                  />
+                  {passwordValue ? (
+                    <PasswordStrength>
+                      <StrengthBar>
+                        <StrengthFill strength={passwordStrength} />
+                      </StrengthBar>
+                      <StrengthText strength={passwordStrength}>
+                        Contraseña {getPasswordStrengthText(passwordStrength)}
+                      </StrengthText>
+                    </PasswordStrength>
+                  ) : null}
+                  <FieldHint>
+                    <Lock size={12} />
+                    Debe contener mayúsculas, minúsculas, números y símbolos
+                  </FieldHint>
+                </FormField>
+              </FormGrid>
+            </Section>
+
+            {/* Personal Information Section */}
+            <Section>
+              <SectionHeader>
+                <UserIcon
+                  size={16}
+                  style={{ color: theme.colors.primaryPurple }}
                 />
-                <FieldHint>
-                  <Phone size={12} />
-                  Formato internacional recomendado
-                </FieldHint>
-              </FormField>
+                <SectionTitle>Información Personal</SectionTitle>
+              </SectionHeader>
 
-              <Input
-                label='Fecha de Nacimiento'
-                type='date'
-                value={
-                  formData.dateOfBirth
-                    ? new Date(formData.dateOfBirth as string)
-                        .toISOString()
-                        .split('T')[0]
-                    : ''
-                }
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const formattedDate = formatDateForAPI(e.target.value);
-                  setFormData(prev => ({
-                    ...prev,
-                    dateOfBirth: formattedDate,
-                  }));
-                  // Limpiar tanto errores de validación como errores del servidor
-                  if (errors['dateOfBirth'] || serverErrors['dateOfBirth']) {
-                    setErrors(prev => ({ ...prev, dateOfBirth: '' }));
-                    setServerErrors(prev => ({ ...prev, dateOfBirth: '' }));
-                  }
-                }}
-                error={
-                  errors['dateOfBirth'] || serverErrors['dateOfBirth'] || ''
-                }
-              />
-            </FormGrid>
-          </Section>
+              <FormGrid>
+                <Input
+                  label='Nombre'
+                  placeholder='Nombre del usuario'
+                  error={errors.firstName?.message}
+                  {...register('firstName')}
+                />
 
-          {/* Settings Section */}
-          <Section>
-            <SectionHeader>
-              <Shield size={16} style={{ color: theme.colors.primaryPurple }} />
-              <SectionTitle>Configuración</SectionTitle>
-            </SectionHeader>
+                <Input
+                  label='Apellido'
+                  placeholder='Apellido del usuario'
+                  error={errors.lastName?.message}
+                  {...register('lastName')}
+                />
 
-            <RoleSelector>
-              <RoleLabel>Rol del Usuario</RoleLabel>
-              <RoleHint>Haz clic en una opción para seleccionarla</RoleHint>
-              <RoleOptions>
-                <RoleOption
-                  selected={formData.role === UserRole.customer}
-                  onClick={() =>
-                    setFormData(prev => ({ ...prev, role: UserRole.customer }))
-                  }
-                >
-                  <RoleIconContainer
-                    selected={formData.role === UserRole.customer}
+                <FormField>
+                  <Input
+                    label='Teléfono'
+                    placeholder='+34 600 000 000'
+                    error={errors.phone?.message}
+                    {...register('phone')}
+                  />
+                  <FieldHint>
+                    <Phone size={12} />
+                    Formato internacional recomendado
+                  </FieldHint>
+                </FormField>
+
+                <Input
+                  label='Fecha de Nacimiento'
+                  type='date'
+                  error={errors.dateOfBirth?.message}
+                  {...register('dateOfBirth')}
+                />
+              </FormGrid>
+            </Section>
+
+            {/* Settings Section */}
+            <Section>
+              <SectionHeader>
+                <Shield
+                  size={16}
+                  style={{ color: theme.colors.primaryPurple }}
+                />
+                <SectionTitle>Configuración</SectionTitle>
+              </SectionHeader>
+
+              <RoleSelector>
+                <RoleLabel>Rol del Usuario</RoleLabel>
+                <RoleHint>Haz clic en una opción para seleccionarla</RoleHint>
+                <RoleOptions>
+                  <RoleOption
+                    selected={roleValue === 'customer'}
+                    onClick={() => setValue('role', 'customer')}
                   >
-                    <Users size={16} />
-                  </RoleIconContainer>
-                  <RoleInfo>
-                    <RoleName>Cliente</RoleName>
-                    <RoleDescription>
-                      Acceso a funciones básicas de cliente
-                    </RoleDescription>
-                  </RoleInfo>
-                </RoleOption>
+                    <RoleIconContainer selected={roleValue === 'customer'}>
+                      <Users size={16} />
+                    </RoleIconContainer>
+                    <RoleInfo>
+                      <RoleName>Cliente</RoleName>
+                      <RoleDescription>
+                        Acceso a funciones básicas de cliente
+                      </RoleDescription>
+                    </RoleInfo>
+                  </RoleOption>
 
-                <RoleOption
-                  selected={formData.role === UserRole.staff}
-                  onClick={() =>
-                    setFormData(prev => ({ ...prev, role: UserRole.staff }))
-                  }
-                >
-                  <RoleIconContainer
-                    selected={formData.role === UserRole.staff}
+                  <RoleOption
+                    selected={roleValue === 'staff'}
+                    onClick={() => setValue('role', 'staff')}
                   >
-                    <UserPlus size={16} />
-                  </RoleIconContainer>
-                  <RoleInfo>
-                    <RoleName>Staff</RoleName>
-                    <RoleDescription>
-                      Acceso a gestión de contenido y soporte
-                    </RoleDescription>
-                  </RoleInfo>
-                </RoleOption>
+                    <RoleIconContainer selected={roleValue === 'staff'}>
+                      <UserPlus size={16} />
+                    </RoleIconContainer>
+                    <RoleInfo>
+                      <RoleName>Staff</RoleName>
+                      <RoleDescription>
+                        Acceso a gestión de contenido y soporte
+                      </RoleDescription>
+                    </RoleInfo>
+                  </RoleOption>
 
-                <RoleOption
-                  selected={formData.role === UserRole.admin}
-                  onClick={() =>
-                    setFormData(prev => ({ ...prev, role: UserRole.admin }))
-                  }
-                >
-                  <RoleIconContainer
-                    selected={formData.role === UserRole.admin}
+                  <RoleOption
+                    selected={roleValue === 'admin'}
+                    onClick={() => setValue('role', 'admin')}
                   >
-                    <Shield size={16} />
-                  </RoleIconContainer>
-                  <RoleInfo>
-                    <RoleName>Administrador</RoleName>
-                    <RoleDescription>
-                      Acceso completo al sistema
-                    </RoleDescription>
-                  </RoleInfo>
-                </RoleOption>
-              </RoleOptions>
-            </RoleSelector>
+                    <RoleIconContainer selected={roleValue === 'admin'}>
+                      <Shield size={16} />
+                    </RoleIconContainer>
+                    <RoleInfo>
+                      <RoleName>Administrador</RoleName>
+                      <RoleDescription>Acceso completo al sistema</RoleDescription>
+                    </RoleInfo>
+                  </RoleOption>
+                </RoleOptions>
+              </RoleSelector>
 
-            <ActiveUserCheckbox>
-              <Checkbox
-                type='checkbox'
-                id='isActiveCreate'
-                checked={formData.isActive || false}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setFormData(prev => ({
-                    ...prev,
-                    isActive: e.target.checked,
-                  }))
-                }
-              />
-              <CheckboxLabel htmlFor='isActiveCreate'>
-                <CheckCircle size={14} />
-                Usuario activo (puede acceder al sistema)
-              </CheckboxLabel>
-            </ActiveUserCheckbox>
-          </Section>
-        </ModalContent>
+              <ActiveUserCheckbox>
+                <Checkbox
+                  type='checkbox'
+                  id='isActiveCreate'
+                  checked={isActiveValue}
+                  onChange={e => setValue('isActive', e.target.checked)}
+                />
+                <CheckboxLabel htmlFor='isActiveCreate'>
+                  <CheckCircle size={14} />
+                  Usuario activo (puede acceder al sistema)
+                </CheckboxLabel>
+              </ActiveUserCheckbox>
+            </Section>
+          </ModalContent>
 
-        <ModalFooter>
-          <Button variant='outline' onClick={handleClose} size='large'>
-            Cancelar
-          </Button>
-          <Button
-            variant='primary'
-            onClick={handleSubmit}
-            isLoading={isLoading}
-            disabled={!isFormValid()}
-            size='large'
-            icon={<UserPlus size={14} />}
-          >
-            {isLoading ? 'Creando...' : 'Crear Usuario'}
-          </Button>
-        </ModalFooter>
+          <ModalFooter>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={handleClose}
+              size='large'
+            >
+              Cancelar
+            </Button>
+            <Button
+              type='submit'
+              variant='primary'
+              isLoading={isLoading}
+              size='large'
+              icon={<UserPlus size={14} />}
+            >
+              {isLoading ? 'Creando...' : 'Crear Usuario'}
+            </Button>
+          </ModalFooter>
+        </form>
       </ModalContainer>
     </ModalOverlay>
   );
