@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [main, feature/migrate]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check
+        run: pnpm type-check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format check
+        run: pnpm format:check
+
+      - name: Test
+        run: pnpm test
+        env:
+          # Variables de entorno para tests (sin valores reales)
+          VITE_GRAPHQL_URL: http://localhost:3001/graphql
+          VITE_AUTH_SECRET: test-secret
+          VITE_LOG_LEVEL: error
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: quality
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build (production)
+        run: pnpm build
+        env:
+          VITE_GRAPHQL_URL: ${{ secrets.VITE_GRAPHQL_URL || 'http://localhost:3001/graphql' }}
+          VITE_AUTH_SECRET: ${{ secrets.VITE_AUTH_SECRET || 'ci-secret' }}
+          VITE_LOG_LEVEL: error
