@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
+import { TooltipProvider } from '@/components/ui';
 import { ThemeProvider } from 'styled-components';
 import { Toaster } from 'react-hot-toast';
 import { ApolloProvider } from '@apollo/client';
@@ -26,136 +27,138 @@ function App() {
       <ApolloProvider client={client}>
         <ThemeProvider theme={theme}>
           <GlobalStyles />
-          <ProductProvider>
-            <AuthProvider>
-              <SidebarProvider>
-                <Router>
-                  <Routes>
-                    {/* Public routes */}
-                    <Route path='/login' element={<Login />} />
-                    <Route path='/unauthorized' element={<Unauthorized />} />
+          <TooltipProvider>
+            <ProductProvider>
+              <AuthProvider>
+                <SidebarProvider>
+                  <Router>
+                    <Routes>
+                      {/* Public routes */}
+                      <Route path='/login' element={<Login />} />
+                      <Route path='/unauthorized' element={<Unauthorized />} />
 
-                    {/* Protected routes */}
-                    <Route
-                      path='/'
-                      element={
-                        <ProtectedRoute>
-                          <Layout>
-                            <Dashboard />
-                          </Layout>
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path='/products'
-                      element={
-                        <ProtectedRoute>
-                          <Layout>
-                            <Products />
-                          </Layout>
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path='/categories'
-                      element={
-                        <ProtectedRoute>
-                          <Layout>
-                            <Categories />
-                          </Layout>
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path='/orders'
-                      element={
-                        <ProtectedRoute>
-                          <Layout>
-                            <Orders />
-                          </Layout>
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path='/users'
-                      element={
-                        <ProtectedRoute>
-                          <Layout>
-                            <UsersPage />
-                          </Layout>
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path='/images'
-                      element={
-                        <ProtectedRoute>
-                          <Layout>
-                            <ComingSoon page='Imágenes' />
-                          </Layout>
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path='/analytics'
-                      element={
-                        <ProtectedRoute>
-                          <Layout>
-                            <ComingSoon page='Estadísticas' />
-                          </Layout>
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path='/settings'
-                      element={
-                        <ProtectedRoute>
-                          <Layout>
-                            <ComingSoon page='Configuración' />
-                          </Layout>
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path='*'
-                      element={
-                        <ProtectedRoute>
-                          <Layout>
-                            <NotFound />
-                          </Layout>
-                        </ProtectedRoute>
-                      }
-                    />
-                  </Routes>
-                </Router>
-              </SidebarProvider>
-              <Toaster
-                position='top-right'
-                toastOptions={{
-                  duration: 4000,
-                  style: {
-                    background: theme.colors.white,
-                    color: theme.colors.text.primary,
-                    borderRadius: theme.borderRadius.lg,
-                    border: `1px solid ${theme.colors.border.light}`,
-                    fontFamily: theme.fonts.primary,
-                  },
-                  success: {
-                    iconTheme: {
-                      primary: theme.colors.success,
-                      secondary: theme.colors.white,
+                      {/* Protected routes */}
+                      <Route
+                        path='/'
+                        element={
+                          <ProtectedRoute>
+                            <Layout>
+                              <Dashboard />
+                            </Layout>
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path='/products'
+                        element={
+                          <ProtectedRoute>
+                            <Layout>
+                              <Products />
+                            </Layout>
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path='/categories'
+                        element={
+                          <ProtectedRoute>
+                            <Layout>
+                              <Categories />
+                            </Layout>
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path='/orders'
+                        element={
+                          <ProtectedRoute>
+                            <Layout>
+                              <Orders />
+                            </Layout>
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path='/users'
+                        element={
+                          <ProtectedRoute>
+                            <Layout>
+                              <UsersPage />
+                            </Layout>
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path='/images'
+                        element={
+                          <ProtectedRoute>
+                            <Layout>
+                              <ComingSoon page='Imágenes' />
+                            </Layout>
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path='/analytics'
+                        element={
+                          <ProtectedRoute>
+                            <Layout>
+                              <ComingSoon page='Estadísticas' />
+                            </Layout>
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path='/settings'
+                        element={
+                          <ProtectedRoute>
+                            <Layout>
+                              <ComingSoon page='Configuración' />
+                            </Layout>
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path='*'
+                        element={
+                          <ProtectedRoute>
+                            <Layout>
+                              <NotFound />
+                            </Layout>
+                          </ProtectedRoute>
+                        }
+                      />
+                    </Routes>
+                  </Router>
+                </SidebarProvider>
+                <Toaster
+                  position='top-right'
+                  toastOptions={{
+                    duration: 4000,
+                    style: {
+                      background: theme.colors.white,
+                      color: theme.colors.text.primary,
+                      borderRadius: theme.borderRadius.lg,
+                      border: `1px solid ${theme.colors.border.light}`,
+                      fontFamily: theme.fonts.primary,
                     },
-                  },
-                  error: {
-                    iconTheme: {
-                      primary: theme.colors.error,
-                      secondary: theme.colors.white,
+                    success: {
+                      iconTheme: {
+                        primary: theme.colors.success,
+                        secondary: theme.colors.white,
+                      },
                     },
-                  },
-                }}
-              />
-            </AuthProvider>
-          </ProductProvider>
+                    error: {
+                      iconTheme: {
+                        primary: theme.colors.error,
+                        secondary: theme.colors.white,
+                      },
+                    },
+                  }}
+                />
+              </AuthProvider>
+            </ProductProvider>
+          </TooltipProvider>
         </ThemeProvider>
       </ApolloProvider>
     </ErrorBoundary>

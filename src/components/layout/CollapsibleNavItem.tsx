@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
 import { theme } from '@/styles/theme';
-import { Tooltip } from '@/components/ui/Tooltip';
 import { useSidebarTooltip } from '@/hooks/useSidebarTooltip';
 
 interface CollapsibleNavItemProps {
@@ -75,10 +74,10 @@ export const CollapsibleNavItem: React.FC<CollapsibleNavItemProps> = ({
     >
       {icon}
       <span>{children}</span>
-      {isCollapsed && (
-        <Tooltip isVisible={isVisible} position='right'>
+      {isCollapsed && isVisible && (
+        <span className='absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 rounded bg-foreground px-2 py-1 text-xs whitespace-nowrap text-background pointer-events-none'>
           {children}
-        </Tooltip>
+        </span>
       )}
     </StyledNavItem>
   );

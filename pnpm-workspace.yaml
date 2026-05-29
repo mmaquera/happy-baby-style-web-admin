@@ -1,6 +1,7 @@
 allowBuilds:
   '@apollo/rover': true
   esbuild: true
+  msw: true
   nx: false
   unrs-resolver: true
 minimumReleaseAgeExclude:

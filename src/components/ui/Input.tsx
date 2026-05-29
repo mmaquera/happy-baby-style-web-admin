@@ -1,215 +1,98 @@
-import React from 'react';
-import styled, { css } from 'styled-components';
-import { theme } from '@/styles/theme';
+import * as React from 'react';
+import { Input as InputPrimitive } from '@base-ui/react/input';
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+import { cn } from '@/lib/utils';
+
+interface InputProps extends React.ComponentProps<'input'> {
   label?: string;
   error?: string;
-  helperText?: string;
   leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
-  icon?: React.ReactNode; // Alias for leftIcon for compatibility
+  icon?: React.ReactNode;
   fullWidth?: boolean;
+  rightIcon?: React.ReactNode;
   onRightIconClick?: () => void;
   rightIconClickable?: boolean;
   rightIconAriaLabel?: string;
-  isError?: boolean; // Add support for isError prop
 }
 
-const InputContainer = styled.div.withConfig({
-  shouldForwardProp: prop => prop !== 'fullWidth',
-})<{ fullWidth?: boolean }>`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[2]};
+function Input({
+  className,
+  type,
+  label,
+  error,
+  leftIcon,
+  icon,
+  fullWidth,
+  id,
+  rightIcon,
+  onRightIconClick,
+  rightIconClickable,
+  rightIconAriaLabel,
+  ...props
+}: InputProps) {
+  const hasLeftIcon = leftIcon ?? icon;
 
-  ${({ fullWidth }) =>
-    fullWidth &&
-    css`
-      width: 100%;
-    `}
-`;
-
-const Label = styled.label`
-  font-size: ${theme.fontSizes.sm};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${theme.colors.text.primary};
-`;
-
-const InputWrapper = styled.div`
-  position: relative;
-  display: flex;
-  align-items: center;
-`;
-
-const StyledInput = styled.input.withConfig({
-  shouldForwardProp: prop =>
-    !['hasLeftIcon', 'hasRightIcon', 'hasError'].includes(prop),
-})<{ hasLeftIcon?: boolean; hasRightIcon?: boolean; hasError?: boolean }>`
-  width: 100%;
-  padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  font-size: ${theme.fontSizes.base};
-  font-family: ${theme.fonts.primary};
-  background: ${theme.colors.white};
-  border: 2px solid
-    ${({ hasError }) =>
-      hasError ? theme.colors.error : theme.colors.border.light};
-  border-radius: ${theme.borderRadius.md};
-  transition: all ${theme.transitions.base};
-  outline: none;
-
-  ${({ hasLeftIcon }) =>
-    hasLeftIcon &&
-    css`
-      padding-left: ${theme.spacing[10]};
-    `}
-
-  ${({ hasRightIcon }) =>
-    hasRightIcon &&
-    css`
-      padding-right: ${theme.spacing[10]};
-    `}
-
-  &:focus {
-    border-color: ${({ hasError }) =>
-      hasError ? theme.colors.error : theme.colors.primaryPurple};
-    box-shadow: 0 0 0 3px
-      ${({ hasError }) =>
-        hasError
-          ? `${theme.colors.error}20`
-          : `${theme.colors.primaryPurple}20`};
-  }
-
-  &:disabled {
-    background: ${theme.colors.lightGray};
-    color: ${theme.colors.warmGray};
-    cursor: not-allowed;
-  }
-
-  &::placeholder {
-    color: ${theme.colors.warmGray};
-  }
-`;
-
-const IconWrapper = styled.div.withConfig({
-  shouldForwardProp: prop => !['position', 'clickable'].includes(prop),
-})<{ position: 'left' | 'right'; clickable?: boolean }>`
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: ${theme.spacing[6]};
-  height: ${theme.spacing[6]};
-  color: ${theme.colors.warmGray};
-  pointer-events: ${({ clickable }) => (clickable ? 'auto' : 'none')};
-  cursor: ${({ clickable }) => (clickable ? 'pointer' : 'default')};
-  border-radius: ${theme.borderRadius.sm};
-  transition: all ${theme.transitions.fast};
-
-  ${({ position }) =>
-    position === 'left'
-      ? css`
-          left: ${theme.spacing[2]};
-        `
-      : css`
-          right: ${theme.spacing[2]};
-        `}
-
-  ${({ clickable }) =>
-    clickable &&
-    css`
-      &:hover {
-        color: ${theme.colors.primaryPurple};
-        background: ${theme.colors.background.accent};
-      }
-
-      &:active {
-        transform: translateY(-50%) scale(0.95);
-      }
-    `}
-`;
-
-const HelperText = styled.span.withConfig({
-  shouldForwardProp: prop => prop !== 'isError',
-})<{ isError?: boolean }>`
-  font-size: ${theme.fontSizes.sm};
-  color: ${({ isError }) =>
-    isError ? theme.colors.error : theme.colors.warmGray};
-  line-height: 1.4;
-`;
-
-export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  (
-    {
-      label,
-      error,
-      helperText,
-      leftIcon,
-      rightIcon,
-      icon,
-      fullWidth = false,
-      className,
-      onRightIconClick,
-      rightIconClickable = false,
-      rightIconAriaLabel,
-      isError,
-      ...domProps
-    },
-    ref
-  ) => {
-    // Use icon as leftIcon if provided
-    const finalLeftIcon = leftIcon || icon;
-
-    // Determine if there's an error (support both error and isError props)
-    const hasError = !!(error || isError);
-
-    // No need for second destructuring - domProps already contains all remaining props
-
-    const handleRightIconClick = () => {
-      if (rightIconClickable && onRightIconClick) {
-        onRightIconClick();
-      }
-    };
-
-    return (
-      <InputContainer fullWidth={fullWidth} className={className}>
-        {label && <Label>{label}</Label>}
-
-        <InputWrapper>
-          {finalLeftIcon && (
-            <IconWrapper position='left'>{finalLeftIcon}</IconWrapper>
-          )}
-
-          <StyledInput
-            ref={ref}
-            hasLeftIcon={!!finalLeftIcon}
-            hasRightIcon={!!rightIcon}
-            hasError={hasError}
-            {...domProps}
-          />
-
-          {rightIcon && (
-            <IconWrapper
-              position='right'
-              clickable={rightIconClickable}
-              onClick={handleRightIconClick}
-              role={rightIconClickable ? 'button' : undefined}
-              aria-label={rightIconAriaLabel}
-              tabIndex={rightIconClickable ? 0 : undefined}
-            >
-              {rightIcon}
-            </IconWrapper>
-          )}
-        </InputWrapper>
-
-        {(error || helperText) && (
-          <HelperText isError={hasError}>{error || helperText}</HelperText>
+  const inputElement = (
+    <div className={cn('relative', fullWidth && 'w-full')}>
+      {hasLeftIcon && (
+        <div className='absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground [&_svg]:size-4'>
+          {hasLeftIcon}
+        </div>
+      )}
+      <InputPrimitive
+        id={id}
+        type={type}
+        data-slot='input'
+        aria-invalid={error ? true : undefined}
+        className={cn(
+          'h-9 w-full min-w-0 rounded-lg border border-input bg-transparent px-3 py-1 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm',
+          hasLeftIcon && 'pl-8',
+          rightIcon && 'pr-8',
+          className
         )}
-      </InputContainer>
-    );
-  }
-);
+        {...props}
+      />
+      {rightIcon && (
+        <div
+          className={cn(
+            'absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground [&_svg]:size-4',
+            rightIconClickable && 'cursor-pointer'
+          )}
+          onClick={rightIconClickable ? onRightIconClick : undefined}
+          role={rightIconClickable ? 'button' : undefined}
+          aria-label={rightIconAriaLabel}
+          tabIndex={rightIconClickable ? 0 : undefined}
+          onKeyDown={
+            rightIconClickable
+              ? e => {
+                  if (e.key === 'Enter' || e.key === ' ') onRightIconClick?.();
+                }
+              : undefined
+          }
+        >
+          {rightIcon}
+        </div>
+      )}
+    </div>
+  );
 
-Input.displayName = 'Input';
+  if (!label && !error) return inputElement;
+
+  return (
+    <div className={cn('flex flex-col gap-1', fullWidth && 'w-full')}>
+      {label && (
+        <label
+          htmlFor={id}
+          className='text-sm font-medium leading-none text-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+        >
+          {label}
+        </label>
+      )}
+      {inputElement}
+      {error && <p className='text-xs text-destructive'>{error}</p>}
+    </div>
+  );
+}
+
+export { Input };
+export type { InputProps };

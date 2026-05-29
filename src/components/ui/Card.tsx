@@ -1,177 +1,123 @@
-import React from 'react';
-import styled, { css } from 'styled-components';
-import { theme } from '@/styles/theme';
+import * as React from 'react';
 
-interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  children: React.ReactNode;
-  padding?: 'small' | 'medium' | 'large';
-  shadow?: 'none' | 'small' | 'medium' | 'large';
+import { cn } from '@/lib/utils';
+
+function CardComponent({
+  className,
+  size = 'default',
+  // Legacy styled-components props — swallowed to avoid TS errors during migration
+  padding: _padding,
+  shadow: _shadow,
+  hover: _hover,
+  clickable: _clickable,
+  ...props
+}: React.ComponentProps<'div'> & {
+  size?: 'default' | 'sm';
+  padding?: string;
+  shadow?: string;
   hover?: boolean;
   clickable?: boolean;
-}
-
-const StyledCard = styled.div.withConfig({
-  shouldForwardProp: prop =>
-    !['padding', 'shadow', 'hover', 'clickable'].includes(prop),
-})<Pick<CardProps, 'padding' | 'shadow' | 'hover' | 'clickable'>>`
-  background: ${theme.colors.white};
-  border-radius: ${theme.borderRadius.xl};
-  border: 1px solid ${theme.colors.border.light};
-  transition: all ${theme.transitions.base};
-  overflow: hidden;
-
-  ${({ padding }) => {
-    switch (padding) {
-      case 'small':
-        return css`
-          padding: ${theme.spacing[4]};
-        `;
-      case 'large':
-        return css`
-          padding: ${theme.spacing[8]};
-        `;
-      default: // medium
-        return css`
-          padding: ${theme.spacing[6]};
-        `;
-    }
-  }}
-
-  ${({ shadow }) => {
-    switch (shadow) {
-      case 'small':
-        return css`
-          box-shadow: ${theme.shadows.sm};
-        `;
-      case 'medium':
-        return css`
-          box-shadow: ${theme.shadows.md};
-        `;
-      case 'large':
-        return css`
-          box-shadow: ${theme.shadows.lg};
-        `;
-      case 'none':
-      default:
-        return css`
-          box-shadow: none;
-        `;
-    }
-  }}
-
-  ${({ hover, clickable }) =>
-    (hover || clickable) &&
-    css`
-      cursor: ${clickable ? 'pointer' : 'default'};
-
-      &:hover {
-        transform: translateY(-4px);
-        box-shadow: ${theme.shadows.card};
-        border-color: ${theme.colors.primaryPurple}20;
-      }
-
-      &:active {
-        transform: translateY(-2px);
-      }
-    `}
-`;
-
-const CardHeader = styled.div`
-  margin-bottom: ${theme.spacing[4]};
-  padding-bottom: ${theme.spacing[4]};
-  border-bottom: 1px solid ${theme.colors.border.light};
-
-  &:last-child {
-    margin-bottom: 0;
-    padding-bottom: 0;
-    border-bottom: none;
-  }
-`;
-
-const CardTitle = styled.h3`
-  font-family: ${theme.fonts.heading};
-  font-size: ${theme.fontSizes.lg};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${theme.colors.text.primary};
-  margin: 0 0 ${theme.spacing[2]} 0;
-`;
-
-const CardSubtitle = styled.p`
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.text.secondary};
-  margin: 0;
-`;
-
-const CardContent = styled.div`
-  flex: 1;
-`;
-
-const CardActions = styled.div`
-  display: flex;
-  gap: ${theme.spacing[3]};
-  margin-top: ${theme.spacing[4]};
-  padding-top: ${theme.spacing[4]};
-  border-top: 1px solid ${theme.colors.border.light};
-  justify-content: flex-end;
-
-  &:first-child {
-    margin-top: 0;
-    padding-top: 0;
-    border-top: none;
-  }
-`;
-
-const CardImage = styled.div`
-  margin: -${theme.spacing[6]} -${theme.spacing[6]}
-    ${theme.spacing[4]} -${theme.spacing[6]};
-  overflow: hidden;
-
-  img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    transition: transform ${theme.transitions.base};
-  }
-
-  &:hover img {
-    transform: scale(1.05);
-  }
-`;
-
-interface CardComponent extends React.FC<CardProps> {
-  Header: typeof CardHeader;
-  Title: typeof CardTitle;
-  Subtitle: typeof CardSubtitle;
-  Content: typeof CardContent;
-  Actions: typeof CardActions;
-  Image: typeof CardImage;
-}
-
-export const Card: CardComponent = ({
-  children,
-  padding = 'medium',
-  shadow = 'small',
-  hover = false,
-  clickable = false,
-  ...props
-}) => {
+}) {
   return (
-    <StyledCard
-      padding={padding}
-      shadow={shadow}
-      hover={hover}
-      clickable={clickable}
+    <div
+      data-slot='card'
+      data-size={size}
+      className={cn(
+        'group/card flex flex-col gap-4 overflow-hidden rounded-xl bg-card py-4 text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-3 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl',
+        className
+      )}
       {...props}
-    >
-      {children}
-    </StyledCard>
+    />
   );
-};
+}
 
-// Export sub-components
-Card.Header = CardHeader;
-Card.Title = CardTitle;
-Card.Subtitle = CardSubtitle;
-Card.Content = CardContent;
-Card.Actions = CardActions;
-Card.Image = CardImage;
+const Card = Object.assign(CardComponent, {
+  Header: CardHeader,
+  Title: CardTitle,
+  Description: CardDescription,
+  Content: CardContent,
+  Footer: CardFooter,
+  Action: CardAction,
+});
+
+function CardHeader({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot='card-header'
+      className={cn(
+        'group/card-header @container/card-header grid auto-rows-min items-start gap-1 rounded-t-xl px-4 group-data-[size=sm]/card:px-3 has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto] [.border-b]:pb-4 group-data-[size=sm]/card:[.border-b]:pb-3',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+function CardTitle({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot='card-title'
+      className={cn(
+        'font-heading text-base leading-snug font-medium group-data-[size=sm]/card:text-sm',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+function CardDescription({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot='card-description'
+      className={cn('text-sm text-muted-foreground', className)}
+      {...props}
+    />
+  );
+}
+
+function CardAction({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot='card-action'
+      className={cn(
+        'col-start-2 row-span-2 row-start-1 self-start justify-self-end',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+function CardContent({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot='card-content'
+      className={cn('px-4 group-data-[size=sm]/card:px-3', className)}
+      {...props}
+    />
+  );
+}
+
+function CardFooter({ className, ...props }: React.ComponentProps<'div'>) {
+  return (
+    <div
+      data-slot='card-footer'
+      className={cn(
+        'flex items-center rounded-b-xl border-t bg-muted/50 p-4 group-data-[size=sm]/card:p-3',
+        className
+      )}
+      {...props}
+    />
+  );
+}
+
+export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardAction,
+  CardDescription,
+  CardContent,
+};

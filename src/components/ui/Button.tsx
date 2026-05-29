@@ -1,214 +1,86 @@
-import React from 'react';
-import styled, { css } from 'styled-components';
-import { theme } from '@/styles/theme';
+import * as React from 'react';
+import { Button as ButtonPrimitive } from '@base-ui/react/button';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { Loader2 } from 'lucide-react';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
-  size?: 'small' | 'medium' | 'large' | 'sm';
+import { cn } from '@/lib/utils';
+
+const buttonVariants = cva(
+  'group/button inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*="size-"])]:size-4',
+  {
+    variants: {
+      variant: {
+        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        outline:
+          'border-border bg-background hover:bg-muted hover:text-foreground',
+        secondary:
+          'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        ghost: 'hover:bg-muted hover:text-foreground',
+        destructive:
+          'bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20',
+        danger:
+          'bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20',
+        link: 'text-primary underline-offset-4 hover:underline',
+      },
+      size: {
+        default: 'h-9 px-4',
+        medium: 'h-9 px-4',
+        sm: 'h-8 rounded-md px-3 text-xs',
+        small: 'h-8 rounded-md px-3 text-xs',
+        lg: 'h-10 px-6',
+        large: 'h-10 px-6',
+        icon: 'size-9',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'default',
+    },
+  }
+);
+
+interface ButtonProps
+  extends
+    Omit<ButtonPrimitive.Props, 'children'>,
+    VariantProps<typeof buttonVariants> {
+  children?: React.ReactNode;
   isLoading?: boolean;
   fullWidth?: boolean;
   icon?: React.ReactNode;
   iconPosition?: 'left' | 'right';
 }
 
-const StyledButton = styled.button.withConfig({
-  shouldForwardProp: prop =>
-    ![
-      'variant',
-      'size',
-      'isLoading',
-      'fullWidth',
-      'icon',
-      'iconPosition',
-    ].includes(prop),
-})<ButtonProps>`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: ${theme.spacing[2]};
-  font-family: ${theme.fonts.primary};
-  font-weight: ${theme.fontWeights.normal};
-  border-radius: ${theme.borderRadius.lg};
-  transition: all ${theme.transitions.base};
-  cursor: pointer;
-  border: 2px solid transparent;
-  outline: none;
-  text-decoration: none;
-  white-space: nowrap;
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none !important;
-  }
-
-  ${({ fullWidth }) =>
-    fullWidth &&
-    css`
-      width: 100%;
-    `}
-
-  ${({ size }) => {
-    switch (size) {
-      case 'small':
-      case 'sm':
-        return css`
-          padding: ${theme.spacing[2]} ${theme.spacing[4]};
-          font-size: ${theme.fontSizes.sm};
-          min-height: 36px;
-        `;
-      case 'large':
-        return css`
-          padding: ${theme.spacing[4]} ${theme.spacing[6]};
-          font-size: ${theme.fontSizes.lg};
-          min-height: 48px;
-        `;
-      default:
-        return css`
-          padding: ${theme.spacing[3]} ${theme.spacing[5]};
-          font-size: ${theme.fontSizes.base};
-          min-height: 40px;
-        `;
-    }
-  }}
-
-  ${({ variant }) => {
-    switch (variant) {
-      case 'secondary':
-        return css`
-          background: ${theme.colors.turquoise};
-          color: ${theme.colors.white};
-          border-color: ${theme.colors.turquoise};
-
-          &:hover:not(:disabled) {
-            background: transparent;
-            color: ${theme.colors.turquoise};
-            transform: translateY(-2px);
-            box-shadow: ${theme.shadows.md};
-          }
-
-          &:active:not(:disabled) {
-            transform: translateY(0);
-          }
-        `;
-      case 'outline':
-        return css`
-          background: transparent;
-          color: ${theme.colors.coralAccent};
-          border-color: ${theme.colors.coralAccent};
-
-          &:hover:not(:disabled) {
-            background: ${theme.colors.coralAccent};
-            color: ${theme.colors.white};
-            transform: translateY(-2px);
-            box-shadow: ${theme.shadows.accent};
-          }
-
-          &:active:not(:disabled) {
-            transform: translateY(0);
-          }
-        `;
-      case 'ghost':
-        return css`
-          background: transparent;
-          color: ${theme.colors.warmGray};
-          border-color: transparent;
-
-          &:hover:not(:disabled) {
-            background: ${theme.colors.background.accent};
-            color: ${theme.colors.primaryPurple};
-          }
-
-          &:active:not(:disabled) {
-            background: ${theme.colors.softPurple};
-          }
-        `;
-      case 'danger':
-        return css`
-          background: ${theme.colors.error};
-          color: ${theme.colors.white};
-          border-color: ${theme.colors.error};
-
-          &:hover:not(:disabled) {
-            background: transparent;
-            color: ${theme.colors.error};
-            transform: translateY(-2px);
-            box-shadow: ${theme.shadows.md};
-          }
-
-          &:active:not(:disabled) {
-            transform: translateY(0);
-          }
-        `;
-      default: // primary
-        return css`
-          background: ${theme.colors.primaryPurple};
-          color: ${theme.colors.white};
-          border-color: ${theme.colors.primaryPurple};
-
-          &:hover:not(:disabled) {
-            background: transparent;
-            color: ${theme.colors.primaryPurple};
-            transform: translateY(-2px);
-            box-shadow: ${theme.shadows.lg};
-          }
-
-          &:active:not(:disabled) {
-            transform: translateY(0);
-          }
-        `;
-    }
-  }}
-
-  ${({ isLoading }) =>
-    isLoading &&
-    css`
-      pointer-events: none;
-
-      .loading-spinner {
-        animation: spin 1s linear infinite;
-      }
-    `}
-`;
-
-const LoadingSpinner = styled.div`
-  width: 16px;
-  height: 16px;
-  border: 2px solid transparent;
-  border-top: 2px solid currentColor;
-  border-radius: 50%;
-`;
-
-export const Button: React.FC<ButtonProps> = ({
-  children,
-  variant = 'primary',
-  size = 'medium',
+function Button({
+  className,
+  variant = 'default',
+  size = 'default',
   isLoading = false,
   fullWidth = false,
   icon,
   iconPosition = 'left',
+  children,
   disabled,
   ...props
-}) => {
-  const content = (
-    <>
-      {isLoading && <LoadingSpinner className='loading-spinner' />}
+}: ButtonProps) {
+  return (
+    <ButtonPrimitive
+      data-slot='button'
+      className={cn(
+        buttonVariants({ variant, size }),
+        fullWidth && 'w-full',
+        className
+      )}
+      disabled={disabled ?? isLoading}
+      {...props}
+    >
+      {isLoading && <Loader2 className='animate-spin size-4' />}
       {!isLoading && icon && iconPosition === 'left' && icon}
       {children}
       {!isLoading && icon && iconPosition === 'right' && icon}
-    </>
+    </ButtonPrimitive>
   );
+}
 
-  return (
-    <StyledButton
-      variant={variant}
-      size={size}
-      isLoading={isLoading}
-      fullWidth={fullWidth}
-      disabled={disabled || isLoading}
-      {...props}
-    >
-      {content}
-    </StyledButton>
-  );
-};
+export { Button, buttonVariants };
+export type { ButtonProps };

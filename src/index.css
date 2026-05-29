@@ -1,0 +1,199 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Quicksand:wght@300;400;500;600&display=swap');
+
+/* ── Happy Baby Style brand tokens ──────────────────────────── */
+@theme inline {
+  /* Colors: map HSL → CSS variable chain */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Brand palette (direct access via Tailwind) */
+  --color-brand-purple: #a285d1;
+  --color-brand-turquoise: #5cbdb4;
+  --color-brand-coral: #ff7b5a;
+  --color-brand-warm-gray: #8b8680;
+
+  /* Typography */
+  --font-sans: 'Quicksand', sans-serif;
+  --font-heading: 'Montserrat', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+
+  /* Radius */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* ── Semantic tokens (light mode) ───────────────────────────── */
+:root {
+  --radius: 0.75rem;
+
+  /* purple #A285D1 → hsl(263 45% 67%) */
+  --background: hsl(0 0% 100%);
+  --foreground: hsl(0 0% 17%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(0 0% 17%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(0 0% 17%);
+  --primary: hsl(263 45% 67%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(175 36% 55%);
+  --secondary-foreground: hsl(0 0% 100%);
+  --muted: hsl(0 0% 97%);
+  --muted-foreground: hsl(25 4% 53%);
+  --accent: hsl(263 45% 93%);
+  --accent-foreground: hsl(263 45% 40%);
+  --destructive: hsl(0 76% 57%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(25 4% 90%);
+  --input: hsl(25 4% 90%);
+  --ring: hsl(263 45% 67%);
+}
+
+/* ── Global resets & base styles ────────────────────────────── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-sans);
+    font-weight: 300;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    font-weight: 300;
+    line-height: 1.2;
+  }
+
+  a {
+    color: hsl(var(--primary));
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  a:hover {
+    color: hsl(14 100% 67%);
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: hsl(263 45% 93%);
+    color: hsl(263 45% 40%);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(0 0% 97%);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(25 4% 53%);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary));
+  }
+}
+
+/* ── Utility classes ─────────────────────────────────────────── */
+@layer utilities {
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+/* ── Keyframes ───────────────────────────────────────────────── */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

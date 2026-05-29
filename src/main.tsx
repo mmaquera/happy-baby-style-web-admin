@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.tsx';
-import './styles/GlobalStyles.ts';
+import './index.css';
 import './utils/authUtils.ts'; // Cleans expired auth tokens on startup
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
