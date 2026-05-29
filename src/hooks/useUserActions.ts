@@ -1,122 +1,154 @@
-import { useState } from 'react';
-import { User, UserRole } from '@/types';
-import { useUpdateUser } from '@/hooks/useUsersGraphQL';
-import toast from 'react-hot-toast';
+import { useState, useCallback } from 'react';
+import { toast } from 'react-hot-toast';
+import { useUserUseCases } from '@/app/di/users';
+import type {
+  User,
+  UserFilter,
+  CreateUserInput,
+  UpdateUserInput,
+} from '@/core/domain/user/User';
+import { isErr } from '@/core/shared/Result';
 
 export const useUserActions = () => {
+  const useCases = useUserUseCases();
+  const [users, setUsers] = useState<User[]>([]);
+  const [total, setTotal] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
-  const updateUserMutation = useUpdateUser();
+  const [error, setError] = useState<string | null>(null);
 
-  const activateUser = async (user: User) => {
-    setLoading(true);
-    try {
-      await updateUserMutation.update(user.id, { isActive: true });
-      toast.success(`Usuario ${user.email} activado exitosamente`);
-    } catch (error) {
-      toast.error('Error al activar usuario');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const clearError = useCallback(() => setError(null), []);
 
-  const deactivateUser = async (user: User) => {
-    setLoading(true);
-    try {
-      await updateUserMutation.update(user.id, { isActive: false });
-      toast.success(`Usuario ${user.email} desactivado exitosamente`);
-    } catch (error) {
-      toast.error('Error al desactivar usuario');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const loadUsers = useCallback(
+    async (filter?: UserFilter, limit = 20, offset = 0) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await useCases.list.execute(filter, limit, offset);
+        if (isErr(result)) {
+          setError(result.error.message ?? 'Error al cargar usuarios');
+          return;
+        }
+        setUsers(result.value.items);
+        setTotal(result.value.total);
+        setHasMore(result.value.hasMore);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [useCases.list]
+  );
 
-  const deleteUser = async (user: User) => {
-    if (
-      !window.confirm(
-        `¿Estás seguro de que quieres eliminar al usuario ${user.email}?`
-      )
-    ) {
-      return;
-    }
+  const createUser = useCallback(
+    async (input: CreateUserInput): Promise<boolean> => {
+      setLoading(true);
+      try {
+        const result = await useCases.create.execute(input);
+        if (isErr(result)) {
+          toast.error(result.error.message ?? 'Error al crear usuario');
+          return false;
+        }
+        setUsers(prev => [result.value, ...prev]);
+        setTotal(prev => prev + 1);
+        toast.success('Usuario creado exitosamente');
+        return true;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [useCases.create]
+  );
 
-    setLoading(true);
-    try {
-      // This would call the deleteUser mutation
-      // await deleteUserMutation({ variables: { id: user.id } });
-      toast.success(`Usuario ${user.email} eliminado exitosamente`);
-    } catch (error) {
-      toast.error('Error al eliminar usuario');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const updateUser = useCallback(
+    async (id: string, input: UpdateUserInput): Promise<boolean> => {
+      setLoading(true);
+      try {
+        const result = await useCases.update.execute(id, input);
+        if (isErr(result)) {
+          toast.error(result.error.message ?? 'Error al actualizar usuario');
+          return false;
+        }
+        setUsers(prev => prev.map(u => (u.id === id ? result.value : u)));
+        toast.success('Usuario actualizado exitosamente');
+        return true;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [useCases.update]
+  );
 
-  const resetPassword = async (user: User) => {
-    if (
-      !window.confirm(
-        `¿Enviar email de restablecimiento de contraseña a ${user.email}?`
-      )
-    ) {
-      return;
-    }
+  const deleteUser = useCallback(
+    async (id: string): Promise<boolean> => {
+      setLoading(true);
+      try {
+        const result = await useCases.delete.execute(id);
+        if (isErr(result)) {
+          toast.error(result.error.message ?? 'Error al eliminar usuario');
+          return false;
+        }
+        setUsers(prev => prev.filter(u => u.id !== id));
+        setTotal(prev => prev - 1);
+        toast.success('Usuario eliminado exitosamente');
+        return true;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [useCases.delete]
+  );
 
-    setLoading(true);
-    try {
-      // This would call the requestPasswordReset mutation
-      // await requestPasswordResetMutation({ variables: { email: user.email } });
-      toast.success(`Email de restablecimiento enviado a ${user.email}`);
-    } catch (error) {
-      toast.error('Error al enviar email de restablecimiento');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const activateUser = useCallback(
+    async (id: string): Promise<boolean> => {
+      setLoading(true);
+      try {
+        const result = await useCases.activate.execute(id);
+        if (isErr(result)) {
+          toast.error(result.error.message ?? 'Error al activar usuario');
+          return false;
+        }
+        setUsers(prev => prev.map(u => (u.id === id ? result.value : u)));
+        toast.success('Usuario activado exitosamente');
+        return true;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [useCases.activate]
+  );
 
-  const promoteToAdmin = async (user: User) => {
-    if (!window.confirm(`¿Promover a ${user.email} como administrador?`)) {
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await updateUserMutation.update(user.id, { role: UserRole.admin });
-      toast.success(`${user.email} promovido a administrador exitosamente`);
-    } catch (error) {
-      toast.error('Error al promover usuario');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const demoteFromAdmin = async (user: User) => {
-    if (
-      !window.confirm(`¿Remover permisos de administrador de ${user.email}?`)
-    ) {
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await updateUserMutation.update(user.id, {
-        role: UserRole.customer,
-      });
-      toast.success(`Permisos de administrador removidos de ${user.email}`);
-    } catch (error) {
-      toast.error('Error al actualizar permisos');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const deactivateUser = useCallback(
+    async (id: string): Promise<boolean> => {
+      setLoading(true);
+      try {
+        const result = await useCases.deactivate.execute(id);
+        if (isErr(result)) {
+          toast.error(result.error.message ?? 'Error al desactivar usuario');
+          return false;
+        }
+        setUsers(prev => prev.map(u => (u.id === id ? result.value : u)));
+        toast.success('Usuario desactivado exitosamente');
+        return true;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [useCases.deactivate]
+  );
 
   return {
+    users,
+    total,
+    hasMore,
     loading,
+    error,
+    clearError,
+    loadUsers,
+    createUser,
+    updateUser,
+    deleteUser,
     activateUser,
     deactivateUser,
-    deleteUser,
-    resetPassword,
-    promoteToAdmin,
-    demoteFromAdmin,
   };
 };
 

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import styled from 'styled-components';
-import { User, UserRole } from '@/types';
+import type { User } from '@/core/domain/user/User';
 import { Button } from '@/components/ui/Button';
 import { theme } from '@/styles/theme';
 import {
@@ -364,7 +364,7 @@ export const UserActionsMenu: React.FC<UserActionsMenuProps> = ({
               </MenuItem>
             )}
 
-            {user.role !== UserRole.admin
+            {user.role !== 'admin'
               ? onPromoteToAdmin && (
                   <MenuItem
                     variant='warning'

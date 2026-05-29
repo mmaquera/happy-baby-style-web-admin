@@ -1,13 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
-import {
-  useUsers,
-  useUserStats,
-  useCreateUser,
-  useUpdateUserOptimized,
-} from '@/hooks/useUsersGraphQL';
-import { User, UserRole } from '@/types';
-import { InputMaybe, type CreateUserProfileInput } from '@/generated/graphql';
+import type { User, UserRole, CreateUserInput } from '@/core/domain/user/User';
+import type { CreateUserProfileInput, User as GQLUser } from '@/generated/graphql';
+import { useUserActions } from '@/hooks/useUserActions';
+import { useUserStats } from '@/hooks/useUsersGraphQL';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -16,31 +12,19 @@ import { AuthProviderDashboard } from '@/components/users/AuthProviderDashboard'
 import { ImprovedCreateUserModal } from '@/components/users/ImprovedCreateUserModal';
 import { UserActionsMenu } from '@/components/users/UserActionsMenu';
 import { PasswordManagementModal } from '@/components/users/PasswordManagementModal';
-import {
-  useProviderUtils,
-  useAccountManagement,
-} from '@/hooks/useAuthManagement';
-import { useUserActions } from '@/hooks/useUserActions';
+import { useProviderUtils } from '@/hooks/useAuthManagement';
 import { theme } from '@/styles/theme';
 import { AuthProvider } from '@/types';
 import {
   Users as UsersIcon,
   UserPlus,
   Search,
-  Filter,
-  Mail,
-  Phone,
   Calendar,
-  Eye,
-  Edit,
-  Trash2,
-  Plus,
   Shield,
-  MoreVertical,
-  Key,
+  Phone,
 } from 'lucide-react';
+
 import toast from 'react-hot-toast';
-import { logger } from '@/utils/logger';
 
 // Styled Components
 const Container = styled.div`
@@ -263,12 +247,12 @@ const UserRoleBadge = styled.span<{ role: UserRole }>`
 
   ${({ role }) => {
     switch (role) {
-      case UserRole.admin:
+      case 'admin':
         return `
           background: ${theme.colors.error}20;
           color: ${theme.colors.error};
         `;
-      case UserRole.staff:
+      case 'staff':
         return `
           background: ${theme.colors.coralAccent}20;
           color: ${theme.colors.coralAccent};
@@ -293,19 +277,16 @@ const UserStatus = styled.span<{ active: boolean }>`
   text-transform: uppercase;
   letter-spacing: 0.5px;
 
-  ${({ active }) => {
-    if (active) {
-      return `
+  ${({ active }) =>
+    active
+      ? `
         background: ${theme.colors.success}20;
         color: ${theme.colors.success};
-      `;
-    } else {
-      return `
+      `
+      : `
         background: ${theme.colors.error}20;
         color: ${theme.colors.error};
-      `;
-    }
-  }}
+      `}
 `;
 
 const UserPhone = styled.div`
@@ -373,7 +354,6 @@ const ErrorMessage = styled.div`
   color: ${theme.colors.error};
 `;
 
-// Modal Components
 const Modal = styled.div`
   position: fixed;
   top: 0;
@@ -448,10 +428,7 @@ const Tab = styled.button<{ active: boolean }>`
   `
       : `
     color: ${theme.colors.text.secondary};
-    
-    &:hover {
-      color: ${theme.colors.text.primary};
-    }
+    &:hover { color: ${theme.colors.text.primary}; }
   `}
 `;
 
@@ -461,12 +438,9 @@ const TabContent = styled.div`
 
 // Component
 export const UsersPage: React.FC = () => {
-  const [filters, setFilters] = useState({
-    search: '',
-    role: null as InputMaybe<UserRole>,
-    isActive: null as InputMaybe<boolean>,
-  });
-
+  const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState<UserRole | ''>('');
+  const [isActiveFilter, setIsActiveFilter] = useState<boolean | null>(null);
   const [activeTab, setActiveTab] = useState<'users' | 'auth-dashboard'>(
     'users'
   );
@@ -477,75 +451,37 @@ export const UsersPage: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [openMenuUserId, setOpenMenuUserId] = useState<string | null>(null);
 
-  // Queries and mutations (conexiones reales al backend)
-  // Crear filtros que solo incluyan valores no nulos
-  const effectiveFilters = {
-    search: filters.search || null,
-    role: filters.role || null,
-    isActive: filters.isActive || null,
-  };
-
-  // 🔍 DEBUGGING: Logs para diagnosticar el problema
-  logger.debug('🔍 DEBUG Users.tsx - Estado actual:', {
-    filters,
-    effectiveFilters,
-    filtersString: JSON.stringify(filters),
-    effectiveFiltersString: JSON.stringify(effectiveFilters),
-  });
-
   const {
-    users = [],
-    loading: usersLoading,
-    error: usersError,
-    refetch,
-  } = useUsers({ filter: effectiveFilters });
-
-  // 🔍 DEBUGGING: Logs del hook useUsers
-  logger.debug('🔍 DEBUG Users.tsx - Hook useUsers:', {
     users,
-    usersLength: users.length,
-    loading: usersLoading,
-    error: usersError,
-    hasRefetch: !!refetch,
-  });
+    loading,
+    error,
+    loadUsers,
+    createUser,
+    updateUser,
+    deleteUser,
+    activateUser,
+    deactivateUser,
+  } = useUserActions();
+
   const { stats } = useUserStats();
-  const createUserMutation = useCreateUser();
-  const updateUserMutation = useUpdateUserOptimized();
   const { getProviderIcon } = useProviderUtils();
 
-  // Password management hooks
-  const { forcePasswordReset } = useAccountManagement();
-  const userActions = useUserActions();
+  const buildFilter = useCallback(() => {
+    const filter: { search?: string; role?: UserRole; isActive?: boolean } = {};
+    if (searchTerm) filter.search = searchTerm;
+    if (roleFilter) filter.role = roleFilter;
+    if (isActiveFilter !== null) filter.isActive = isActiveFilter;
+    return Object.keys(filter).length > 0 ? filter : undefined;
+  }, [searchTerm, roleFilter, isActiveFilter]);
 
-  // Sincronización automática de filtros con GraphQL
-  const stableRefetch = useCallback(() => {
-    logger.debug('🔍 DEBUG Users.tsx - stableRefetch ejecutándose');
-    refetch();
-  }, [refetch]);
-
-  // Carga inicial de usuarios al montar el componente
   useEffect(() => {
-    logger.debug('🔍 DEBUG Users.tsx - useEffect inicial ejecutándose');
-    stableRefetch();
-  }, [stableRefetch]);
+    void loadUsers(buildFilter());
+  }, [loadUsers, buildFilter]);
 
-  // Sincronización automática cuando cambian los filtros
-  useEffect(() => {
-    logger.debug('🔍 DEBUG Users.tsx - useEffect de filtros ejecutándose', {
-      filters,
-      shouldRefetch:
-        filters.search || filters.role !== null || filters.isActive !== null,
-    });
-    if (filters.search || filters.role !== null || filters.isActive !== null) {
-      stableRefetch();
-    }
-  }, [filters, stableRefetch]);
-
-  // Form state
+  // Form state for edit modal
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
-    role: UserRole.customer,
+    role: 'customer' as UserRole,
     isActive: true,
     profile: {
       firstName: '',
@@ -555,41 +491,32 @@ export const UsersPage: React.FC = () => {
     },
   });
 
-  const handleCreateUser = async (userData: CreateUserProfileInput) => {
-    try {
-      const result = await createUserMutation.create(userData);
-
-      if (result?.success) {
-        setShowCreateModal(false);
-        // El toast ya se maneja en el hook
-      } else {
-        // Manejar caso donde success es false pero no hay excepción
-        toast.error(result?.message || 'Error al crear usuario');
-      }
-    } catch (error) {
-      // El error ya se maneja en el hook, solo cerrar el modal si es necesario
-      logger.error('Error en handleCreateUser:', error);
-    }
+  const handleCreateUser = async (gqlInput: CreateUserProfileInput) => {
+    const input: CreateUserInput = {
+      email: gqlInput.email,
+      firstName: gqlInput.firstName,
+      lastName: gqlInput.lastName,
+      phone: gqlInput.phone ?? null,
+      ...(gqlInput.password ? { password: gqlInput.password } : {}),
+      ...(gqlInput.role ? { role: gqlInput.role as UserRole } : {}),
+    };
+    const ok = await createUser(input);
+    if (ok) setShowCreateModal(false);
   };
 
   const handleUpdateUser = async () => {
     if (!selectedUser) return;
-
-    try {
-      const updateData = {
-        email: formData.email,
-        role: formData.role,
-        isActive: formData.isActive,
-        profile: formData.profile,
-      };
-
-      await updateUserMutation.update(selectedUser.id, updateData);
-
+    const ok = await updateUser(selectedUser.id, {
+      email: formData.email,
+      role: formData.role,
+      isActive: formData.isActive,
+      firstName: formData.profile.firstName,
+      lastName: formData.profile.lastName,
+      phone: formData.profile.phone || null,
+    });
+    if (ok) {
       setShowEditModal(false);
       setSelectedUser(null);
-      toast.success('Usuario actualizado exitosamente');
-    } catch (error) {
-      toast.error('Error al actualizar usuario');
     }
   };
 
@@ -597,46 +524,50 @@ export const UsersPage: React.FC = () => {
     setSelectedUser(user);
     setFormData({
       email: user.email,
-      password: '',
       role: user.role,
       isActive: user.isActive,
       profile: {
-        firstName: user.profile?.firstName || '',
-        lastName: user.profile?.lastName || '',
-        phone: user.profile?.phone || '',
-        dateOfBirth: user.profile?.dateOfBirth || undefined,
+        firstName: user.profile?.firstName ?? '',
+        lastName: user.profile?.lastName ?? '',
+        phone: user.profile?.phone ?? '',
+        dateOfBirth: user.profile?.dateOfBirth ?? undefined,
       },
     });
     setShowEditModal(true);
   };
 
-  // User action handlers
   const handleResetPassword = (user: User) => {
     setSelectedUser(user);
     setShowPasswordModal(true);
   };
 
   const handleActivateUser = async (user: User) => {
-    await userActions.activateUser(user);
+    await activateUser(user.id);
   };
 
   const handleDeactivateUser = async (user: User) => {
-    await userActions.deactivateUser(user);
+    await deactivateUser(user.id);
   };
 
   const handleDeleteUser = async (user: User) => {
-    await userActions.deleteUser(user);
+    if (!window.confirm(`¿Eliminar al usuario ${user.email}?`)) return;
+    await deleteUser(user.id);
   };
 
   const handlePromoteToAdmin = async (user: User) => {
-    await userActions.promoteToAdmin(user);
+    if (!window.confirm(`¿Promover a ${user.email} como administrador?`))
+      return;
+    await updateUser(user.id, { role: 'admin' });
   };
 
   const handleDemoteFromAdmin = async (user: User) => {
-    await userActions.demoteFromAdmin(user);
+    if (
+      !window.confirm(`¿Remover permisos de administrador de ${user.email}?`)
+    )
+      return;
+    await updateUser(user.id, { role: 'customer' });
   };
 
-  // Menu management handlers
   const handleMenuToggle = (userId: string) => {
     setOpenMenuUserId(openMenuUserId === userId ? null : userId);
   };
@@ -647,127 +578,28 @@ export const UsersPage: React.FC = () => {
 
   const getRoleLabel = (role: UserRole) => {
     switch (role) {
-      case UserRole.admin:
+      case 'admin':
         return 'Administrador';
-      case UserRole.staff:
+      case 'staff':
         return 'Personal';
-      case UserRole.customer:
-        return 'Cliente';
       default:
-        return role;
+        return 'Cliente';
     }
   };
 
-  if (usersError) {
+  if (error) {
     return (
       <Container>
-        <Header>
-          <HeaderContent>
-            <HeaderInfo>
-              <Title>Gestión de Usuarios</Title>
-              <Subtitle>Administra usuarios del sistema</Subtitle>
-            </HeaderInfo>
-            <HeaderActions>
-              <Button
-                variant='primary'
-                onClick={() => setShowCreateModal(true)}
-                icon={<UserPlus size={16} />}
-              >
-                Nuevo Usuario
-              </Button>
-            </HeaderActions>
-          </HeaderContent>
-        </Header>
-
-        <StatsGrid>
-          <StatsCard>
-            <StatsIcon>
-              <UsersIcon size={24} />
-            </StatsIcon>
-            <StatsContent>
-              <StatsNumber>{stats?.totalUsers || 0}</StatsNumber>
-              <StatsLabel>Total Usuarios</StatsLabel>
-            </StatsContent>
-          </StatsCard>
-          <StatsCard>
-            <StatsIcon>
-              <UserPlus size={24} />
-            </StatsIcon>
-            <StatsContent>
-              <StatsNumber>{stats?.activeUsers || 0}</StatsNumber>
-              <StatsLabel>Usuarios Activos</StatsLabel>
-            </StatsContent>
-          </StatsCard>
-          <StatsCard>
-            <StatsIcon>
-              <UsersIcon size={24} />
-            </StatsIcon>
-            <StatsContent>
-              <StatsNumber>{stats?.totalUsers || 0}</StatsNumber>
-              <StatsLabel>Usuarios por Rol</StatsLabel>
-            </StatsContent>
-          </StatsCard>
-          <StatsCard>
-            <StatsIcon>
-              <Calendar size={24} />
-            </StatsIcon>
-            <StatsContent>
-              <StatsNumber>{stats?.newUsersThisMonth || 0}</StatsNumber>
-              <StatsLabel>Nuevos este Mes</StatsLabel>
-            </StatsContent>
-          </StatsCard>
-        </StatsGrid>
-
-        <FiltersSection>
-          <FiltersRow>
-            <SearchInput
-              placeholder='Buscar usuarios...'
-              value={filters.search}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setFilters(prev => ({ ...prev, search: e.target.value }))
-              }
-              icon={<Search size={16} />}
-              style={{ minWidth: '250px' }}
-            />
-            <FilterSelect
-              value={filters.role || ''}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                setFilters(prev => ({
-                  ...prev,
-                  role: e.target.value ? (e.target.value as UserRole) : null,
-                }))
-              }
-            >
-              <option value=''>Todos los roles</option>
-              <option value='admin'>Administrador</option>
-              <option value='customer'>Cliente</option>
-              <option value='staff'>Staff</option>
-            </FilterSelect>
-            <FilterSelect
-              value={
-                filters.isActive === null
-                  ? ''
-                  : filters.isActive
-                    ? 'true'
-                    : 'false'
-              }
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                setFilters(prev => ({
-                  ...prev,
-                  isActive: e.target.value ? e.target.value === 'true' : null,
-                }))
-              }
-            >
-              <option value=''>Todos los estados</option>
-              <option value='true'>Activo</option>
-              <option value='false'>Inactivo</option>
-            </FilterSelect>
-          </FiltersRow>
-        </FiltersSection>
-
-        <UsersGrid>
-          <LoadingMessage>Cargando usuarios...</LoadingMessage>
-        </UsersGrid>
+        <ErrorMessage>
+          Error al cargar usuarios: {error}
+          <br />
+          <Button
+            onClick={() => void loadUsers(buildFilter())}
+            style={{ marginTop: '1rem' }}
+          >
+            Reintentar
+          </Button>
+        </ErrorMessage>
       </Container>
     );
   }
@@ -824,7 +656,7 @@ export const UsersPage: React.FC = () => {
                   <UsersIcon size={24} />
                 </StatsIcon>
                 <StatsContent>
-                  <StatsNumber>{stats?.totalUsers || 0}</StatsNumber>
+                  <StatsNumber>{stats?.totalUsers ?? 0}</StatsNumber>
                   <StatsLabel>Total Usuarios</StatsLabel>
                 </StatsContent>
               </StatsCard>
@@ -833,7 +665,7 @@ export const UsersPage: React.FC = () => {
                   <UserPlus size={24} />
                 </StatsIcon>
                 <StatsContent>
-                  <StatsNumber>{stats?.activeUsers || 0}</StatsNumber>
+                  <StatsNumber>{stats?.activeUsers ?? 0}</StatsNumber>
                   <StatsLabel>Usuarios Activos</StatsLabel>
                 </StatsContent>
               </StatsCard>
@@ -842,7 +674,7 @@ export const UsersPage: React.FC = () => {
                   <Shield size={24} />
                 </StatsIcon>
                 <StatsContent>
-                  <StatsNumber>{stats?.activeUsers || 0}</StatsNumber>
+                  <StatsNumber>{stats?.activeUsers ?? 0}</StatsNumber>
                   <StatsLabel>Email Verificado</StatsLabel>
                 </StatsContent>
               </StatsCard>
@@ -851,7 +683,7 @@ export const UsersPage: React.FC = () => {
                   <Calendar size={24} />
                 </StatsIcon>
                 <StatsContent>
-                  <StatsNumber>{stats?.newUsersThisMonth || 0}</StatsNumber>
+                  <StatsNumber>{stats?.newUsersThisMonth ?? 0}</StatsNumber>
                   <StatsLabel>Nuevos este Mes</StatsLabel>
                 </StatsContent>
               </StatsCard>
@@ -862,22 +694,17 @@ export const UsersPage: React.FC = () => {
               <FiltersRow>
                 <SearchInput
                   placeholder='Buscar usuarios...'
-                  value={filters.search}
+                  value={searchTerm}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setFilters(prev => ({ ...prev, search: e.target.value }))
+                    setSearchTerm(e.target.value)
                   }
                   icon={<Search size={16} />}
                   style={{ minWidth: '250px' }}
                 />
                 <FilterSelect
-                  value={filters.role || ''}
+                  value={roleFilter}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                    setFilters(prev => ({
-                      ...prev,
-                      role: e.target.value
-                        ? (e.target.value as UserRole)
-                        : null,
-                    }))
+                    setRoleFilter(e.target.value as UserRole | '')
                   }
                 >
                   <option value=''>Todos los roles</option>
@@ -887,19 +714,18 @@ export const UsersPage: React.FC = () => {
                 </FilterSelect>
                 <FilterSelect
                   value={
-                    filters.isActive === null
+                    isActiveFilter === null
                       ? ''
-                      : filters.isActive
+                      : isActiveFilter
                         ? 'true'
                         : 'false'
                   }
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                    setFilters(prev => ({
-                      ...prev,
-                      isActive: e.target.value
-                        ? e.target.value === 'true'
-                        : null,
-                    }))
+                    setIsActiveFilter(
+                      e.target.value === ''
+                        ? null
+                        : e.target.value === 'true'
+                    )
                   }
                 >
                   <option value=''>Todos los estados</option>
@@ -909,45 +735,24 @@ export const UsersPage: React.FC = () => {
               </FiltersRow>
             </FiltersSection>
 
-            {/* 🔍 DEBUGGING: Log del render final */}
-            {(() => {
-              logger.debug('🔍 DEBUG Users.tsx - Render final:', {
-                usersLength: users.length,
-                loading: usersLoading,
-                error: usersError,
-                filters,
-                effectiveFilters,
-                usersArray: users,
-              });
-              return null;
-            })()}
-
             {/* Users List */}
-            {usersLoading ? (
+            {loading && users.length === 0 ? (
               <LoadingMessage>Cargando usuarios...</LoadingMessage>
-            ) : usersError ? (
-              <ErrorMessage>
-                Error al cargar usuarios: Error desconocido
-              </ErrorMessage>
             ) : (
               <UsersGrid>
-                {users.map((gqlUser) => {
-                  const user = gqlUser as unknown as User;
-                  // Determinar el proveedor principal del usuario
+                {users.map(user => {
                   const primaryProvider = AuthProvider.email;
-                  logger.debug('User data:', user);
                   return (
                     <UserCard
                       key={user.id}
                       onClick={() => openEditModal(user)}
                     >
-                      {/* Indicador del proveedor de autenticación */}
                       <AuthProviderIndicator provider={primaryProvider}>
                         {getProviderIcon(primaryProvider)}
                       </AuthProviderIndicator>
                       <UserAvatar>
                         {user.profile?.firstName?.[0]}
-                        {user.profile?.lastName?.[0] || 'U'}
+                        {user.profile?.lastName?.[0] ?? 'U'}
                       </UserAvatar>
                       <UserInfo>
                         <UserName>
@@ -991,28 +796,20 @@ export const UsersPage: React.FC = () => {
                               setSelectedUser(u);
                               setShowDetailModal(true);
                             }}
-                            onActivate={
-                              user.isActive
-                                ? () => {}
-                                : (u) => handleActivateUser(u)
-                            }
-                            onDeactivate={
-                              user.isActive
-                                ? (u) => handleDeactivateUser(u)
-                                : () => {}
-                            }
-                            onDelete={(u) => handleDeleteUser(u)}
-                            onResetPassword={(u) => handleResetPassword(u)}
-                            onPromoteToAdmin={
-                              user.role !== UserRole.admin
-                                ? (u) => handlePromoteToAdmin(u)
-                                : () => {}
-                            }
-                            onDemoteFromAdmin={
-                              user.role === UserRole.admin
-                                ? (u) => handleDemoteFromAdmin(u)
-                                : () => {}
-                            }
+                            onDelete={handleDeleteUser}
+                            onResetPassword={handleResetPassword}
+                            {...(!user.isActive
+                              ? { onActivate: handleActivateUser }
+                              : {})}
+                            {...(user.isActive
+                              ? { onDeactivate: handleDeactivateUser }
+                              : {})}
+                            {...(user.role !== 'admin'
+                              ? { onPromoteToAdmin: handlePromoteToAdmin }
+                              : {})}
+                            {...(user.role === 'admin'
+                              ? { onDemoteFromAdmin: handleDemoteFromAdmin }
+                              : {})}
                           />
                         </div>
                       </UserActions>
@@ -1032,8 +829,7 @@ export const UsersPage: React.FC = () => {
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onSubmit={handleCreateUser}
-        isLoading={createUserMutation.loading}
-        serverError={createUserMutation.error?.message}
+        isLoading={loading}
       />
 
       {/* Edit User Modal */}
@@ -1063,33 +859,33 @@ export const UsersPage: React.FC = () => {
               />
               <Input
                 label='Nombre'
-                value={formData.profile?.firstName || ''}
+                value={formData.profile.firstName}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setFormData(prev => ({
                     ...prev,
-                    profile: { ...prev.profile!, firstName: e.target.value },
+                    profile: { ...prev.profile, firstName: e.target.value },
                   }))
                 }
                 required
               />
               <Input
                 label='Apellido'
-                value={formData.profile?.lastName || ''}
+                value={formData.profile.lastName}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setFormData(prev => ({
                     ...prev,
-                    profile: { ...prev.profile!, lastName: e.target.value },
+                    profile: { ...prev.profile, lastName: e.target.value },
                   }))
                 }
                 required
               />
               <Input
                 label='Teléfono'
-                value={formData.profile?.phone || ''}
+                value={formData.profile.phone}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setFormData(prev => ({
                     ...prev,
-                    profile: { ...prev.profile!, phone: e.target.value },
+                    profile: { ...prev.profile, phone: e.target.value },
                   }))
                 }
               />
@@ -1097,7 +893,7 @@ export const UsersPage: React.FC = () => {
                 label='Fecha de Nacimiento'
                 type='date'
                 value={
-                  formData.profile?.dateOfBirth
+                  formData.profile.dateOfBirth
                     ? new Date(formData.profile.dateOfBirth)
                         .toISOString()
                         .split('T')[0]
@@ -1107,7 +903,7 @@ export const UsersPage: React.FC = () => {
                   setFormData(prev => ({
                     ...prev,
                     profile: {
-                      ...prev.profile!,
+                      ...prev.profile,
                       dateOfBirth: e.target.value || undefined,
                     },
                   }))
@@ -1136,9 +932,9 @@ export const UsersPage: React.FC = () => {
                   }))
                 }
               >
-                <option value={UserRole.customer}>Cliente</option>
-                <option value={UserRole.staff}>Staff</option>
-                <option value={UserRole.admin}>Administrador</option>
+                <option value='customer'>Cliente</option>
+                <option value='staff'>Staff</option>
+                <option value='admin'>Administrador</option>
               </FormSelect>
             </div>
 
@@ -1165,8 +961,8 @@ export const UsersPage: React.FC = () => {
               </Button>
               <Button
                 variant='primary'
-                onClick={handleUpdateUser}
-                isLoading={updateUserMutation.loading}
+                onClick={() => void handleUpdateUser()}
+                isLoading={loading}
               >
                 Actualizar Usuario
               </Button>
@@ -1178,7 +974,7 @@ export const UsersPage: React.FC = () => {
       {/* User Detail Modal */}
       {selectedUser && (
         <UserDetailModal
-          user={selectedUser}
+          user={selectedUser as unknown as GQLUser}
           isOpen={showDetailModal}
           onClose={() => {
             setShowDetailModal(false);
