@@ -1,5 +1,7 @@
 import type React from 'react';
 import { useState, useCallback, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
@@ -10,13 +12,16 @@ import { type UpdateCategoryInput } from '@/generated/graphql';
 import { SVGUpload } from './SVGUpload/SVGUpload';
 import type { Category } from './types';
 import {
+  createCategoryFormSchema,
+  type CreateCategoryFormData,
+} from '@/core/shared/validation/categorySchema';
+import {
   X,
   Edit3,
   Hash,
   Image as ImageIcon,
   Settings,
   CheckCircle,
-  AlertTriangle,
   Calendar,
   Clock,
 } from 'lucide-react';
@@ -26,15 +31,6 @@ interface EditCategoryModalProps {
   onClose: () => void;
   onSuccess: (category: Category) => void;
   category: Category | null;
-}
-
-interface CategoryFormData {
-  name: string;
-  description: string;
-  slug: string;
-  image: string;
-  isActive: string;
-  sortOrder: string;
 }
 
 // Styled Components
@@ -205,18 +201,6 @@ const ModalFooter = styled.div`
   background: ${theme.colors.background.light};
 `;
 
-const ErrorMessage = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  padding: ${theme.spacing[3]};
-  background: ${theme.colors.error}15;
-  border: 1px solid ${theme.colors.error}30;
-  border-radius: ${theme.borderRadius.md};
-  color: ${theme.colors.error};
-  font-size: ${theme.fontSizes.sm};
-  margin-bottom: ${theme.spacing[4]};
-`;
 
 const SuccessMessage = styled.div`
   display: flex;
@@ -427,182 +411,104 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
   onSuccess,
   category,
 }) => {
-  const [formData, setFormData] = useState<CategoryFormData>({
-    name: '',
-    description: '',
-    slug: '',
-    image: '',
-    isActive: 'true',
-    sortOrder: '0',
-  });
-
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [successMessage, setSuccessMessage] = useState('');
   const [showUploadComponent, setShowUploadComponent] = useState(false);
-
   const { update, loading } = useUpdateCategory();
 
-  // Initialize form when modal opens or category changes
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors, isSubmitSuccessful },
+  } = useForm<CreateCategoryFormData>({
+    resolver: zodResolver(createCategoryFormSchema),
+    defaultValues: {
+      name: '',
+      description: '',
+      slug: '',
+      image: '',
+      isActive: true,
+      sortOrder: 0,
+    },
+  });
+
+  const imageValue = watch('image');
+  const isActiveValue = watch('isActive');
+
   useEffect(() => {
     if (isOpen && category) {
-      setFormData({
+      reset({
         name: category.name || '',
         description: category.description || '',
         slug: category.slug || '',
         image: category.image || '',
-        isActive: category.isActive ? 'true' : 'false',
-        sortOrder: category.sortOrder?.toString() || '0',
+        isActive: category.isActive,
+        sortOrder: category.sortOrder ?? 0,
       });
-      setErrors({});
-      setSuccessMessage('');
       setShowUploadComponent(false);
     }
-  }, [isOpen, category]);
+  }, [isOpen, category, reset]);
 
-  // Generate slug from name
-  const generateSlug = useCallback((name: string) => {
-    return name
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-');
-  }, []);
-
-  // Auto-generate slug when name changes
-  useEffect(() => {
-    if (formData.name && !formData.slug) {
-      setFormData(prev => ({
-        ...prev,
-        slug: generateSlug(formData.name),
-      }));
-    }
-  }, [formData.name, formData.slug, generateSlug]);
-
-  const validateForm = useCallback((): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData['name'].trim()) {
-      newErrors['name'] = 'El nombre de la categoría es requerido';
-    }
-
-    if (!formData['slug'].trim()) {
-      newErrors['slug'] = 'El slug es requerido';
-    } else if (!/^[a-z0-9-]+$/.test(formData['slug'])) {
-      newErrors['slug'] =
-        'El slug solo puede contener letras minúsculas, números y guiones';
-    }
-
-    if (formData['sortOrder'] && parseInt(formData['sortOrder']) < 0) {
-      newErrors['sortOrder'] = 'El orden no puede ser negativo';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  }, [formData]);
-
-  const handleInputChange = useCallback(
-    (field: keyof CategoryFormData, value: CategoryFormData[typeof field]) => {
-      setFormData(prev => ({ ...prev, [field]: value }));
-
-      // Clear error when user starts typing
-      if (errors[field]) {
-        setErrors(prev => ({ ...prev, [field]: '' }));
-      }
+  const handleSVGUploadComplete = useCallback(
+    (svgUrl: string) => {
+      setValue('image', svgUrl);
+      setShowUploadComponent(false);
     },
-    [errors]
+    [setValue]
   );
 
-  // Handle SVG upload success - store in image field
-  const handleSVGUploadComplete = useCallback((svgUrl: string) => {
-    setFormData(prev => ({ ...prev, image: svgUrl }));
-    setErrors(prev => ({ ...prev, image: '' }));
-    setShowUploadComponent(false); // Hide upload component after successful upload
+  const handleSVGUploadError = useCallback((_error: string) => {
+    // Error displayed inline by SVGUpload component
   }, []);
 
-  // Handle SVG upload error
-  const handleSVGUploadError = useCallback((error: string) => {
-    setErrors(prev => ({ ...prev, image: error }));
-  }, []);
+  const handleShowUpload = useCallback(() => setShowUploadComponent(true), []);
 
-  // Handle showing upload component
-  const handleShowUpload = useCallback(() => {
-    setShowUploadComponent(true);
-  }, []);
+  const handleCancelUpload = useCallback(
+    () => setShowUploadComponent(false),
+    []
+  );
 
-  // Handle canceling upload
-  const handleCancelUpload = useCallback(() => {
-    setShowUploadComponent(false);
-    setErrors(prev => ({ ...prev, image: '' }));
-  }, []);
+  const onSubmit = useCallback(
+    async (data: CreateCategoryFormData) => {
+      if (!category) return;
 
-  const handleSubmit = useCallback(
-    async (event: React.FormEvent) => {
-      event.preventDefault();
+      const imageUrl = data.image?.trim() ?? '';
+      const relativeImagePath = imageUrl
+        ? imageUrl.startsWith('http')
+          ? new URL(imageUrl).pathname
+          : imageUrl
+        : null;
 
-      if (!validateForm() || !category) {
-        return;
-      }
+      const categoryData: UpdateCategoryInput = {
+        name: data.name.trim(),
+        description: data.description?.trim() || null,
+        slug: data.slug.trim(),
+        image: relativeImagePath,
+        isActive: data.isActive,
+        sortOrder: data.sortOrder ?? null,
+      };
 
-      setErrors({});
+      const rawResult = await update(category.id, categoryData);
+      const result = rawResult as { success?: boolean; message?: string } | false;
 
-      try {
-        // Convert absolute URL to relative path for image field
-        const imageUrl = formData['image'].trim();
-        const relativeImagePath = imageUrl
-          ? imageUrl.startsWith('http')
-            ? new URL(imageUrl).pathname
-            : imageUrl
-          : null;
-
-        const categoryData: UpdateCategoryInput = {
-          name: formData['name'].trim(),
-          description: formData['description'].trim() || null,
-          slug: formData['slug'].trim(),
-          image: relativeImagePath,
-          isActive: formData['isActive'] === 'true',
-          sortOrder: formData['sortOrder']
-            ? parseInt(formData['sortOrder'])
-            : null,
-        };
-
-        const rawResult = await update(category.id, categoryData);
-        const result = rawResult as
-          | { success?: boolean; message?: string }
-          | false;
-
-        if (result && result.success) {
-          setSuccessMessage('Categoría actualizada exitosamente');
-
-          // Wait a bit before closing to show success message
-          setTimeout(() => {
-            const updatedCategory = {
-              ...category,
-              name: categoryData.name || category.name,
-              description:
-                categoryData.description || category.description || null,
-              slug: categoryData.slug || category.slug,
-              image: categoryData.image || category.image || null,
-              isActive: categoryData.isActive || category.isActive,
-              sortOrder: categoryData.sortOrder || category.sortOrder,
-            };
-            onSuccess(updatedCategory);
-            onClose();
-          }, 1500);
-        } else {
-          const errorMessage =
-            (result && result.message) || 'Error al actualizar la categoría';
-          setErrors({ submit: errorMessage });
-        }
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : 'Error al actualizar la categoría. Intente nuevamente.';
-        setErrors({ submit: errorMessage });
+      if (result && result.success) {
+        setTimeout(() => {
+          const updatedCategory: Category = {
+            ...category,
+            name: categoryData.name ?? category.name,
+            description: categoryData.description ?? category.description,
+            slug: categoryData.slug ?? category.slug,
+            image: categoryData.image ?? category.image,
+            isActive: categoryData.isActive ?? category.isActive,
+            sortOrder: categoryData.sortOrder ?? category.sortOrder,
+          };
+          onSuccess(updatedCategory);
+          onClose();
+        }, 1500);
       }
     },
-    [formData, validateForm, update, category, onSuccess, onClose]
+    [update, category, onSuccess, onClose]
   );
 
   if (!isOpen || !category) return null;
@@ -626,19 +532,12 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
           </CloseButton>
         </ModalHeader>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <ModalBody>
-            {errors['submit'] ? (
-              <ErrorMessage>
-                <AlertTriangle size={16} />
-                {errors['submit']}
-              </ErrorMessage>
-            ) : null}
-
-            {successMessage ? (
+            {isSubmitSuccessful ? (
               <SuccessMessage>
                 <CheckCircle size={16} />
-                {successMessage}
+                Categoría actualizada exitosamente
               </SuccessMessage>
             ) : null}
 
@@ -681,14 +580,13 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
                   id='name'
                   type='text'
                   placeholder='Ej: Ropa para Bebés'
-                  value={formData['name']}
-                  onChange={e => handleInputChange('name', e.target.value)}
-                  error={errors['name'] ? errors['name'] : ''}
+                  error={errors.name?.message}
                   disabled={loading}
+                  {...register('name')}
                 />
-                {errors['name'] ? (
+                {errors.name ? (
                   <small style={{ color: theme.colors.error }}>
-                    {errors['name']}
+                    {errors.name.message}
                   </small>
                 ) : null}
               </FormField>
@@ -699,11 +597,8 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
                   id='description'
                   type='text'
                   placeholder='Descripción opcional de la categoría'
-                  value={formData['description']}
-                  onChange={e =>
-                    handleInputChange('description', e.target.value)
-                  }
                   disabled={loading}
+                  {...register('description')}
                 />
               </FormField>
 
@@ -713,14 +608,13 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
                   id='slug'
                   type='text'
                   placeholder='ropa-para-bebes'
-                  value={formData['slug']}
-                  onChange={e => handleInputChange('slug', e.target.value)}
-                  error={errors['slug'] ? errors['slug'] : ''}
+                  error={errors.slug?.message}
                   disabled={loading}
+                  {...register('slug')}
                 />
-                {errors['slug'] ? (
+                {errors.slug ? (
                   <small style={{ color: theme.colors.error }}>
-                    {errors['slug']}
+                    {errors.slug.message}
                   </small>
                 ) : null}
                 <small
@@ -747,14 +641,13 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
                   id='sortOrder'
                   type='number'
                   placeholder='0'
-                  value={formData['sortOrder']}
-                  onChange={e => handleInputChange('sortOrder', e.target.value)}
-                  error={errors['sortOrder'] ? errors['sortOrder'] : ''}
+                  error={errors.sortOrder?.message}
                   disabled={loading}
+                  {...register('sortOrder', { valueAsNumber: true })}
                 />
-                {errors['sortOrder'] ? (
+                {errors.sortOrder ? (
                   <small style={{ color: theme.colors.error }}>
-                    {errors['sortOrder']}
+                    {errors.sortOrder.message}
                   </small>
                 ) : null}
                 <small
@@ -778,10 +671,10 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
                     </PreviewTitle>
 
                     <PreviewContainer>
-                      {formData['image'] ? (
+                      {imageValue ? (
                         <ImagePreview>
                           <ImagePreviewImg
-                            src={formData['image']}
+                            src={imageValue}
                             alt='Imagen actual de la categoría'
                             onError={e => {
                               const target = e.target as HTMLImageElement;
@@ -814,8 +707,7 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
                       )}
                     </PreviewContainer>
 
-                    {/* Success indicator similar to products */}
-                    {formData['image'] ? (
+                    {imageValue ? (
                       <SuccessIndicator>
                         <SuccessText>
                           <SuccessDot />
@@ -824,15 +716,12 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
                       </SuccessIndicator>
                     ) : null}
 
-                    {/* Action button */}
                     <div style={{ marginTop: theme.spacing[3] }}>
                       <ReplaceButton
                         onClick={handleShowUpload}
                         disabled={loading}
                       >
-                        {formData['image']
-                          ? 'Cambiar Imagen SVG'
-                          : 'Agregar Imagen SVG'}
+                        {imageValue ? 'Cambiar Imagen SVG' : 'Agregar Imagen SVG'}
                       </ReplaceButton>
                     </div>
                   </CurrentImagePreview>
@@ -867,30 +756,14 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
                   </div>
                 )}
 
-                {errors['image'] ? (
-                  <small
-                    style={{
-                      color: theme.colors.error,
-                      marginTop: theme.spacing[2],
-                      display: 'block',
-                    }}
-                  >
-                    {errors['image']}
-                  </small>
-                ) : null}
               </FormField>
 
               <SwitchContainer>
                 <Switch>
                   <SwitchInput
                     type='checkbox'
-                    checked={formData['isActive'] === 'true'}
-                    onChange={e =>
-                      handleInputChange(
-                        'isActive',
-                        e.target.checked ? 'true' : 'false'
-                      )
-                    }
+                    checked={isActiveValue}
+                    onChange={e => setValue('isActive', e.target.checked)}
                     disabled={loading}
                   />
                   <Slider />
@@ -909,12 +782,7 @@ export const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
             >
               Cancelar
             </Button>
-            <Button
-              type='submit'
-              disabled={
-                loading || !formData['name'].trim() || !formData['slug'].trim()
-              }
-            >
+            <Button type='submit' disabled={loading}>
               {loading ? 'Actualizando...' : 'Actualizar Categoría'}
             </Button>
           </ModalFooter>

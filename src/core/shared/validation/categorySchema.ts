@@ -35,3 +35,24 @@ export const updateCategorySchema = categoryObjectSchema.partial();
 
 export type CategorySchemaInput = z.infer<typeof categorySchema>;
 export type UpdateCategorySchemaInput = z.infer<typeof updateCategorySchema>;
+
+export const createCategoryFormSchema = z.object({
+  name: z
+    .string()
+    .min(1, 'El nombre de la categoría es requerido')
+    .max(200, 'Máximo 200 caracteres'),
+  description: z.string().max(2000, 'Máximo 2000 caracteres').optional(),
+  slug: z
+    .string()
+    .min(1, 'El slug es requerido')
+    .max(200, 'Máximo 200 caracteres')
+    .regex(
+      /^[a-z0-9-]+$/,
+      'El slug solo puede contener letras minúsculas, números y guiones'
+    ),
+  image: z.string().optional(),
+  isActive: z.boolean(),
+  sortOrder: z.number().int().min(0, 'El orden no puede ser negativo'),
+});
+
+export type CreateCategoryFormData = z.infer<typeof createCategoryFormSchema>;
