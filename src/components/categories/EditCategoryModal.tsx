@@ -12,15 +12,12 @@ import {
   X,
   Edit3,
   Hash,
-  FileText,
   Image as ImageIcon,
   Settings,
   CheckCircle,
   AlertTriangle,
-  SortAsc,
   Calendar,
   Clock,
-  Upload,
 } from 'lucide-react';
 
 interface EditCategoryModalProps {

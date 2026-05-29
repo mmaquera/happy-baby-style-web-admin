@@ -347,7 +347,7 @@ export const useUserImpersonation = () => {
 };
 
 export const useAuthProviderStats = () => {
-  const { user } = useAuth();
+  const { user: _user } = useAuth();
   const [stats, setStats] = useState<AuthProviderStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

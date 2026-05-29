@@ -12,7 +12,7 @@ interface ProfileLike {
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { theme } from '@/styles/theme';
-import { Save, X, User, Mail, Phone, Calendar, Shield } from 'lucide-react';
+
 import { logger } from '@/utils/logger';
 
 interface ProfileSaveInput {
@@ -230,19 +230,6 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
       await onSave(input);
     } catch (error) {
       logger.error('Error saving profile:', error);
-    }
-  };
-
-  const getRoleLabel = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return 'Administrador';
-      case 'staff':
-        return 'Personal';
-      case 'customer':
-        return 'Cliente';
-      default:
-        return role;
     }
   };
 

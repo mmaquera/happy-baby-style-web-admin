@@ -13,11 +13,8 @@ import {
   Edit,
   Trash2,
   Package,
-  Eye,
   Settings,
   Download,
-  Upload,
-  Printer,
 } from 'lucide-react';
 import { logger } from '@/utils/logger';
 
@@ -406,7 +403,7 @@ const StatusBadge = styled.div<{ isActive: boolean }>`
 `;
 
 export const ProductDetail: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id: _id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState(0);
 

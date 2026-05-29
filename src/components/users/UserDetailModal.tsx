@@ -14,7 +14,6 @@ import { AuthProvider } from '@/types';
 import { theme } from '@/styles/theme';
 import {
   X,
-  Mail,
   Phone,
   Calendar,
   MapPin,
@@ -26,7 +25,6 @@ import {
   Activity,
   AtSign,
   Edit,
-  Save,
 } from 'lucide-react';
 
 interface UserDetailModalProps {
@@ -184,34 +182,6 @@ const RoleBadge = styled.span<{ role: string }>`
   color: ${theme.colors.text.secondary};
 `;
 
-const AddressList = styled.div`
-  margin-top: ${theme.spacing[3]};
-`;
-
-const AddressItem = styled.div`
-  background: ${theme.colors.white};
-  border-radius: ${theme.borderRadius.md};
-  padding: ${theme.spacing[3]};
-  margin-bottom: ${theme.spacing[2]};
-  border-left: 3px solid ${theme.colors.primaryPurple};
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-const AddressTitle = styled.div`
-  font-weight: ${theme.fontWeights.semibold};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[1]};
-`;
-
-const AddressText = styled.div`
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.text.secondary};
-  line-height: 1.4;
-`;
-
 const TabsContainer = styled.div`
   display: flex;
   border-bottom: 1px solid ${theme.colors.border.light};
@@ -259,20 +229,20 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
   >('general');
   const {
     sessions,
-    loading: sessionsLoading,
+    loading: _sessionsLoading,
     refetch: refetchSessions,
   } = useUserSessions(user.id);
 
   // Hook para manejar el perfil del usuario
   const {
     profile,
-    loading: profileLoading,
+    loading: _profileLoading,
     isEditing,
     updatingProfile,
     updateProfile,
     startEditing,
     cancelEditing,
-    editingAddressId,
+    editingAddressId: _editingAddressId,
     creatingAddress,
     updatingAddress,
     deletingAddress,
@@ -281,7 +251,7 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
     updateAddress,
     deleteAddress,
     setDefaultAddress,
-    refetch: refetchProfile,
+    refetch: _refetchProfile,
   } = useUserProfile({ userId: user.id, skip: !isOpen });
 
   // Verificar si el usuario tiene cuenta de Google

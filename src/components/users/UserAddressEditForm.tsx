@@ -306,21 +306,6 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
     }
   };
 
-  const getTypeLabel = (type: string) => {
-    switch (type) {
-      case 'home':
-        return 'Casa';
-      case 'work':
-        return 'Trabajo';
-      case 'billing':
-        return 'Facturación';
-      case 'shipping':
-        return 'Envío';
-      default:
-        return type;
-    }
-  };
-
   return (
     <Form onSubmit={handleSubmit}>
       <FormRow>

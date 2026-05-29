@@ -5,7 +5,6 @@ export { UserSessionsManager } from './UserSessionsManager';
 export { AuthProviderDashboard } from './AuthProviderDashboard';
 export { GoogleUserFeatures } from './GoogleUserFeatures';
 export { CreateUserModal } from './CreateUserModal';
-export { ImprovedCreateUserModal } from './ImprovedCreateUserModal';
 export { PasswordManagementModal } from './PasswordManagementModal';
 export { PasswordHistoryCard } from './PasswordHistoryCard';
 export { UserProfileEditForm } from './UserProfileEditForm';

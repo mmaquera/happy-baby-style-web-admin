@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { UserDetailModal } from '@/components/users/UserDetailModal';
 import { AuthProviderDashboard } from '@/components/users/AuthProviderDashboard';
-import { ImprovedCreateUserModal } from '@/components/users/ImprovedCreateUserModal';
+import { CreateUserModal } from '@/components/users';
 import { UserActionsMenu } from '@/components/users/UserActionsMenu';
 import { PasswordManagementModal } from '@/components/users/PasswordManagementModal';
 import { useProviderUtils } from '@/hooks/useAuthManagement';
@@ -23,8 +23,6 @@ import {
   Shield,
   Phone,
 } from 'lucide-react';
-
-import toast from 'react-hot-toast';
 
 // Styled Components
 const Container = styled.div`
@@ -825,7 +823,7 @@ export const UsersPage: React.FC = () => {
       </TabContent>
 
       {/* Create User Modal */}
-      <ImprovedCreateUserModal
+      <CreateUserModal
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onSubmit={handleCreateUser}

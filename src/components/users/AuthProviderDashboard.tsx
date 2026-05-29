@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { AuthProvider } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { theme } from '@/styles/theme';

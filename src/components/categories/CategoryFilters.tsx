@@ -14,9 +14,6 @@ import {
   Image as ImageIcon,
   FileText,
   Package,
-  Calendar,
-  SortAsc,
-  SortDesc,
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';

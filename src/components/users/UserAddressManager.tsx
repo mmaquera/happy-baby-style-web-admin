@@ -247,14 +247,6 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
     }
   };
 
-  const formatDate = (date: string | Date) => {
-    return new Date(date).toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-  };
-
   return (
     <Container>
       <Header>

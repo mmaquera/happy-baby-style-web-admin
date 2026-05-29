@@ -17,7 +17,6 @@ import { useApolloClient, type NormalizedCacheObject } from '@apollo/client';
 import type { ApolloClient } from '@apollo/client';
 import { toast } from 'react-hot-toast';
 import {
-  UnifiedAuthService,
   AuthError,
   AuthServiceFactory,
 } from '../services/auth/UnifiedAuthService';
@@ -379,14 +378,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
         dispatch({ type: 'SET_LOADING', payload: false });
         return success;
-      } catch (error) {
-        const errorMessage =
-          error instanceof AuthError
-            ? error.message
-            : error instanceof Error
-              ? error.message
-              : 'Registration failed';
-
+      } catch (_error) {
         dispatch({ type: 'SET_LOADING', payload: false });
         return false;
       }

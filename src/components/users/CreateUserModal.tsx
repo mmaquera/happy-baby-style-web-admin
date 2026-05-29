@@ -4,6 +4,7 @@ import { CreateUserProfileInput, UserRole } from '@/generated/graphql';
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+
 import {
   UserPlus,
   X,
@@ -17,78 +18,136 @@ import {
   Lock,
   User as UserIcon,
 } from 'lucide-react';
+import { logger } from '@/utils/logger';
 
 interface CreateUserModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (userData: CreateUserProfileInput) => void;
+  onSubmit: (userData: CreateUserProfileInput) => Promise<void>;
   isLoading: boolean;
+  serverError?: string | undefined;
 }
 
 // Styled Components
-const Modal = styled.div`
+const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: ${theme.spacing[4]};
+  padding: 16px;
+  overflow-y: auto;
 `;
 
-const ModalContent = styled.div`
-  background: ${theme.colors.background.primary};
-  border-radius: ${theme.borderRadius.lg};
+const ModalContainer = styled.div`
+  background: white;
+  border-radius: 12px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  max-width: 600px;
+  max-width: 650px;
   width: 100%;
-  max-height: 90vh;
+  max-height: 95vh;
   overflow-y: auto;
-  border: 1px solid ${theme.colors.border.light};
+  border: 1px solid #e5e7eb;
+  animation: slideUp 0.3s ease-out;
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(32px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
 `;
 
 const ModalHeader = styled.div`
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: ${theme.spacing[6]} ${theme.spacing[6]} ${theme.spacing[4]};
-  border-bottom: 1px solid ${theme.colors.border.light};
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid #f3f4f6;
 `;
 
-const ModalHeaderLeft = styled.div`
+const HeaderLeft = styled.div`
   display: flex;
-  gap: ${theme.spacing[3]};
+  gap: 12px;
   align-items: flex-start;
+`;
+
+const HeaderIcon = styled.div`
+  padding: ${theme.spacing[2]};
+  background: ${theme.colors.background.accent};
+  border-radius: ${theme.borderRadius.md};
+  color: ${theme.colors.primaryPurple};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+`;
+
+const HeaderText = styled.div`
+  flex: 1;
 `;
 
 const ModalTitle = styled.h2`
   font-size: ${theme.fontSizes.xl};
   font-weight: ${theme.fontWeights.bold};
   color: ${theme.colors.text.primary};
-  margin: 0;
+  margin: 0 0 ${theme.spacing[1]} 0;
+  line-height: 1.4;
+  font-family: ${theme.fonts.heading};
 `;
 
 const ModalSubtitle = styled.p`
   font-size: ${theme.fontSizes.sm};
   color: ${theme.colors.text.secondary};
-  margin: ${theme.spacing[1]} 0 0 0;
+  margin: 0;
+  line-height: 1.4;
+  font-family: ${theme.fonts.primary};
 `;
 
-const FormSteps = styled.div`
+const CloseButton = styled.button`
+  background: none;
+  border: none;
+  padding: ${theme.spacing[2]};
+  border-radius: ${theme.borderRadius.base};
+  color: ${theme.colors.text.secondary};
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all ${theme.transitions.fast};
+
+  &:hover {
+    background: ${theme.colors.background.hover};
+    color: ${theme.colors.text.primary};
+  }
+`;
+
+const StepsIndicator = styled.div`
+  position: sticky;
+  top: 88px;
+  background: ${theme.colors.background.light};
+  z-index: 9;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: ${theme.spacing[4]} ${theme.spacing[6]};
-  background: ${theme.colors.background.light};
   border-bottom: 1px solid ${theme.colors.border.light};
 `;
 
-const FormStep = styled.div<{ active: boolean; completed: boolean }>`
+const Step = styled.div<{ active: boolean; completed: boolean }>`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[2]};
@@ -96,50 +155,69 @@ const FormStep = styled.div<{ active: boolean; completed: boolean }>`
 `;
 
 const StepNumber = styled.div<{ active?: boolean; completed?: boolean }>`
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: ${props =>
     props.completed
       ? theme.colors.success
       : props.active
-        ? theme.colors.primary
-        : theme.colors.background.primary};
+        ? theme.colors.primaryPurple
+        : theme.colors.border.medium};
   color: ${props =>
-    props.completed || props.active ? 'white' : theme.colors.text.secondary};
+    props.completed || props.active
+      ? theme.colors.white
+      : theme.colors.text.secondary};
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: ${theme.fontSizes.sm};
-  font-weight: ${theme.fontWeights.medium};
+  font-size: ${theme.fontSizes.xs};
+  font-weight: ${theme.fontWeights.semibold};
   border: 2px solid
     ${props =>
       props.completed
         ? theme.colors.success
         : props.active
-          ? theme.colors.primary
+          ? theme.colors.primaryPurple
           : theme.colors.border.medium};
+  transition: all ${theme.transitions.fast};
 `;
 
 const StepLabel = styled.span`
   font-size: ${theme.fontSizes.sm};
   font-weight: ${theme.fontWeights.medium};
   color: ${theme.colors.text.primary};
+  font-family: ${theme.fonts.primary};
 `;
 
-const StepConnector = styled.div`
-  width: 40px;
+const StepLine = styled.div`
+  width: 32px;
   height: 2px;
   background: ${theme.colors.border.medium};
   margin: 0 ${theme.spacing[3]};
 `;
 
-const FormContent = styled.div`
+const ModalContent = styled.div`
   padding: ${theme.spacing[6]};
+  padding-top: ${theme.spacing[4]};
 `;
 
-const FormSection = styled.div`
-  margin-bottom: ${theme.spacing[6]};
+const ServerErrorBanner = styled.div`
+  background: ${theme.colors.error}15;
+  border: 1px solid ${theme.colors.error};
+  border-radius: ${theme.borderRadius.md};
+  padding: ${theme.spacing[3]};
+  margin-bottom: ${theme.spacing[4]};
+  color: ${theme.colors.error};
+  font-size: ${theme.fontSizes.sm};
+  font-weight: ${theme.fontWeights.medium};
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing[2]};
+`;
+
+const Section = styled.div`
+  margin-bottom: ${theme.spacing[8]};
 
   &:last-child {
     margin-bottom: 0;
@@ -158,74 +236,48 @@ const SectionTitle = styled.h3`
   font-weight: ${theme.fontWeights.semibold};
   color: ${theme.colors.text.primary};
   margin: 0;
+  font-family: ${theme.fonts.heading};
 `;
 
 const FormGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: ${theme.spacing[4]};
+  margin-bottom: ${theme.spacing[4]};
 
-  @media (max-width: 640px) {
+  @media (max-width: ${theme.breakpoints.md}) {
     grid-template-columns: 1fr;
   }
 `;
 
-const FullWidthField = styled.div`
-  grid-column: 1 / -1;
-`;
-
-const InputWrapper = styled.div`
+const FormField = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing[2]};
 `;
 
-const InputHint = styled.div`
+const FieldHint = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[1]};
   font-size: ${theme.fontSizes.xs};
   color: ${theme.colors.text.secondary};
+  font-family: ${theme.fonts.primary};
 `;
 
-const PasswordInputWrapper = styled.div`
-  position: relative;
-  width: 100%;
-`;
-
-const PasswordToggle = styled.button`
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: ${theme.colors.text.secondary};
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-
-  &:hover {
-    color: ${theme.colors.text.primary};
-  }
-`;
-
-const PasswordStrengthContainer = styled.div`
+const PasswordStrength = styled.div`
   margin-top: ${theme.spacing[2]};
 `;
 
-const PasswordStrengthBar = styled.div`
-  height: 4px;
+const StrengthBar = styled.div`
+  height: 3px;
   background: ${theme.colors.border.light};
-  border-radius: 2px;
+  border-radius: ${theme.borderRadius.sm};
   overflow: hidden;
   margin-bottom: ${theme.spacing[1]};
 `;
 
-const PasswordStrengthFill = styled.div<{ strength: number }>`
+const StrengthFill = styled.div<{ strength: number }>`
   height: 100%;
   width: ${props => props.strength}%;
   background: ${props =>
@@ -234,10 +286,10 @@ const PasswordStrengthFill = styled.div<{ strength: number }>`
       : props.strength < 70
         ? theme.colors.warning
         : theme.colors.success};
-  transition: all 0.3s ease;
+  transition: all ${theme.transitions.base};
 `;
 
-const PasswordStrengthText = styled.span<{ strength: number }>`
+const StrengthText = styled.span<{ strength: number }>`
   font-size: ${theme.fontSizes.xs};
   color: ${props =>
     props.strength < 30
@@ -246,10 +298,11 @@ const PasswordStrengthText = styled.span<{ strength: number }>`
         ? theme.colors.warning
         : theme.colors.success};
   font-weight: ${theme.fontWeights.medium};
+  font-family: ${theme.fonts.primary};
 `;
 
 const RoleSelector = styled.div`
-  margin-bottom: ${theme.spacing[4]};
+  margin-bottom: ${theme.spacing[5]};
 `;
 
 const RoleLabel = styled.label`
@@ -258,44 +311,82 @@ const RoleLabel = styled.label`
   font-weight: ${theme.fontWeights.medium};
   color: ${theme.colors.text.primary};
   margin-bottom: ${theme.spacing[3]};
+  font-family: ${theme.fonts.primary};
 `;
 
-const RoleGrid = styled.div`
-  display: grid;
-  gap: ${theme.spacing[3]};
+const RoleHint = styled.div`
+  font-size: ${theme.fontSizes.xs};
+  color: ${theme.colors.text.secondary};
+  margin-bottom: ${theme.spacing[2]};
+  font-style: italic;
+`;
+
+const RoleOptions = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${theme.spacing[2]};
 `;
 
 const RoleOption = styled.div<{ selected: boolean }>`
   padding: ${theme.spacing[4]};
   border: 2px solid
     ${props =>
-      props.selected ? theme.colors.primary : theme.colors.border.medium};
+      props.selected ? theme.colors.primaryPurple : theme.colors.border.medium};
   border-radius: ${theme.borderRadius.md};
   background: ${props =>
-    props.selected
-      ? theme.colors.background.accent
-      : theme.colors.background.primary};
+    props.selected ? theme.colors.background.accent : theme.colors.white};
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all ${theme.transitions.fast};
   display: flex;
   align-items: center;
   gap: ${theme.spacing[3]};
+  user-select: none;
+  position: relative;
 
   &:hover {
-    border-color: ${theme.colors.primary};
+    border-color: ${theme.colors.primaryPurple};
     background: ${props =>
       props.selected
         ? theme.colors.background.accent
         : theme.colors.background.hover};
+    transform: translateY(-1px);
+    box-shadow: ${theme.shadows.md};
   }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: ${theme.shadows.sm};
+  }
+
+  ${props =>
+    props.selected &&
+    `
+    &::before {
+      content: "✓";
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      color: ${theme.colors.primaryPurple};
+      font-weight: bold;
+      font-size: 16px;
+    }
+  `}
 `;
 
-const RoleIcon = styled.div<{ selected?: boolean }>`
+const RoleIconContainer = styled.div<{ selected?: boolean }>`
   padding: ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.md};
+  border-radius: ${theme.borderRadius.base};
   background: ${props =>
-    props.selected ? theme.colors.primary : theme.colors.background.light};
-  color: ${props => (props.selected ? 'white' : theme.colors.text.secondary)};
+    props.selected
+      ? theme.colors.primaryPurple
+      : theme.colors.background.light};
+  color: ${props =>
+    props.selected ? theme.colors.white : theme.colors.text.secondary};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all ${theme.transitions.fast};
+  flex-shrink: 0;
 `;
 
 const RoleInfo = styled.div`
@@ -306,27 +397,36 @@ const RoleName = styled.div`
   font-weight: ${theme.fontWeights.semibold};
   color: ${theme.colors.text.primary};
   margin-bottom: ${theme.spacing[1]};
+  font-family: ${theme.fonts.heading};
 `;
 
 const RoleDescription = styled.div`
   font-size: ${theme.fontSizes.sm};
   color: ${theme.colors.text.secondary};
+  font-family: ${theme.fonts.primary};
 `;
 
-const CheckboxContainer = styled.div`
+const ActiveUserCheckbox = styled.div`
   display: flex;
   align-items: center;
   gap: ${theme.spacing[3]};
-  padding: ${theme.spacing[3]};
+  padding: ${theme.spacing[4]};
   border: 1px solid ${theme.colors.border.medium};
   border-radius: ${theme.borderRadius.md};
   background: ${theme.colors.background.light};
+  transition: all ${theme.transitions.fast};
+
+  &:hover {
+    border-color: ${theme.colors.primaryPurple};
+    background: ${theme.colors.background.hover};
+  }
 `;
 
 const Checkbox = styled.input`
   width: 18px;
   height: 18px;
   cursor: pointer;
+  accent-color: ${theme.colors.primaryPurple};
 `;
 
 const CheckboxLabel = styled.label`
@@ -337,22 +437,17 @@ const CheckboxLabel = styled.label`
   font-weight: ${theme.fontWeights.medium};
   color: ${theme.colors.text.primary};
   cursor: pointer;
+  flex: 1;
+  font-family: ${theme.fonts.primary};
 `;
 
-const FormActions = styled.div`
+const ModalFooter = styled.div`
   display: flex;
   gap: ${theme.spacing[3]};
   justify-content: flex-end;
-  padding: ${theme.spacing[6]};
+  padding: ${theme.spacing[5]} ${theme.spacing[6]};
   border-top: 1px solid ${theme.colors.border.light};
   background: ${theme.colors.background.light};
-  margin: ${theme.spacing[6]} -${theme.spacing[6]} -${theme.spacing[6]};
-`;
-
-const ErrorMessage = styled.div`
-  color: ${theme.colors.error};
-  font-size: ${theme.fontSizes.sm};
-  margin-top: ${theme.spacing[1]};
 `;
 
 // Utility functions
@@ -377,54 +472,28 @@ const getPasswordStrengthText = (strength: number): string => {
   return 'Fuerte';
 };
 
-const getPasswordErrors = (password: string): string[] => {
-  const errors: string[] = [];
-  if (password.length < 8) errors.push('Mínimo 8 caracteres');
-  if (!/[a-z]/.test(password)) errors.push('Al menos una minúscula');
-  if (!/[A-Z]/.test(password)) errors.push('Al menos una mayúscula');
-  if (!/[0-9]/.test(password)) errors.push('Al menos un número');
-  if (!/[^A-Za-z0-9]/.test(password)) errors.push('Al menos un símbolo');
-  return errors;
-};
-
 // Component
-const PasswordStrength: React.FC<{ password: string }> = ({ password }) => {
-  const strength = calculatePasswordStrength(password);
-  const strengthText = getPasswordStrengthText(strength);
-
-  if (!password) return null;
-
-  return (
-    <PasswordStrengthContainer>
-      <PasswordStrengthBar>
-        <PasswordStrengthFill strength={strength} />
-      </PasswordStrengthBar>
-      <PasswordStrengthText strength={strength}>
-        Contraseña {strengthText}
-      </PasswordStrengthText>
-    </PasswordStrengthContainer>
-  );
-};
-
 export const CreateUserModal: React.FC<CreateUserModalProps> = ({
   isOpen,
   onClose,
   onSubmit,
   isLoading,
+  serverError,
 }) => {
   const [formData, setFormData] = useState<CreateUserProfileInput>({
     email: '',
     password: '',
-    role: UserRole.customer,
-    isActive: true,
     firstName: '',
     lastName: '',
     phone: '',
     dateOfBirth: null,
+    role: UserRole.customer,
+    isActive: true,
   });
 
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
 
   // Limpiar formulario cuando se abra el modal
   useEffect(() => {
@@ -432,17 +501,76 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
       setFormData({
         email: '',
         password: '',
-        role: UserRole.customer,
-        isActive: true,
         firstName: '',
         lastName: '',
         phone: '',
         dateOfBirth: null,
+        role: UserRole.customer,
+        isActive: true,
       });
       setErrors({});
+      setServerErrors({});
       setShowPassword(false);
     }
   }, [isOpen]);
+
+  // Procesar errores del servidor cuando cambien
+  useEffect(() => {
+    if (serverError) {
+      processServerError(serverError);
+    } else {
+      setServerErrors({});
+    }
+  }, [serverError]);
+
+  // Función para validar y formatear fecha
+  const formatDateForAPI = (dateString: string): string | null => {
+    if (!dateString) return null;
+
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return null;
+
+      // Asegurar formato ISO para el backend
+      return date.toISOString();
+    } catch {
+      return null;
+    }
+  };
+
+  // Función para procesar errores del servidor y mapearlos a campos específicos
+  const processServerError = (errorMessage: string): void => {
+    const newServerErrors: Record<string, string> = {};
+
+    // Mapear errores específicos del servidor a campos del formulario
+    if (
+      errorMessage.toLowerCase().includes('birth date') ||
+      errorMessage.toLowerCase().includes('fecha de nacimiento')
+    ) {
+      newServerErrors['dateOfBirth'] = 'Fecha de nacimiento inválida';
+    } else if (errorMessage.toLowerCase().includes('email')) {
+      newServerErrors['email'] = 'Email inválido o ya existe';
+    } else if (errorMessage.toLowerCase().includes('password')) {
+      newServerErrors['password'] = 'Contraseña inválida';
+    } else if (
+      errorMessage.toLowerCase().includes('first name') ||
+      errorMessage.toLowerCase().includes('nombre')
+    ) {
+      newServerErrors['firstName'] = 'Nombre inválido';
+    } else if (
+      errorMessage.toLowerCase().includes('last name') ||
+      errorMessage.toLowerCase().includes('apellido')
+    ) {
+      newServerErrors['lastName'] = 'Apellido inválido';
+    } else if (
+      errorMessage.toLowerCase().includes('phone') ||
+      errorMessage.toLowerCase().includes('teléfono')
+    ) {
+      newServerErrors['phone'] = 'Teléfono inválido';
+    }
+
+    setServerErrors(newServerErrors);
+  };
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -455,7 +583,7 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
 
     if (!formData.password) {
       newErrors['password'] = 'Contraseña es requerida';
-    } else if (calculatePasswordStrength(formData.password || '') < 50) {
+    } else if (calculatePasswordStrength(formData.password) < 50) {
       newErrors['password'] = 'Contraseña muy débil';
     }
 
@@ -467,13 +595,43 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
       newErrors['lastName'] = 'Apellido es requerido';
     }
 
+    // Validar fecha de nacimiento
+    if (formData.dateOfBirth) {
+      const birthDate = new Date(formData.dateOfBirth);
+      const today = new Date();
+
+      if (isNaN(birthDate.getTime())) {
+        newErrors['dateOfBirth'] = 'Fecha de nacimiento no válida';
+      } else if (birthDate > today) {
+        newErrors['dateOfBirth'] = 'La fecha de nacimiento no puede ser futura';
+      } else if (birthDate < new Date('1900-01-01')) {
+        newErrors['dateOfBirth'] = 'Fecha de nacimiento demasiado antigua';
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validateForm()) {
-      onSubmit(formData);
+      try {
+        // Limpiar errores del servidor antes de enviar
+        setServerErrors({});
+
+        // Formatear la fecha antes de enviar
+        const formattedData = {
+          ...formData,
+          dateOfBirth: formData.dateOfBirth
+            ? formatDateForAPI(formData.dateOfBirth as string)
+            : null,
+        };
+
+        await onSubmit(formattedData);
+      } catch (error) {
+        // Los errores se manejan en el hook, pero podemos mostrar errores específicos aquí si es necesario
+        logger.error('Error en el modal:', error);
+      }
     }
   };
 
@@ -481,128 +639,166 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
     setFormData({
       email: '',
       password: '',
-      role: UserRole.customer,
-      isActive: true,
       firstName: '',
       lastName: '',
       phone: '',
       dateOfBirth: null,
+      role: UserRole.customer,
+      isActive: true,
     });
     setErrors({});
+    setServerErrors({});
     onClose();
   };
 
   const isFormValid = (): boolean => {
-    return !!(
+    const hasRequiredFields = !!(
       formData.email &&
       formData.password &&
       formData.firstName &&
       formData.lastName &&
       isValidEmail(formData.email) &&
-      calculatePasswordStrength(formData.password || '') >= 50
+      calculatePasswordStrength(formData.password) >= 50
     );
+
+    // Solo validar que no haya errores de validación locales
+    // Los errores del servidor no deberían impedir que el usuario pueda enviar el formulario
+    const hasNoValidationErrors = Object.keys(errors).length === 0;
+
+    return hasRequiredFields && hasNoValidationErrors;
   };
+
+  const passwordStrength = calculatePasswordStrength(formData.password || '');
 
   if (!isOpen) return null;
 
   return (
-    <Modal onClick={handleClose}>
-      <ModalContent onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+    <ModalOverlay onClick={handleClose}>
+      <ModalContainer onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         <ModalHeader>
-          <ModalHeaderLeft>
-            <UserPlus size={24} style={{ color: theme.colors.primary }} />
-            <div>
+          <HeaderLeft>
+            <HeaderIcon>
+              <UserPlus size={20} />
+            </HeaderIcon>
+            <HeaderText>
               <ModalTitle>Crear Nuevo Usuario</ModalTitle>
               <ModalSubtitle>
                 Completa la información para crear una nueva cuenta de usuario
               </ModalSubtitle>
-            </div>
-          </ModalHeaderLeft>
-          <Button
-            variant='ghost'
-            size='small'
-            onClick={handleClose}
-            style={{ padding: theme.spacing[2] }}
-          >
+            </HeaderText>
+          </HeaderLeft>
+          <CloseButton onClick={handleClose}>
             <X size={18} />
-          </Button>
+          </CloseButton>
         </ModalHeader>
 
-        <FormSteps>
-          <FormStep active={true} completed={isFormValid()}>
-            <StepNumber active={true}>1</StepNumber>
+        <StepsIndicator>
+          <Step active={true} completed={isFormValid()}>
+            <StepNumber active={true} completed={isFormValid()}>
+              1
+            </StepNumber>
             <StepLabel>Datos Básicos</StepLabel>
-          </FormStep>
-          <StepConnector />
-          <FormStep active={isFormValid()} completed={false}>
+          </Step>
+          <StepLine />
+          <Step active={isFormValid()} completed={false}>
             <StepNumber active={isFormValid()}>2</StepNumber>
             <StepLabel>Configuración</StepLabel>
-          </FormStep>
-        </FormSteps>
+          </Step>
+        </StepsIndicator>
 
-        <FormContent>
+        <ModalContent>
+          {/* Server Error Banner */}
+          {serverError && (
+            <ServerErrorBanner>
+              <Shield size={16} />
+              {serverError}
+            </ServerErrorBanner>
+          )}
+
           {/* Account Information Section */}
-          <FormSection>
+          <Section>
             <SectionHeader>
-              <Mail size={18} style={{ color: theme.colors.primary }} />
+              <Mail size={16} style={{ color: theme.colors.primaryPurple }} />
               <SectionTitle>Información de Cuenta</SectionTitle>
             </SectionHeader>
 
             <FormGrid>
-              <InputWrapper>
+              <FormField>
                 <Input
                   label='Email'
                   type='email'
                   value={formData.email}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setFormData(prev => ({ ...prev, email: e.target.value }))
-                  }
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    setFormData(prev => ({ ...prev, email: e.target.value }));
+                    // Limpiar errores cuando el usuario empiece a corregir
+                    if (errors['email'] || serverErrors['email']) {
+                      setErrors(prev => ({ ...prev, email: '' }));
+                      setServerErrors(prev => ({ ...prev, email: '' }));
+                    }
+                  }}
                   required
                   placeholder='ejemplo@correo.com'
-                  error={errors['email'] || ''}
+                  error={errors['email'] || serverErrors['email'] || ''}
                 />
-                <InputHint>
+                <FieldHint>
                   <Mail size={12} />
                   Este será el email de acceso al sistema
-                </InputHint>
-              </InputWrapper>
+                </FieldHint>
+              </FormField>
 
-              <InputWrapper>
-                <PasswordInputWrapper>
-                  <Input
-                    label='Contraseña'
-                    type={showPassword ? 'text' : 'password'}
-                    value={formData.password || ''}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      setFormData(prev => ({
-                        ...prev,
-                        password: e.target.value,
-                      }))
+              <FormField>
+                <Input
+                  label='Contraseña'
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password || ''}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    setFormData(prev => ({
+                      ...prev,
+                      password: e.target.value,
+                    }));
+                    // Limpiar errores cuando el usuario empiece a corregir
+                    if (errors['password'] || serverErrors['password']) {
+                      setErrors(prev => ({ ...prev, password: '' }));
+                      setServerErrors(prev => ({ ...prev, password: '' }));
                     }
-                    required
-                    placeholder='Mínimo 8 caracteres'
-                    error={errors['password'] || ''}
-                  />
-                  <PasswordToggle
-                    type='button'
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </PasswordToggle>
-                </PasswordInputWrapper>
-                <PasswordStrength password={formData.password || ''} />
-                <InputHint>
+                  }}
+                  required
+                  placeholder='Mínimo 8 caracteres'
+                  error={errors['password'] || serverErrors['password'] || ''}
+                  rightIcon={
+                    showPassword ? <EyeOff size={16} /> : <Eye size={16} />
+                  }
+                  onRightIconClick={() => setShowPassword(!showPassword)}
+                  rightIconClickable={true}
+                  rightIconAriaLabel={
+                    showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                  }
+                />
+                {formData.password && (
+                  <PasswordStrength>
+                    <StrengthBar>
+                      <StrengthFill strength={passwordStrength} />
+                    </StrengthBar>
+                    <StrengthText strength={passwordStrength}>
+                      Contraseña {getPasswordStrengthText(passwordStrength)}
+                    </StrengthText>
+                  </PasswordStrength>
+                )}
+                <FieldHint>
                   <Lock size={12} />
                   Debe contener mayúsculas, minúsculas, números y símbolos
-                </InputHint>
-              </InputWrapper>
+                </FieldHint>
+              </FormField>
             </FormGrid>
-          </FormSection>
+          </Section>
 
           {/* Personal Information Section */}
-          <FormSection>
+          <Section>
             <SectionHeader>
-              <Users size={18} style={{ color: theme.colors.primary }} />
+              <UserIcon
+                size={16}
+                style={{ color: theme.colors.primaryPurple }}
+              />
               <SectionTitle>Información Personal</SectionTitle>
             </SectionHeader>
 
@@ -610,87 +806,116 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
               <Input
                 label='Nombre'
                 value={formData.firstName || ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setFormData(prev => ({
                     ...prev,
                     firstName: e.target.value,
-                  }))
-                }
+                  }));
+                  // Limpiar errores cuando el usuario empiece a corregir
+                  if (errors['firstName'] || serverErrors['firstName']) {
+                    setErrors(prev => ({ ...prev, firstName: '' }));
+                    setServerErrors(prev => ({ ...prev, firstName: '' }));
+                  }
+                }}
                 required
                 placeholder='Nombre del usuario'
-                error={errors['firstName'] || ''}
+                error={errors['firstName'] || serverErrors['firstName'] || ''}
               />
 
               <Input
                 label='Apellido'
                 value={formData.lastName || ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setFormData(prev => ({
                     ...prev,
                     lastName: e.target.value,
-                  }))
-                }
+                  }));
+                  // Limpiar errores cuando el usuario empiece a corregir
+                  if (errors['lastName'] || serverErrors['lastName']) {
+                    setErrors(prev => ({ ...prev, lastName: '' }));
+                    setServerErrors(prev => ({ ...prev, lastName: '' }));
+                  }
+                }}
                 required
                 placeholder='Apellido del usuario'
-                error={errors['lastName'] || ''}
+                error={errors['lastName'] || serverErrors['lastName'] || ''}
               />
 
-              <InputWrapper>
+              <FormField>
                 <Input
                   label='Teléfono'
                   value={formData.phone || ''}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     setFormData(prev => ({
                       ...prev,
                       phone: e.target.value,
-                    }))
-                  }
+                    }));
+                    // Limpiar errores cuando el usuario empiece a corregir
+                    if (errors['phone'] || serverErrors['phone']) {
+                      setErrors(prev => ({ ...prev, phone: '' }));
+                      setServerErrors(prev => ({ ...prev, phone: '' }));
+                    }
+                  }}
                   placeholder='+34 600 000 000'
+                  error={errors['phone'] || serverErrors['phone'] || ''}
                 />
-                <InputHint>
+                <FieldHint>
                   <Phone size={12} />
                   Formato internacional recomendado
-                </InputHint>
-              </InputWrapper>
+                </FieldHint>
+              </FormField>
 
               <Input
                 label='Fecha de Nacimiento'
                 type='date'
                 value={
                   formData.dateOfBirth
-                    ? new Date(formData.dateOfBirth).toISOString().split('T')[0]
+                    ? new Date(formData.dateOfBirth as string)
+                        .toISOString()
+                        .split('T')[0]
                     : ''
                 }
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  const formattedDate = formatDateForAPI(e.target.value);
                   setFormData(prev => ({
                     ...prev,
-                    dateOfBirth: e.target.value || null,
-                  }))
+                    dateOfBirth: formattedDate,
+                  }));
+                  // Limpiar tanto errores de validación como errores del servidor
+                  if (errors['dateOfBirth'] || serverErrors['dateOfBirth']) {
+                    setErrors(prev => ({ ...prev, dateOfBirth: '' }));
+                    setServerErrors(prev => ({ ...prev, dateOfBirth: '' }));
+                  }
+                }}
+                error={
+                  errors['dateOfBirth'] || serverErrors['dateOfBirth'] || ''
                 }
-                placeholder='dd/mm/yyyy'
               />
             </FormGrid>
-          </FormSection>
+          </Section>
 
           {/* Settings Section */}
-          <FormSection>
+          <Section>
             <SectionHeader>
-              <Shield size={18} style={{ color: theme.colors.primary }} />
+              <Shield size={16} style={{ color: theme.colors.primaryPurple }} />
               <SectionTitle>Configuración</SectionTitle>
             </SectionHeader>
 
             <RoleSelector>
               <RoleLabel>Rol del Usuario</RoleLabel>
-              <RoleGrid>
+              <RoleHint>Haz clic en una opción para seleccionarla</RoleHint>
+              <RoleOptions>
                 <RoleOption
                   selected={formData.role === UserRole.customer}
                   onClick={() =>
                     setFormData(prev => ({ ...prev, role: UserRole.customer }))
                   }
                 >
-                  <RoleIcon selected={formData.role === UserRole.customer}>
-                    <Users size={20} />
-                  </RoleIcon>
+                  <RoleIconContainer
+                    selected={formData.role === UserRole.customer}
+                  >
+                    <Users size={16} />
+                  </RoleIconContainer>
                   <RoleInfo>
                     <RoleName>Cliente</RoleName>
                     <RoleDescription>
@@ -705,9 +930,11 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                     setFormData(prev => ({ ...prev, role: UserRole.staff }))
                   }
                 >
-                  <RoleIcon selected={formData.role === UserRole.staff}>
-                    <UserPlus size={20} />
-                  </RoleIcon>
+                  <RoleIconContainer
+                    selected={formData.role === UserRole.staff}
+                  >
+                    <UserPlus size={16} />
+                  </RoleIconContainer>
                   <RoleInfo>
                     <RoleName>Staff</RoleName>
                     <RoleDescription>
@@ -722,9 +949,11 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                     setFormData(prev => ({ ...prev, role: UserRole.admin }))
                   }
                 >
-                  <RoleIcon selected={formData.role === UserRole.admin}>
-                    <Shield size={20} />
-                  </RoleIcon>
+                  <RoleIconContainer
+                    selected={formData.role === UserRole.admin}
+                  >
+                    <Shield size={16} />
+                  </RoleIconContainer>
                   <RoleInfo>
                     <RoleName>Administrador</RoleName>
                     <RoleDescription>
@@ -732,10 +961,10 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                     </RoleDescription>
                   </RoleInfo>
                 </RoleOption>
-              </RoleGrid>
+              </RoleOptions>
             </RoleSelector>
 
-            <CheckboxContainer>
+            <ActiveUserCheckbox>
               <Checkbox
                 type='checkbox'
                 id='isActiveCreate'
@@ -748,14 +977,14 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
                 }
               />
               <CheckboxLabel htmlFor='isActiveCreate'>
-                <CheckCircle size={16} />
+                <CheckCircle size={14} />
                 Usuario activo (puede acceder al sistema)
               </CheckboxLabel>
-            </CheckboxContainer>
-          </FormSection>
-        </FormContent>
+            </ActiveUserCheckbox>
+          </Section>
+        </ModalContent>
 
-        <FormActions>
+        <ModalFooter>
           <Button variant='outline' onClick={handleClose} size='large'>
             Cancelar
           </Button>
@@ -765,12 +994,12 @@ export const CreateUserModal: React.FC<CreateUserModalProps> = ({
             isLoading={isLoading}
             disabled={!isFormValid()}
             size='large'
-            icon={<UserPlus size={16} />}
+            icon={<UserPlus size={14} />}
           >
             {isLoading ? 'Creando...' : 'Crear Usuario'}
           </Button>
-        </FormActions>
-      </ModalContent>
-    </Modal>
+        </ModalFooter>
+      </ModalContainer>
+    </ModalOverlay>
   );
 };

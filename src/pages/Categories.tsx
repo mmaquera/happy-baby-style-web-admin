@@ -137,7 +137,7 @@ export const Categories: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
-  const [showFilters, setShowFilters] = useState(true);
+  const [showFilters, _setShowFilters] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [filters, setFilters] = useState<CategoryFiltersType>({});
   const [currentPage, setCurrentPage] = useState(1);

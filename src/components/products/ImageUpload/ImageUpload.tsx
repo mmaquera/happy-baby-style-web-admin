@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Upload, X, Image as ImageIcon, Trash2 } from 'lucide-react';
+import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useUploadNotifications } from '@/hooks/useUploadNotifications';
 import type {
@@ -16,20 +16,10 @@ import {
   UploadIcon,
   UploadText,
   UploadSubtext,
-  ProgressBar,
-  ProgressFill,
-  ProgressText,
   ErrorMessage,
-  FileList,
-  FileItem,
-  FileInfo,
-  FileName,
-  FileSize,
-  RemoveButton,
   ImagePreview,
   ImagePreviewImg,
   ImagePreviewOverlay,
-  ImagePreviewActions,
 } from './ImageUpload.styles';
 
 export const ImageUpload: React.FC<ImageUploadProps> = ({
@@ -48,14 +38,13 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { upload, loading, progress, error, clearError } = useImageUpload();
-  const { showSuccess, showError, showProgress, dismiss } =
+  const { upload, loading: _loading, progress, error, clearError: _clearError } = useImageUpload();
+  const { showSuccess, showError, showProgress: _showProgress, dismiss: _dismiss } =
     useUploadNotifications();
 
   const {
     register,
     formState: { errors },
-    setValue,
   } = useForm<ImageUploadFormData>();
 
   // Función para validar archivos

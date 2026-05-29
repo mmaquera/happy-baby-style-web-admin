@@ -1,11 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useCategoriesGraphQL } from './useCategoriesGraphQL';
 import { useCategoryFilters } from './useCategoryFilters';
-import { type PaginationInput, type Category, type CreateCategoryInput, type UpdateCategoryInput } from '@/generated/graphql';
-import {
-  CategoryFilters,
-  CategoryFilterInput,
-} from '@/components/categories/types';
+import { type Category, type CreateCategoryInput, type UpdateCategoryInput } from '@/generated/graphql';
+import { CategoryFilters } from '@/components/categories/types';
 
 export interface UseCategoriesReturn {
   // Data
@@ -69,101 +66,6 @@ export interface UseCategoriesReturn {
 }
 
 export const useCategories = (): UseCategoriesReturn => {
-  // Helper function to map GraphQL filters to local filters
-  const mapGraphQLFiltersToLocal = useCallback(
-    (graphqlFilters: CategoryFilterInput): CategoryFilters => {
-      const localFilters: CategoryFilters = {};
-
-      // Only add properties that are not null or undefined
-      if (
-        graphqlFilters.isActive !== null &&
-        graphqlFilters.isActive !== undefined
-      ) {
-        localFilters.isActive = graphqlFilters.isActive;
-      }
-
-      if (
-        graphqlFilters.search !== null &&
-        graphqlFilters.search !== undefined
-      ) {
-        localFilters.search = graphqlFilters.search;
-      }
-
-      if (
-        graphqlFilters.hasImage !== null &&
-        graphqlFilters.hasImage !== undefined
-      ) {
-        localFilters.hasImage = graphqlFilters.hasImage;
-      }
-
-      if (
-        graphqlFilters.hasDescription !== null &&
-        graphqlFilters.hasDescription !== undefined
-      ) {
-        localFilters.hasDescription = graphqlFilters.hasDescription;
-      }
-
-      if (
-        graphqlFilters.hasProducts !== null &&
-        graphqlFilters.hasProducts !== undefined
-      ) {
-        localFilters.hasProducts = graphqlFilters.hasProducts;
-      }
-
-      if (
-        graphqlFilters.minProducts !== null &&
-        graphqlFilters.minProducts !== undefined
-      ) {
-        localFilters.minProducts = graphqlFilters.minProducts;
-      }
-
-      if (
-        graphqlFilters.maxProducts !== null &&
-        graphqlFilters.maxProducts !== undefined
-      ) {
-        localFilters.maxProducts = graphqlFilters.maxProducts;
-      }
-
-      if (
-        graphqlFilters.createdAfter !== null &&
-        graphqlFilters.createdAfter !== undefined
-      ) {
-        localFilters.createdAfter = graphqlFilters.createdAfter;
-      }
-
-      if (
-        graphqlFilters.createdBefore !== null &&
-        graphqlFilters.createdBefore !== undefined
-      ) {
-        localFilters.createdBefore = graphqlFilters.createdBefore;
-      }
-
-      if (
-        graphqlFilters.updatedAfter !== null &&
-        graphqlFilters.updatedAfter !== undefined
-      ) {
-        localFilters.updatedAfter = graphqlFilters.updatedAfter;
-      }
-
-      if (
-        graphqlFilters.updatedBefore !== null &&
-        graphqlFilters.updatedBefore !== undefined
-      ) {
-        localFilters.updatedBefore = graphqlFilters.updatedBefore;
-      }
-
-      if (
-        graphqlFilters.sortOrder !== null &&
-        graphqlFilters.sortOrder !== undefined
-      ) {
-        localFilters.sortOrder = graphqlFilters.sortOrder;
-      }
-
-      return localFilters;
-    },
-    []
-  );
-
   // Core GraphQL operations
   const {
     categories,

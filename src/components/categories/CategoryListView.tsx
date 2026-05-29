@@ -1,7 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
-import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import {
   List,
@@ -11,16 +10,9 @@ import {
   Trash2,
   Folder,
   CheckCircle,
-  AlertTriangle,
   XCircle,
-  Tag,
   Filter,
-  Search,
-  SortAsc,
-  SortDesc,
-  MoreHorizontal,
   Download,
-  Upload,
   Settings,
 } from 'lucide-react';
 
@@ -304,38 +296,15 @@ export const CategoryListView: React.FC<CategoryListViewProps> = ({
   total,
   currentPage,
   totalPages,
-  hasMore,
+  hasMore: _hasMore,
   onPageChange,
   onEdit,
   onDelete,
   onToggleStatus,
   onViewDetails,
-  onSort,
-  onFilter,
+  onSort: _onSort,
+  onFilter: _onFilter,
 }) => {
-  const [sortField, setSortField] = useState<string>('');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-
-  const handleSort = useCallback(
-    (field: string) => {
-      const newDirection =
-        sortField === field && sortDirection === 'asc' ? 'desc' : 'asc';
-      setSortField(field);
-      setSortDirection(newDirection);
-      onSort(field, newDirection);
-    },
-    [sortField, sortDirection, onSort]
-  );
-
-  const renderSortIcon = (field: string) => {
-    if (sortField !== field) return null;
-    return sortDirection === 'asc' ? (
-      <SortAsc size={14} />
-    ) : (
-      <SortDesc size={14} />
-    );
-  };
-
   if (loading) {
     return (
       <ListViewContainer>

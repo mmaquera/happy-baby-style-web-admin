@@ -5,14 +5,9 @@
 // Specific component for SVG upload functionality in categories
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import styled from 'styled-components';
 import {
-  Upload,
   FileText,
   X,
-  CheckCircle,
-  AlertTriangle,
-  Loader2,
   Image as ImageIcon,
 } from 'lucide-react';
 import { theme } from '@/styles/theme';
@@ -56,8 +51,8 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
   onUploadError,
   maxSize = SVG_UPLOAD_DEFAULTS.maxSize,
   allowedTypes = SVG_UPLOAD_DEFAULTS.allowedTypes,
-  entityType = SVG_UPLOAD_DEFAULTS.entityType,
-  categoryId,
+  entityType: _entityType = SVG_UPLOAD_DEFAULTS.entityType,
+  categoryId: _categoryId,
   disabled = false,
   className,
   placeholder = 'Arrastra tu archivo SVG aquí o haz clic para seleccionar',

@@ -9,8 +9,6 @@ import {
   List,
   Package,
   AlertTriangle,
-  XCircle,
-  CheckCircle,
 } from 'lucide-react';
 
 interface Product {

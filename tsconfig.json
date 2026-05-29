@@ -19,11 +19,8 @@
 
     /* Linting */
     "strict": true,
-    // TODO(fase2): re-enable once God components are refactored — currently ~181
-    // unused-import errors, mostly in files slated for rewrite. ESLint no-unused-vars
-    // enforces this in the meantime.
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
     /* Path mapping */

@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 import type { User } from '@/core/domain/user/User';
-import { Button } from '@/components/ui/Button';
 import { theme } from '@/styles/theme';
 import {
   MoreVertical,

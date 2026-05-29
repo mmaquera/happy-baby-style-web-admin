@@ -8,10 +8,8 @@ import {
 import {
   CreateProductInput,
   ProductFilterInput,
-  Product,
 } from '../generated/graphql';
 import { theme } from '@/styles/theme';
-import { CURRENCY_SYMBOL } from '@/config';
 import { logger } from '@/utils/logger';
 
 const ProductsGraphQL: React.FC = () => {

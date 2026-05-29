@@ -11,13 +11,9 @@ import {
   X,
   FolderPlus,
   Hash,
-  FileText,
-  Image as ImageIcon,
   Settings,
   CheckCircle,
   AlertTriangle,
-  SortAsc,
-  Upload,
 } from 'lucide-react';
 
 interface CreateCategoryModalProps {

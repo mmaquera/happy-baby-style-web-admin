@@ -9,33 +9,24 @@ import {
   Edit3,
   Package,
   Tag,
-  DollarSign,
   Hash,
   FileText,
   CheckCircle,
-  AlertTriangle,
-  XCircle,
   Star,
   Calendar,
   BarChart3,
-  ShoppingCart,
-  Heart,
   MessageSquare,
   TrendingUp,
-  Users,
   MapPin,
-  Globe,
   Settings,
   Activity,
   AlertCircle,
-  Clock,
   User,
   ThumbsUp,
-  ImageIcon,
   Database,
   ShoppingBag,
 } from 'lucide-react';
-import type { Product, Category, ProductReview, InventoryTransaction, StockAlert, AppEvent } from './types';
+import type { Product, ProductReview, InventoryTransaction, StockAlert, AppEvent } from './types';
 
 interface ProductDetailModalProps {
   isOpen: boolean;

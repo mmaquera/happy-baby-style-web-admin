@@ -37,7 +37,7 @@ export const CURRENCY_CONFIG = {
   },
 
   // Format function for discount prices
-  formatDiscount: (originalPrice: number, discountPrice: number): string => {
+  formatDiscount: (_originalPrice: number, discountPrice: number): string => {
     return `S/ ${discountPrice.toFixed(2)}`;
   },
 

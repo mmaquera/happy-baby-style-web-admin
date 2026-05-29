@@ -8,15 +8,12 @@ import {
   InMemoryCache,
   type NormalizedCacheObject,
   from,
-  createHttpLink,
 } from '@apollo/client';
 import { createUploadLink } from 'apollo-upload-client';
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { RetryLink } from '@apollo/client/link/retry';
 import {
-  UnifiedAuthService,
-  AuthServiceFactory,
   LocalTokenStorage,
 } from '../auth/UnifiedAuthService';
 import { GraphQLMiddlewareConfig, ITokenStorage } from '../../types/auth';
@@ -73,7 +70,7 @@ export class UnifiedGraphQLMiddleware {
 
   // Create error link that handles authentication errors - Following SOLID principles
   private createErrorLink(): ApolloLink {
-    return onError(({ graphQLErrors, networkError, operation, forward }) => {
+    return onError(({ graphQLErrors, networkError, operation, forward: _forward }) => {
       // Handle GraphQL errors following development standards
       if (graphQLErrors) {
         graphQLErrors.forEach(({ message, extensions, locations, path }) => {
@@ -124,26 +121,6 @@ export class UnifiedGraphQLMiddleware {
     });
   }
 
-  // Create CORS-aware link for handling cross-origin requests
-  private createCorsLink(): ApolloLink {
-    return new ApolloLink((operation, forward) => {
-      const context = operation.getContext();
-      const isLocalhost =
-        context['uri']?.includes('localhost') ||
-        context['uri']?.includes('127.0.0.1');
-
-      operation.setContext({
-        ...context,
-        fetchOptions: {
-          mode: 'cors',
-          credentials: isLocalhost ? 'include' : 'same-origin',
-        },
-      });
-
-      return forward(operation);
-    });
-  }
-
   // Create upload link using apollo-upload-client (configuración estándar)
   private createUploadLink(config: GraphQLMiddlewareConfig): ApolloLink {
     return createUploadLink({
@@ -188,7 +165,7 @@ export class UnifiedGraphQLMiddleware {
   // ✅ CSRF Link eliminado - servidor tiene csrfPrevention: false
 
   // Create retry link with authentication-aware retry logic
-  private createRetryLink(config: GraphQLMiddlewareConfig): ApolloLink {
+  private createRetryLink(_config: GraphQLMiddlewareConfig): ApolloLink {
     const retryLink = new RetryLink({
       delay: {
         initial: 300,
@@ -231,15 +208,6 @@ export class UnifiedGraphQLMiddleware {
     });
 
     return retryLink;
-  }
-
-  // Handle authentication errors
-  private handleAuthError(): void {
-    // Don't clear tokens immediately - let the auth system handle token validation
-    // Only clear tokens if they are definitely invalid after refresh attempt
-    logger.warn('Authentication error detected - tokens may need refresh');
-
-    // Don't redirect automatically - let the auth context handle it
   }
 
   // Static method to clear stored tokens (can be called before creating the client)

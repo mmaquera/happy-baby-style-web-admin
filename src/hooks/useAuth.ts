@@ -144,7 +144,7 @@ export const useAuth = (): UseAuthReturn => {
   }, [authService]);
 
   // Register function - Not implemented in this hook
-  const register = useCallback(async (credentials: RegisterCredentials) => {
+  const register = useCallback(async (_credentials: RegisterCredentials) => {
     throw new Error(
       'Registration is not available in useAuth. Please use useUnifiedAuth instead.'
     );

@@ -28,10 +28,8 @@ export interface AuthMiddlewareConfig {
 
 export class AuthMiddleware {
   private authService: GraphQLAuthService;
-  private client: ApolloClient<NormalizedCacheObject>;
 
   constructor(client: ApolloClient<NormalizedCacheObject>) {
-    this.client = client;
     this.authService = AuthServiceFactory.createGraphQLAuthService(client);
   }
 
@@ -162,8 +160,7 @@ export class AuthMiddleware {
       },
     });
 
-    // Update the auth middleware with the created client
-    authMiddleware.client = client;
+    // Update the auth service with the created client
     authMiddleware.authService =
       AuthServiceFactory.createGraphQLAuthService(client);
 

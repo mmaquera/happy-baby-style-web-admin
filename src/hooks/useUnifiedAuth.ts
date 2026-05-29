@@ -5,12 +5,11 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useApolloClient, type ApolloClient, type NormalizedCacheObject } from '@apollo/client';
 import {
-  UnifiedAuthService,
   AuthServiceFactory,
   AuthError,
 } from '../services/auth/UnifiedAuthService';
 import { UserRole } from '../types/unified';
-import { IAuthUser, IAuthError } from '../types/auth';
+import { IAuthUser } from '../types/auth';
 import { logger } from '@/utils/logger';
 
 // Hook state interface

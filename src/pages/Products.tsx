@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
 import {
@@ -16,30 +16,11 @@ import {
   useUpdateProduct,
   useDeleteProduct,
 } from '@/hooks/useProductsGraphQL';
-import { useProductActions } from '@/hooks/useProductActions';
 import { useCategories } from '@/hooks/useCategories';
-import type { Category, ProductFilterInput } from '@/components/products/types';
+import type { ProductFilterInput } from '@/components/products/types';
 import type { Product } from '@/components/products/types';
-import {
-  Package,
-  Search,
-  CheckCircle,
-  AlertTriangle,
-  XCircle,
-  Grid3X3,
-  List,
-  Printer,
-  Plus,
-  Edit,
-  Trash2,
-  Eye,
-  Filter,
-  Download,
-  Upload,
-  Settings,
-} from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
 import { logger } from '@/utils/logger';
 
@@ -105,11 +86,6 @@ const ErrorState = styled.div`
   color: ${theme.colors.error};
 `;
 
-const EmptyState = styled.div`
-  text-align: center;
-  padding: ${theme.spacing[6]};
-  color: ${theme.colors.text.secondary};
-`;
 
 export const Products: React.FC = () => {
   // =====================================================
@@ -122,8 +98,8 @@ export const Products: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortField, setSortField] = useState<string>('');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [_sortField, setSortField] = useState<string>('');
+  const [_sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   // Filter State - Mapped to GraphQL filters
@@ -204,11 +180,11 @@ export const Products: React.FC = () => {
   } = useCategories();
 
   // Product mutations
-  const { create: createProduct, loading: creatingProduct } =
+  const { create: _createProduct, loading: _creatingProduct } =
     useCreateProduct();
-  const { update: updateProduct, loading: updatingProduct } =
+  const { update: updateProduct, loading: _updatingProduct } =
     useUpdateProduct();
-  const { remove: deleteProduct, loading: deletingProduct } =
+  const { remove: deleteProduct, loading: _deletingProduct } =
     useDeleteProduct();
 
   // =====================================================

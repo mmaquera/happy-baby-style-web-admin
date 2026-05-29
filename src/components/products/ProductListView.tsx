@@ -1,8 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import styled from 'styled-components';
 import { theme } from '@/styles/theme';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
+
 import { CURRENCY_SYMBOL } from '@/config/currency';
 import {
   List,
@@ -16,7 +15,6 @@ import {
   Star,
   SortAsc,
   SortDesc,
-  MoreHorizontal,
 } from 'lucide-react';
 
 interface Product {
@@ -677,11 +675,11 @@ export const ProductListView: React.FC<ProductListViewProps> = ({
   onToggleStatus,
   onViewDetails,
   onSort,
-  onFilter,
+  onFilter: _onFilter,
 }) => {
   const [sortField, setSortField] = useState<string>('');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
+  const [_hoveredProduct, setHoveredProduct] = useState<string | null>(null);
 
   const handleSort = useCallback(
     (field: string) => {
