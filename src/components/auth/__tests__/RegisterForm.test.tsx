@@ -1,13 +1,9 @@
-// RegisterForm.test.tsx - Following testing standards
-// Tests the RegisterForm component functionality
-
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MockedProvider } from '@apollo/client/testing';
 import { RegisterForm } from '../RegisterForm';
 import { RegisterUserDocument } from '@/generated/graphql';
 
-// Mock react-hot-toast
 vi.mock('react-hot-toast', () => ({
   default: { success: vi.fn(), error: vi.fn() },
   success: vi.fn(),
@@ -115,7 +111,7 @@ describe('RegisterForm', () => {
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/nombre/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/apellido/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/contraseña/i)).toBeInTheDocument();
+    expect(screen.getByLabelText('Contraseña', { exact: true })).toBeInTheDocument();
     expect(screen.getByLabelText(/confirmar contraseña/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/teléfono/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/fecha de nacimiento/i)).toBeInTheDocument();
@@ -135,7 +131,7 @@ describe('RegisterForm', () => {
       expect(screen.getByText(/email es requerido/i)).toBeInTheDocument();
       expect(screen.getByText(/nombre es requerido/i)).toBeInTheDocument();
       expect(screen.getByText(/apellido es requerido/i)).toBeInTheDocument();
-      expect(screen.getByText(/contraseña es requerida/i)).toBeInTheDocument();
+      expect(screen.getByText('Contraseña es requerida', { exact: true })).toBeInTheDocument();
       expect(
         screen.getByText(/confirmar contraseña es requerida/i)
       ).toBeInTheDocument();
@@ -167,7 +163,7 @@ describe('RegisterForm', () => {
       </MockedProvider>
     );
 
-    const passwordInput = screen.getByLabelText(/contraseña/i);
+    const passwordInput = screen.getByLabelText('Contraseña', { exact: true });
     fireEvent.change(passwordInput, { target: { value: '123' } });
 
     const submitButton = screen.getByRole('button', { name: /crear cuenta/i });
@@ -187,7 +183,7 @@ describe('RegisterForm', () => {
       </MockedProvider>
     );
 
-    const passwordInput = screen.getByLabelText(/contraseña/i);
+    const passwordInput = screen.getByLabelText('Contraseña', { exact: true });
     const confirmPasswordInput = screen.getByLabelText(/confirmar contraseña/i);
 
     fireEvent.change(passwordInput, { target: { value: 'password123' } });
@@ -212,7 +208,6 @@ describe('RegisterForm', () => {
       </MockedProvider>
     );
 
-    // Fill in form fields
     fireEvent.change(screen.getByLabelText(/email/i), {
       target: { value: 'test@example.com' },
     });
@@ -222,7 +217,7 @@ describe('RegisterForm', () => {
     fireEvent.change(screen.getByLabelText(/apellido/i), {
       target: { value: 'Doe' },
     });
-    fireEvent.change(screen.getByLabelText(/contraseña/i), {
+    fireEvent.change(screen.getByLabelText('Contraseña', { exact: true }), {
       target: { value: 'password123' },
     });
     fireEvent.change(screen.getByLabelText(/confirmar contraseña/i), {
@@ -248,7 +243,6 @@ describe('RegisterForm', () => {
       </MockedProvider>
     );
 
-    // Fill in form fields
     fireEvent.change(screen.getByLabelText(/email/i), {
       target: { value: 'test@example.com' },
     });
@@ -258,7 +252,7 @@ describe('RegisterForm', () => {
     fireEvent.change(screen.getByLabelText(/apellido/i), {
       target: { value: 'Doe' },
     });
-    fireEvent.change(screen.getByLabelText(/contraseña/i), {
+    fireEvent.change(screen.getByLabelText('Contraseña', { exact: true }), {
       target: { value: 'password123' },
     });
     fireEvent.change(screen.getByLabelText(/confirmar contraseña/i), {
@@ -282,21 +276,17 @@ describe('RegisterForm', () => {
       </MockedProvider>
     );
 
-    const passwordInput = screen.getByLabelText(/contraseña/i);
+    const passwordInput = screen.getByLabelText('Contraseña', { exact: true });
     const confirmPasswordInput = screen.getByLabelText(/confirmar contraseña/i);
 
-    // Initially should be password type
     expect(passwordInput).toHaveAttribute('type', 'password');
     expect(confirmPasswordInput).toHaveAttribute('type', 'password');
 
-    // Toggle password visibility
-    const passwordToggle = screen.getAllByRole('button')[0]; // First toggle button
-    const confirmPasswordToggle = screen.getAllByRole('button')[1]; // Second toggle button
+    const [passwordToggle, confirmPasswordToggle] = screen.getAllByRole('button');
 
     fireEvent.click(passwordToggle);
     fireEvent.click(confirmPasswordToggle);
 
-    // Should now be text type
     expect(passwordInput).toHaveAttribute('type', 'text');
     expect(confirmPasswordInput).toHaveAttribute('type', 'text');
   });
@@ -308,14 +298,11 @@ describe('RegisterForm', () => {
       </MockedProvider>
     );
 
-    // Initially customer role should be selected
-    expect(screen.getByText(/cliente/i)).toBeInTheDocument();
+    expect(screen.getByText('Cliente', { exact: true })).toBeInTheDocument();
 
-    // Click on staff role
-    const staffRole = screen.getByText(/staff/i);
+    const staffRole = screen.getByText('Staff', { exact: true });
     fireEvent.click(staffRole);
 
-    // Staff role should now be selected
-    expect(screen.getByText(/staff/i)).toBeInTheDocument();
+    expect(screen.getByText('Staff', { exact: true })).toBeInTheDocument();
   });
 });

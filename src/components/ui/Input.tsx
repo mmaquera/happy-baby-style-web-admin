@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 
 interface InputProps extends React.ComponentProps<'input'> {
   label?: string;
-  error?: string;
+  error?: string | undefined;
   leftIcon?: React.ReactNode;
   icon?: React.ReactNode;
   fullWidth?: boolean;
@@ -15,21 +15,24 @@ interface InputProps extends React.ComponentProps<'input'> {
   rightIconAriaLabel?: string;
 }
 
-function Input({
-  className,
-  type,
-  label,
-  error,
-  leftIcon,
-  icon,
-  fullWidth,
-  id,
-  rightIcon,
-  onRightIconClick,
-  rightIconClickable,
-  rightIconAriaLabel,
-  ...props
-}: InputProps) {
+const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input(
+  {
+    className,
+    type,
+    label,
+    error,
+    leftIcon,
+    icon,
+    fullWidth,
+    id,
+    rightIcon,
+    onRightIconClick,
+    rightIconClickable,
+    rightIconAriaLabel,
+    ...props
+  },
+  ref
+) {
   const hasLeftIcon = leftIcon ?? icon;
 
   const inputElement = (
@@ -40,6 +43,7 @@ function Input({
         </div>
       )}
       <InputPrimitive
+        ref={ref}
         id={id}
         type={type}
         data-slot='input'
@@ -92,7 +96,7 @@ function Input({
       {error && <p className='text-xs text-destructive'>{error}</p>}
     </div>
   );
-}
+});
 
 export { Input };
 export type { InputProps };

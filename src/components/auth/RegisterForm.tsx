@@ -1,11 +1,4 @@
-// RegisterForm Component - Following SOLID principles and Clean Architecture
-// Single Responsibility: Renders registration form only
-// Open/Closed: Extensible for new form fields
-// Liskov Substitution: Consistent form behavior
-// Interface Segregation: Specific props interface
-// Dependency Inversion: Depends on hook abstraction
-
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import {
   Eye,
@@ -21,10 +14,9 @@ import {
 import { theme } from '@/styles/theme';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { useRegisterUser } from '@/hooks/useRegisterUser';
-import { CreateUserProfileInput, UserRole } from '@/generated/graphql';
+import { UserRole } from '@/generated/graphql';
+import { useRegisterForm } from '@/hooks/useRegisterForm';
 
-// Styled Components following Single Responsibility Principle
 const FormContainer = styled.form`
   display: flex;
   flex-direction: column;
@@ -196,118 +188,31 @@ const SuccessMessage = styled.div`
   text-align: center;
 `;
 
-// Component following Single Responsibility Principle
 export const RegisterForm: React.FC<{ onSuccess?: () => void }> = ({
   onSuccess,
 }) => {
-  const { register, isLoading, error, clearError } = useRegisterUser();
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const {
+    form,
+    isLoading,
+    error,
+    success,
+    showPassword,
+    showConfirmPassword,
+    role,
+    isActive,
+    dateOfBirth,
+    onSubmit,
+    togglePassword,
+    toggleConfirmPassword,
+    setRole,
+    setIsActive,
+    setDateOfBirth,
+  } = useRegisterForm(onSuccess);
 
-  const [formData, setFormData] = useState<CreateUserProfileInput>({
-    email: '',
-    password: '',
-    role: UserRole.customer,
-    isActive: true,
-    firstName: '',
-    lastName: '',
-    phone: '',
-    dateOfBirth: null,
-  });
-
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-
-  // Clear error when component mounts or error changes
-  useEffect(() => {
-    if (error) {
-      clearError();
-    }
-  }, [error, clearError]);
-
-  // Clear success message after 5 seconds
-  useEffect(() => {
-    if (success) {
-      const timer = setTimeout(() => setSuccess(false), 5000);
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [success]);
-
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.email) {
-      newErrors['email'] = 'Email es requerido';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors['email'] = 'Email no válido';
-    }
-
-    if (!formData.password) {
-      newErrors['password'] = 'Contraseña es requerida';
-    } else if (formData.password.length < 8) {
-      newErrors['password'] = 'Contraseña debe tener al menos 8 caracteres';
-    }
-
-    if (!confirmPassword) {
-      newErrors['confirmPassword'] = 'Confirmar contraseña es requerida';
-    } else if (formData.password !== confirmPassword) {
-      newErrors['confirmPassword'] = 'Las contraseñas no coinciden';
-    }
-
-    if (!formData.firstName) {
-      newErrors['firstName'] = 'Nombre es requerido';
-    }
-
-    if (!formData.lastName) {
-      newErrors['lastName'] = 'Apellido es requerido';
-    }
-
-    setFormErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (validateForm()) {
-      const success = await register(formData);
-      if (success) {
-        setSuccess(true);
-        // Reset form
-        setFormData({
-          email: '',
-          password: '',
-          role: UserRole.customer,
-          isActive: true,
-          firstName: '',
-          lastName: '',
-          phone: '',
-          dateOfBirth: null,
-        });
-        setConfirmPassword('');
-        setFormErrors({});
-
-        // Call onSuccess callback if provided
-        if (onSuccess) {
-          onSuccess();
-        }
-      }
-    }
-  };
-
-  const isFormValid = (): boolean => {
-    return !!(
-      formData.email &&
-      formData.password &&
-      confirmPassword &&
-      formData.firstName &&
-      formData.lastName &&
-      formData.password === confirmPassword &&
-      formData.password.length >= 8
-    );
-  };
+  const {
+    register,
+    formState: { errors },
+  } = form;
 
   return (
     <>
@@ -324,142 +229,99 @@ export const RegisterForm: React.FC<{ onSuccess?: () => void }> = ({
 
       {error && <ErrorMessage>{error}</ErrorMessage>}
 
-      <FormContainer onSubmit={handleSubmit}>
-        {/* Account Information Section */}
+      <FormContainer onSubmit={onSubmit} noValidate>
         <FormGrid>
           <FullWidthField>
             <Input
+              id='email'
               label='Email'
               type='email'
-              value={formData.email}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setFormData(prev => ({ ...prev, email: e.target.value }))
-              }
-              required
               placeholder='ejemplo@correo.com'
               leftIcon={<Mail size={18} />}
-              error={formErrors['email'] || ''}
+              error={errors.email?.message}
+              {...register('email')}
             />
           </FullWidthField>
 
           <Input
+            id='firstName'
             label='Nombre'
-            value={formData.firstName || ''}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setFormData(prev => ({
-                ...prev,
-                firstName: e.target.value,
-              }))
-            }
-            required
             placeholder='Nombre del usuario'
             leftIcon={<User size={18} />}
-            error={formErrors['firstName'] || ''}
+            error={errors.firstName?.message}
+            {...register('firstName')}
           />
 
           <Input
+            id='lastName'
             label='Apellido'
-            value={formData.lastName || ''}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setFormData(prev => ({
-                ...prev,
-                lastName: e.target.value,
-              }))
-            }
-            required
             placeholder='Apellido del usuario'
             leftIcon={<User size={18} />}
-            error={formErrors['lastName'] || ''}
+            error={errors.lastName?.message}
+            {...register('lastName')}
           />
 
           <Input
+            id='phone'
             label='Teléfono'
-            value={formData.phone || ''}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setFormData(prev => ({
-                ...prev,
-                phone: e.target.value,
-              }))
-            }
             placeholder='+34 600 000 000'
             leftIcon={<Phone size={18} />}
+            {...register('phone')}
           />
 
           <Input
+            id='dateOfBirth'
             label='Fecha de Nacimiento'
             type='date'
-            value={
-              formData.dateOfBirth
-                ? new Date(formData.dateOfBirth).toISOString().split('T')[0]
-                : ''
-            }
+            value={dateOfBirth}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setFormData(prev => ({
-                ...prev,
-                dateOfBirth: e.target.value || null,
-              }))
+              setDateOfBirth(e.target.value)
             }
             placeholder='dd/mm/yyyy'
             leftIcon={<Calendar size={18} />}
           />
         </FormGrid>
 
-        {/* Password Section */}
         <FormGrid>
           <PasswordInputWrapper>
             <Input
+              id='password'
               label='Contraseña'
               type={showPassword ? 'text' : 'password'}
-              value={formData.password || ''}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setFormData(prev => ({ ...prev, password: e.target.value }))
-              }
-              required
               placeholder='Mínimo 8 caracteres'
               leftIcon={<Lock size={18} />}
-              error={formErrors['password'] || ''}
+              error={errors.password?.message}
+              {...register('password')}
             />
-            <PasswordToggle
-              type='button'
-              onClick={() => setShowPassword(!showPassword)}
-            >
+            <PasswordToggle type='button' onClick={togglePassword}>
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </PasswordToggle>
           </PasswordInputWrapper>
 
           <PasswordInputWrapper>
             <Input
+              id='confirmPassword'
               label='Confirmar Contraseña'
               type={showConfirmPassword ? 'text' : 'password'}
-              value={confirmPassword}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setConfirmPassword(e.target.value)
-              }
-              required
               placeholder='Repite tu contraseña'
               leftIcon={<Lock size={18} />}
-              error={formErrors['confirmPassword'] || ''}
+              error={errors.confirmPassword?.message}
+              {...register('confirmPassword')}
             />
-            <PasswordToggle
-              type='button'
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            >
+            <PasswordToggle type='button' onClick={toggleConfirmPassword}>
               {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </PasswordToggle>
           </PasswordInputWrapper>
         </FormGrid>
 
-        {/* Role Selection */}
         <RoleSelector>
           <RoleLabel>Rol del Usuario</RoleLabel>
           <RoleGrid>
             <RoleOption
-              selected={formData.role === UserRole.customer}
-              onClick={() =>
-                setFormData(prev => ({ ...prev, role: UserRole.customer }))
-              }
+              selected={role === UserRole.customer}
+              onClick={() => setRole(UserRole.customer)}
             >
-              <RoleIcon selected={formData.role === UserRole.customer}>
+              <RoleIcon selected={role === UserRole.customer}>
                 <Users size={20} />
               </RoleIcon>
               <RoleInfo>
@@ -471,12 +333,10 @@ export const RegisterForm: React.FC<{ onSuccess?: () => void }> = ({
             </RoleOption>
 
             <RoleOption
-              selected={formData.role === UserRole.staff}
-              onClick={() =>
-                setFormData(prev => ({ ...prev, role: UserRole.staff }))
-              }
+              selected={role === UserRole.staff}
+              onClick={() => setRole(UserRole.staff)}
             >
-              <RoleIcon selected={formData.role === UserRole.staff}>
+              <RoleIcon selected={role === UserRole.staff}>
                 <Shield size={20} />
               </RoleIcon>
               <RoleInfo>
@@ -489,17 +349,13 @@ export const RegisterForm: React.FC<{ onSuccess?: () => void }> = ({
           </RoleGrid>
         </RoleSelector>
 
-        {/* Active Status */}
         <CheckboxContainer>
           <Checkbox
             type='checkbox'
             id='isActiveRegister'
-            checked={formData.isActive || false}
+            checked={isActive}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setFormData(prev => ({
-                ...prev,
-                isActive: e.target.checked,
-              }))
+              setIsActive(e.target.checked)
             }
           />
           <CheckboxLabel htmlFor='isActiveRegister'>
@@ -513,7 +369,6 @@ export const RegisterForm: React.FC<{ onSuccess?: () => void }> = ({
           size='large'
           fullWidth
           isLoading={isLoading}
-          disabled={!isFormValid()}
         >
           {isLoading ? 'Creando cuenta...' : 'Crear Cuenta'}
         </Button>
