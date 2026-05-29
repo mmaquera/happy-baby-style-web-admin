@@ -7,6 +7,7 @@ import {
   ApolloLink,
   InMemoryCache,
   type NormalizedCacheObject,
+  type TypePolicies,
   from,
 } from '@apollo/client';
 import { createUploadLink } from 'apollo-upload-client';
@@ -229,11 +230,16 @@ export class UnifiedGraphQLMiddleware {
   }
 
   // Create the complete Apollo Client with unified middleware
-  static createClient(config: GraphQLMiddlewareConfig): ApolloClient<NormalizedCacheObject> {
+  static createClient(
+    config: GraphQLMiddlewareConfig,
+    cacheTypePolicies?: TypePolicies
+  ): ApolloClient<NormalizedCacheObject> {
     // Don't clear stored tokens automatically - let the auth system handle token validation
 
     const client = new ApolloClient({
-      cache: new InMemoryCache(),
+      cache: new InMemoryCache(
+        ...(cacheTypePolicies ? [{ typePolicies: cacheTypePolicies }] : [])
+      ),
       defaultOptions: {
         watchQuery: {
           errorPolicy: 'all',
@@ -262,9 +268,10 @@ export class UnifiedGraphQLMiddleware {
 
 // Factory function for creating Apollo Client with unified middleware
 export const createApolloClientWithUnifiedMiddleware = (
-  config: GraphQLMiddlewareConfig
+  config: GraphQLMiddlewareConfig,
+  cacheTypePolicies?: TypePolicies
 ): ApolloClient<NormalizedCacheObject> => {
-  return UnifiedGraphQLMiddleware.createClient(config);
+  return UnifiedGraphQLMiddleware.createClient(config, cacheTypePolicies);
 };
 
 // Default configuration

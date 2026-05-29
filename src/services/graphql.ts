@@ -1,12 +1,3 @@
-// GraphQL Service Configuration - Following Clean Architecture
-// Uses the new UnifiedGraphQLMiddleware for authentication
-
-import { createApolloClientWithUnifiedMiddleware } from './graphql/UnifiedGraphQLMiddleware';
-import { defaultGraphQLConfig } from '../config/auth';
-
-// Create Apollo Client with unified middleware
-export const client =
-  createApolloClientWithUnifiedMiddleware(defaultGraphQLConfig);
-
-// Export the main client (preferred)
-export default client;
+// Re-export Apollo client from infrastructure layer.
+// All consumers (App.tsx, etc.) continue importing from this path unchanged.
+export { client, default } from '@/infrastructure/graphql/apollo/apolloClient';
