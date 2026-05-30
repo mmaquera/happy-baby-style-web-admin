@@ -1,5 +1,5 @@
-import { ListProductsUseCase } from '../ListProductsUseCase';
-import { isOk } from '@/core/shared/Result';
+import { ListProductsUseCase } from '@happy-baby/application-product';
+import { isOk } from '@happy-baby/domain-shared';
 import { createMockRepository } from './fixtures';
 
 describe('ListProductsUseCase', () => {

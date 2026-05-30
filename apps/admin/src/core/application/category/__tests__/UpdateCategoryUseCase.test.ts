@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { UpdateCategoryUseCase } from '../UpdateCategoryUseCase';
+import { UpdateCategoryUseCase } from '@happy-baby/application-category';
 import { createMockRepository, MOCK_CATEGORY } from './fixtures';
-import { isOk, isErr } from '@/core/shared/Result';
+import { isOk, isErr } from '@happy-baby/domain-shared';
 
 describe('UpdateCategoryUseCase', () => {
   let useCase: UpdateCategoryUseCase;

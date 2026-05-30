@@ -2,7 +2,7 @@ import { memo, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import type { User, UserRole } from '@/core/domain/user/User';
+import type { User, UserRole } from '@happy-baby/domain-user';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 

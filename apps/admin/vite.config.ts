@@ -38,6 +38,42 @@ export default defineConfig(({ command, mode }) => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
+        '@happy-baby/domain-product': path.resolve(
+          __dirname,
+          '../../libs/domain/product/src/index.ts'
+        ),
+        '@happy-baby/domain-order': path.resolve(
+          __dirname,
+          '../../libs/domain/order/src/index.ts'
+        ),
+        '@happy-baby/domain-user': path.resolve(
+          __dirname,
+          '../../libs/domain/user/src/index.ts'
+        ),
+        '@happy-baby/domain-category': path.resolve(
+          __dirname,
+          '../../libs/domain/category/src/index.ts'
+        ),
+        '@happy-baby/domain-shared': path.resolve(
+          __dirname,
+          '../../libs/domain/shared/src/index.ts'
+        ),
+        '@happy-baby/application-product': path.resolve(
+          __dirname,
+          '../../libs/application/product/src/index.ts'
+        ),
+        '@happy-baby/application-order': path.resolve(
+          __dirname,
+          '../../libs/application/order/src/index.ts'
+        ),
+        '@happy-baby/application-user': path.resolve(
+          __dirname,
+          '../../libs/application/user/src/index.ts'
+        ),
+        '@happy-baby/application-category': path.resolve(
+          __dirname,
+          '../../libs/application/category/src/index.ts'
+        ),
       },
     },
 
@@ -66,11 +102,9 @@ export default defineConfig(({ command, mode }) => {
       rollupOptions: {
         output: {
           manualChunks: {
-            // Vendor chunks for better caching
             vendor: ['react', 'react-dom'],
             router: ['react-router-dom'],
             apollo: ['@apollo/client', 'graphql'],
-            ui: ['styled-components', 'lucide-react'],
             forms: ['react-hook-form'],
           },
         },
@@ -92,8 +126,6 @@ export default defineConfig(({ command, mode }) => {
         'react-router-dom',
         '@apollo/client',
         'graphql',
-        'styled-components',
-        'lucide-react',
         'react-hook-form',
         'react-hot-toast',
       ],

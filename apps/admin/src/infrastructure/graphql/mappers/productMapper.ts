@@ -7,7 +7,7 @@ import type {
   Product,
   CreateProductInput,
   UpdateProductInput,
-} from '@/core/domain/product/Product';
+} from '@happy-baby/domain-product';
 
 const parseDecimal = (value: unknown): number => {
   if (typeof value === 'number') return value;

@@ -1,6 +1,6 @@
-import type { User } from '@/core/domain/user/User';
-import type { UserRepository } from '@/core/domain/user/UserRepository';
-import { ok } from '@/core/shared/Result';
+import type { User } from '@happy-baby/domain-user';
+import type { UserRepository } from '@happy-baby/domain-user';
+import { ok } from '@happy-baby/domain-shared';
 import { vi, type Mocked } from 'vitest';
 
 export const MOCK_USER: User = {

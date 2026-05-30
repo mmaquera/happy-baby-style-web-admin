@@ -1,6 +1,6 @@
-import type { Product } from '@/core/domain/product/Product';
-import type { ProductRepository } from '@/core/domain/product/ProductRepository';
-import { ok } from '@/core/shared/Result';
+import type { Product } from '@happy-baby/domain-product';
+import type { ProductRepository } from '@happy-baby/domain-product';
+import { ok } from '@happy-baby/domain-shared';
 import { vi, type Mocked } from 'vitest';
 
 export const MOCK_PRODUCT: Product = {

@@ -2,7 +2,7 @@ import {
   createUserSchema,
   updateUserSchema,
   createUserFormSchema,
-} from '../userSchema';
+} from '@happy-baby/domain-shared';
 
 describe('createUserSchema', () => {
   const validData = {

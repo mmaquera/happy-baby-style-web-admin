@@ -1,6 +1,6 @@
-import { UploadProductImageUseCase } from '../UploadProductImageUseCase';
-import { isOk, isErr, ok } from '@/core/shared/Result';
-import { ValidationError } from '@/core/shared/Result';
+import { UploadProductImageUseCase } from '@happy-baby/application-product';
+import { isOk, isErr, ok } from '@happy-baby/domain-shared';
+import { ValidationError } from '@happy-baby/domain-shared';
 import { createMockRepository } from './fixtures';
 
 const makeFile = (name: string, type: string, sizeBytes: number): File => {

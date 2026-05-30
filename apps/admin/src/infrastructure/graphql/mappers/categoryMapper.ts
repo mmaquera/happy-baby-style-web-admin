@@ -7,7 +7,7 @@ import type {
   Category,
   CreateCategoryInput,
   UpdateCategoryInput,
-} from '@/core/domain/category/Category';
+} from '@happy-baby/domain-category';
 
 export const categoryMapper = {
   toDomain(gql: GQLCategory): Category {

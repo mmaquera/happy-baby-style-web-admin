@@ -1,12 +1,8 @@
 import { useState, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import { useOrderUseCases } from '@/app/di/orders';
-import type {
-  Order,
-  OrderFilter,
-  OrderStatus,
-} from '@/core/domain/order/Order';
-import { isErr } from '@/core/shared/Result';
+import type { Order, OrderFilter, OrderStatus } from '@happy-baby/domain-order';
+import { isErr } from '@happy-baby/domain-shared';
 
 export const useOrderActions = () => {
   const useCases = useOrderUseCases();

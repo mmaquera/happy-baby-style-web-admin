@@ -10,7 +10,7 @@ import {
 import UsersIcon from 'lucide-react/dist/esm/icons/users';
 import ShieldIcon from 'lucide-react/dist/esm/icons/shield';
 import UserPlusIcon from 'lucide-react/dist/esm/icons/user-plus';
-import type { User, UserRole, CreateUserInput } from '@/core/domain/user/User';
+import type { User, UserRole, CreateUserInput } from '@happy-baby/domain-user';
 import type { CreateUserProfileInput } from '@/generated/graphql';
 import { useUserActions } from '@/hooks/useUserActions';
 import { useUserStats } from '@/hooks/useUsersGraphQL';

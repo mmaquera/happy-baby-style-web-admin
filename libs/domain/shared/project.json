@@ -1,0 +1,15 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "domain-shared",
+  "projectType": "library",
+  "sourceRoot": "libs/domain/shared/src",
+  "tags": ["type:domain", "scope:domain"],
+  "targets": {
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit --project libs/domain/shared/tsconfig.json"
+      }
+    }
+  }
+}

@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/Button';
 import { useOrderActions } from '@/hooks/useOrderActions';
 import { OrderCard } from '@/components/orders/OrderCard';
 import { OrderFilters } from '@/components/orders/OrderFilters';
-import type { Order, OrderStatus } from '@/core/domain/order/Order';
+import type { Order, OrderStatus } from '@happy-baby/domain-order';
 
 const OrderDetailModal = lazy(() =>
   import('@/components/orders/OrderDetailModal').then(m => ({

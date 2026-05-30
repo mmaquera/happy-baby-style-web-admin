@@ -1,3 +1,7 @@
+packages:
+  - "apps/*"
+  - "libs/**"
+
 allowBuilds:
   '@apollo/rover': true
   esbuild: true

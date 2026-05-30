@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import type { Order } from '@/core/domain/order/Order';
+import type { Order } from '@happy-baby/domain-order';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { OrderStatusBadge } from './OrderStatusBadge';

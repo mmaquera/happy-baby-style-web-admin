@@ -1,0 +1,15 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "domain-category",
+  "projectType": "library",
+  "sourceRoot": "libs/domain/category/src",
+  "tags": ["type:domain", "scope:domain"],
+  "targets": {
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit --project libs/domain/category/tsconfig.json"
+      }
+    }
+  }
+}

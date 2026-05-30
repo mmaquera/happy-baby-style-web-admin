@@ -6,7 +6,7 @@ import {
   DomainError,
   NotFoundError,
   ValidationError,
-} from '../Result';
+} from '@happy-baby/domain-shared';
 
 describe('ok', () => {
   it('creates an Ok result with the value', () => {

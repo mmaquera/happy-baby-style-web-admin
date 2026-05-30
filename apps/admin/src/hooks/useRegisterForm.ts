@@ -5,7 +5,7 @@ import { useRegisterUser } from './useRegisterUser';
 import {
   registerSchema,
   type RegisterFormData,
-} from '@/core/shared/validation/authSchema';
+} from '@happy-baby/domain-shared';
 import { UserRole } from '@/generated/graphql';
 
 export interface UseRegisterFormReturn {

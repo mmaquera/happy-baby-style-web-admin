@@ -1,13 +1,13 @@
 import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
-import type { OrderRepository } from '@/core/domain/order/OrderRepository';
+import type { OrderRepository } from '@happy-baby/domain-order';
 import type {
   Order,
   OrderFilter,
   OrderPage,
   OrderStatus,
-} from '@/core/domain/order/Order';
-import type { Result } from '@/core/shared/Result';
-import { ok, err } from '@/core/shared/Result';
+} from '@happy-baby/domain-order';
+import type { Result } from '@happy-baby/domain-shared';
+import { ok, err } from '@happy-baby/domain-shared';
 import { orderMapper } from '../mappers/orderMapper';
 import { OrderStatus as GQLOrderStatus } from '@/generated/graphql';
 import {

@@ -1,82 +1,35 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
-
-    /* Test globals — exposes vi, describe, it, expect etc. without imports */
     "types": ["vitest/globals"],
-
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-
-    /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-
-    /* Path mapping */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@/components/*": ["src/components/*"],
-      "@/pages/*": ["src/pages/*"],
-      "@/hooks/*": ["src/hooks/*"],
-      "@/services/*": ["src/services/*"],
-      "@/contexts/*": ["src/contexts/*"],
-      "@/types/*": ["src/types/*"],
-      "@/styles/*": ["src/styles/*"],
-      "@/utils/*": ["src/utils/*"],
-      "@/config/*": ["src/config/*"]
-    },
-
-    /* Performance optimizations */
-    "incremental": true,
-    "tsBuildInfoFile": "./node_modules/.cache/.tsbuildinfo",
-
-    /* Advanced type checking */
-    "exactOptionalPropertyTypes": true,
-    "noImplicitReturns": true,
-    "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "noUncheckedIndexedAccess": true,
-
-    /* Module resolution */
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-
-    /* Source maps */
-    "sourceMap": true,
-    "inlineSourceMap": false,
-    "inlineSources": false,
-
-    /* Declaration files */
-    "declaration": false,
-    "declarationMap": false,
-
-    /* Experimental features */
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+      "@/*": ["apps/admin/src/*"],
+      "@/components/*": ["apps/admin/src/components/*"],
+      "@/pages/*": ["apps/admin/src/pages/*"],
+      "@/hooks/*": ["apps/admin/src/hooks/*"],
+      "@/services/*": ["apps/admin/src/services/*"],
+      "@/contexts/*": ["apps/admin/src/contexts/*"],
+      "@/types/*": ["apps/admin/src/types/*"],
+      "@/styles/*": ["apps/admin/src/styles/*"],
+      "@/utils/*": ["apps/admin/src/utils/*"],
+      "@/config/*": ["apps/admin/src/config/*"],
+      "@happy-baby/domain-product": ["libs/domain/product/src/index.ts"],
+      "@happy-baby/domain-order": ["libs/domain/order/src/index.ts"],
+      "@happy-baby/domain-user": ["libs/domain/user/src/index.ts"],
+      "@happy-baby/domain-category": ["libs/domain/category/src/index.ts"],
+      "@happy-baby/domain-shared": ["libs/domain/shared/src/index.ts"],
+      "@happy-baby/application-product": [
+        "libs/application/product/src/index.ts"
+      ],
+      "@happy-baby/application-order": ["libs/application/order/src/index.ts"],
+      "@happy-baby/application-user": ["libs/application/user/src/index.ts"],
+      "@happy-baby/application-category": [
+        "libs/application/category/src/index.ts"
+      ]
+    }
   },
-  "include": ["src/**/*", "src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "build",
-    "coverage",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx"
-  ],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["apps/admin/src/**/*", "libs/**/*.ts"],
+  "exclude": ["node_modules", "dist", "build", "coverage"]
 }

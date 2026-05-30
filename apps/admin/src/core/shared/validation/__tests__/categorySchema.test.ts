@@ -2,7 +2,7 @@ import {
   categorySchema,
   updateCategorySchema,
   createCategoryFormSchema,
-} from '../categorySchema';
+} from '@happy-baby/domain-shared';
 
 describe('categorySchema', () => {
   it('accepts valid category with all fields', () => {

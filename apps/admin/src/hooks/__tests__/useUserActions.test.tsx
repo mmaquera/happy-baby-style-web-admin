@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { useUserActions } from '../useUserActions';
-import { ok, err, DomainError } from '@/core/shared/Result';
-import type { User } from '@/core/domain/user/User';
+import { ok, err, DomainError } from '@happy-baby/domain-shared';
+import type { User } from '@happy-baby/domain-user';
 
 vi.mock('react-hot-toast', () => ({
   toast: { success: vi.fn(), error: vi.fn() },

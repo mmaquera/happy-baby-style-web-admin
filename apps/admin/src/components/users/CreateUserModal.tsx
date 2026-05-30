@@ -20,7 +20,7 @@ import { Input } from '@/components/ui/Input';
 import {
   createUserFormSchema,
   type CreateUserFormValues,
-} from '@/core/shared/validation/userSchema';
+} from '@happy-baby/domain-shared';
 
 interface CreateUserModalProps {
   isOpen: boolean;

@@ -3,7 +3,7 @@ import type { Product as GQLProduct } from '@/generated/graphql';
 import type {
   CreateProductInput,
   UpdateProductInput,
-} from '@/core/domain/product/Product';
+} from '@happy-baby/domain-product';
 
 const gqlProduct: GQLProduct = {
   id: 'prod-1',

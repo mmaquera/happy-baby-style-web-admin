@@ -1,6 +1,6 @@
-import { UpdateProductUseCase } from '../UpdateProductUseCase';
-import { isOk, isErr, ok } from '@/core/shared/Result';
-import { ValidationError } from '@/core/shared/Result';
+import { UpdateProductUseCase } from '@happy-baby/application-product';
+import { isOk, isErr, ok } from '@happy-baby/domain-shared';
+import { ValidationError } from '@happy-baby/domain-shared';
 import { createMockRepository, MOCK_PRODUCT } from './fixtures';
 
 describe('UpdateProductUseCase', () => {

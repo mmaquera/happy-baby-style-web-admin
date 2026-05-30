@@ -1,6 +1,10 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "defaultProject": "admin",
+  "workspaceLayout": {
+    "appsDir": "apps",
+    "libsDir": "libs"
+  },
   "targetDefaults": {
     "build": {
       "cache": true,
@@ -9,7 +13,11 @@
     },
     "test": {
       "cache": true,
-      "inputs": ["default", "^production", "{workspaceRoot}/vitest.config.ts"]
+      "inputs": [
+        "default",
+        "^production",
+        "{workspaceRoot}/apps/admin/vitest.config.ts"
+      ]
     },
     "lint": {
       "cache": true,
@@ -17,7 +25,7 @@
     },
     "type-check": {
       "cache": true,
-      "inputs": ["default", "{workspaceRoot}/tsconfig.json"]
+      "inputs": ["default", "{workspaceRoot}/tsconfig.base.json"]
     }
   },
   "namedInputs": {
@@ -30,8 +38,8 @@
       "!{projectRoot}/.eslintrc.cjs"
     ],
     "sharedGlobals": [
-      "{workspaceRoot}/tsconfig.json",
-      "{workspaceRoot}/vite.config.ts"
+      "{workspaceRoot}/tsconfig.base.json",
+      "{workspaceRoot}/apps/admin/vite.config.ts"
     ]
   }
 }

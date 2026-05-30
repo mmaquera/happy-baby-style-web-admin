@@ -13,7 +13,7 @@ import ClockIcon from 'lucide-react/dist/esm/icons/clock';
 import LockIcon from 'lucide-react/dist/esm/icons/lock';
 import AlertCircleIcon from 'lucide-react/dist/esm/icons/alert-circle';
 import { cn } from '@/lib/utils';
-import type { User } from '@/core/domain/user/User';
+import type { User } from '@happy-baby/domain-user';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';

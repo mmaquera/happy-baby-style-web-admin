@@ -1,5 +1,5 @@
-import { CreateUserUseCase } from '../CreateUserUseCase';
-import { isOk, isErr, ValidationError } from '@/core/shared/Result';
+import { CreateUserUseCase } from '@happy-baby/application-user';
+import { isOk, isErr, ValidationError } from '@happy-baby/domain-shared';
 import { createMockRepository } from './fixtures';
 
 describe('CreateUserUseCase', () => {

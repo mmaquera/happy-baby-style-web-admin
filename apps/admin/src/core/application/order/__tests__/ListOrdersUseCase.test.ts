@@ -1,5 +1,5 @@
-import { ListOrdersUseCase } from '../ListOrdersUseCase';
-import { isOk, isErr } from '@/core/shared/Result';
+import { ListOrdersUseCase } from '@happy-baby/application-order';
+import { isOk, isErr } from '@happy-baby/domain-shared';
 import { createMockRepository, MOCK_ORDER } from './fixtures';
 
 describe('ListOrdersUseCase', () => {

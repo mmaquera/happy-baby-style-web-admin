@@ -2,13 +2,13 @@ import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { useApolloClient } from '@apollo/client';
 import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { ApolloUserRepository } from '@/infrastructure/graphql/repositories/ApolloUserRepository';
-import { ListUsersUseCase } from '@/core/application/user/ListUsersUseCase';
-import { GetUserUseCase } from '@/core/application/user/GetUserUseCase';
-import { CreateUserUseCase } from '@/core/application/user/CreateUserUseCase';
-import { UpdateUserUseCase } from '@/core/application/user/UpdateUserUseCase';
-import { DeleteUserUseCase } from '@/core/application/user/DeleteUserUseCase';
-import { ActivateUserUseCase } from '@/core/application/user/ActivateUserUseCase';
-import { DeactivateUserUseCase } from '@/core/application/user/DeactivateUserUseCase';
+import { ListUsersUseCase } from '@happy-baby/application-user';
+import { GetUserUseCase } from '@happy-baby/application-user';
+import { CreateUserUseCase } from '@happy-baby/application-user';
+import { UpdateUserUseCase } from '@happy-baby/application-user';
+import { DeleteUserUseCase } from '@happy-baby/application-user';
+import { ActivateUserUseCase } from '@happy-baby/application-user';
+import { DeactivateUserUseCase } from '@happy-baby/application-user';
 
 export interface UserUseCases {
   list: ListUsersUseCase;

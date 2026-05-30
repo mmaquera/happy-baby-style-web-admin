@@ -5,8 +5,8 @@ import type {
   Category,
   CategoryFilter,
   UpdateCategoryInput,
-} from '@/core/domain/category/Category';
-import { isErr } from '@/core/shared/Result';
+} from '@happy-baby/domain-category';
+import { isErr } from '@happy-baby/domain-shared';
 
 export const useCategoryActions = () => {
   const useCases = useCategoryUseCases();

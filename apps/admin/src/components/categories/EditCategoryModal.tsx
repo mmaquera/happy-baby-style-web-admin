@@ -19,7 +19,7 @@ import type { Category } from './types';
 import {
   createCategoryFormSchema,
   type CreateCategoryFormData,
-} from '@/core/shared/validation/categorySchema';
+} from '@happy-baby/domain-shared';
 
 interface EditCategoryModalProps {
   isOpen: boolean;

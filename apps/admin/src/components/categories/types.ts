@@ -1,4 +1,4 @@
-export type { Category } from '@/core/domain/category/Category';
+export type { Category } from '@happy-baby/domain-category';
 
 // Enhanced filter types following development standards
 export interface CategoryFilterInput {

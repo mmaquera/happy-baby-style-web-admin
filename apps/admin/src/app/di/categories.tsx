@@ -2,10 +2,10 @@ import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { useApolloClient } from '@apollo/client';
 import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { ApolloCategoryRepository } from '@/infrastructure/graphql/repositories/ApolloCategoryRepository';
-import { ListCategoriesUseCase } from '@/core/application/category/ListCategoriesUseCase';
-import { CreateCategoryUseCase } from '@/core/application/category/CreateCategoryUseCase';
-import { UpdateCategoryUseCase } from '@/core/application/category/UpdateCategoryUseCase';
-import { DeleteCategoryUseCase } from '@/core/application/category/DeleteCategoryUseCase';
+import { ListCategoriesUseCase } from '@happy-baby/application-category';
+import { CreateCategoryUseCase } from '@happy-baby/application-category';
+import { UpdateCategoryUseCase } from '@happy-baby/application-category';
+import { DeleteCategoryUseCase } from '@happy-baby/application-category';
 
 export interface CategoryUseCases {
   list: ListCategoriesUseCase;

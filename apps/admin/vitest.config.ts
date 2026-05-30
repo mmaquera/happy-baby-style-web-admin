@@ -4,15 +4,52 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [react()],
+  root: path.resolve(__dirname, '.'),
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@happy-baby/domain-product': path.resolve(
+        __dirname,
+        '../../libs/domain/product/src/index.ts'
+      ),
+      '@happy-baby/domain-order': path.resolve(
+        __dirname,
+        '../../libs/domain/order/src/index.ts'
+      ),
+      '@happy-baby/domain-user': path.resolve(
+        __dirname,
+        '../../libs/domain/user/src/index.ts'
+      ),
+      '@happy-baby/domain-category': path.resolve(
+        __dirname,
+        '../../libs/domain/category/src/index.ts'
+      ),
+      '@happy-baby/domain-shared': path.resolve(
+        __dirname,
+        '../../libs/domain/shared/src/index.ts'
+      ),
+      '@happy-baby/application-product': path.resolve(
+        __dirname,
+        '../../libs/application/product/src/index.ts'
+      ),
+      '@happy-baby/application-order': path.resolve(
+        __dirname,
+        '../../libs/application/order/src/index.ts'
+      ),
+      '@happy-baby/application-user': path.resolve(
+        __dirname,
+        '../../libs/application/user/src/index.ts'
+      ),
+      '@happy-baby/application-category': path.resolve(
+        __dirname,
+        '../../libs/application/category/src/index.ts'
+      ),
     },
   },
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/setupTests.ts'],
+    setupFiles: [path.resolve(__dirname, './src/setupTests.ts')],
     include: [
       'src/**/__tests__/**/*.{test,spec}.{ts,tsx}',
       'src/**/*.{test,spec}.{ts,tsx}',

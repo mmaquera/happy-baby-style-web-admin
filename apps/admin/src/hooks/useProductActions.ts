@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react';
 import { toast } from 'react-hot-toast';
 import { useProductUseCases } from '@/app/di/products';
-import type { Product as DomainProduct } from '@/core/domain/product/Product';
-import type { Result } from '@/core/shared/Result';
-import { isErr, ValidationError } from '@/core/shared/Result';
+import type { Product as DomainProduct } from '@happy-baby/domain-product';
+import type { Result } from '@happy-baby/domain-shared';
+import { isErr, ValidationError } from '@happy-baby/domain-shared';
 import type {
   Product,
   CreateProductInput,

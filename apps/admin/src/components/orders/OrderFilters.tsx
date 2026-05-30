@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import FilterIcon from 'lucide-react/dist/esm/icons/filter';
 import SearchIcon from 'lucide-react/dist/esm/icons/search';
-import type { OrderStatus } from '@/core/domain/order/Order';
+import type { OrderStatus } from '@happy-baby/domain-order';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { STATUS_CONFIG } from './OrderStatusBadge';

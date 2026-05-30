@@ -1,6 +1,6 @@
-import type { Category } from '@/core/domain/category/Category';
-import type { CategoryRepository } from '@/core/domain/category/CategoryRepository';
-import { ok } from '@/core/shared/Result';
+import type { Category } from '@happy-baby/domain-category';
+import type { CategoryRepository } from '@happy-baby/domain-category';
+import { ok } from '@happy-baby/domain-shared';
 import { vi, type Mocked } from 'vitest';
 
 export const MOCK_CATEGORY: Category = {

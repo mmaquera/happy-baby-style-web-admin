@@ -1,4 +1,4 @@
-import { productSchema, updateProductSchema } from '../productSchema';
+import { productSchema, updateProductSchema } from '@happy-baby/domain-shared';
 
 describe('productSchema', () => {
   const validData = {

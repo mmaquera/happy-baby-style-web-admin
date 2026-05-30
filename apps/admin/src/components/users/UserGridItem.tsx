@@ -2,7 +2,7 @@ import { memo } from 'react';
 import PhoneIcon from 'lucide-react/dist/esm/icons/phone';
 import CalendarIcon from 'lucide-react/dist/esm/icons/calendar';
 import { cn } from '@/lib/utils';
-import type { User, UserRole } from '@/core/domain/user/User';
+import type { User, UserRole } from '@happy-baby/domain-user';
 import { Card } from '@/components/ui/Card';
 import { UserActionsMenu } from '@/components/users/UserActionsMenu';
 

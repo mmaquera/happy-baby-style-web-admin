@@ -1,8 +1,8 @@
 import { renderHook, act } from '@testing-library/react';
 import { useCategoryActions } from '../useCategoryActions';
-import { ok, err } from '@/core/shared/Result';
-import { DomainError } from '@/core/shared/Result';
-import type { Category } from '@/core/domain/category/Category';
+import { ok, err } from '@happy-baby/domain-shared';
+import { DomainError } from '@happy-baby/domain-shared';
+import type { Category } from '@happy-baby/domain-category';
 
 vi.mock('react-hot-toast', () => ({
   default: { success: vi.fn(), error: vi.fn() },

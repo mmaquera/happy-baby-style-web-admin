@@ -5,7 +5,7 @@ import type {
   CreateUserInput,
   UpdateUserInput,
   UserRole,
-} from '@/core/domain/user/User';
+} from '@happy-baby/domain-user';
 import { UserRole as GQLUserRole } from '@/generated/graphql';
 
 // Minimal address shape returned by any query (subset of full GQLUserAddress)

@@ -11,7 +11,7 @@ import KeyIcon from 'lucide-react/dist/esm/icons/key';
 import ShieldIcon from 'lucide-react/dist/esm/icons/shield';
 import ShieldOffIcon from 'lucide-react/dist/esm/icons/shield-off';
 import { cn } from '@/lib/utils';
-import type { User } from '@/core/domain/user/User';
+import type { User } from '@happy-baby/domain-user';
 
 interface UserActionsMenuProps {
   user: User;

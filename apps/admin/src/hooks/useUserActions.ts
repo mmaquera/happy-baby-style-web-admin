@@ -6,8 +6,8 @@ import type {
   UserFilter,
   CreateUserInput,
   UpdateUserInput,
-} from '@/core/domain/user/User';
-import { isErr } from '@/core/shared/Result';
+} from '@happy-baby/domain-user';
+import { isErr } from '@happy-baby/domain-shared';
 
 export const useUserActions = () => {
   const useCases = useUserUseCases();

@@ -1,4 +1,4 @@
-import { loginSchema, registerSchema } from '../authSchema';
+import { loginSchema, registerSchema } from '@happy-baby/domain-shared';
 
 describe('loginSchema', () => {
   it('accepts valid credentials', () => {

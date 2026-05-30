@@ -1,5 +1,5 @@
-import { ListUsersUseCase } from '../ListUsersUseCase';
-import { isOk, isErr } from '@/core/shared/Result';
+import { ListUsersUseCase } from '@happy-baby/application-user';
+import { isOk, isErr } from '@happy-baby/domain-shared';
 import { createMockRepository, MOCK_USER_PAGE } from './fixtures';
 
 describe('ListUsersUseCase', () => {

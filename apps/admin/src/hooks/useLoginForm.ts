@@ -9,10 +9,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import {
-  loginSchema,
-  type LoginFormData,
-} from '@/core/shared/validation/authSchema';
+import { loginSchema, type LoginFormData } from '@happy-baby/domain-shared';
 
 interface UseLoginFormReturn {
   form: ReturnType<typeof useForm<LoginFormData>>;

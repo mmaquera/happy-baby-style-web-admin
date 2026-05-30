@@ -5,7 +5,7 @@ import type {
   OrderAddress,
   OrderCustomer,
   OrderStatus as DomainOrderStatus,
-} from '@/core/domain/order/Order';
+} from '@happy-baby/domain-order';
 
 // Minimal address shape from any order query
 interface OrderAddressDTO {

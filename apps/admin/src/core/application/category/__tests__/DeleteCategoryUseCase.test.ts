@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { DeleteCategoryUseCase } from '../DeleteCategoryUseCase';
+import { DeleteCategoryUseCase } from '@happy-baby/application-category';
 import { createMockRepository } from './fixtures';
-import { err, isOk, isErr, DomainError } from '@/core/shared/Result';
+import { err, isOk, isErr, DomainError } from '@happy-baby/domain-shared';
 
 describe('DeleteCategoryUseCase', () => {
   let useCase: DeleteCategoryUseCase;

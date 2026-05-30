@@ -2,10 +2,10 @@ import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { useApolloClient } from '@apollo/client';
 import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { ApolloOrderRepository } from '@/infrastructure/graphql/repositories/ApolloOrderRepository';
-import { ListOrdersUseCase } from '@/core/application/order/ListOrdersUseCase';
-import { GetOrderUseCase } from '@/core/application/order/GetOrderUseCase';
-import { UpdateOrderStatusUseCase } from '@/core/application/order/UpdateOrderStatusUseCase';
-import { CancelOrderUseCase } from '@/core/application/order/CancelOrderUseCase';
+import { ListOrdersUseCase } from '@happy-baby/application-order';
+import { GetOrderUseCase } from '@happy-baby/application-order';
+import { UpdateOrderStatusUseCase } from '@happy-baby/application-order';
+import { CancelOrderUseCase } from '@happy-baby/application-order';
 
 export interface OrderUseCases {
   list: ListOrdersUseCase;

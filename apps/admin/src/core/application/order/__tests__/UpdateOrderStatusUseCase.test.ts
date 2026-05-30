@@ -1,5 +1,5 @@
-import { UpdateOrderStatusUseCase } from '../UpdateOrderStatusUseCase';
-import { isOk, isErr, ValidationError } from '@/core/shared/Result';
+import { UpdateOrderStatusUseCase } from '@happy-baby/application-order';
+import { isOk, isErr, ValidationError } from '@happy-baby/domain-shared';
 import { createMockRepository, MOCK_ORDER } from './fixtures';
 
 describe('UpdateOrderStatusUseCase', () => {

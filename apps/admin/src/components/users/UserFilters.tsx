@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import SearchIcon from 'lucide-react/dist/esm/icons/search';
-import type { UserRole } from '@/core/domain/user/User';
+import type { UserRole } from '@happy-baby/domain-user';
 import { Input } from '@/components/ui/Input';
 
 interface UserFiltersProps {

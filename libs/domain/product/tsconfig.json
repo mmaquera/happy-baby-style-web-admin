@@ -1,0 +1,30 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@happy-baby/domain-product": [
+        "../../../libs/domain/product/src/index.ts"
+      ],
+      "@happy-baby/domain-order": ["../../../libs/domain/order/src/index.ts"],
+      "@happy-baby/domain-user": ["../../../libs/domain/user/src/index.ts"],
+      "@happy-baby/domain-category": [
+        "../../../libs/domain/category/src/index.ts"
+      ],
+      "@happy-baby/domain-shared": ["../../../libs/domain/shared/src/index.ts"],
+      "@happy-baby/application-product": [
+        "../../../libs/application/product/src/index.ts"
+      ],
+      "@happy-baby/application-order": [
+        "../../../libs/application/order/src/index.ts"
+      ],
+      "@happy-baby/application-user": [
+        "../../../libs/application/user/src/index.ts"
+      ],
+      "@happy-baby/application-category": [
+        "../../../libs/application/category/src/index.ts"
+      ]
+    }
+  },
+  "include": ["src"]
+}

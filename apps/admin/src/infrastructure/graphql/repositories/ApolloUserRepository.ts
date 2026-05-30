@@ -1,14 +1,14 @@
 import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
-import type { UserRepository } from '@/core/domain/user/UserRepository';
+import type { UserRepository } from '@happy-baby/domain-user';
 import type {
   User,
   CreateUserInput,
   UpdateUserInput,
   UserFilter,
   UserPage,
-} from '@/core/domain/user/User';
-import type { Result } from '@/core/shared/Result';
-import { ok, err } from '@/core/shared/Result';
+} from '@happy-baby/domain-user';
+import type { Result } from '@happy-baby/domain-shared';
+import { ok, err } from '@happy-baby/domain-shared';
 import { userMapper } from '../mappers/userMapper';
 import {
   GetUsersDocument,

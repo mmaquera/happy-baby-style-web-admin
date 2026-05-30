@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { cn } from '@/lib/utils';
-import type { OrderStatus } from '@/core/domain/order/Order';
+import type { OrderStatus } from '@happy-baby/domain-order';
 import ClockIcon from 'lucide-react/dist/esm/icons/clock';
 import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
 import PackageIcon from 'lucide-react/dist/esm/icons/package';

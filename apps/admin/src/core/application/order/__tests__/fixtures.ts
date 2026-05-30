@@ -1,6 +1,6 @@
-import type { Order } from '@/core/domain/order/Order';
-import type { OrderRepository } from '@/core/domain/order/OrderRepository';
-import { ok } from '@/core/shared/Result';
+import type { Order } from '@happy-baby/domain-order';
+import type { OrderRepository } from '@happy-baby/domain-order';
+import { ok } from '@happy-baby/domain-shared';
 import { vi, type Mocked } from 'vitest';
 
 export const MOCK_ORDER: Order = {

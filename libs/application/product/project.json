@@ -1,0 +1,15 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "application-product",
+  "projectType": "library",
+  "sourceRoot": "libs/application/product/src",
+  "tags": ["type:application", "scope:application"],
+  "targets": {
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit --project libs/application/product/tsconfig.json"
+      }
+    }
+  }
+}

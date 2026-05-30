@@ -1,8 +1,9 @@
 {
-  "$schema": "./node_modules/nx/schemas/project-schema.json",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "name": "admin",
   "projectType": "application",
-  "sourceRoot": "src",
+  "sourceRoot": "apps/admin/src",
+  "tags": ["type:app", "scope:admin"],
   "targets": {
     "build": {
       "executor": "@nx/vite:build",
@@ -10,15 +11,9 @@
         "outputPath": "dist"
       },
       "configurations": {
-        "production": {
-          "mode": "production"
-        },
-        "staging": {
-          "mode": "staging"
-        },
-        "development": {
-          "mode": "development"
-        }
+        "production": { "mode": "production" },
+        "staging": { "mode": "staging" },
+        "development": { "mode": "development" }
       }
     },
     "dev": {
@@ -36,19 +31,22 @@
     "test": {
       "executor": "@nx/vite:test",
       "options": {
-        "configFile": "vitest.config.ts"
+        "configFile": "apps/admin/vitest.config.ts"
       }
     },
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": ["src/**/*.ts", "src/**/*.tsx"]
+        "lintFilePatterns": [
+          "apps/admin/src/**/*.ts",
+          "apps/admin/src/**/*.tsx"
+        ]
       }
     },
     "type-check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsc --noEmit"
+        "command": "tsc --noEmit --project apps/admin/tsconfig.json"
       }
     },
     "codegen": {

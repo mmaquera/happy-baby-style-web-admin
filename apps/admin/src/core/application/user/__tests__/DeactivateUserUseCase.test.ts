@@ -1,5 +1,5 @@
-import { DeactivateUserUseCase } from '../DeactivateUserUseCase';
-import { isOk, isErr } from '@/core/shared/Result';
+import { DeactivateUserUseCase } from '@happy-baby/application-user';
+import { isOk, isErr } from '@happy-baby/domain-shared';
 import { createMockRepository, MOCK_USER } from './fixtures';
 
 describe('DeactivateUserUseCase', () => {

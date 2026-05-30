@@ -15,7 +15,7 @@ import { SVGUpload } from './SVGUpload/SVGUpload';
 import {
   createCategoryFormSchema,
   type CreateCategoryFormData,
-} from '@/core/shared/validation/categorySchema';
+} from '@happy-baby/domain-shared';
 
 interface CreateCategoryModalProps {
   isOpen: boolean;

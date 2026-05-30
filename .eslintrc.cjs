@@ -25,14 +25,14 @@ module.exports = {
     'import/resolver': {
       typescript: {
         alwaysTryTypes: true,
-        project: './tsconfig.json',
+        project: './apps/admin/tsconfig.json',
       },
     },
     // ─── Architectural boundaries (Clean Architecture) ───────────────────
-    // Patterns are relative to boundaries/root-path (= ./src).
+    // Patterns are relative to boundaries/root-path (= ./apps/admin/src).
     // Rule: domain ← application ← infrastructure ← app/di ← presentation
     // Dependency arrow means "can import from"; arrows only go inward.
-    'boundaries/root-path': './src',
+    'boundaries/root-path': './apps/admin/src',
     'boundaries/elements': [
       { type: 'domain',         pattern: 'core/domain/**' },
       { type: 'application',    pattern: 'core/application/**' },
@@ -203,13 +203,14 @@ module.exports = {
     // no-restricted-imports covers @/ alias imports (moduleResolution:bundler
     // prevents the TypeScript resolver from working in ESLint).
     {
-      // domain: innermost layer — no outward imports
-      files: ['src/core/domain/**/*.ts', 'src/core/domain/**/*.tsx'],
+      // domain: innermost layer — no outward imports (libs/domain/** after Sprint 2)
+      files: ['libs/domain/**/*.ts', 'libs/domain/**/*.tsx'],
       rules: {
         'no-restricted-imports': ['error', {
           patterns: [
-            { group: ['@/core/application/**'], message: 'Domain layer must not import from application' },
-            { group: ['@/infrastructure/**'],   message: 'Domain layer must not import from infrastructure' },
+            { group: ['@happy-baby/application-*'], message: 'Domain layer must not import from application' },
+            { group: ['@/infrastructure/**', '@happy-baby/infrastructure-*'],
+              message: 'Domain layer must not import from infrastructure' },
             { group: ['@/app/**'],              message: 'Domain layer must not import from composition root' },
             { group: ['@/components/**', '@/pages/**', '@/hooks/**', '@/contexts/**'],
               message: 'Domain layer must not import from presentation' },
@@ -219,12 +220,13 @@ module.exports = {
       },
     },
     {
-      // application (use cases): must not touch infrastructure or UI
-      files: ['src/core/application/**/*.ts', 'src/core/application/**/*.tsx'],
+      // application (use cases): must not touch infrastructure or UI (libs/application/** after Sprint 2)
+      files: ['libs/application/**/*.ts', 'libs/application/**/*.tsx'],
       rules: {
         'no-restricted-imports': ['error', {
           patterns: [
-            { group: ['@/infrastructure/**'],   message: 'Use cases must not import infrastructure — depend on the port interface instead' },
+            { group: ['@/infrastructure/**', '@happy-baby/infrastructure-*'],
+              message: 'Use cases must not import infrastructure — depend on the port interface instead' },
             { group: ['@/app/**'],              message: 'Use cases must not import from composition root' },
             { group: ['@/components/**', '@/pages/**', '@/hooks/**', '@/contexts/**'],
               message: 'Use cases must not import from presentation' },
@@ -235,7 +237,7 @@ module.exports = {
     },
     {
       // infrastructure: adapters must not know about UI or DI root
-      files: ['src/infrastructure/**/*.ts', 'src/infrastructure/**/*.tsx'],
+      files: ['apps/admin/src/infrastructure/**/*.ts', 'apps/admin/src/infrastructure/**/*.tsx'],
       rules: {
         'no-restricted-imports': ['error', {
           patterns: [
@@ -249,10 +251,10 @@ module.exports = {
     {
       // presentation: must go through app/di — never reach infrastructure directly
       files: [
-        'src/components/**/*.ts', 'src/components/**/*.tsx',
-        'src/pages/**/*.ts',      'src/pages/**/*.tsx',
-        'src/hooks/**/*.ts',      'src/hooks/**/*.tsx',
-        'src/contexts/**/*.ts',   'src/contexts/**/*.tsx',
+        'apps/admin/src/components/**/*.ts', 'apps/admin/src/components/**/*.tsx',
+        'apps/admin/src/pages/**/*.ts',      'apps/admin/src/pages/**/*.tsx',
+        'apps/admin/src/hooks/**/*.ts',      'apps/admin/src/hooks/**/*.tsx',
+        'apps/admin/src/contexts/**/*.ts',   'apps/admin/src/contexts/**/*.tsx',
       ],
       rules: {
         'no-restricted-imports': ['error', {

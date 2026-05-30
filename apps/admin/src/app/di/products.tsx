@@ -2,11 +2,11 @@ import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { useApolloClient } from '@apollo/client';
 import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { ApolloProductRepository } from '@/infrastructure/graphql/repositories/ApolloProductRepository';
-import { ListProductsUseCase } from '@/core/application/product/ListProductsUseCase';
-import { CreateProductUseCase } from '@/core/application/product/CreateProductUseCase';
-import { UpdateProductUseCase } from '@/core/application/product/UpdateProductUseCase';
-import { DeleteProductUseCase } from '@/core/application/product/DeleteProductUseCase';
-import { UploadProductImageUseCase } from '@/core/application/product/UploadProductImageUseCase';
+import { ListProductsUseCase } from '@happy-baby/application-product';
+import { CreateProductUseCase } from '@happy-baby/application-product';
+import { UpdateProductUseCase } from '@happy-baby/application-product';
+import { DeleteProductUseCase } from '@happy-baby/application-product';
+import { UploadProductImageUseCase } from '@happy-baby/application-product';
 
 export interface ProductUseCases {
   list: ListProductsUseCase;

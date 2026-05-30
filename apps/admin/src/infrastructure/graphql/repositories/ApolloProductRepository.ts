@@ -1,14 +1,14 @@
 import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
-import type { ProductRepository } from '@/core/domain/product/ProductRepository';
+import type { ProductRepository } from '@happy-baby/domain-product';
 import type {
   Product,
   CreateProductInput,
   UpdateProductInput,
   ProductFilter,
   ProductPage,
-} from '@/core/domain/product/Product';
-import type { Result } from '@/core/shared/Result';
-import { ok, err } from '@/core/shared/Result';
+} from '@happy-baby/domain-product';
+import type { Result } from '@happy-baby/domain-shared';
+import { ok, err } from '@happy-baby/domain-shared';
 import { productMapper } from '../mappers/productMapper';
 import type {
   Product as GQLProduct,

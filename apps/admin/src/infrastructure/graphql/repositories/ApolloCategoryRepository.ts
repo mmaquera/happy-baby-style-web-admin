@@ -1,14 +1,14 @@
 import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
-import type { CategoryRepository } from '@/core/domain/category/CategoryRepository';
+import type { CategoryRepository } from '@happy-baby/domain-category';
 import type {
   Category,
   CreateCategoryInput,
   UpdateCategoryInput,
   CategoryFilter,
   CategoryPage,
-} from '@/core/domain/category/Category';
-import type { Result } from '@/core/shared/Result';
-import { ok, err } from '@/core/shared/Result';
+} from '@happy-baby/domain-category';
+import type { Result } from '@happy-baby/domain-shared';
+import { ok, err } from '@happy-baby/domain-shared';
 import { categoryMapper } from '../mappers/categoryMapper';
 import type {
   Category as GQLCategory,

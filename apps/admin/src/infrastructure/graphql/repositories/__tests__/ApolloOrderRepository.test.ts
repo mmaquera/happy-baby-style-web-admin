@@ -1,5 +1,5 @@
 import { ApolloOrderRepository } from '../ApolloOrderRepository';
-import { isOk, isErr } from '@/core/shared/Result';
+import { isOk, isErr } from '@happy-baby/domain-shared';
 import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 
 const makeOrderDTO = (overrides = {}) => ({
