@@ -1,13 +1,8 @@
-// =====================================================
-// SVG UPLOAD COMPONENT - Categories Module
-// =====================================================
-// Following Clean Architecture principles and React best practices
-// Specific component for SVG upload functionality in categories
-
 import type React from 'react';
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { FileText, X, Image as ImageIcon } from 'lucide-react';
-import { theme } from '@/styles/theme';
+import FileTextIcon from 'lucide-react/dist/esm/icons/file-text';
+import XIcon from 'lucide-react/dist/esm/icons/x';
+import ImageIcon from 'lucide-react/dist/esm/icons/image';
 import { useSVGUpload } from '@/hooks/useSVGUpload';
 import {
   type SVGUploadProps,
@@ -43,6 +38,14 @@ import {
   SVGClearButton,
 } from './SVGUpload.styles';
 
+const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+};
+
 export const SVGUpload: React.FC<SVGUploadProps> = ({
   onUploadComplete,
   onUploadError,
@@ -55,10 +58,7 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
   placeholder = 'Arrastra tu archivo SVG aquí o haz clic para seleccionar',
   showPreview = SVG_UPLOAD_DEFAULTS.showPreview,
 }) => {
-  // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // State
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadResult, setUploadResult] = useState<SVGUploadResult | null>(
@@ -69,7 +69,6 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
     message: string;
   } | null>(null);
 
-  // Custom hook
   const {
     uploadSVG,
     validateSVG,
@@ -80,30 +79,21 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
     reset,
   } = useSVGUpload();
 
-  // Clear validation message when error changes
   useEffect(() => {
     if (error) {
-      setValidationMessage({
-        type: 'error',
-        message: error.message,
-      });
+      setValidationMessage({ type: 'error', message: error.message });
     } else {
       setValidationMessage(null);
     }
   }, [error]);
 
-  // Handle file selection
   const handleFileSelect = useCallback(
     async (file: File) => {
       if (disabled) return;
-
-      // Clear previous state
       clearError();
       setValidationMessage(null);
 
-      // Validate file
       const validation = validateSVG(file);
-
       if (!validation.isValid) {
         setValidationMessage({
           type: 'error',
@@ -113,7 +103,6 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
         return;
       }
 
-      // Show warnings if any
       if (validation.warnings.length > 0) {
         setValidationMessage({
           type: 'warning',
@@ -124,14 +113,9 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
       setSelectedFile(file);
 
       try {
-        // Upload file
         const result = await uploadSVG(file);
         setUploadResult(result);
-
-        // Notify parent component
         onUploadComplete(result.url);
-
-        // Show success message
         setValidationMessage({
           type: 'success',
           message: 'Archivo SVG subido exitosamente',
@@ -139,10 +123,7 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
       } catch (err: unknown) {
         const errMsg =
           err instanceof Error ? err.message : 'Error al subir el archivo';
-        setValidationMessage({
-          type: 'error',
-          message: errMsg,
-        });
+        setValidationMessage({ type: 'error', message: errMsg });
         onUploadError?.(errMsg);
       }
     },
@@ -156,13 +137,10 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
     ]
   );
 
-  // Handle drag and drop
   const handleDragOver = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
-      if (!disabled) {
-        setIsDragOver(true);
-      }
+      if (!disabled) setIsDragOver(true);
     },
     [disabled]
   );
@@ -176,7 +154,6 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
     (e: React.DragEvent) => {
       e.preventDefault();
       setIsDragOver(false);
-
       if (disabled) return;
 
       const files = Array.from(e.dataTransfer.files);
@@ -199,43 +176,25 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
     [disabled, allowedTypes, handleFileSelect]
   );
 
-  // Handle file input change
   const handleFileInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
-      if (file) {
-        handleFileSelect(file);
-      }
+      if (file) handleFileSelect(file);
     },
     [handleFileSelect]
   );
 
-  // Handle click to select file
   const handleClick = useCallback(() => {
-    if (!disabled) {
-      fileInputRef.current?.click();
-    }
+    if (!disabled) fileInputRef.current?.click();
   }, [disabled]);
 
-  // Handle remove file
   const handleRemoveFile = useCallback(() => {
     setSelectedFile(null);
     setUploadResult(null);
     setValidationMessage(null);
     reset();
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    if (fileInputRef.current) fileInputRef.current.value = '';
   }, [reset]);
-
-  // Format file size
-  const formatFileSize = useCallback((bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
-  }, []);
 
   return (
     <SVGUploadContainer className={className}>
@@ -274,15 +233,14 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
             ni elementos inseguros
           </SVGUploadSubtext>
 
-          {!loading && (
+          {!loading ? (
             <SVGUploadButton disabled={disabled}>
               Seleccionar archivo SVG
             </SVGUploadButton>
-          )}
+          ) : null}
         </SVGUploadContent>
       </SVGUploadZone>
 
-      {/* Progress Bar */}
       {progress ? (
         <div>
           <SVGProgressBar>
@@ -294,52 +252,34 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
         </div>
       ) : null}
 
-      {/* Error Message */}
       {error ? <SVGErrorMessage>{error.message}</SVGErrorMessage> : null}
 
-      {/* Validation Message */}
       {validationMessage ? (
         <SVGValidationMessage type={validationMessage.type}>
           {validationMessage.message}
         </SVGValidationMessage>
       ) : null}
 
-      {/* File List */}
       {selectedFile ? (
         <SVGFileList>
           <SVGFileItem>
             <SVGFileInfo>
-              <FileText size={16} />
+              <FileTextIcon size={16} />
               <div>
                 <SVGFileName>{selectedFile.name}</SVGFileName>
                 <SVGFileSize>{formatFileSize(selectedFile.size)}</SVGFileSize>
               </div>
             </SVGFileInfo>
             <SVGRemoveButton onClick={handleRemoveFile}>
-              <X size={14} />
+              <XIcon size={14} />
             </SVGRemoveButton>
           </SVGFileItem>
         </SVGFileList>
       ) : null}
 
-      {/* SVG Specifications Info */}
-      <div
-        style={{
-          marginTop: theme.spacing[4],
-          padding: theme.spacing[3],
-          background: theme.colors.background.light,
-          borderRadius: theme.borderRadius.md,
-          fontSize: theme.fontSizes.sm,
-          color: theme.colors.text.secondary,
-        }}
-      >
+      <div className='mt-4 rounded-lg bg-muted p-3 text-sm text-muted-foreground'>
         <strong>Especificaciones para archivos SVG:</strong>
-        <ul
-          style={{
-            margin: `${theme.spacing[2]} 0 0 0`,
-            paddingLeft: theme.spacing[4],
-          }}
-        >
+        <ul className='ml-4 mt-2 list-disc'>
           <li>Formato: SVG (Scalable Vector Graphics)</li>
           <li>Tamaño máximo: {formatFileSize(maxSize)}</li>
           <li>Elementos permitidos: formas, texto, gradientes</li>
@@ -348,7 +288,6 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
         </ul>
       </div>
 
-      {/* SVG Preview */}
       {showPreview && uploadResult ? (
         <SVGPreview>
           <SVGPreviewContent>
@@ -356,14 +295,14 @@ export const SVGUpload: React.FC<SVGUploadProps> = ({
               <img
                 src={uploadResult.url}
                 alt='Preview'
-                style={{ maxWidth: '100%', maxHeight: '100%' }}
+                className='max-h-full max-w-full'
               />
             </SVGPreviewImg>
           </SVGPreviewContent>
           <SVGPreviewOverlay>
             <SVGPreviewActions>
               <SVGClearButton onClick={handleRemoveFile}>
-                <X size={16} />
+                <XIcon size={16} />
                 Eliminar
               </SVGClearButton>
             </SVGPreviewActions>

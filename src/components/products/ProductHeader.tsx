@@ -1,20 +1,17 @@
 import type React from 'react';
-import styled from 'styled-components';
-import { theme } from '@/styles/theme';
+import { memo } from 'react';
+import PackageIcon from 'lucide-react/dist/esm/icons/package';
+import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
+import AlertTriangleIcon from 'lucide-react/dist/esm/icons/alert-triangle';
+import XCircleIcon from 'lucide-react/dist/esm/icons/x-circle';
+import PlusIcon from 'lucide-react/dist/esm/icons/plus';
+import SettingsIcon from 'lucide-react/dist/esm/icons/settings';
+import DownloadIcon from 'lucide-react/dist/esm/icons/download';
+import UploadIcon from 'lucide-react/dist/esm/icons/upload';
+import Grid3X3Icon from 'lucide-react/dist/esm/icons/grid-3x3';
+import ListIcon from 'lucide-react/dist/esm/icons/list';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import {
-  Package,
-  CheckCircle,
-  AlertTriangle,
-  XCircle,
-  Plus,
-  Settings,
-  Download,
-  Upload,
-  Grid3X3,
-  List,
-} from 'lucide-react';
 
 interface ProductHeaderProps {
   title?: string;
@@ -33,349 +30,169 @@ interface ProductHeaderProps {
   onViewModeChange?: (mode: 'grid' | 'list') => void;
 }
 
-// =====================================================
-// STYLED COMPONENTS - Minimalist Design
-// =====================================================
+interface StatCardProps {
+  icon: React.ReactNode;
+  value: number;
+  label: string;
+  change: string;
+  isPositive: boolean;
+}
 
-const HeaderContainer = styled.div`
-  margin-bottom: ${theme.spacing[6]};
-`;
+const StatCard = memo<StatCardProps>(({ icon, value, label, change, isPositive }) => (
+  <div className='rounded-lg border border-border p-4 text-center transition-transform hover:-translate-y-0.5 hover:border-brand-purple'>
+    <div className='mb-2 flex items-center justify-center'>{icon}</div>
+    <div className='font-heading mb-1 text-2xl font-bold text-foreground'>
+      {value.toLocaleString()}
+    </div>
+    <div className='text-sm font-medium text-muted-foreground'>{label}</div>
+    <div
+      className={cn(
+        'mt-1 text-xs font-medium',
+        isPositive ? 'text-green-600' : 'text-destructive'
+      )}
+    >
+      {change}
+    </div>
+  </div>
+));
+StatCard.displayName = 'StatCard';
 
-const MainHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: ${theme.spacing[4]};
-  flex-wrap: wrap;
-  gap: ${theme.spacing[4]};
+export const ProductHeader: React.FC<ProductHeaderProps> = memo(
+  ({
+    title = 'Productos Happy Baby Style',
+    stats,
+    viewMode = 'list',
+    onAddProduct,
+    onBulkActions,
+    onExport,
+    onImport,
+    showActions = true,
+    onViewModeChange,
+  }) => {
+    const hasStats =
+      stats != null && Object.values(stats).some(v => v !== undefined);
 
-  @media (max-width: ${theme.breakpoints.md}) {
-    flex-direction: column;
-    align-items: stretch;
-    gap: ${theme.spacing[3]};
-  }
-`;
+    return (
+      <div className='mb-6'>
+        {/* Title row */}
+        <div className='mb-4 flex flex-wrap items-center justify-between gap-4 max-md:flex-col max-md:items-stretch max-md:gap-3'>
+          <div className='flex items-center gap-3 max-md:justify-center'>
+            <div className='flex h-12 w-12 items-center justify-center rounded-full bg-brand-purple/10 text-brand-purple'>
+              <PackageIcon size={24} />
+            </div>
+            <div className='flex flex-col gap-1'>
+              <h1 className='font-heading m-0 text-3xl font-bold leading-tight text-foreground max-md:text-center max-md:text-2xl'>
+                {title}
+              </h1>
+              <p className='m-0 text-base text-muted-foreground max-md:text-center'>
+                Gestiona tu catálogo de productos para bebés
+              </p>
+            </div>
+          </div>
 
-const HeaderLeft = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
+          {showActions ? (
+            <div className='flex flex-wrap items-center justify-end gap-3 max-md:justify-center max-md:gap-2'>
+              {onViewModeChange ? (
+                <div className='flex gap-1 rounded-md border border-border bg-muted p-1'>
+                  <button
+                    onClick={() => onViewModeChange('list')}
+                    title='Vista de lista'
+                    className={cn(
+                      'flex min-w-[60px] items-center justify-center gap-1 rounded px-3 py-2 text-sm transition-all',
+                      viewMode === 'list'
+                        ? 'bg-brand-purple text-white'
+                        : 'text-muted-foreground hover:bg-muted-foreground/10'
+                    )}
+                  >
+                    <ListIcon size={16} />
+                    Lista
+                  </button>
+                  <button
+                    onClick={() => onViewModeChange('grid')}
+                    title='Vista de cuadrícula'
+                    className={cn(
+                      'flex min-w-[60px] items-center justify-center gap-1 rounded px-3 py-2 text-sm transition-all',
+                      viewMode === 'grid'
+                        ? 'bg-brand-purple text-white'
+                        : 'text-muted-foreground hover:bg-muted-foreground/10'
+                    )}
+                  >
+                    <Grid3X3Icon size={16} />
+                    Grid
+                  </button>
+                </div>
+              ) : null}
+              {onImport ? (
+                <Button variant='ghost' size='medium' onClick={onImport}>
+                  <UploadIcon size={16} />
+                  Importar
+                </Button>
+              ) : null}
+              {onExport ? (
+                <Button variant='ghost' size='medium' onClick={onExport}>
+                  <DownloadIcon size={16} />
+                  Exportar
+                </Button>
+              ) : null}
+              {onBulkActions ? (
+                <Button variant='secondary' size='medium' onClick={onBulkActions}>
+                  <SettingsIcon size={16} />
+                  Acciones Masivas
+                </Button>
+              ) : null}
+              {onAddProduct ? (
+                <Button variant='primary' size='medium' onClick={onAddProduct}>
+                  <PlusIcon size={16} />
+                  Nuevo Producto
+                </Button>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
 
-  @media (max-width: ${theme.breakpoints.md}) {
-    justify-content: center;
-  }
-`;
-
-const HeaderIcon = styled.div`
-  width: 48px;
-  height: 48px;
-  background: ${theme.colors.softPurple};
-  border-radius: ${theme.borderRadius.full};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${theme.colors.primaryPurple};
-`;
-
-const HeaderContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[1]};
-`;
-
-const HeaderTitle = styled.h1`
-  font-family: ${theme.fonts.heading};
-  font-size: ${theme.fontSizes['3xl']};
-  font-weight: ${theme.fontWeights.bold};
-  color: ${theme.colors.text.primary};
-  margin: 0;
-  line-height: 1.2;
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    font-size: ${theme.fontSizes['2xl']};
-    text-align: center;
-  }
-`;
-
-const HeaderSubtitle = styled.p`
-  font-size: ${theme.fontSizes.base};
-  color: ${theme.colors.text.secondary};
-  margin: 0;
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    text-align: center;
-  }
-`;
-
-const HeaderActions = styled.div`
-  display: flex;
-  gap: ${theme.spacing[3]};
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-end;
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    justify-content: center;
-    gap: ${theme.spacing[2]};
-  }
-`;
-
-const ViewToggleContainer = styled.div`
-  display: flex;
-  gap: ${theme.spacing[1]};
-  border: 1px solid ${theme.colors.border.light};
-  border-radius: ${theme.borderRadius.md};
-  padding: ${theme.spacing[1]};
-  background: ${theme.colors.background.light};
-`;
-
-const ViewToggleButton = styled.button<{ isActive: boolean }>`
-  padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  background: ${({ isActive }) =>
-    isActive ? theme.colors.primaryPurple : 'transparent'};
-  color: ${({ isActive }) =>
-    isActive ? theme.colors.white : theme.colors.text.secondary};
-  border: none;
-  border-radius: ${theme.borderRadius.sm};
-  font-size: ${theme.fontSizes.sm};
-  cursor: pointer;
-  transition: all ${theme.transitions.base};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-  min-width: 60px;
-  justify-content: center;
-
-  &:hover {
-    background: ${({ isActive }) =>
-      isActive ? theme.colors.primaryPurple : theme.colors.background.accent};
-  }
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: ${theme.spacing[4]};
-  margin-bottom: ${theme.spacing[4]};
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: ${theme.spacing[3]};
-  }
-`;
-
-const StatCard = styled(Card)`
-  text-align: center;
-  padding: ${theme.spacing[4]};
-  transition: transform ${theme.transitions.base};
-  border: 1px solid ${theme.colors.border.light};
-
-  &:hover {
-    transform: translateY(-2px);
-    border-color: ${theme.colors.primaryPurple};
-  }
-`;
-
-const StatIcon = styled.div<{
-  variant: 'primary' | 'success' | 'warning' | 'error';
-}>`
-  color: ${({ variant }) => {
-    switch (variant) {
-      case 'success':
-        return theme.colors.success;
-      case 'warning':
-        return theme.colors.warning;
-      case 'error':
-        return theme.colors.error;
-      default:
-        return theme.colors.primaryPurple;
-    }
-  }};
-  margin-bottom: ${theme.spacing[2]};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const StatValue = styled.div`
-  font-family: ${theme.fonts.heading};
-  font-size: ${theme.fontSizes['2xl']};
-  font-weight: ${theme.fontWeights.bold};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[1]};
-`;
-
-const StatLabel = styled.div`
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.text.secondary};
-  font-weight: ${theme.fontWeights.medium};
-`;
-
-const StatChange = styled.div<{ isPositive: boolean }>`
-  font-size: ${theme.fontSizes.xs};
-  color: ${({ isPositive }) =>
-    isPositive ? theme.colors.success : theme.colors.error};
-  font-weight: ${theme.fontWeights.medium};
-  margin-top: ${theme.spacing[1]};
-`;
-
-// =====================================================
-// COMPONENT - Clean and Focused
-// =====================================================
-
-export const ProductHeader: React.FC<ProductHeaderProps> = ({
-  title = 'Productos Happy Baby Style',
-  stats,
-  viewMode = 'list',
-  onAddProduct,
-  onBulkActions,
-  onExport,
-  onImport,
-  showActions = true,
-  onViewModeChange,
-}) => {
-  const hasStats =
-    stats && Object.values(stats).some(value => value !== undefined);
-
-  return (
-    <HeaderContainer>
-      <MainHeader>
-        <HeaderLeft>
-          <HeaderIcon>
-            <Package size={24} />
-          </HeaderIcon>
-          <HeaderContent>
-            <HeaderTitle>{title}</HeaderTitle>
-            <HeaderSubtitle>
-              Gestiona tu catálogo de productos para bebés
-            </HeaderSubtitle>
-          </HeaderContent>
-        </HeaderLeft>
-
-        {showActions ? (
-          <HeaderActions>
-            {/* View Mode Toggle - Consolidated */}
-            {onViewModeChange ? (
-              <ViewToggleContainer>
-                <ViewToggleButton
-                  isActive={viewMode === 'list'}
-                  onClick={() => onViewModeChange('list')}
-                  title='Vista de lista'
-                >
-                  <List size={16} />
-                  Lista
-                </ViewToggleButton>
-                <ViewToggleButton
-                  isActive={viewMode === 'grid'}
-                  onClick={() => onViewModeChange('grid')}
-                  title='Vista de cuadrícula'
-                >
-                  <Grid3X3 size={16} />
-                  Grid
-                </ViewToggleButton>
-              </ViewToggleContainer>
+        {/* Stats grid */}
+        {hasStats ? (
+          <div className='mb-4 grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))] max-md:gap-3 max-md:[grid-template-columns:repeat(auto-fit,minmax(150px,1fr))]'>
+            {stats!.totalProducts !== undefined ? (
+              <StatCard
+                icon={<PackageIcon size={24} className='text-brand-purple' />}
+                value={stats!.totalProducts}
+                label='Total de Productos'
+                change='+12% este mes'
+                isPositive
+              />
             ) : null}
-
-            {/* Primary Actions */}
-            {onImport ? (
-              <Button
-                variant='ghost'
-                size='medium'
-                onClick={onImport}
-                title='Importar productos'
-              >
-                <Upload size={16} />
-                Importar
-              </Button>
+            {stats!.activeProducts !== undefined ? (
+              <StatCard
+                icon={<CheckCircleIcon size={24} className='text-green-500' />}
+                value={stats!.activeProducts}
+                label='Productos Activos'
+                change='+8% este mes'
+                isPositive
+              />
             ) : null}
-
-            {onExport ? (
-              <Button
-                variant='ghost'
-                size='medium'
-                onClick={onExport}
-                title='Exportar productos'
-              >
-                <Download size={16} />
-                Exportar
-              </Button>
+            {stats!.lowStockProducts !== undefined ? (
+              <StatCard
+                icon={<AlertTriangleIcon size={24} className='text-yellow-500' />}
+                value={stats!.lowStockProducts}
+                label='Stock Bajo'
+                change='+3% este mes'
+                isPositive={false}
+              />
             ) : null}
-
-            {onBulkActions ? (
-              <Button
-                variant='secondary'
-                size='medium'
-                onClick={onBulkActions}
-                title='Acciones masivas'
-              >
-                <Settings size={16} />
-                Acciones Masivas
-              </Button>
+            {stats!.outOfStockProducts !== undefined ? (
+              <StatCard
+                icon={<XCircleIcon size={24} className='text-destructive' />}
+                value={stats!.outOfStockProducts}
+                label='Sin Stock'
+                change='+2% este mes'
+                isPositive={false}
+              />
             ) : null}
-
-            {onAddProduct ? (
-              <Button
-                variant='primary'
-                size='medium'
-                onClick={onAddProduct}
-                title='Agregar nuevo producto'
-              >
-                <Plus size={16} />
-                Nuevo Producto
-              </Button>
-            ) : null}
-          </HeaderActions>
+          </div>
         ) : null}
-      </MainHeader>
-
-      {/* Statistics - Clean and Informative */}
-      {hasStats ? (
-        <StatsGrid>
-          {stats.totalProducts !== undefined && (
-            <StatCard>
-              <StatIcon variant='primary'>
-                <Package size={24} />
-              </StatIcon>
-              <StatValue>{stats.totalProducts.toLocaleString()}</StatValue>
-              <StatLabel>Total de Productos</StatLabel>
-              <StatChange isPositive={true}>+12% este mes</StatChange>
-            </StatCard>
-          )}
-
-          {stats.activeProducts !== undefined && (
-            <StatCard>
-              <StatIcon variant='success'>
-                <CheckCircle size={24} />
-              </StatIcon>
-              <StatValue>{stats.activeProducts.toLocaleString()}</StatValue>
-              <StatLabel>Productos Activos</StatLabel>
-              <StatChange isPositive={true}>+8% este mes</StatChange>
-            </StatCard>
-          )}
-
-          {stats.lowStockProducts !== undefined && (
-            <StatCard>
-              <StatIcon variant='warning'>
-                <AlertTriangle size={24} />
-              </StatIcon>
-              <StatValue>{stats.lowStockProducts.toLocaleString()}</StatValue>
-              <StatLabel>Stock Bajo</StatLabel>
-              <StatChange isPositive={false}>+3% este mes</StatChange>
-            </StatCard>
-          )}
-
-          {stats.outOfStockProducts !== undefined && (
-            <StatCard>
-              <StatIcon variant='error'>
-                <XCircle size={24} />
-              </StatIcon>
-              <StatValue>{stats.outOfStockProducts.toLocaleString()}</StatValue>
-              <StatLabel>Sin Stock</StatLabel>
-              <StatChange isPositive={false}>+2% este mes</StatChange>
-            </StatCard>
-          )}
-        </StatsGrid>
-      ) : null}
-    </HeaderContainer>
-  );
-};
+      </div>
+    );
+  }
+);
+ProductHeader.displayName = 'ProductHeader';

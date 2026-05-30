@@ -1,18 +1,16 @@
 import type React from 'react';
-import styled from 'styled-components';
-import { theme } from '@/styles/theme';
+import { memo } from 'react';
+import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
+import XCircleIcon from 'lucide-react/dist/esm/icons/x-circle';
+import AlertTriangleIcon from 'lucide-react/dist/esm/icons/alert-triangle';
+import StarIcon from 'lucide-react/dist/esm/icons/star';
+import EyeIcon from 'lucide-react/dist/esm/icons/eye';
+import EditIcon from 'lucide-react/dist/esm/icons/edit';
+import Trash2Icon from 'lucide-react/dist/esm/icons/trash-2';
+import PackageIcon from 'lucide-react/dist/esm/icons/package';
+import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import {
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
-  Star,
-  Eye,
-  Edit,
-  Trash2,
-  Package,
-} from 'lucide-react';
 
 interface ProductCardProps {
   product: {
@@ -38,341 +36,198 @@ interface ProductCardProps {
   onViewDetails?: (productId: string) => void;
 }
 
-const ProductImageContainer = styled.div`
-  position: relative;
-  width: 100%;
-  height: 200px;
-  overflow: hidden;
-  border-radius: ${theme.borderRadius.lg} ${theme.borderRadius.lg} 0 0;
-  background: ${theme.colors.background.light};
-`;
+export const ProductCard: React.FC<ProductCardProps> = memo(
+  ({ product, onEdit, onDelete, onToggleStatus, onViewDetails }) => {
+    const hasDiscount =
+      product.salePrice != null && product.salePrice < product.price;
+    const discountPercentage = hasDiscount
+      ? Math.round(
+          ((product.price - product.salePrice!) / product.price) * 100
+        )
+      : 0;
 
-const ProductImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform ${theme.transitions.base};
-`;
+    const isLowStock =
+      product.stockQuantity <= 5 && product.stockQuantity > 0;
+    const isOutOfStock = product.stockQuantity === 0;
+    const currentPrice =
+      typeof product.salePrice === 'number'
+        ? product.salePrice
+        : product.price;
 
-const ImageOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    135deg,
-    ${theme.colors.primaryPurple}20 0%,
-    ${theme.colors.turquoise}20 100%
-  );
-  opacity: 0;
-  transition: opacity ${theme.transitions.base};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const StatusBadge = styled.div<{ isActive: boolean }>`
-  position: absolute;
-  top: ${theme.spacing[3]};
-  right: ${theme.spacing[3]};
-  padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  background: ${({ isActive }) =>
-    isActive ? theme.colors.success : theme.colors.warning};
-  color: ${theme.colors.white};
-  font-size: ${theme.fontSizes.xs};
-  font-weight: ${theme.fontWeights.medium};
-  border-radius: ${theme.borderRadius.full};
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-`;
-
-const StockBadge = styled.div<{ isLowStock: boolean; isOutOfStock: boolean }>`
-  position: absolute;
-  top: ${theme.spacing[3]};
-  left: ${theme.spacing[3]};
-  padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  background: ${({ isOutOfStock, isLowStock }) =>
-    isOutOfStock
-      ? theme.colors.error
-      : isLowStock
-        ? theme.colors.warning
-        : theme.colors.success};
-  color: ${theme.colors.white};
-  font-size: ${theme.fontSizes.xs};
-  font-weight: ${theme.fontWeights.medium};
-  border-radius: ${theme.borderRadius.full};
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-`;
-
-const ProductInfo = styled.div`
-  padding: ${theme.spacing[4]};
-`;
-
-const ProductName = styled.h3`
-  font-family: ${theme.fonts.heading};
-  font-size: ${theme.fontSizes.lg};
-  font-weight: ${theme.fontWeights.semibold};
-  color: ${theme.colors.text.primary};
-  margin: 0 0 ${theme.spacing[2]} 0;
-  line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-`;
-
-const ProductDescription = styled.p`
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.text.secondary};
-  margin: 0 0 ${theme.spacing[3]} 0;
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-`;
-
-const PriceContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  margin-bottom: ${theme.spacing[3]};
-`;
-
-const CurrentPrice = styled.span`
-  font-size: ${theme.fontSizes.xl};
-  font-weight: ${theme.fontWeights.bold};
-  color: ${theme.colors.primaryPurple};
-`;
-
-const OriginalPrice = styled.span`
-  font-size: ${theme.fontSizes.base};
-  color: ${theme.colors.warmGray};
-  text-decoration: line-through;
-`;
-
-const DiscountBadge = styled.span`
-  background: ${theme.colors.coralAccent};
-  color: ${theme.colors.white};
-  font-size: ${theme.fontSizes.xs};
-  font-weight: ${theme.fontWeights.medium};
-  padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.full};
-`;
-
-const ProductMeta = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: ${theme.spacing[3]};
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.text.secondary};
-`;
-
-const RatingContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-`;
-
-const StarIcon = styled(Star)`
-  color: ${theme.colors.warning};
-  width: 16px;
-  height: 16px;
-`;
-
-const CategoryTag = styled.span`
-  background: ${theme.colors.softPurple};
-  color: ${theme.colors.primaryPurple};
-  font-size: ${theme.fontSizes.xs};
-  font-weight: ${theme.fontWeights.medium};
-  padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.full};
-`;
-
-const TagsContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: ${theme.spacing[1]};
-  margin-bottom: ${theme.spacing[3]};
-`;
-
-const Tag = styled.span`
-  background: ${theme.colors.background.accent};
-  color: ${theme.colors.text.secondary};
-  font-size: ${theme.fontSizes.xs};
-  padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.full};
-`;
-
-const ActionsContainer = styled.div`
-  display: flex;
-  gap: ${theme.spacing[2]};
-  flex-wrap: wrap;
-`;
-
-export const ProductCard: React.FC<ProductCardProps> = ({
-  product,
-  onEdit,
-  onDelete,
-  onToggleStatus,
-  onViewDetails,
-}) => {
-  const hasDiscount = product.salePrice && product.salePrice < product.price;
-  const discountPercentage = hasDiscount
-    ? Math.round(((product.price - product.salePrice!) / product.price) * 100)
-    : 0;
-
-  const isLowStock = product.stockQuantity <= 5 && product.stockQuantity > 0;
-  const isOutOfStock = product.stockQuantity === 0;
-
-  const currentPrice = product.salePrice || product.price;
-  const safeCurrentPrice =
-    typeof currentPrice === 'number' ? currentPrice : product.price;
-
-  return (
-    <Card hover clickable shadow='medium' padding='small'>
-      <ProductImageContainer>
-        {product.images.length > 0 ? (
-          <ProductImage
-            src={product.images[0]}
-            alt={product.name}
-            onError={e => {
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-            }}
-          />
-        ) : (
-          <div
-            style={{
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: theme.colors.background.light,
-              color: theme.colors.warmGray,
-              fontSize: theme.fontSizes.sm,
-            }}
-          >
-            <Package size={24} data-testid='placeholder-icon' />
-          </div>
-        )}
-
-        <ImageOverlay />
-
-        <StatusBadge isActive={product.isActive}>
-          {product.isActive ? <CheckCircle size={12} /> : <XCircle size={12} />}
-          {product.isActive ? 'Activo' : 'Inactivo'}
-        </StatusBadge>
-
-        <StockBadge isLowStock={isLowStock} isOutOfStock={isOutOfStock}>
-          {isOutOfStock ? (
-            <XCircle size={12} />
-          ) : isLowStock ? (
-            <AlertTriangle size={12} />
+    return (
+      <Card hover clickable shadow='medium' padding='small'>
+        {/* Image */}
+        <div className='relative h-[200px] w-full overflow-hidden rounded-t-lg bg-muted'>
+          {product.images.length > 0 ? (
+            <img
+              src={product.images[0]}
+              alt={product.name}
+              className='h-full w-full object-cover transition-transform duration-200'
+              onError={e => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
           ) : (
-            <CheckCircle size={12} />
+            <div className='flex h-full w-full items-center justify-center text-muted-foreground'>
+              <PackageIcon size={24} data-testid='placeholder-icon' />
+            </div>
           )}
-          {isOutOfStock ? 'Sin stock' : isLowStock ? 'Stock bajo' : 'En stock'}
-        </StockBadge>
-      </ProductImageContainer>
 
-      <ProductInfo>
-        {product.category ? (
-          <CategoryTag>{product.category.name}</CategoryTag>
-        ) : null}
+          {/* Status badge */}
+          <span
+            className={cn(
+              'absolute right-3 top-3 z-10 flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium text-white',
+              product.isActive ? 'bg-green-500' : 'bg-yellow-500'
+            )}
+          >
+            {product.isActive ? (
+              <CheckCircleIcon size={12} />
+            ) : (
+              <XCircleIcon size={12} />
+            )}
+            {product.isActive ? 'Activo' : 'Inactivo'}
+          </span>
 
-        <ProductName>{product.name}</ProductName>
+          {/* Stock badge */}
+          <span
+            className={cn(
+              'absolute left-3 top-3 z-10 flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium text-white',
+              isOutOfStock
+                ? 'bg-destructive'
+                : isLowStock
+                  ? 'bg-yellow-500'
+                  : 'bg-green-500'
+            )}
+          >
+            {isOutOfStock ? (
+              <XCircleIcon size={12} />
+            ) : isLowStock ? (
+              <AlertTriangleIcon size={12} />
+            ) : (
+              <CheckCircleIcon size={12} />
+            )}
+            {isOutOfStock
+              ? 'Sin stock'
+              : isLowStock
+                ? 'Stock bajo'
+                : 'En stock'}
+          </span>
+        </div>
 
-        {product.description ? (
-          <ProductDescription>{product.description}</ProductDescription>
-        ) : null}
-
-        <PriceContainer>
-          <CurrentPrice>S/ {safeCurrentPrice.toFixed(2)}</CurrentPrice>
-          {hasDiscount ? (
-            <>
-              <OriginalPrice>S/ {product.price.toFixed(2)}</OriginalPrice>
-              <DiscountBadge>-{discountPercentage}%</DiscountBadge>
-            </>
-          ) : null}
-        </PriceContainer>
-
-        <ProductMeta>
-          <RatingContainer>
-            <StarIcon />
-            <span>{product.rating?.toFixed(1) || 'N/A'}</span>
-            <span>({product.reviewCount})</span>
-          </RatingContainer>
-          <span>Stock: {product.stockQuantity}</span>
-        </ProductMeta>
-
-        {product.tags.length > 0 && (
-          <TagsContainer>
-            {product.tags.slice(0, 3).map((tag, index) => (
-              <Tag key={index}>{tag}</Tag>
-            ))}
-            {product.tags.length > 3 && <Tag>+{product.tags.length - 3}</Tag>}
-          </TagsContainer>
-        )}
-
-        <ActionsContainer>
-          {onViewDetails ? (
-            <Button
-              variant='primary'
-              size='small'
-              onClick={() => onViewDetails(product.id)}
-              fullWidth
-              aria-label='Ver detalles del producto'
-            >
-              <Eye size={14} />
-              Ver Detalles
-            </Button>
+        {/* Content */}
+        <div className='p-4'>
+          {product.category ? (
+            <span className='mb-2 inline-block rounded-full bg-brand-purple/10 px-2 py-0.5 text-xs font-medium text-brand-purple'>
+              {product.category.name}
+            </span>
           ) : null}
 
-          {onEdit ? (
-            <Button
-              variant='outline'
-              size='small'
-              onClick={() => onEdit(product.id)}
-              aria-label='Editar producto'
-            >
-              <Edit size={14} />
-              Editar
-            </Button>
+          <h3 className='font-heading mb-2 line-clamp-2 text-lg font-semibold leading-snug text-foreground'>
+            {product.name}
+          </h3>
+
+          {product.description ? (
+            <p className='mb-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground'>
+              {product.description}
+            </p>
           ) : null}
 
-          {onToggleStatus ? (
-            <Button
-              variant={product.isActive ? 'ghost' : 'secondary'}
-              size='small'
-              onClick={() => onToggleStatus(product.id, !product.isActive)}
-              aria-label='Cambiar estado del producto'
-            >
-              {product.isActive ? 'Desactivar' : 'Activar'}
-            </Button>
+          {/* Price */}
+          <div className='mb-3 flex items-center gap-2'>
+            <span className='text-xl font-bold text-brand-purple'>
+              S/ {currentPrice.toFixed(2)}
+            </span>
+            {hasDiscount ? (
+              <>
+                <span className='text-base text-muted-foreground line-through'>
+                  S/ {product.price.toFixed(2)}
+                </span>
+                <span className='rounded-full bg-[#FF6B6B] px-2 py-0.5 text-xs font-medium text-white'>
+                  -{discountPercentage}%
+                </span>
+              </>
+            ) : null}
+          </div>
+
+          {/* Rating + stock */}
+          <div className='mb-3 flex items-center justify-between text-sm text-muted-foreground'>
+            <div className='flex items-center gap-1'>
+              <StarIcon size={16} className='text-yellow-400' />
+              <span>{product.rating?.toFixed(1) ?? 'N/A'}</span>
+              <span>({product.reviewCount})</span>
+            </div>
+            <span>Stock: {product.stockQuantity}</span>
+          </div>
+
+          {/* Tags */}
+          {product.tags.length > 0 ? (
+            <div className='mb-3 flex flex-wrap gap-1'>
+              {product.tags.slice(0, 3).map((tag, i) => (
+                <span
+                  key={i}
+                  className='rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground'
+                >
+                  {tag}
+                </span>
+              ))}
+              {product.tags.length > 3 ? (
+                <span className='rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground'>
+                  +{product.tags.length - 3}
+                </span>
+              ) : null}
+            </div>
           ) : null}
 
-          {onDelete ? (
-            <Button
-              variant='danger'
-              size='small'
-              onClick={() => onDelete(product.id)}
-              aria-label='Eliminar producto'
-            >
-              <Trash2 size={14} />
-              Eliminar
-            </Button>
-          ) : null}
-        </ActionsContainer>
-      </ProductInfo>
-    </Card>
-  );
-};
+          {/* Actions */}
+          <div className='flex flex-wrap gap-2'>
+            {onViewDetails ? (
+              <Button
+                variant='primary'
+                size='small'
+                onClick={() => onViewDetails(product.id)}
+                fullWidth
+                aria-label='Ver detalles del producto'
+              >
+                <EyeIcon size={14} />
+                Ver Detalles
+              </Button>
+            ) : null}
+            {onEdit ? (
+              <Button
+                variant='outline'
+                size='small'
+                onClick={() => onEdit(product.id)}
+                aria-label='Editar producto'
+              >
+                <EditIcon size={14} />
+                Editar
+              </Button>
+            ) : null}
+            {onToggleStatus ? (
+              <Button
+                variant={product.isActive ? 'ghost' : 'secondary'}
+                size='small'
+                onClick={() => onToggleStatus(product.id, !product.isActive)}
+                aria-label='Cambiar estado del producto'
+              >
+                {product.isActive ? 'Desactivar' : 'Activar'}
+              </Button>
+            ) : null}
+            {onDelete ? (
+              <Button
+                variant='danger'
+                size='small'
+                onClick={() => onDelete(product.id)}
+                aria-label='Eliminar producto'
+              >
+                <Trash2Icon size={14} />
+                Eliminar
+              </Button>
+            ) : null}
+          </div>
+        </div>
+      </Card>
+    );
+  }
+);
+ProductCard.displayName = 'ProductCard';

@@ -1,273 +1,30 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { theme } from '@/styles/theme';
-import {
-  Search,
-  Bell,
-  User,
-  Settings,
-  LogOut,
-  ChevronDown,
-} from 'lucide-react';
+import type React from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import SearchIcon from 'lucide-react/dist/esm/icons/search';
+import BellIcon from 'lucide-react/dist/esm/icons/bell';
+import UserIcon from 'lucide-react/dist/esm/icons/user';
+import SettingsIcon from 'lucide-react/dist/esm/icons/settings';
+import LogOutIcon from 'lucide-react/dist/esm/icons/log-out';
+import ChevronDownIcon from 'lucide-react/dist/esm/icons/chevron-down';
+import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLogout } from '@/hooks/useLogout';
 import { LogoutConfirmModal } from '@/components/auth/LogoutConfirmModal';
 import { useSidebar } from '@/contexts/SidebarContext';
 
-const HeaderContainer = styled.header<{ sidebarWidth: number }>`
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: ${props => props.sidebarWidth}px;
-  height: 80px;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid ${theme.colors.border.light};
-  z-index: ${theme.zIndex.header};
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 ${theme.spacing[6]};
-  transition: left ${theme.transitions.base};
-
-  @media (max-width: ${theme.breakpoints.lg}) {
-    left: 0;
-    padding: 0 ${theme.spacing[4]};
+const getUserInitials = (name: string) => {
+  if (!name) return 'U';
+  if (name.includes('@')) {
+    const emailUser = name.split('@')[0];
+    if (emailUser) return emailUser.charAt(0).toUpperCase();
   }
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    height: 70px;
-  }
-
-  @media (max-width: ${theme.breakpoints.sm}) {
-    height: 60px;
-    padding: 0 ${theme.spacing[3]};
-  }
-`;
-
-const SearchContainer = styled.div<{ isCollapsed: boolean }>`
-  flex: 1;
-  max-width: ${props => (props.isCollapsed ? '500px' : '400px')};
-  position: relative;
-  margin-right: ${theme.spacing[6]};
-  transition: max-width ${theme.transitions.base};
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    max-width: 300px;
-    margin-right: ${theme.spacing[4]};
-  }
-
-  @media (max-width: ${theme.breakpoints.sm}) {
-    display: none;
-  }
-`;
-
-const SearchInput = styled.input`
-  width: 100%;
-  padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  padding-left: ${theme.spacing[10]};
-  font-size: ${theme.fontSizes.base};
-  background: ${theme.colors.white};
-  border: 2px solid ${theme.colors.border.light};
-  border-radius: ${theme.borderRadius.lg};
-  transition: all ${theme.transitions.base};
-  outline: none;
-
-  &:focus {
-    border-color: ${theme.colors.primaryPurple};
-    box-shadow: 0 0 0 3px ${theme.colors.primaryPurple}20;
-  }
-
-  &::placeholder {
-    color: ${theme.colors.warmGray};
-  }
-`;
-
-const SearchIcon = styled(Search)`
-  position: absolute;
-  left: ${theme.spacing[3]};
-  top: 50%;
-  transform: translateY(-50%);
-  color: ${theme.colors.warmGray};
-  width: 20px;
-  height: 20px;
-  pointer-events: none;
-`;
-
-const HeaderActions = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-`;
-
-const NotificationButton = styled.button`
-  position: relative;
-  background: none;
-  border: none;
-  padding: ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.md};
-  color: ${theme.colors.warmGray};
-  cursor: pointer;
-  transition: all ${theme.transitions.base};
-
-  &:hover {
-    background: ${theme.colors.background.accent};
-    color: ${theme.colors.primaryPurple};
-  }
-`;
-
-const NotificationBadge = styled.div`
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 8px;
-  height: 8px;
-  background: ${theme.colors.coralAccent};
-  border-radius: 50%;
-`;
-
-const UserProfile = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-  cursor: pointer;
-  padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  border-radius: ${theme.borderRadius.md};
-  transition: all ${theme.transitions.base};
-
-  &:hover {
-    background: ${theme.colors.background.accent};
-  }
-
-  @media (max-width: ${theme.breakpoints.sm}) {
-    gap: ${theme.spacing[2]};
-  }
-`;
-
-const Avatar = styled.div`
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(
-    135deg,
-    ${theme.colors.primaryPurple},
-    ${theme.colors.coralAccent}
-  );
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${theme.colors.white};
-  font-weight: ${theme.fontWeights.medium};
-
-  @media (max-width: ${theme.breakpoints.sm}) {
-    width: 32px;
-    height: 32px;
-    font-size: ${theme.fontSizes.sm};
-  }
-`;
-
-const UserInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  @media (max-width: ${theme.breakpoints.sm}) {
-    display: none;
-  }
-`;
-
-const UserName = styled.span`
-  font-size: ${theme.fontSizes.sm};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${theme.colors.text.primary};
-  line-height: 1.2;
-`;
-
-const UserRole = styled.span`
-  font-size: ${theme.fontSizes.xs};
-  color: ${theme.colors.text.secondary};
-  line-height: 1.2;
-`;
-
-const MobileMenuButton = styled.button`
-  display: none;
-  background: none;
-  border: none;
-  padding: ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.md};
-  color: ${theme.colors.warmGray};
-  cursor: pointer;
-  transition: all ${theme.transitions.base};
-
-  &:hover {
-    background: ${theme.colors.background.accent};
-    color: ${theme.colors.primaryPurple};
-  }
-
-  @media (max-width: ${theme.breakpoints.lg}) {
-    display: block;
-  }
-`;
-
-const UserDropdown = styled.div`
-  position: relative;
-`;
-
-const UserDropdownMenu = styled.div<{ isOpen: boolean }>`
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: ${theme.spacing[2]};
-  background: ${theme.colors.white};
-  border: 1px solid ${theme.colors.border.light};
-  border-radius: ${theme.borderRadius.lg};
-  box-shadow: ${theme.shadows.lg};
-  min-width: 200px;
-  opacity: ${({ isOpen }) => (isOpen ? 1 : 0)};
-  visibility: ${({ isOpen }) => (isOpen ? 'visible' : 'hidden')};
-  transform: ${({ isOpen }) =>
-    isOpen ? 'translateY(0)' : 'translateY(-10px)'};
-  transition: all ${theme.transitions.base};
-  z-index: ${theme.zIndex.dropdown};
-`;
-
-const UserDropdownItem = styled.button`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-  padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  background: none;
-  border: none;
-  color: ${theme.colors.text.primary};
-  font-size: ${theme.fontSizes.sm};
-  cursor: pointer;
-  transition: all ${theme.transitions.fast};
-
-  &:hover {
-    background: ${theme.colors.background.accent};
-    color: ${theme.colors.primaryPurple};
-  }
-
-  &:first-child {
-    border-radius: ${theme.borderRadius.lg} ${theme.borderRadius.lg} 0 0;
-  }
-
-  &:last-child {
-    border-radius: 0 0 ${theme.borderRadius.lg} ${theme.borderRadius.lg};
-    border-top: 1px solid ${theme.colors.border.light};
-    color: ${theme.colors.error};
-  }
-
-  &:last-child:hover {
-    background: ${theme.colors.error}10;
-    color: ${theme.colors.error};
-  }
-`;
-
-const DropdownArrow = styled(ChevronDown)<{ isOpen: boolean }>`
-  transition: transform ${theme.transitions.fast};
-  transform: ${({ isOpen }) => (isOpen ? 'rotate(180deg)' : 'rotate(0deg)')};
-`;
+  return name
+    .split(' ')
+    .map(word => word.charAt(0))
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+};
 
 export const Header: React.FC = () => {
   const { user } = useAuth();
@@ -283,107 +40,126 @@ export const Header: React.FC = () => {
 
   const sidebarWidth = isCollapsed ? 80 : 280;
 
-  const handleUserClick = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
+  const handleUserClick = useCallback(() => {
+    setIsDropdownOpen(prev => !prev);
+  }, []);
 
-  const handleLogoutClick = () => {
+  const handleLogoutClick = useCallback(() => {
     setIsDropdownOpen(false);
     openLogoutModal();
-  };
+  }, [openLogoutModal]);
 
-  // Close dropdown when clicking outside
-  React.useEffect(() => {
+  useEffect(() => {
     const handleClickOutside = () => setIsDropdownOpen(false);
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  const getUserInitials = (name: string) => {
-    if (!name) return 'U';
-
-    // If it's an email, use the part before @
-    if (name.includes('@')) {
-      const emailUser = name.split('@')[0];
-      if (emailUser) {
-        return emailUser.charAt(0).toUpperCase();
-      }
-    }
-
-    // If it's a regular name, use first letters of words
-    return name
-      .split(' ')
-      .map(word => word.charAt(0))
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
+  const displayName =
+    user?.profile?.firstName && user?.profile?.lastName
+      ? `${user.profile.firstName} ${user.profile.lastName}`
+      : (user?.email ?? 'Usuario');
 
   return (
-    <HeaderContainer sidebarWidth={sidebarWidth}>
-      <MobileMenuButton>
-        <Settings size={24} />
-      </MobileMenuButton>
+    <header
+      className='fixed right-0 top-0 z-[100] flex h-20 items-center justify-between border-b border-border bg-white/95 px-6 backdrop-blur-[10px] transition-[left] duration-200 max-lg:left-0 max-lg:px-4 md:h-[70px] sm:h-[60px] sm:px-3'
+      style={{ left: sidebarWidth }}
+    >
+      {/* Mobile menu placeholder */}
+      <button className='hidden rounded-md p-2 text-muted-foreground transition-all hover:bg-muted hover:text-brand-purple max-lg:block'>
+        <SettingsIcon size={24} />
+      </button>
 
-      <SearchContainer isCollapsed={isCollapsed}>
-        <SearchIcon />
-        <SearchInput placeholder='Buscar productos, pedidos...' type='search' />
-      </SearchContainer>
+      {/* Search */}
+      <div
+        className={cn(
+          'relative mr-6 flex-1 transition-[max-width] duration-200 max-md:mr-4 max-md:max-w-[300px] max-sm:hidden',
+          isCollapsed ? 'max-w-[500px]' : 'max-w-[400px]'
+        )}
+      >
+        <SearchIcon
+          size={20}
+          className='pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground'
+        />
+        <input
+          type='search'
+          placeholder='Buscar productos, pedidos...'
+          className='w-full rounded-lg border-2 border-border bg-white py-3 pl-10 pr-4 text-base outline-none transition-all placeholder:text-muted-foreground focus:border-brand-purple focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-brand-purple)_20%,transparent)]'
+        />
+      </div>
 
-      <HeaderActions>
-        <NotificationButton>
-          <Bell size={20} />
-          <NotificationBadge />
-        </NotificationButton>
+      {/* Actions */}
+      <div className='flex items-center gap-3'>
+        {/* Notification bell */}
+        <button className='relative rounded-md p-2 text-muted-foreground transition-all hover:bg-muted hover:text-brand-purple'>
+          <BellIcon size={20} />
+          <span className='absolute right-1 top-1 h-2 w-2 rounded-full bg-destructive' />
+        </button>
 
-        <UserDropdown>
-          <UserProfile onClick={handleUserClick}>
-            <Avatar>
-              {user
-                ? getUserInitials(
-                    user.profile?.firstName && user.profile?.lastName
-                      ? `${user.profile.firstName} ${user.profile.lastName}`
-                      : user.email
-                  )
-                : 'U'}
-            </Avatar>
-            <UserInfo>
-              <UserName>
-                {user?.profile?.firstName && user?.profile?.lastName
-                  ? `${user.profile.firstName} ${user.profile.lastName}`
-                  : user?.email || 'Usuario'}
-              </UserName>
-              <UserRole>
+        {/* User dropdown */}
+        <div className='relative'>
+          <div
+            onClick={handleUserClick}
+            className='flex cursor-pointer items-center gap-3 rounded-md p-2 transition-all hover:bg-muted max-sm:gap-2'
+          >
+            {/* Avatar */}
+            <div className='flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-purple to-[#FF6B6B] font-medium text-white max-sm:h-8 max-sm:w-8 max-sm:text-sm'>
+              {user ? getUserInitials(displayName) : 'U'}
+            </div>
+
+            {/* User info */}
+            <div className='flex flex-col max-sm:hidden'>
+              <span className='text-sm font-medium leading-tight text-foreground'>
+                {displayName}
+              </span>
+              <span className='text-xs leading-tight text-muted-foreground'>
                 {user?.role === 'admin' ? 'Administrador' : 'Usuario'}
-              </UserRole>
-            </UserInfo>
-            <DropdownArrow size={16} isOpen={isDropdownOpen} />
-          </UserProfile>
+              </span>
+            </div>
 
-          <UserDropdownMenu isOpen={isDropdownOpen}>
-            <UserDropdownItem>
-              <User size={16} />
+            <ChevronDownIcon
+              size={16}
+              className={cn(
+                'text-muted-foreground transition-transform duration-200',
+                isDropdownOpen && 'rotate-180'
+              )}
+            />
+          </div>
+
+          {/* Dropdown menu */}
+          <div
+            className={cn(
+              'absolute right-0 top-full z-[200] mt-2 min-w-[200px] overflow-hidden rounded-lg border border-border bg-white shadow-lg transition-all duration-200',
+              isDropdownOpen
+                ? 'visible translate-y-0 opacity-100'
+                : 'invisible -translate-y-2 opacity-0'
+            )}
+          >
+            <button className='flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-foreground transition-colors hover:bg-muted hover:text-brand-purple'>
+              <UserIcon size={16} />
               Mi Perfil
-            </UserDropdownItem>
-            <UserDropdownItem>
-              <Settings size={16} />
+            </button>
+            <button className='flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-foreground transition-colors hover:bg-muted hover:text-brand-purple'>
+              <SettingsIcon size={16} />
               Configuración
-            </UserDropdownItem>
-            <UserDropdownItem onClick={handleLogoutClick}>
-              <LogOut size={16} />
+            </button>
+            <button
+              onClick={handleLogoutClick}
+              className='flex w-full items-center gap-3 border-t border-border px-4 py-3 text-left text-sm text-destructive transition-colors hover:bg-destructive/10'
+            >
+              <LogOutIcon size={16} />
               Cerrar Sesión
-            </UserDropdownItem>
-          </UserDropdownMenu>
-        </UserDropdown>
-      </HeaderActions>
+            </button>
+          </div>
+        </div>
+      </div>
 
-      {/* Logout Confirmation Modal */}
       <LogoutConfirmModal
         isOpen={isLogoutModalOpen}
         onClose={closeLogoutModal}
         onConfirm={handleLogout}
         isLoading={isLoggingOut}
       />
-    </HeaderContainer>
+    </header>
   );
 };

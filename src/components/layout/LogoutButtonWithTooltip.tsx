@@ -1,7 +1,6 @@
 import type React from 'react';
-import styled from 'styled-components';
-import { LogOut } from 'lucide-react';
-import { theme } from '@/styles/theme';
+import LogOutIcon from 'lucide-react/dist/esm/icons/log-out';
+import { cn } from '@/lib/utils';
 import { useSidebarTooltip } from '@/hooks/useSidebarTooltip';
 
 interface LogoutButtonWithTooltipProps {
@@ -9,64 +8,35 @@ interface LogoutButtonWithTooltipProps {
   isCollapsed: boolean;
 }
 
-const StyledLogoutButton = styled.button<{ isCollapsed: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: ${props => (props.isCollapsed ? 0 : theme.spacing[3])};
-  width: 100%;
-  padding: ${props => (props.isCollapsed ? theme.spacing[4] : theme.spacing[3])}
-    ${props => (props.isCollapsed ? theme.spacing[2] : theme.spacing[4])};
-  background: none;
-  border: 1px solid ${theme.colors.border.light};
-  border-radius: ${theme.borderRadius.md};
-  color: ${theme.colors.error};
-  font-size: ${theme.fontSizes.sm};
-  cursor: pointer;
-  transition: all ${theme.transitions.base};
-  margin-bottom: ${theme.spacing[3]};
-  justify-content: ${props => (props.isCollapsed ? 'center' : 'flex-start')};
-  min-height: 48px;
-  position: relative;
-
-  &:hover {
-    background: ${theme.colors.error}10;
-    border-color: ${theme.colors.error};
-    color: ${theme.colors.error};
-  }
-
-  svg {
-    width: 18px;
-    height: 18px;
-  }
-
-  span {
-    opacity: ${props => (props.isCollapsed ? 0 : 1)};
-    transition: opacity ${theme.transitions.base};
-    white-space: nowrap;
-    overflow: hidden;
-    width: ${props => (props.isCollapsed ? 0 : 'auto')};
-  }
-`;
-
 export const LogoutButtonWithTooltip: React.FC<
   LogoutButtonWithTooltipProps
 > = ({ onClick, isCollapsed }) => {
   const { isVisible, showTooltip, hideTooltip } = useSidebarTooltip(300);
 
   return (
-    <StyledLogoutButton
+    <button
       onClick={onClick}
-      isCollapsed={isCollapsed}
       onMouseEnter={isCollapsed ? showTooltip : undefined}
       onMouseLeave={isCollapsed ? hideTooltip : undefined}
+      className={cn(
+        'relative mb-3 flex min-h-12 w-full items-center rounded-md border border-border text-sm text-destructive transition-all hover:border-destructive hover:bg-destructive/10',
+        isCollapsed ? 'justify-center gap-0 px-2 py-4' : 'justify-start gap-3 px-4 py-3'
+      )}
     >
-      <LogOut />
-      <span>Cerrar Sesión</span>
+      <LogOutIcon size={18} />
+      <span
+        className={cn(
+          'overflow-hidden whitespace-nowrap transition-all',
+          isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
+        )}
+      >
+        Cerrar Sesión
+      </span>
       {isCollapsed && isVisible ? (
-        <span className='absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 rounded bg-foreground px-2 py-1 text-xs whitespace-nowrap text-background pointer-events-none'>
+        <span className='pointer-events-none absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 whitespace-nowrap rounded bg-foreground px-2 py-1 text-xs text-background'>
           Cerrar Sesión
         </span>
       ) : null}
-    </StyledLogoutButton>
+    </button>
   );
 };

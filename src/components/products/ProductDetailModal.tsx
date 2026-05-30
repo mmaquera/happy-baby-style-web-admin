@@ -1,31 +1,28 @@
-import React from 'react';
-import styled from 'styled-components';
-import { theme } from '@/styles/theme';
-import { Card } from '@/components/ui/Card';
+import { useState } from 'react';
+import type React from 'react';
+import XIcon from 'lucide-react/dist/esm/icons/x';
+import EyeIcon from 'lucide-react/dist/esm/icons/eye';
+import Edit3Icon from 'lucide-react/dist/esm/icons/edit-3';
+import PackageIcon from 'lucide-react/dist/esm/icons/package';
+import TagIcon from 'lucide-react/dist/esm/icons/tag';
+import HashIcon from 'lucide-react/dist/esm/icons/hash';
+import FileTextIcon from 'lucide-react/dist/esm/icons/file-text';
+import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
+import StarIcon from 'lucide-react/dist/esm/icons/star';
+import CalendarIcon from 'lucide-react/dist/esm/icons/calendar';
+import BarChart3Icon from 'lucide-react/dist/esm/icons/bar-chart-3';
+import MessageSquareIcon from 'lucide-react/dist/esm/icons/message-square';
+import TrendingUpIcon from 'lucide-react/dist/esm/icons/trending-up';
+import MapPinIcon from 'lucide-react/dist/esm/icons/map-pin';
+import SettingsIcon from 'lucide-react/dist/esm/icons/settings';
+import ActivityIcon from 'lucide-react/dist/esm/icons/activity';
+import AlertCircleIcon from 'lucide-react/dist/esm/icons/alert-circle';
+import UserIcon from 'lucide-react/dist/esm/icons/user';
+import ThumbsUpIcon from 'lucide-react/dist/esm/icons/thumbs-up';
+import DatabaseIcon from 'lucide-react/dist/esm/icons/database';
+import ShoppingBagIcon from 'lucide-react/dist/esm/icons/shopping-bag';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
-import {
-  X,
-  Eye,
-  Edit3,
-  Package,
-  Tag,
-  Hash,
-  FileText,
-  CheckCircle,
-  Star,
-  Calendar,
-  BarChart3,
-  MessageSquare,
-  TrendingUp,
-  MapPin,
-  Settings,
-  Activity,
-  AlertCircle,
-  User,
-  ThumbsUp,
-  Database,
-  ShoppingBag,
-} from 'lucide-react';
 import type {
   Product,
   ProductReview,
@@ -41,379 +38,34 @@ interface ProductDetailModalProps {
   onEdit: (product: Product) => void;
 }
 
-const ModalOverlay = styled.div<{ isOpen: boolean }>`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  display: ${({ isOpen }) => (isOpen ? 'flex' : 'none')};
-  align-items: center;
-  justify-content: center;
-  z-index: ${theme.zIndex.modal};
-  padding: ${theme.spacing[4]};
-`;
+const Section = ({
+  title,
+  icon,
+  children,
+}: {
+  title: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) => (
+  <div className='rounded-lg border border-border bg-muted p-4'>
+    <h3 className='font-heading mb-3 flex items-center gap-2 text-lg font-semibold text-foreground'>
+      {icon}
+      {title}
+    </h3>
+    {children}
+  </div>
+);
 
-const ModalContainer = styled(Card)`
-  width: 100%;
-  max-width: 1000px;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  padding: 0;
-  z-index: ${theme.zIndex.modal + 1};
-`;
-
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: ${theme.spacing[6]};
-  border-bottom: 1px solid ${theme.colors.border.light};
-  position: sticky;
-  top: 0;
-  background: ${theme.colors.white};
-  z-index: ${theme.zIndex.modal + 2};
-`;
-
-const ModalTitle = styled.h2`
-  font-family: ${theme.fonts.heading};
-  font-size: ${theme.fontSizes.xl};
-  font-weight: ${theme.fontWeights.semibold};
-  color: ${theme.colors.text.primary};
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  color: ${theme.colors.text.secondary};
-  cursor: pointer;
-  padding: ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.md};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all ${theme.transitions.base};
-
-  &:hover {
-    background: ${theme.colors.background.accent};
-    color: ${theme.colors.text.primary};
-  }
-`;
-
-const ModalBody = styled.div`
-  padding: ${theme.spacing[6]};
-`;
-
-const ProductHeader = styled.div`
-  display: grid;
-  grid-template-columns: 300px 1fr;
-  gap: ${theme.spacing[6]};
-  margin-bottom: ${theme.spacing[6]};
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const ImageSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[3]};
-`;
-
-const MainImage = styled.div`
-  width: 100%;
-  height: 300px;
-  border-radius: ${theme.borderRadius.lg};
-  overflow: hidden;
-  border: 2px solid ${theme.colors.border.light};
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-`;
-
-const ImageThumbnails = styled.div`
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: ${theme.spacing[2]};
-`;
-
-const ImageThumbnail = styled.div<{ isActive: boolean }>`
-  width: 60px;
-  height: 60px;
-  border-radius: ${theme.borderRadius.md};
-  overflow: hidden;
-  border: 2px solid
-    ${({ isActive }) =>
-      isActive ? theme.colors.primary : theme.colors.border.light};
-  cursor: pointer;
-  transition: all ${theme.transitions.base};
-
-  &:hover {
-    border-color: ${theme.colors.primary};
-  }
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-`;
-
-const ProductInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[4]};
-`;
-
-const ProductTitle = styled.h1`
-  font-family: ${theme.fonts.heading};
-  font-size: ${theme.fontSizes['2xl']};
-  font-weight: ${theme.fontWeights.bold};
-  color: ${theme.colors.text.primary};
-  margin: 0;
-`;
-
-const ProductSKU = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  font-family: ${theme.fonts.primary};
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.text.secondary};
-`;
-
-const PriceSection = styled.div`
-  display: flex;
-  align-items: baseline;
-  gap: ${theme.spacing[3]};
-`;
-
-const CurrentPrice = styled.span`
-  font-family: ${theme.fonts.heading};
-  font-size: ${theme.fontSizes['2xl']};
-  font-weight: ${theme.fontWeights.bold};
-  color: ${theme.colors.primary};
-`;
-
-const OriginalPrice = styled.span`
-  font-family: ${theme.fonts.primary};
-  font-size: ${theme.fontSizes.lg};
-  color: ${theme.colors.text.secondary};
-  text-decoration: line-through;
-`;
-
-const DiscountBadge = styled.span`
-  background: ${theme.colors.success};
-  color: ${theme.colors.white};
-  padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.full};
-  font-size: ${theme.fontSizes.xs};
-  font-weight: ${theme.fontWeights.medium};
-`;
-
-const StatusBadge = styled.span<{ isActive: boolean }>`
-  background: ${({ isActive }) =>
-    isActive ? theme.colors.success : theme.colors.error};
-  color: ${theme.colors.white};
-  padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.full};
-  font-size: ${theme.fontSizes.xs};
-  font-weight: ${theme.fontWeights.medium};
-  align-self: flex-start;
-`;
-
-const StockInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  font-family: ${theme.fonts.primary};
-  font-size: ${theme.fontSizes.sm};
-`;
-
-const StockBadge = styled.span<{ isInStock: boolean; isLowStock: boolean }>`
-  background: ${({ isInStock, isLowStock }) => {
-    if (!isInStock) return theme.colors.error;
-    if (isLowStock) return theme.colors.warning;
-    return theme.colors.success;
-  }};
-  color: ${theme.colors.white};
-  padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.full};
-  font-size: ${theme.fontSizes.xs};
-  font-weight: ${theme.fontWeights.medium};
-`;
-
-const RatingSection = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-`;
-
-const Stars = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 2px;
-`;
-
-const StarIcon = styled(Star)<{ filled: boolean }>`
-  color: ${({ filled }) =>
-    filled ? theme.colors.warning : theme.colors.border.light};
-  fill: ${({ filled }) => (filled ? theme.colors.warning : 'none')};
-`;
-
-const ContentGrid = styled.div`
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: ${theme.spacing[6]};
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const MainContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[6]};
-`;
-
-const Sidebar = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[4]};
-`;
-
-const Section = styled.div`
-  background: ${theme.colors.background.light};
-  border-radius: ${theme.borderRadius.lg};
-  padding: ${theme.spacing[4]};
-  border: 1px solid ${theme.colors.border.light};
-`;
-
-const SectionTitle = styled.h3`
-  font-family: ${theme.fonts.heading};
-  font-size: ${theme.fontSizes.lg};
-  font-weight: ${theme.fontWeights.semibold};
-  color: ${theme.colors.text.primary};
-  margin: 0 0 ${theme.spacing[3]} 0;
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-`;
-
-const Description = styled.p`
-  font-family: ${theme.fonts.primary};
-  font-size: ${theme.fontSizes.base};
-  color: ${theme.colors.text.secondary};
-  line-height: 1.6;
-  margin: 0;
-`;
-
-const TagsContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: ${theme.spacing[2]};
-`;
-
-const TagChip = styled.span`
-  background: ${theme.colors.primary};
-  color: ${theme.colors.white};
-  padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.full};
-  font-size: ${theme.fontSizes.xs};
-  font-weight: ${theme.fontWeights.medium};
-`;
-
-const VariantsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: ${theme.spacing[3]};
-`;
-
-const VariantCard = styled.div<{ isActive: boolean }>`
-  background: ${theme.colors.white};
-  border: 1px solid
-    ${({ isActive }) =>
-      isActive ? theme.colors.primary : theme.colors.border.light};
-  border-radius: ${theme.borderRadius.md};
-  padding: ${theme.spacing[3]};
-  opacity: ${({ isActive }) => (isActive ? 1 : 0.7)};
-`;
-
-const VariantName = styled.div`
-  font-family: ${theme.fonts.primary};
-  font-size: ${theme.fontSizes.sm};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[2]};
-`;
-
-const VariantPrice = styled.div`
-  font-family: ${theme.fonts.primary};
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.text.secondary};
-`;
-
-const VariantStock = styled.div`
-  font-family: ${theme.fonts.primary};
-  font-size: ${theme.fontSizes.xs};
-  color: ${theme.colors.text.secondary};
-  margin-top: ${theme.spacing[1]};
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: ${theme.spacing[3]};
-`;
-
-const StatItem = styled.div`
-  text-align: center;
-  padding: ${theme.spacing[3]};
-  background: ${theme.colors.white};
-  border-radius: ${theme.borderRadius.md};
-  border: 1px solid ${theme.colors.border.light};
-`;
-
-const StatValue = styled.div`
-  font-family: ${theme.fonts.heading};
-  font-size: ${theme.fontSizes.xl};
-  font-weight: ${theme.fontWeights.bold};
-  color: ${theme.colors.primary};
-  margin-bottom: ${theme.spacing[1]};
-`;
-
-const StatLabel = styled.div`
-  font-family: ${theme.fonts.primary};
-  font-size: ${theme.fontSizes.xs};
-  color: ${theme.colors.text.secondary};
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-`;
-
-const ModalFooter = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: ${theme.spacing[3]};
-  padding: ${theme.spacing[6]};
-  border-top: 1px solid ${theme.colors.border.light};
-  background: ${theme.colors.background.light};
-  position: sticky;
-  bottom: 0;
-  z-index: ${theme.zIndex.modal + 2};
-`;
+const renderStars = (rating: number) =>
+  Array.from({ length: 5 }, (_, i) => (
+    <StarIcon
+      key={i}
+      size={16}
+      className={
+        i < rating ? 'fill-yellow-400 text-yellow-400' : 'text-border'
+      }
+    />
+  ));
 
 export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   isOpen,
@@ -421,271 +73,256 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   product,
   onEdit,
 }) => {
-  const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-  if (!product) return null;
+  if (!isOpen || !product) return null;
 
-  const currentPrice = parseFloat(product.currentPrice?.toString() || '0');
-  const originalPrice = parseFloat(product.price?.toString() || '0');
-  const hasDiscount = product.hasDiscount;
-  const discountPercentage = product.discountPercentage;
-  const isLowStock = product.stockQuantity > 0 && product.stockQuantity <= 10;
+  const currentPrice = parseFloat(product.currentPrice?.toString() ?? '0');
+  const originalPrice = parseFloat(product.price?.toString() ?? '0');
+  const isLowStock =
+    product.stockQuantity > 0 && product.stockQuantity <= 10;
 
   const handleEdit = () => {
     onEdit(product);
     onClose();
   };
 
-  const renderStars = (rating: number) => {
-    const stars = [];
-    for (let i = 1; i <= 5; i++) {
-      stars.push(<StarIcon key={i} size={16} filled={i <= rating} />);
-    }
-    return stars;
-  };
-
   return (
-    <ModalOverlay isOpen={isOpen}>
-      <ModalContainer>
-        <ModalHeader>
-          <ModalTitle>
-            <Eye size={24} />
+    <div className='fixed inset-0 z-[500] flex items-center justify-center bg-black/60 p-4 backdrop-blur-[8px]'>
+      <div className='relative z-[501] flex max-h-[90vh] w-full max-w-[1000px] flex-col overflow-hidden rounded-xl bg-white shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]'>
+        {/* Sticky header */}
+        <div className='sticky top-0 z-[502] flex items-center justify-between border-b border-border bg-white px-6 py-6'>
+          <h2 className='font-heading flex items-center gap-2 text-xl font-semibold text-foreground'>
+            <EyeIcon size={24} />
             Detalles del Producto
-          </ModalTitle>
-          <CloseButton onClick={onClose}>
-            <X size={20} />
-          </CloseButton>
-        </ModalHeader>
+          </h2>
+          <button
+            onClick={onClose}
+            className='flex items-center justify-center rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'
+          >
+            <XIcon size={20} />
+          </button>
+        </div>
 
-        <ModalBody>
-          <ProductHeader>
-            <ImageSection>
-              <MainImage>
+        {/* Scrollable body */}
+        <div className='overflow-y-auto px-6 py-6'>
+          {/* Product hero */}
+          <div className='mb-6 grid gap-6 max-md:grid-cols-1 md:grid-cols-[300px_1fr]'>
+            {/* Images */}
+            <div className='flex flex-col gap-3'>
+              <div className='h-[300px] w-full overflow-hidden rounded-lg border-2 border-border'>
                 <img
                   src={
-                    product.images[selectedImageIndex] ||
+                    product.images[selectedImageIndex] ??
                     'https://via.placeholder.com/300x300'
                   }
                   alt={product.name}
+                  className='h-full w-full object-cover'
                 />
-              </MainImage>
-              {product.images.length > 1 && (
-                <ImageThumbnails>
-                  {product.images.map((image, index) => (
-                    <ImageThumbnail
-                      key={index}
-                      isActive={index === selectedImageIndex}
-                      onClick={() => setSelectedImageIndex(index)}
+              </div>
+              {product.images.length > 1 ? (
+                <div className='grid grid-cols-4 gap-2'>
+                  {product.images.map((img, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => setSelectedImageIndex(idx)}
+                      className={cn(
+                        'h-[60px] w-full cursor-pointer overflow-hidden rounded-md border-2 transition-all',
+                        idx === selectedImageIndex
+                          ? 'border-brand-purple'
+                          : 'border-border hover:border-brand-purple'
+                      )}
                     >
-                      <img src={image} alt={`${product.name} ${index + 1}`} />
-                    </ImageThumbnail>
+                      <img
+                        src={img}
+                        alt={`${product.name} ${idx + 1}`}
+                        className='h-full w-full object-cover'
+                      />
+                    </div>
                   ))}
-                </ImageThumbnails>
-              )}
-            </ImageSection>
+                </div>
+              ) : null}
+            </div>
 
-            <ProductInfo>
+            {/* Info */}
+            <div className='flex flex-col gap-4'>
               <div>
-                <ProductTitle>{product.name}</ProductTitle>
-                <ProductSKU>
-                  <Hash size={16} />
+                <h1 className='font-heading text-2xl font-bold text-foreground'>
+                  {product.name}
+                </h1>
+                <div className='mt-1 flex items-center gap-2 text-sm text-muted-foreground'>
+                  <HashIcon size={16} />
                   SKU: {product.sku}
-                </ProductSKU>
+                </div>
               </div>
 
-              <PriceSection>
-                <CurrentPrice>S/ {currentPrice.toFixed(2)}</CurrentPrice>
-                {hasDiscount ? (
+              {/* Price */}
+              <div className='flex items-baseline gap-3'>
+                <span className='font-heading text-2xl font-bold text-brand-purple'>
+                  S/ {currentPrice.toFixed(2)}
+                </span>
+                {product.hasDiscount ? (
                   <>
-                    <OriginalPrice>S/ {originalPrice.toFixed(2)}</OriginalPrice>
-                    <DiscountBadge>-{discountPercentage}%</DiscountBadge>
+                    <span className='text-lg text-muted-foreground line-through'>
+                      S/ {originalPrice.toFixed(2)}
+                    </span>
+                    <span className='rounded-full bg-green-500 px-2 py-0.5 text-xs font-medium text-white'>
+                      -{product.discountPercentage}%
+                    </span>
                   </>
                 ) : null}
-              </PriceSection>
+              </div>
 
-              <div style={{ display: 'flex', gap: theme.spacing[2] }}>
-                <StatusBadge isActive={product.isActive}>
+              {/* Badges */}
+              <div className='flex gap-2'>
+                <span
+                  className={cn(
+                    'self-start rounded-full px-2 py-0.5 text-xs font-medium text-white',
+                    product.isActive ? 'bg-green-500' : 'bg-destructive'
+                  )}
+                >
                   {product.isActive ? 'Activo' : 'Inactivo'}
-                </StatusBadge>
-                <StockBadge
-                  isInStock={product.isInStock}
-                  isLowStock={isLowStock}
+                </span>
+                <span
+                  className={cn(
+                    'rounded-full px-2 py-0.5 text-xs font-medium text-white',
+                    !product.isInStock
+                      ? 'bg-destructive'
+                      : isLowStock
+                        ? 'bg-yellow-500'
+                        : 'bg-green-500'
+                  )}
                 >
                   {!product.isInStock
                     ? 'Sin Stock'
                     : isLowStock
                       ? 'Stock Bajo'
                       : 'En Stock'}
-                </StockBadge>
+                </span>
               </div>
 
-              <StockInfo>
-                <Package size={16} />
+              <div className='flex items-center gap-2 text-sm text-foreground'>
+                <PackageIcon size={16} />
                 Stock disponible: {product.stockQuantity} unidades
-              </StockInfo>
+              </div>
 
               {product.rating ? (
-                <RatingSection>
-                  <Stars>
+                <div className='flex items-center gap-2'>
+                  <div className='flex items-center gap-0.5'>
                     {renderStars(
                       Math.round(parseFloat(product.rating.toString()))
                     )}
-                  </Stars>
-                  <span style={{ color: theme.colors.text.secondary }}>
+                  </div>
+                  <span className='text-sm text-muted-foreground'>
                     ({product.reviewCount} reseñas)
                   </span>
-                </RatingSection>
+                </div>
               ) : null}
-            </ProductInfo>
-          </ProductHeader>
+            </div>
+          </div>
 
-          <ContentGrid>
-            <MainContent>
-              {/* Description */}
-              <Section>
-                <SectionTitle>
-                  <FileText size={20} />
-                  Descripción
-                </SectionTitle>
-                <Description>
-                  {product.description ||
+          {/* Content grid */}
+          <div className='grid gap-6 max-md:grid-cols-1 md:grid-cols-[2fr_1fr]'>
+            {/* Main content */}
+            <div className='flex flex-col gap-6'>
+              <Section title='Descripción' icon={<FileTextIcon size={20} />}>
+                <p className='m-0 text-base leading-relaxed text-muted-foreground'>
+                  {product.description ??
                     'No hay descripción disponible para este producto.'}
-                </Description>
+                </p>
               </Section>
 
-              {/* Tags */}
-              {product.tags.length > 0 && (
-                <Section>
-                  <SectionTitle>
-                    <Tag size={20} />
-                    Etiquetas
-                  </SectionTitle>
-                  <TagsContainer>
+              {product.tags.length > 0 ? (
+                <Section title='Etiquetas' icon={<TagIcon size={20} />}>
+                  <div className='flex flex-wrap gap-2'>
                     {product.tags.map(tag => (
-                      <TagChip key={tag}>{tag}</TagChip>
-                    ))}
-                  </TagsContainer>
-                </Section>
-              )}
-
-              {/* Variants */}
-              {product.variants.length > 0 && (
-                <Section>
-                  <SectionTitle>
-                    <Package size={20} />
-                    Variantes ({product.variants.length})
-                  </SectionTitle>
-                  <VariantsGrid>
-                    {product.variants.map(variant => (
-                      <VariantCard key={variant.id} isActive={variant.isActive}>
-                        <VariantName>{variant.name}</VariantName>
-                        <VariantPrice>
-                          S/ {parseFloat(variant.price.toString()).toFixed(2)}
-                        </VariantPrice>
-                        <VariantStock>
-                          Stock: {variant.stockQuantity}
-                        </VariantStock>
-                      </VariantCard>
-                    ))}
-                  </VariantsGrid>
-                </Section>
-              )}
-
-              {/* Attributes */}
-              {product.attributes &&
-              Object.keys(product.attributes).length > 0 ? (
-                <Section>
-                  <SectionTitle>
-                    <Settings size={20} />
-                    Atributos
-                  </SectionTitle>
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns:
-                        'repeat(auto-fill, minmax(200px, 1fr))',
-                      gap: theme.spacing[3],
-                    }}
-                  >
-                    {Object.entries(product.attributes).map(([key, value]) => (
-                      <div
-                        key={key}
-                        style={{
-                          padding: theme.spacing[2],
-                          background: theme.colors.white,
-                          borderRadius: theme.borderRadius.md,
-                        }}
+                      <span
+                        key={tag}
+                        className='rounded-full bg-brand-purple px-2 py-0.5 text-xs font-medium text-white'
                       >
-                        <strong>{key}:</strong> {String(value)}
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </Section>
+              ) : null}
+
+              {product.variants.length > 0 ? (
+                <Section
+                  title={`Variantes (${product.variants.length})`}
+                  icon={<PackageIcon size={20} />}
+                >
+                  <div className='grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(200px,1fr))]'>
+                    {product.variants.map(v => (
+                      <div
+                        key={v.id}
+                        className={cn(
+                          'rounded-md border p-3',
+                          v.isActive
+                            ? 'border-brand-purple bg-white'
+                            : 'border-border bg-white opacity-70'
+                        )}
+                      >
+                        <div className='mb-2 text-sm font-medium text-foreground'>
+                          {v.name}
+                        </div>
+                        <div className='text-sm text-muted-foreground'>
+                          S/ {parseFloat(v.price.toString()).toFixed(2)}
+                        </div>
+                        <div className='mt-1 text-xs text-muted-foreground'>
+                          Stock: {v.stockQuantity}
+                        </div>
                       </div>
                     ))}
                   </div>
                 </Section>
               ) : null}
 
-              {/* Reviews Section */}
+              {product.attributes &&
+              Object.keys(product.attributes).length > 0 ? (
+                <Section
+                  title='Atributos'
+                  icon={<SettingsIcon size={20} />}
+                >
+                  <div className='grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(200px,1fr))]'>
+                    {Object.entries(product.attributes).map(([k, v]) => (
+                      <div
+                        key={k}
+                        className='rounded-md bg-white p-2 text-sm'
+                      >
+                        <strong>{k}:</strong> {String(v)}
+                      </div>
+                    ))}
+                  </div>
+                </Section>
+              ) : null}
+
               {product.reviews && product.reviews.length > 0 ? (
-                <Section>
-                  <SectionTitle>
-                    <MessageSquare size={20} />
-                    Reseñas ({product.reviews.length})
-                  </SectionTitle>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: theme.spacing[3],
-                    }}
-                  >
+                <Section
+                  title={`Reseñas (${product.reviews.length})`}
+                  icon={<MessageSquareIcon size={20} />}
+                >
+                  <div className='flex flex-col gap-3'>
                     {product.reviews
                       .slice(0, 5)
                       .map((review: ProductReview) => (
                         <div
                           key={review.id}
-                          style={{
-                            padding: theme.spacing[3],
-                            background: theme.colors.white,
-                            borderRadius: theme.borderRadius.md,
-                            border: `1px solid ${theme.colors.border.light}`,
-                          }}
+                          className='rounded-md border border-border bg-white p-3'
                         >
-                          <div
-                            style={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                              marginBottom: theme.spacing[2],
-                            }}
-                          >
-                            <div
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: theme.spacing[2],
-                              }}
-                            >
-                              <User size={16} />
-                              <span
-                                style={{ fontWeight: theme.fontWeights.medium }}
-                              >
-                                {review.user?.firstName || 'Usuario'}{' '}
-                                {review.user?.lastName || ''}
+                          <div className='mb-2 flex items-center justify-between'>
+                            <div className='flex items-center gap-2'>
+                              <UserIcon size={16} />
+                              <span className='font-medium'>
+                                {review.user?.firstName ?? 'Usuario'}{' '}
+                                {review.user?.lastName ?? ''}
                               </span>
                             </div>
-                            <div
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: theme.spacing[1],
-                              }}
-                            >
-                              {renderStars(review.rating)}
-                              <span
-                                style={{
-                                  fontSize: theme.fontSizes.sm,
-                                  color: theme.colors.text.secondary,
-                                }}
-                              >
+                            <div className='flex items-center gap-1'>
+                              <div className='flex gap-0.5'>
+                                {renderStars(review.rating)}
+                              </div>
+                              <span className='text-sm text-muted-foreground'>
                                 {new Date(
                                   review.createdAt
                                 ).toLocaleDateString()}
@@ -693,218 +330,101 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                             </div>
                           </div>
                           {review.title ? (
-                            <div
-                              style={{
-                                fontWeight: theme.fontWeights.medium,
-                                marginBottom: theme.spacing[1],
-                              }}
-                            >
+                            <div className='mb-1 font-medium'>
                               {review.title}
                             </div>
                           ) : null}
                           {review.comment ? (
-                            <div
-                              style={{
-                                color: theme.colors.text.secondary,
-                                lineHeight: 1.5,
-                              }}
-                            >
+                            <div className='leading-snug text-muted-foreground'>
                               {review.comment}
                             </div>
                           ) : null}
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: theme.spacing[2],
-                              marginTop: theme.spacing[2],
-                            }}
-                          >
-                            <div
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: theme.spacing[1],
-                              }}
-                            >
-                              <ThumbsUp size={14} />
-                              <span style={{ fontSize: theme.fontSizes.sm }}>
-                                {review.helpfulCount} útil
-                              </span>
-                            </div>
+                          <div className='mt-2 flex items-center gap-2 text-sm'>
+                            <span className='flex items-center gap-1'>
+                              <ThumbsUpIcon size={14} />
+                              {review.helpfulCount} útil
+                            </span>
                             {review.isVerified ? (
-                              <div
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  gap: theme.spacing[1],
-                                  color: theme.colors.success,
-                                  fontSize: theme.fontSizes.sm,
-                                }}
-                              >
-                                <CheckCircle size={14} />
+                              <span className='flex items-center gap-1 text-green-600'>
+                                <CheckCircleIcon size={14} />
                                 Verificado
-                              </div>
+                              </span>
                             ) : null}
                           </div>
                         </div>
                       ))}
-                    {product.reviews.length > 5 && (
-                      <div
-                        style={{
-                          textAlign: 'center',
-                          padding: theme.spacing[2],
-                          color: theme.colors.text.secondary,
-                        }}
-                      >
+                    {product.reviews.length > 5 ? (
+                      <p className='p-2 text-center text-sm text-muted-foreground'>
                         Mostrando 5 de {product.reviews.length} reseñas
-                      </div>
-                    )}
+                      </p>
+                    ) : null}
                   </div>
                 </Section>
               ) : null}
 
-              {/* Inventory Transactions */}
               {product.inventoryTransactions &&
               product.inventoryTransactions.length > 0 ? (
-                <Section>
-                  <SectionTitle>
-                    <Activity size={20} />
-                    Transacciones de Inventario (
-                    {product.inventoryTransactions.length})
-                  </SectionTitle>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: theme.spacing[2],
-                    }}
-                  >
+                <Section
+                  title={`Transacciones de Inventario (${product.inventoryTransactions.length})`}
+                  icon={<ActivityIcon size={20} />}
+                >
+                  <div className='flex flex-col gap-2'>
                     {product.inventoryTransactions
                       .slice(0, 10)
-                      .map((transaction: InventoryTransaction) => (
+                      .map((t: InventoryTransaction) => (
                         <div
-                          key={transaction.id}
-                          style={{
-                            padding: theme.spacing[2],
-                            background: theme.colors.white,
-                            borderRadius: theme.borderRadius.md,
-                            border: `1px solid ${theme.colors.border.light}`,
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                          }}
+                          key={t.id}
+                          className='flex items-center justify-between rounded-md border border-border bg-white p-2'
                         >
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: theme.spacing[2],
-                            }}
-                          >
-                            <Database size={16} />
+                          <div className='flex items-center gap-2'>
+                            <DatabaseIcon size={16} />
                             <div>
-                              <div
-                                style={{
-                                  fontWeight: theme.fontWeights.medium,
-                                }}
-                              >
-                                {transaction.type}
-                              </div>
-                              <div
-                                style={{
-                                  fontSize: theme.fontSizes.sm,
-                                  color: theme.colors.text.secondary,
-                                }}
-                              >
-                                {transaction.quantity} unidades
+                              <div className='font-medium'>{t.type}</div>
+                              <div className='text-sm text-muted-foreground'>
+                                {t.quantity} unidades
                               </div>
                             </div>
                           </div>
-                          <div style={{ textAlign: 'right' }}>
-                            <div
-                              style={{
-                                fontSize: theme.fontSizes.sm,
-                                color: theme.colors.text.secondary,
-                              }}
-                            >
-                              {new Date(
-                                transaction.createdAt
-                              ).toLocaleDateString()}
+                          <div className='text-right'>
+                            <div className='text-sm text-muted-foreground'>
+                              {new Date(t.createdAt).toLocaleDateString()}
                             </div>
-                            {transaction.reference ? (
-                              <div
-                                style={{
-                                  fontSize: theme.fontSizes.xs,
-                                  color: theme.colors.text.secondary,
-                                }}
-                              >
-                                Ref: {transaction.reference}
+                            {t.reference ? (
+                              <div className='text-xs text-muted-foreground'>
+                                Ref: {t.reference}
                               </div>
                             ) : null}
                           </div>
                         </div>
                       ))}
-                    {product.inventoryTransactions.length > 10 && (
-                      <div
-                        style={{
-                          textAlign: 'center',
-                          padding: theme.spacing[2],
-                          color: theme.colors.text.secondary,
-                        }}
-                      >
-                        Mostrando 10 de {product.inventoryTransactions.length}{' '}
-                        transacciones
-                      </div>
-                    )}
+                    {product.inventoryTransactions.length > 10 ? (
+                      <p className='p-2 text-center text-sm text-muted-foreground'>
+                        Mostrando 10 de{' '}
+                        {product.inventoryTransactions.length} transacciones
+                      </p>
+                    ) : null}
                   </div>
                 </Section>
               ) : null}
 
-              {/* Stock Alerts */}
               {product.stockAlerts && product.stockAlerts.length > 0 ? (
-                <Section>
-                  <SectionTitle>
-                    <AlertCircle size={20} />
-                    Alertas de Stock ({product.stockAlerts.length})
-                  </SectionTitle>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: theme.spacing[2],
-                    }}
-                  >
+                <Section
+                  title={`Alertas de Stock (${product.stockAlerts.length})`}
+                  icon={<AlertCircleIcon size={20} />}
+                >
+                  <div className='flex flex-col gap-2'>
                     {product.stockAlerts.map((alert: StockAlert) => (
                       <div
                         key={alert.id}
-                        style={{
-                          padding: theme.spacing[3],
-                          background: alert.isActive
-                            ? `${theme.colors.warning}20`
-                            : theme.colors.background.light,
-                          borderRadius: theme.borderRadius.md,
-                          border: `1px solid ${
-                            alert.isActive
-                              ? `${theme.colors.warning}40`
-                              : theme.colors.border.light
-                          }`,
-                        }}
+                        className={cn(
+                          'rounded-md border p-3',
+                          alert.isActive
+                            ? 'border-yellow-400/40 bg-yellow-400/20'
+                            : 'border-border bg-muted'
+                        )}
                       >
-                        <div
-                          style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            marginBottom: theme.spacing[1],
-                          }}
-                        >
-                          <div
-                            style={{
-                              fontWeight: theme.fontWeights.medium,
-                              color: theme.colors.warning,
-                            }}
-                          >
+                        <div className='mb-1 flex items-center justify-between'>
+                          <span className='font-medium text-yellow-600'>
                             {alert.type === 'low_stock'
                               ? 'Stock Bajo'
                               : alert.type === 'out_of_stock'
@@ -912,288 +432,173 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                                 : alert.type === 'overstock'
                                   ? 'Sobre Stock'
                                   : alert.type}
-                          </div>
-                          <div
-                            style={{
-                              padding: theme.spacing[1],
-                              background: alert.isActive
-                                ? theme.colors.warning
-                                : theme.colors.background.accent,
-                              color: alert.isActive
-                                ? theme.colors.white
-                                : theme.colors.text.secondary,
-                              borderRadius: theme.borderRadius.sm,
-                              fontSize: theme.fontSizes.xs,
-                            }}
+                          </span>
+                          <span
+                            className={cn(
+                              'rounded px-1.5 py-0.5 text-xs',
+                              alert.isActive
+                                ? 'bg-yellow-500 text-white'
+                                : 'bg-muted text-muted-foreground'
+                            )}
                           >
                             {alert.isActive ? 'Activa' : 'Inactiva'}
-                          </div>
+                          </span>
                         </div>
-                        <div
-                          style={{
-                            fontSize: theme.fontSizes.sm,
-                            color: theme.colors.text.secondary,
-                          }}
-                        >
+                        <p className='text-sm text-muted-foreground'>
                           Umbral: {alert.threshold} | Stock actual:{' '}
                           {alert.currentStock}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: theme.fontSizes.xs,
-                            color: theme.colors.text.secondary,
-                            marginTop: theme.spacing[1],
-                          }}
-                        >
+                        </p>
+                        <p className='mt-1 text-xs text-muted-foreground'>
                           Creada:{' '}
                           {new Date(alert.createdAt).toLocaleDateString()}
-                        </div>
+                        </p>
                       </div>
                     ))}
                   </div>
                 </Section>
               ) : null}
 
-              {/* App Events */}
               {product.appEvents && product.appEvents.length > 0 ? (
-                <Section>
-                  <SectionTitle>
-                    <TrendingUp size={20} />
-                    Actividad Reciente ({product.appEvents.length})
-                  </SectionTitle>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: theme.spacing[2],
-                    }}
-                  >
-                    {product.appEvents.slice(0, 5).map((event: AppEvent) => (
+                <Section
+                  title={`Actividad Reciente (${product.appEvents.length})`}
+                  icon={<TrendingUpIcon size={20} />}
+                >
+                  <div className='flex flex-col gap-2'>
+                    {product.appEvents.slice(0, 5).map((ev: AppEvent) => (
                       <div
-                        key={event.id}
-                        style={{
-                          padding: theme.spacing[2],
-                          background: theme.colors.white,
-                          borderRadius: theme.borderRadius.md,
-                          border: `1px solid ${theme.colors.border.light}`,
-                        }}
+                        key={ev.id}
+                        className='rounded-md border border-border bg-white p-2'
                       >
-                        <div
-                          style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: theme.spacing[2],
-                            }}
-                          >
-                            <Activity size={16} />
-                            <span
-                              style={{ fontWeight: theme.fontWeights.medium }}
-                            >
-                              {event.eventType}
-                            </span>
-                          </div>
-                          <div
-                            style={{
-                              fontSize: theme.fontSizes.sm,
-                              color: theme.colors.text.secondary,
-                            }}
-                          >
-                            {new Date(event.createdAt).toLocaleDateString()}
-                          </div>
+                        <div className='flex items-center justify-between'>
+                          <span className='flex items-center gap-2 font-medium'>
+                            <ActivityIcon size={16} />
+                            {ev.eventType}
+                          </span>
+                          <span className='text-sm text-muted-foreground'>
+                            {new Date(ev.createdAt).toLocaleDateString()}
+                          </span>
                         </div>
-                        {Boolean(event.eventData) && (
-                          <div
-                            style={{
-                              fontSize: theme.fontSizes.sm,
-                              color: theme.colors.text.secondary,
-                              marginTop: theme.spacing[1],
-                            }}
-                          >
-                            {JSON.stringify(event.eventData)}
-                          </div>
-                        )}
+                        {Boolean(ev.eventData) ? (
+                          <p className='mt-1 text-sm text-muted-foreground'>
+                            {JSON.stringify(ev.eventData)}
+                          </p>
+                        ) : null}
                       </div>
                     ))}
-                    {product.appEvents.length > 5 && (
-                      <div
-                        style={{
-                          textAlign: 'center',
-                          padding: theme.spacing[2],
-                          color: theme.colors.text.secondary,
-                        }}
-                      >
+                    {product.appEvents.length > 5 ? (
+                      <p className='p-2 text-center text-sm text-muted-foreground'>
                         Mostrando 5 de {product.appEvents.length} eventos
-                      </div>
-                    )}
+                      </p>
+                    ) : null}
                   </div>
                 </Section>
               ) : null}
-            </MainContent>
+            </div>
 
-            <Sidebar>
-              {/* Category */}
+            {/* Sidebar */}
+            <div className='flex flex-col gap-4'>
               {product.category ? (
-                <Section>
-                  <SectionTitle>
-                    <MapPin size={20} />
-                    Categoría
-                  </SectionTitle>
-                  <div
-                    style={{
-                      padding: theme.spacing[2],
-                      background: theme.colors.white,
-                      borderRadius: theme.borderRadius.md,
-                    }}
-                  >
+                <Section title='Categoría' icon={<MapPinIcon size={20} />}>
+                  <div className='rounded-md bg-white p-2 text-sm'>
                     {product.category.name}
                   </div>
                 </Section>
               ) : null}
 
-              {/* Usage Statistics */}
-              <Section>
-                <SectionTitle>
-                  <BarChart3 size={20} />
-                  Uso del Producto
-                </SectionTitle>
-                <StatsGrid>
-                  <StatItem>
-                    <StatValue>{product.reviewCount}</StatValue>
-                    <StatLabel>Reseñas</StatLabel>
-                  </StatItem>
-                  <StatItem>
-                    <StatValue>{product.totalStock}</StatValue>
-                    <StatLabel>Stock Total</StatLabel>
-                  </StatItem>
-                  <StatItem>
-                    <StatValue>{product.variants.length}</StatValue>
-                    <StatLabel>Variantes</StatLabel>
-                  </StatItem>
-                  <StatItem>
-                    <StatValue>{product.favorites?.length || 0}</StatValue>
-                    <StatLabel>Favoritos</StatLabel>
-                  </StatItem>
-                  <StatItem>
-                    <StatValue>{product.cartItems?.length || 0}</StatValue>
-                    <StatLabel>En Carrito</StatLabel>
-                  </StatItem>
-                  <StatItem>
-                    <StatValue>{product.orderItems?.length || 0}</StatValue>
-                    <StatLabel>Pedidos</StatLabel>
-                  </StatItem>
-                </StatsGrid>
+              <Section title='Uso del Producto' icon={<BarChart3Icon size={20} />}>
+                <div className='grid grid-cols-2 gap-3'>
+                  {[
+                    { value: product.reviewCount, label: 'Reseñas' },
+                    { value: product.totalStock, label: 'Stock Total' },
+                    { value: product.variants.length, label: 'Variantes' },
+                    {
+                      value: product.favorites?.length ?? 0,
+                      label: 'Favoritos',
+                    },
+                    {
+                      value: product.cartItems?.length ?? 0,
+                      label: 'En Carrito',
+                    },
+                    {
+                      value: product.orderItems?.length ?? 0,
+                      label: 'Pedidos',
+                    },
+                  ].map(({ value, label }) => (
+                    <div
+                      key={label}
+                      className='rounded-md border border-border bg-white p-3 text-center'
+                    >
+                      <div className='font-heading text-xl font-bold text-brand-purple'>
+                        {value}
+                      </div>
+                      <div className='text-xs uppercase tracking-wide text-muted-foreground'>
+                        {label}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </Section>
 
-              {/* Inventory Summary */}
-              <Section>
-                <SectionTitle>
-                  <ShoppingBag size={20} />
-                  Resumen de Inventario
-                </SectionTitle>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: theme.spacing[2],
-                  }}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      padding: theme.spacing[2],
-                      background: theme.colors.white,
-                      borderRadius: theme.borderRadius.md,
-                    }}
-                  >
-                    <span>Stock Principal:</span>
-                    <strong>{product.stockQuantity}</strong>
-                  </div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      padding: theme.spacing[2],
-                      background: theme.colors.white,
-                      borderRadius: theme.borderRadius.md,
-                    }}
-                  >
-                    <span>Stock Total:</span>
-                    <strong>{product.totalStock}</strong>
-                  </div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      padding: theme.spacing[2],
-                      background: theme.colors.white,
-                      borderRadius: theme.borderRadius.md,
-                    }}
-                  >
-                    <span>Estado:</span>
+              <Section
+                title='Resumen de Inventario'
+                icon={<ShoppingBagIcon size={20} />}
+              >
+                <div className='flex flex-col gap-2'>
+                  {[
+                    { label: 'Stock Principal:', value: product.stockQuantity },
+                    { label: 'Stock Total:', value: product.totalStock },
+                  ].map(({ label, value }) => (
                     <div
-                      style={{
-                        padding: theme.spacing[1],
-                        background: product.isInStock
-                          ? `${theme.colors.success}20`
-                          : `${theme.colors.error}20`,
-                        color: product.isInStock
-                          ? theme.colors.success
-                          : theme.colors.error,
-                        borderRadius: theme.borderRadius.sm,
-                        fontSize: theme.fontSizes.xs,
-                      }}
+                      key={label}
+                      className='flex items-center justify-between rounded-md bg-white p-2 text-sm'
+                    >
+                      <span>{label}</span>
+                      <strong>{value}</strong>
+                    </div>
+                  ))}
+                  <div className='flex items-center justify-between rounded-md bg-white p-2 text-sm'>
+                    <span>Estado:</span>
+                    <span
+                      className={cn(
+                        'rounded px-1.5 py-0.5 text-xs',
+                        product.isInStock
+                          ? 'bg-green-500/20 text-green-700'
+                          : 'bg-destructive/20 text-destructive'
+                      )}
                     >
                       {product.isInStock ? 'Disponible' : 'Agotado'}
-                    </div>
+                    </span>
                   </div>
                 </div>
               </Section>
 
-              {/* Dates */}
-              <Section>
-                <SectionTitle>
-                  <Calendar size={20} />
-                  Fechas
-                </SectionTitle>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: theme.spacing[2],
-                  }}
-                >
-                  <div style={{ fontSize: theme.fontSizes.sm }}>
+              <Section title='Fechas' icon={<CalendarIcon size={20} />}>
+                <div className='flex flex-col gap-2 text-sm'>
+                  <div>
                     <strong>Creado:</strong>{' '}
                     {new Date(product.createdAt).toLocaleDateString()}
                   </div>
-                  <div style={{ fontSize: theme.fontSizes.sm }}>
+                  <div>
                     <strong>Actualizado:</strong>{' '}
                     {new Date(product.updatedAt).toLocaleDateString()}
                   </div>
                 </div>
               </Section>
-            </Sidebar>
-          </ContentGrid>
-        </ModalBody>
+            </div>
+          </div>
+        </div>
 
-        <ModalFooter>
+        {/* Sticky footer */}
+        <div className='sticky bottom-0 z-[502] flex justify-end gap-3 border-t border-border bg-muted px-6 py-6'>
           <Button type='button' variant='outline' onClick={onClose}>
             Cerrar
           </Button>
           <Button type='button' variant='primary' onClick={handleEdit}>
-            <Edit3 size={16} />
+            <Edit3Icon size={16} />
             Editar Producto
           </Button>
-        </ModalFooter>
-      </ModalContainer>
-    </ModalOverlay>
+        </div>
+      </div>
+    </div>
   );
 };

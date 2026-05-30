@@ -1,119 +1,16 @@
-// LoginForm Component - Following SOLID principles and Clean Architecture
-// Single Responsibility: Renders login form only
-// Open/Closed: Extensible for new form fields
-// Liskov Substitution: Consistent form behavior
-// Interface Segregation: Specific props interface
-// Dependency Inversion: Depends on hook abstraction
-
 import type React from 'react';
 import { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import { Eye, EyeOff, Lock, Mail, AlertCircle, RefreshCw } from 'lucide-react';
-import { theme } from '@/styles/theme';
+import EyeIcon from 'lucide-react/dist/esm/icons/eye';
+import EyeOffIcon from 'lucide-react/dist/esm/icons/eye-off';
+import LockIcon from 'lucide-react/dist/esm/icons/lock';
+import MailIcon from 'lucide-react/dist/esm/icons/mail';
+import AlertCircleIcon from 'lucide-react/dist/esm/icons/alert-circle';
+import RefreshCwIcon from 'lucide-react/dist/esm/icons/refresh-cw';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useLoginForm } from '@/hooks/useLoginForm';
 import { ForgotPasswordModal } from './ForgotPasswordModal';
 
-// Styled Components following Single Responsibility Principle
-const FormContainer = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[4]};
-  margin-bottom: ${theme.spacing[6]};
-`;
-
-const FormTitle = styled.h2`
-  font-family: ${theme.fonts.heading};
-  font-size: ${theme.fontSizes['2xl']};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${theme.colors.text.primary};
-  margin: 0 0 ${theme.spacing[2]} 0;
-`;
-
-const FormSubtitle = styled.p`
-  font-size: ${theme.fontSizes.base};
-  color: ${theme.colors.text.secondary};
-  margin: 0 0 ${theme.spacing[4]} 0;
-`;
-
-const ForgotPasswordLink = styled.button`
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.primaryPurple};
-  text-decoration: none;
-  font-weight: ${theme.fontWeights.medium};
-  transition: color ${theme.transitions.fast};
-  align-self: flex-end;
-  margin-top: -${theme.spacing[2]};
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: ${theme.spacing[1]};
-  border-radius: ${theme.borderRadius.sm};
-
-  &:hover {
-    color: ${theme.colors.coralAccent};
-    text-decoration: underline;
-    background: ${theme.colors.background.accent};
-  }
-
-  &:active {
-    transform: scale(0.98);
-  }
-`;
-
-// ✅ Banner de error mejorado siguiendo estándares
-const EnhancedErrorMessage = styled.div`
-  background: ${theme.colors.error}15;
-  border: 1px solid ${theme.colors.error}30;
-  color: ${theme.colors.error};
-  padding: ${theme.spacing[4]};
-  border-radius: ${theme.borderRadius.md};
-  font-size: ${theme.fontSizes.sm};
-  text-align: center;
-  margin-top: ${theme.spacing[3]};
-  animation: slideIn 0.3s ease-out;
-
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-`;
-
-const ErrorIcon = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: ${theme.spacing[2]};
-  color: ${theme.colors.error};
-`;
-
-const ErrorTitle = styled.div`
-  font-weight: ${theme.fontWeights.medium};
-  margin-bottom: ${theme.spacing[1]};
-`;
-
-const ErrorDescription = styled.div`
-  font-size: ${theme.fontSizes.sm};
-  opacity: 0.9;
-  margin-bottom: ${theme.spacing[3]};
-`;
-
-// ✅ Acciones de error siguiendo estándares
-const ErrorActions = styled.div`
-  display: flex;
-  gap: ${theme.spacing[2]};
-  justify-content: center;
-  flex-wrap: wrap;
-`;
-
-// Component following Single Responsibility Principle
 export const LoginForm: React.FC = () => {
   const {
     form,
@@ -133,41 +30,39 @@ export const LoginForm: React.FC = () => {
     formState: { errors },
   } = form;
 
-  // Enhanced error handling following development standards
   useEffect(() => {
-    // Clear error when user starts typing (better UX)
     if (error && (form.watch('email') || form.watch('password'))) {
       const timer = setTimeout(() => {
         clearError();
       }, 100);
       return () => clearTimeout(timer);
     }
-    return undefined; // ✅ Fix linting error
+    return undefined;
   }, [error, clearError, form]);
 
-  // Handle forgot password modal
   const handleForgotPassword = (e: React.MouseEvent) => {
     e.preventDefault();
     setIsForgotPasswordOpen(true);
   };
 
-  const closeForgotPassword = () => {
-    setIsForgotPasswordOpen(false);
-  };
-
   return (
     <>
-      <FormTitle>Iniciar Sesión</FormTitle>
-      <FormSubtitle>
+      <h2 className='font-heading mb-2 text-2xl font-medium text-foreground'>
+        Iniciar Sesión
+      </h2>
+      <p className='mb-4 text-base text-muted-foreground'>
         Ingresa tus credenciales para acceder al panel de administración
-      </FormSubtitle>
+      </p>
 
-      <FormContainer onSubmit={handleSubmit(onSubmit)}>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className='mb-6 flex flex-col gap-4'
+      >
         <Input
           label='Correo Electrónico'
           type='email'
           placeholder='admin@happybabystyle.com'
-          leftIcon={<Mail size={18} />}
+          leftIcon={<MailIcon size={18} />}
           fullWidth
           {...register('email', {
             required: 'El correo electrónico es requerido',
@@ -176,16 +71,18 @@ export const LoginForm: React.FC = () => {
               message: 'Ingresa un correo electrónico válido',
             },
           })}
-          error={errors.email?.message || ''}
+          error={errors.email?.message ?? ''}
         />
 
         <Input
           label='Contraseña'
           type={showPassword ? 'text' : 'password'}
           placeholder='••••••••'
-          leftIcon={<Lock size={18} />}
-          rightIcon={showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-          rightIconClickable={true}
+          leftIcon={<LockIcon size={18} />}
+          rightIcon={
+            showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />
+          }
+          rightIconClickable
           onRightIconClick={togglePasswordVisibility}
           rightIconAriaLabel={
             showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
@@ -198,34 +95,37 @@ export const LoginForm: React.FC = () => {
               message: 'La contraseña debe tener al menos 6 caracteres',
             },
           })}
-          error={errors.password?.message || ''}
+          error={errors.password?.message ?? ''}
         />
 
-        <ForgotPasswordLink
+        <button
           type='button'
           onClick={handleForgotPassword}
           aria-label='¿Olvidaste tu contraseña?'
+          className='-mt-2 self-end rounded px-1 py-0.5 text-sm font-medium text-brand-purple transition-colors hover:bg-muted hover:text-[#FF6B6B] hover:underline active:scale-[0.98]'
         >
           ¿Olvidaste tu contraseña?
-        </ForgotPasswordLink>
+        </button>
 
-        {/* ✅ Banner de error mejorado siguiendo estándares */}
         {error ? (
-          <EnhancedErrorMessage role='alert' aria-live='polite'>
-            <ErrorIcon>
-              <AlertCircle size={20} />
-            </ErrorIcon>
-            <ErrorTitle>Error de autenticación</ErrorTitle>
-            <ErrorDescription>{error}</ErrorDescription>
-
-            <ErrorActions>
+          <div
+            role='alert'
+            aria-live='polite'
+            className='mt-3 animate-[slideIn_0.3s_ease-out] rounded-md border border-destructive/30 bg-destructive/10 p-4 text-center text-sm text-destructive'
+          >
+            <div className='mb-2 flex items-center justify-center'>
+              <AlertCircleIcon size={20} />
+            </div>
+            <div className='mb-1 font-medium'>Error de autenticación</div>
+            <div className='mb-3 text-sm opacity-90'>{error}</div>
+            <div className='flex flex-wrap justify-center gap-2'>
               <Button
                 type='button'
                 variant='outline'
                 size='small'
                 onClick={clearError}
               >
-                <RefreshCw size={14} />
+                <RefreshCwIcon size={14} />
                 Reintentar
               </Button>
               <Button
@@ -236,11 +136,10 @@ export const LoginForm: React.FC = () => {
               >
                 Recuperar contraseña
               </Button>
-            </ErrorActions>
-          </EnhancedErrorMessage>
+            </div>
+          </div>
         ) : null}
 
-        {/* ✅ Botón con estados mejorados siguiendo estándares */}
         <Button
           type='submit'
           variant='primary'
@@ -251,11 +150,11 @@ export const LoginForm: React.FC = () => {
         >
           {isLoading ? 'Verificando credenciales...' : 'Iniciar Sesión'}
         </Button>
-      </FormContainer>
+      </form>
 
       <ForgotPasswordModal
         isOpen={isForgotPasswordOpen}
-        onClose={closeForgotPassword}
+        onClose={() => setIsForgotPasswordOpen(false)}
       />
     </>
   );

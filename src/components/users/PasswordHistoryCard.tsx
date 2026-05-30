@@ -1,242 +1,126 @@
 import type React from 'react';
-import styled from 'styled-components';
-import { theme } from '@/styles/theme';
+import KeyIcon from 'lucide-react/dist/esm/icons/key';
+import RefreshCwIcon from 'lucide-react/dist/esm/icons/refresh-cw';
+import LockIcon from 'lucide-react/dist/esm/icons/lock';
+import ClockIcon from 'lucide-react/dist/esm/icons/clock';
+import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
+import AlertTriangleIcon from 'lucide-react/dist/esm/icons/alert-triangle';
+import ShieldIcon from 'lucide-react/dist/esm/icons/shield';
+import { cn } from '@/lib/utils';
 import { type PasswordAction } from '@/hooks/usePasswordHistory';
-import {
-  Key,
-  RefreshCw,
-  Lock,
-  Clock,
-  CheckCircle,
-  AlertTriangle,
-  Shield,
-} from 'lucide-react';
 
 interface PasswordHistoryCardProps {
   actions: PasswordAction[];
 }
 
-// Styled Components
-const Card = styled.div`
-  background: ${theme.colors.white};
-  border: 1px solid ${theme.colors.border.light};
-  border-radius: ${theme.borderRadius.lg};
-  padding: ${theme.spacing[4]};
-`;
-
-const Header = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  margin-bottom: ${theme.spacing[4]};
-`;
-
-const Title = styled.h3`
-  font-size: ${theme.fontSizes.lg};
-  font-weight: ${theme.fontWeights.semibold};
-  color: ${theme.colors.text.primary};
-  margin: 0;
-`;
-
-const ActionsList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[3]};
-`;
-
-const ActionItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-  padding: ${theme.spacing[3]};
-  background: ${theme.colors.background.light};
-  border-radius: ${theme.borderRadius.md};
-  border-left: 3px solid ${theme.colors.primaryPurple};
-`;
-
-const ActionIcon = styled.div<{ type: PasswordAction['type'] }>`
-  width: 32px;
-  height: 32px;
-  border-radius: ${theme.borderRadius.full};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: ${props => {
-    switch (props.type) {
-      case 'reset':
-        return `${theme.colors.warning}20`;
-      case 'temporary':
-        return `${theme.colors.info}20`;
-      case 'admin_set':
-        return `${theme.colors.error}20`;
-      case 'user_change':
-        return `${theme.colors.success}20`;
-      default:
-        return `${theme.colors.primaryPurple}20`;
-    }
-  }};
-  color: ${props => {
-    switch (props.type) {
-      case 'reset':
-        return theme.colors.warning;
-      case 'temporary':
-        return theme.colors.info;
-      case 'admin_set':
-        return theme.colors.error;
-      case 'user_change':
-        return theme.colors.success;
-      default:
-        return theme.colors.primaryPurple;
-    }
-  }};
-`;
-
-const ActionContent = styled.div`
-  flex: 1;
-`;
-
-const ActionDescription = styled.div`
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[1]};
-`;
-
-const ActionMeta = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  font-size: ${theme.fontSizes.xs};
-  color: ${theme.colors.text.secondary};
-`;
-
-const StatusBadge = styled.div<{ status: 'completed' | 'pending' | 'failed' }>`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-  padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.full};
-  font-size: ${theme.fontSizes.xs};
-  font-weight: ${theme.fontWeights.medium};
-  background: ${props => {
-    switch (props.status) {
-      case 'completed':
-        return `${theme.colors.success}20`;
-      case 'pending':
-        return `${theme.colors.warning}20`;
-      case 'failed':
-        return `${theme.colors.error}20`;
-      default:
-        return theme.colors.background.light;
-    }
-  }};
-  color: ${props => {
-    switch (props.status) {
-      case 'completed':
-        return theme.colors.success;
-      case 'pending':
-        return theme.colors.warning;
-      case 'failed':
-        return theme.colors.error;
-      default:
-        return theme.colors.text.secondary;
-    }
-  }};
-`;
-
-const EmptyState = styled.div`
-  text-align: center;
-  padding: ${theme.spacing[6]};
-  color: ${theme.colors.text.secondary};
-  font-size: ${theme.fontSizes.sm};
-`;
-
-// Helper Functions
-const getActionIcon = (type: PasswordAction['type']) => {
-  switch (type) {
-    case 'reset':
-      return <RefreshCw size={16} />;
-    case 'temporary':
-      return <Key size={16} />;
-    case 'admin_set':
-      return <Lock size={16} />;
-    case 'user_change':
-      return <Shield size={16} />;
-    default:
-      return <Key size={16} />;
-  }
-};
-
-const getStatusIcon = (status: PasswordAction['status']) => {
-  switch (status) {
-    case 'completed':
-      return <CheckCircle size={12} />;
-    case 'pending':
-      return <Clock size={12} />;
-    case 'failed':
-      return <AlertTriangle size={12} />;
-    default:
-      return <Clock size={12} />;
-  }
-};
-
-const formatTimestamp = (date: Date) => {
-  return new Intl.DateTimeFormat('es-ES', {
+const formatTimestamp = (date: Date) =>
+  new Intl.DateTimeFormat('es-ES', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
   }).format(date);
+
+const ACTION_ICON_CLASS: Record<PasswordAction['type'], string> = {
+  reset: 'bg-yellow-500/20 text-yellow-600',
+  temporary: 'bg-blue-500/20 text-blue-600',
+  admin_set: 'bg-destructive/20 text-destructive',
+  user_change: 'bg-green-500/20 text-green-600',
 };
 
-// Component
+const getActionIcon = (type: PasswordAction['type']) => {
+  switch (type) {
+    case 'reset': return <RefreshCwIcon size={16} />;
+    case 'temporary': return <KeyIcon size={16} />;
+    case 'admin_set': return <LockIcon size={16} />;
+    case 'user_change': return <ShieldIcon size={16} />;
+    default: return <KeyIcon size={16} />;
+  }
+};
+
+const STATUS_CONFIG: Record<
+  PasswordAction['status'],
+  { label: string; className: string; icon: React.ReactNode }
+> = {
+  completed: {
+    label: 'Completado',
+    className: 'bg-green-500/20 text-green-600',
+    icon: <CheckCircleIcon size={12} />,
+  },
+  pending: {
+    label: 'Pendiente',
+    className: 'bg-yellow-500/20 text-yellow-600',
+    icon: <ClockIcon size={12} />,
+  },
+  failed: {
+    label: 'Fallido',
+    className: 'bg-destructive/20 text-destructive',
+    icon: <AlertTriangleIcon size={12} />,
+  },
+};
+
 export const PasswordHistoryCard: React.FC<PasswordHistoryCardProps> = ({
   actions,
-}) => {
-  return (
-    <Card>
-      <Header>
-        <Key size={20} />
-        <Title>Historial de Contraseñas</Title>
-      </Header>
+}) => (
+  <div className='rounded-lg border border-border bg-white p-4'>
+    <div className='mb-4 flex items-center gap-2'>
+      <KeyIcon size={20} />
+      <h3 className='m-0 text-lg font-semibold text-foreground'>
+        Historial de Contraseñas
+      </h3>
+    </div>
 
-      {actions.length > 0 ? (
-        <ActionsList>
-          {actions.map(action => (
-            <ActionItem key={action.id}>
-              <ActionIcon type={action.type}>
+    {actions.length > 0 ? (
+      <div className='flex flex-col gap-3'>
+        {actions.map(action => {
+          const status = STATUS_CONFIG[action.status];
+          return (
+            <div
+              key={action.id}
+              className='flex items-center gap-3 rounded-md border-l-[3px] border-l-brand-purple bg-muted p-3'
+            >
+              <div
+                className={cn(
+                  'flex h-8 w-8 shrink-0 items-center justify-center rounded-full',
+                  ACTION_ICON_CLASS[action.type] ?? 'bg-brand-purple/20 text-brand-purple'
+                )}
+              >
                 {getActionIcon(action.type)}
-              </ActionIcon>
+              </div>
 
-              <ActionContent>
-                <ActionDescription>{action.description}</ActionDescription>
-                <ActionMeta>
-                  <Clock size={12} />
+              <div className='flex-1'>
+                <div className='mb-1 text-sm text-foreground'>
+                  {action.description}
+                </div>
+                <div className='flex items-center gap-2 text-xs text-muted-foreground'>
+                  <ClockIcon size={12} />
                   {formatTimestamp(action.timestamp)}
                   {action.adminUser ? (
                     <>• Administrador: {action.adminUser}</>
                   ) : null}
-                </ActionMeta>
-              </ActionContent>
+                </div>
+              </div>
 
-              <StatusBadge status={action.status}>
-                {getStatusIcon(action.status)}
-                {action.status === 'completed'
-                  ? 'Completado'
-                  : action.status === 'pending'
-                    ? 'Pendiente'
-                    : 'Fallido'}
-              </StatusBadge>
-            </ActionItem>
-          ))}
-        </ActionsList>
-      ) : (
-        <EmptyState>
-          No hay acciones de contraseña registradas para este usuario
-        </EmptyState>
-      )}
-    </Card>
-  );
-};
+              <div
+                className={cn(
+                  'flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium',
+                  status.className
+                )}
+              >
+                {status.icon}
+                {status.label}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    ) : (
+      <div className='py-6 text-center text-sm text-muted-foreground'>
+        No hay acciones de contraseña registradas para este usuario
+      </div>
+    )}
+  </div>
+);
 
 export default PasswordHistoryCard;

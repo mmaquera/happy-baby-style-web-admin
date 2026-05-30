@@ -1,6 +1,18 @@
 import type React from 'react';
 import { useState } from 'react';
-import styled from 'styled-components';
+import XIcon from 'lucide-react/dist/esm/icons/x';
+import PhoneIcon from 'lucide-react/dist/esm/icons/phone';
+import CalendarIcon from 'lucide-react/dist/esm/icons/calendar';
+import MapPinIcon from 'lucide-react/dist/esm/icons/map-pin';
+import UserIcon from 'lucide-react/dist/esm/icons/user';
+import ShieldIcon from 'lucide-react/dist/esm/icons/shield';
+import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
+import XCircleIcon from 'lucide-react/dist/esm/icons/x-circle';
+import KeyIcon from 'lucide-react/dist/esm/icons/key';
+import ActivityIcon from 'lucide-react/dist/esm/icons/activity';
+import AtSignIcon from 'lucide-react/dist/esm/icons/at-sign';
+import EditIcon from 'lucide-react/dist/esm/icons/edit';
+import { cn } from '@/lib/utils';
 import { type User } from '@/types';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -12,21 +24,6 @@ import { UserAddressManager } from './UserAddressManager';
 import { useUserSessions } from '@/hooks/useAuthManagement';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { AuthProvider } from '@/types';
-import { theme } from '@/styles/theme';
-import {
-  X,
-  Phone,
-  Calendar,
-  MapPin,
-  User as UserIcon,
-  Shield,
-  CheckCircle,
-  XCircle,
-  Key,
-  Activity,
-  AtSign,
-  Edit,
-} from 'lucide-react';
 
 interface UserDetailModalProps {
   user: User;
@@ -34,216 +31,59 @@ interface UserDetailModalProps {
   onClose: () => void;
 }
 
-// Styled Components
-const Modal = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-`;
+type Tab = 'general' | 'auth' | 'sessions' | 'google-features';
 
-const ModalContent = styled(Card)`
-  max-width: 800px;
-  width: 90%;
-  max-height: 90vh;
-  overflow-y: auto;
-`;
+const formatDate = (date: string | Date) =>
+  new Date(date).toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
 
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: ${theme.spacing[6]};
-  padding-bottom: ${theme.spacing[4]};
-  border-bottom: 1px solid ${theme.colors.border.light};
-`;
-
-const ModalTitle = styled.h2`
-  font-size: ${theme.fontSizes['2xl']};
-  font-weight: ${theme.fontWeights.semibold};
-  color: ${theme.colors.text.primary};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-`;
-
-const UserAvatar = styled.div`
-  width: 60px;
-  height: 60px;
-  background-color: ${theme.colors.primaryPurple}10;
-  border-radius: ${theme.borderRadius.full};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: ${theme.fontSizes['2xl']};
-  font-weight: ${theme.fontWeights.bold};
-  color: ${theme.colors.primaryPurple};
-`;
-
-const ContentGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: ${theme.spacing[6]};
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
+const getRoleLabel = (role: string) => {
+  switch (role) {
+    case 'admin': return 'Administrador';
+    case 'staff': return 'Personal';
+    case 'customer': return 'Cliente';
+    default: return role;
   }
-`;
+};
 
-const Section = styled.div`
-  background: ${theme.colors.background.light};
-  border-radius: ${theme.borderRadius.lg};
-  padding: ${theme.spacing[4]};
-  margin-bottom: ${theme.spacing[4]};
-`;
-
-const SectionTitle = styled.h3`
-  font-size: ${theme.fontSizes.lg};
-  font-weight: ${theme.fontWeights.semibold};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[4]};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-`;
-
-const InfoItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-  margin-bottom: ${theme.spacing[3]};
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
-const InfoIcon = styled.div`
-  color: ${theme.colors.text.secondary};
-  min-width: 20px;
-`;
-
-const InfoContent = styled.div`
-  flex: 1;
-`;
-
-const InfoLabel = styled.div`
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.text.secondary};
-  margin-bottom: ${theme.spacing[1]};
-`;
-
-const InfoValue = styled.div`
-  font-size: ${theme.fontSizes.base};
-  color: ${theme.colors.text.primary};
-  font-weight: ${theme.fontWeights.medium};
-`;
-
-const StatusBadge = styled.span<{
-  status: 'active' | 'inactive' | 'verified' | 'unverified';
-}>`
-  display: inline-flex;
-  align-items: center;
-  padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.sm};
-  font-size: ${theme.fontSizes.xs};
-  font-weight: ${theme.fontWeights.medium};
-  background: ${theme.colors.background.secondary};
-
-  ${({ status }) => {
-    switch (status) {
-      case 'active':
-      case 'verified':
-        return `color: ${theme.colors.success};`;
-      case 'inactive':
-        return `color: ${theme.colors.error};`;
-      case 'unverified':
-        return `color: ${theme.colors.warning};`;
-      default:
-        return `color: ${theme.colors.text.secondary};`;
-    }
-  }}
-`;
-
-const RoleBadge = styled.span<{ role: string }>`
-  display: inline-flex;
-  align-items: center;
-  padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.sm};
-  font-size: ${theme.fontSizes.xs};
-  font-weight: ${theme.fontWeights.medium};
-  text-transform: capitalize;
-  background: ${theme.colors.background.secondary};
-  color: ${theme.colors.text.secondary};
-`;
-
-const TabsContainer = styled.div`
-  display: flex;
-  border-bottom: 1px solid ${theme.colors.border.light};
-  margin-bottom: ${theme.spacing[4]};
-`;
-
-const Tab = styled.button<{ active: boolean }>`
-  padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  border: none;
-  background: none;
-  font-size: ${theme.fontSizes.sm};
-  font-weight: ${theme.fontWeights.medium};
-  cursor: pointer;
-  transition: all ${theme.transitions.base};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-
-  ${({ active }) =>
-    active
-      ? `
-    color: ${theme.colors.primaryPurple};
-    border-bottom: 2px solid ${theme.colors.primaryPurple};
-  `
-      : `
-    color: ${theme.colors.text.secondary};
-    
-    &:hover {
-      color: ${theme.colors.text.primary};
-    }
-  `}
-`;
-
-const TabContent = styled.div`
-  min-height: 200px;
-`;
+const InfoItem = ({
+  icon,
+  label,
+  children,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  children: React.ReactNode;
+}) => (
+  <div className='mb-3 flex items-center gap-3 last:mb-0'>
+    <div className='min-w-[20px] text-muted-foreground'>{icon}</div>
+    <div className='flex-1'>
+      <div className='mb-1 text-sm text-muted-foreground'>{label}</div>
+      <div className='text-base font-medium text-foreground'>{children}</div>
+    </div>
+  </div>
+);
 
 export const UserDetailModal: React.FC<UserDetailModalProps> = ({
   user,
   isOpen,
   onClose,
 }) => {
-  const [activeTab, setActiveTab] = useState<
-    'general' | 'auth' | 'sessions' | 'google-features'
-  >('general');
-  const {
-    sessions,
-    loading: _sessionsLoading,
-    refetch: refetchSessions,
-  } = useUserSessions(user.id);
+  const [activeTab, setActiveTab] = useState<Tab>('general');
 
-  // Hook para manejar el perfil del usuario
+  const { sessions, loading: _sl, refetch: refetchSessions } = useUserSessions(user.id);
   const {
     profile,
-    loading: _profileLoading,
+    loading: _pl,
     isEditing,
     updatingProfile,
     updateProfile,
     startEditing,
     cancelEditing,
-    editingAddressId: _editingAddressId,
+    editingAddressId: _eai,
     creatingAddress,
     updatingAddress,
     deletingAddress,
@@ -252,356 +92,232 @@ export const UserDetailModal: React.FC<UserDetailModalProps> = ({
     updateAddress,
     deleteAddress,
     setDefaultAddress,
-    refetch: _refetchProfile,
+    refetch: _rp,
   } = useUserProfile({ userId: user.id, skip: !isOpen });
 
-  // Verificar si el usuario tiene cuenta de Google
   const hasGoogleAccount = user.accounts?.some(
-    account => account.provider === AuthProvider.google
+    a => a.provider === AuthProvider.google
   );
 
   if (!isOpen) return null;
 
-  const getRoleLabel = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return 'Administrador';
-      case 'staff':
-        return 'Personal';
-      case 'customer':
-        return 'Cliente';
-      default:
-        return role;
-    }
-  };
-
-  const formatDate = (date: string | Date) => {
-    return new Date(date).toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-  };
+  const TABS: { id: Tab; label: string; icon: React.ReactNode; hidden?: boolean }[] = [
+    { id: 'general', label: 'Información General', icon: <UserIcon size={16} /> },
+    { id: 'auth', label: 'Autenticación', icon: <KeyIcon size={16} /> },
+    { id: 'sessions', label: 'Sesiones', icon: <ActivityIcon size={16} /> },
+    { id: 'google-features', label: '🔍 Google', icon: null, hidden: !hasGoogleAccount },
+  ];
 
   return (
-    <Modal onClick={onClose}>
-      <ModalContent onClick={e => e.stopPropagation()}>
-        <ModalHeader>
-          <ModalTitle>
-            <UserAvatar>
+    <div
+      className='fixed inset-0 z-[1000] flex items-center justify-center bg-black/50'
+      onClick={onClose}
+    >
+      <Card
+        className='max-h-[90vh] w-[90%] max-w-[800px] overflow-y-auto'
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className='mb-6 flex items-center justify-between border-b border-border pb-4'>
+          <h2 className='flex items-center gap-3 text-2xl font-semibold text-foreground'>
+            <div className='flex h-[60px] w-[60px] items-center justify-center rounded-full bg-brand-purple/10 text-2xl font-bold text-brand-purple'>
               {user.profile?.firstName?.[0]}
               {user.profile?.lastName?.[0]}
-            </UserAvatar>
+            </div>
             Detalles del Usuario
-          </ModalTitle>
+          </h2>
           <Button
             variant='ghost'
             size='small'
             onClick={onClose}
-            icon={<X size={20} />}
+            icon={<XIcon size={20} />}
           />
-        </ModalHeader>
+        </div>
 
-        {/* Tabs Navigation */}
-        <TabsContainer>
-          <Tab
-            active={activeTab === 'general'}
-            onClick={() => setActiveTab('general')}
-          >
-            <UserIcon size={16} />
-            Información General
-          </Tab>
-          <Tab
-            active={activeTab === 'auth'}
-            onClick={() => setActiveTab('auth')}
-          >
-            <Key size={16} />
-            Autenticación
-          </Tab>
-          <Tab
-            active={activeTab === 'sessions'}
-            onClick={() => setActiveTab('sessions')}
-          >
-            <Activity size={16} />
-            Sesiones
-          </Tab>
-          {hasGoogleAccount ? (
-            <Tab
-              active={activeTab === 'google-features'}
-              onClick={() => setActiveTab('google-features')}
+        {/* Tabs */}
+        <div className='mb-4 flex border-b border-border'>
+          {TABS.filter(t => !t.hidden).map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={cn(
+                'flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors',
+                activeTab === tab.id
+                  ? 'border-b-2 border-brand-purple text-brand-purple'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
             >
-              🔍 Google
-            </Tab>
-          ) : null}
-        </TabsContainer>
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
         {/* Tab Content */}
-        <TabContent>
-          {activeTab === 'general' && (
+        <div className='min-h-[200px]'>
+          {activeTab === 'general' ? (
             <>
-              <ContentGrid>
-                {/* User Information */}
-                <Section>
-                  <SectionTitle>
+              <div className='mb-4 grid gap-6 max-md:grid-cols-1 md:grid-cols-2'>
+                {/* Personal Info */}
+                <div className='mb-4 rounded-lg bg-muted p-4'>
+                  <h3 className='mb-4 flex items-center gap-2 text-lg font-semibold text-foreground'>
                     <UserIcon size={20} />
                     Información Personal
-                    {!isEditing && (
+                    {!isEditing ? (
                       <Button
                         variant='ghost'
                         size='small'
                         onClick={startEditing}
-                        icon={<Edit size={16} />}
-                        style={{ marginLeft: 'auto' }}
+                        icon={<EditIcon size={16} />}
+                        className='ml-auto'
                       >
                         Editar
                       </Button>
-                    )}
-                  </SectionTitle>
+                    ) : null}
+                  </h3>
 
                   {isEditing ? (
                     <UserProfileEditForm
                       profile={profile ?? user.profile ?? {}}
                       onSave={async input => {
-                        await updateProfile(
-                          input as unknown as Parameters<
-                            typeof updateProfile
-                          >[0]
-                        );
+                        await updateProfile(input as unknown as Parameters<typeof updateProfile>[0]);
                       }}
                       onCancel={cancelEditing}
                       loading={updatingProfile}
                     />
                   ) : (
                     <>
-                      <InfoItem>
-                        <InfoIcon>
-                          <UserIcon size={16} />
-                        </InfoIcon>
-                        <InfoContent>
-                          <InfoLabel>Nombre Completo</InfoLabel>
-                          <InfoValue>
-                            {user.profile?.firstName && user.profile?.lastName
-                              ? `${user.profile.firstName} ${user.profile.lastName}`
-                              : 'No especificado'}
-                          </InfoValue>
-                        </InfoContent>
+                      <InfoItem icon={<UserIcon size={16} />} label='Nombre Completo'>
+                        {user.profile?.firstName && user.profile?.lastName
+                          ? `${user.profile.firstName} ${user.profile.lastName}`
+                          : 'No especificado'}
                       </InfoItem>
-
-                      <InfoItem>
-                        <InfoIcon>
-                          <AtSign size={16} />
-                        </InfoIcon>
-                        <InfoContent>
-                          <InfoLabel>Email</InfoLabel>
-                          <InfoValue>{user.email}</InfoValue>
-                        </InfoContent>
+                      <InfoItem icon={<AtSignIcon size={16} />} label='Email'>
+                        {user.email}
                       </InfoItem>
-
                       {user.profile?.phone ? (
-                        <InfoItem>
-                          <InfoIcon>
-                            <Phone size={16} />
-                          </InfoIcon>
-                          <InfoContent>
-                            <InfoLabel>Teléfono</InfoLabel>
-                            <InfoValue>{user.profile.phone}</InfoValue>
-                          </InfoContent>
+                        <InfoItem icon={<PhoneIcon size={16} />} label='Teléfono'>
+                          {user.profile.phone}
                         </InfoItem>
                       ) : null}
-
                       {user.profile?.dateOfBirth ? (
-                        <InfoItem>
-                          <InfoIcon>
-                            <Calendar size={16} />
-                          </InfoIcon>
-                          <InfoContent>
-                            <InfoLabel>Fecha de Nacimiento</InfoLabel>
-                            <InfoValue>
-                              {formatDate(user.profile.dateOfBirth)}
-                            </InfoValue>
-                          </InfoContent>
+                        <InfoItem icon={<CalendarIcon size={16} />} label='Fecha de Nacimiento'>
+                          {formatDate(user.profile.dateOfBirth)}
                         </InfoItem>
                       ) : null}
-
-                      <InfoItem>
-                        <InfoIcon>
-                          <Calendar size={16} />
-                        </InfoIcon>
-                        <InfoContent>
-                          <InfoLabel>Fecha de Registro</InfoLabel>
-                          <InfoValue>{formatDate(user.createdAt)}</InfoValue>
-                        </InfoContent>
+                      <InfoItem icon={<CalendarIcon size={16} />} label='Fecha de Registro'>
+                        {formatDate(user.createdAt)}
                       </InfoItem>
-
                       {user.lastLoginAt ? (
-                        <InfoItem>
-                          <InfoIcon>
-                            <Activity size={16} />
-                          </InfoIcon>
-                          <InfoContent>
-                            <InfoLabel>Último Acceso</InfoLabel>
-                            <InfoValue>
-                              {formatDate(user.lastLoginAt)}
-                            </InfoValue>
-                          </InfoContent>
+                        <InfoItem icon={<ActivityIcon size={16} />} label='Último Acceso'>
+                          {formatDate(user.lastLoginAt)}
                         </InfoItem>
                       ) : null}
                     </>
                   )}
-                </Section>
+                </div>
 
                 {/* Account Status */}
-                <Section>
-                  <SectionTitle>
-                    <Shield size={20} />
+                <div className='mb-4 rounded-lg bg-muted p-4'>
+                  <h3 className='mb-4 flex items-center gap-2 text-lg font-semibold text-foreground'>
+                    <ShieldIcon size={20} />
                     Estado de la Cuenta
-                  </SectionTitle>
+                  </h3>
 
-                  <InfoItem>
-                    <InfoIcon>
-                      <Shield size={16} />
-                    </InfoIcon>
-                    <InfoContent>
-                      <InfoLabel>Rol</InfoLabel>
-                      <InfoValue>
-                        <RoleBadge role={user.role}>
-                          {getRoleLabel(user.role)}
-                        </RoleBadge>
-                      </InfoValue>
-                    </InfoContent>
+                  <InfoItem icon={<ShieldIcon size={16} />} label='Rol'>
+                    <span className='inline-flex items-center rounded-sm bg-muted px-2 py-1 text-xs font-medium capitalize text-muted-foreground'>
+                      {getRoleLabel(user.role)}
+                    </span>
                   </InfoItem>
 
-                  <InfoItem>
-                    <InfoIcon>
-                      {user.isActive ? (
-                        <CheckCircle size={16} />
-                      ) : (
-                        <XCircle size={16} />
+                  <InfoItem
+                    icon={user.isActive ? <CheckCircleIcon size={16} /> : <XCircleIcon size={16} />}
+                    label='Estado'
+                  >
+                    <span
+                      className={cn(
+                        'inline-flex items-center gap-1 rounded-sm px-2 py-1 text-xs font-medium',
+                        user.isActive ? 'text-green-600' : 'text-destructive'
                       )}
-                    </InfoIcon>
-                    <InfoContent>
-                      <InfoLabel>Estado</InfoLabel>
-                      <InfoValue>
-                        <StatusBadge
-                          status={user.isActive ? 'active' : 'inactive'}
-                        >
-                          {user.isActive ? (
-                            <CheckCircle size={12} />
-                          ) : (
-                            <XCircle size={12} />
-                          )}
-                          {user.isActive ? 'Activo' : 'Inactivo'}
-                        </StatusBadge>
-                      </InfoValue>
-                    </InfoContent>
+                    >
+                      {user.isActive ? <CheckCircleIcon size={12} /> : <XCircleIcon size={12} />}
+                      {user.isActive ? 'Activo' : 'Inactivo'}
+                    </span>
                   </InfoItem>
 
-                  <InfoItem>
-                    <InfoIcon>
-                      {user.emailVerified ? (
-                        <CheckCircle size={16} />
-                      ) : (
-                        <XCircle size={16} />
+                  <InfoItem
+                    icon={user.emailVerified ? <CheckCircleIcon size={16} /> : <XCircleIcon size={16} />}
+                    label='Email Verificado'
+                  >
+                    <span
+                      className={cn(
+                        'inline-flex items-center gap-1 rounded-sm px-2 py-1 text-xs font-medium',
+                        user.emailVerified ? 'text-green-600' : 'text-yellow-600'
                       )}
-                    </InfoIcon>
-                    <InfoContent>
-                      <InfoLabel>Email Verificado</InfoLabel>
-                      <InfoValue>
-                        <StatusBadge
-                          status={
-                            user.emailVerified ? 'verified' : 'unverified'
-                          }
-                        >
-                          {user.emailVerified ? (
-                            <CheckCircle size={12} />
-                          ) : (
-                            <XCircle size={12} />
-                          )}
-                          {user.emailVerified ? 'Verificado' : 'No Verificado'}
-                        </StatusBadge>
-                      </InfoValue>
-                    </InfoContent>
+                    >
+                      {user.emailVerified ? <CheckCircleIcon size={12} /> : <XCircleIcon size={12} />}
+                      {user.emailVerified ? 'Verificado' : 'No Verificado'}
+                    </span>
                   </InfoItem>
 
-                  <InfoItem>
-                    <InfoIcon>
-                      <Calendar size={16} />
-                    </InfoIcon>
-                    <InfoContent>
-                      <InfoLabel>Última Actualización</InfoLabel>
-                      <InfoValue>{formatDate(user.updatedAt)}</InfoValue>
-                    </InfoContent>
+                  <InfoItem icon={<CalendarIcon size={16} />} label='Última Actualización'>
+                    {formatDate(user.updatedAt)}
                   </InfoItem>
-                </Section>
-              </ContentGrid>
+                </div>
+              </div>
 
               {/* Addresses */}
-              <Section>
-                <SectionTitle>
-                  <MapPin size={20} />
+              <div className='mb-4 rounded-lg bg-muted p-4'>
+                <h3 className='mb-4 flex items-center gap-2 text-lg font-semibold text-foreground'>
+                  <MapPinIcon size={20} />
                   Direcciones
-                </SectionTitle>
-
+                </h3>
                 <UserAddressManager
-                  addresses={user.addresses || []}
+                  addresses={user.addresses ?? []}
                   userId={user.id}
                   onCreateAddress={input => createAddress(input as never)}
-                  onUpdateAddress={(id, input) =>
-                    updateAddress(id, input as never)
-                  }
+                  onUpdateAddress={(id, input) => updateAddress(id, input as never)}
                   onDeleteAddress={deleteAddress}
                   onSetDefaultAddress={setDefaultAddress}
-                  loading={
-                    creatingAddress ||
-                    updatingAddress ||
-                    deletingAddress ||
-                    settingDefault
-                  }
+                  loading={creatingAddress || updatingAddress || deletingAddress || settingDefault}
                 />
-              </Section>
+              </div>
             </>
-          )}
+          ) : null}
 
-          {activeTab === 'auth' && (
-            <Section>
-              <SectionTitle>
-                <Key size={20} />
+          {activeTab === 'auth' ? (
+            <div className='mb-4 rounded-lg bg-muted p-4'>
+              <h3 className='mb-4 flex items-center gap-2 text-lg font-semibold text-foreground'>
+                <KeyIcon size={20} />
                 Cuentas de Autenticación
-              </SectionTitle>
+              </h3>
               <UserAuthAccounts
-                accounts={user.accounts || []}
-                onAccountUnlinked={() => {
-                  // Refresh user data when account is unlinked
-                }}
+                accounts={user.accounts ?? []}
+                onAccountUnlinked={() => {}}
               />
-            </Section>
-          )}
+            </div>
+          ) : null}
 
-          {activeTab === 'sessions' && (
-            <Section>
-              <SectionTitle>
-                <Activity size={20} />
+          {activeTab === 'sessions' ? (
+            <div className='mb-4 rounded-lg bg-muted p-4'>
+              <h3 className='mb-4 flex items-center gap-2 text-lg font-semibold text-foreground'>
+                <ActivityIcon size={20} />
                 Gestión de Sesiones
-              </SectionTitle>
+              </h3>
               <UserSessionsManager
                 userId={user.id}
                 sessions={sessions}
                 onSessionRevoked={refetchSessions}
               />
-            </Section>
-          )}
+            </div>
+          ) : null}
 
           {activeTab === 'google-features' && hasGoogleAccount ? (
-            <GoogleUserFeatures
-              user={user}
-              onUserUpdated={() => {
-                // Refresh user data when needed
-              }}
-            />
+            <GoogleUserFeatures user={user} onUserUpdated={() => {}} />
           ) : null}
-        </TabContent>
-      </ModalContent>
-    </Modal>
+        </div>
+      </Card>
+    </div>
   );
 };
 

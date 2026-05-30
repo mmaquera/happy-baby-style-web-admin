@@ -1,10 +1,8 @@
 import type React from 'react';
 import { useState } from 'react';
-import styled from 'styled-components';
 import { type UserAddress } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { UserAddressEditForm } from './UserAddressEditForm';
-import { theme } from '@/styles/theme';
 import { logger } from '@/utils/logger';
 
 interface AddressInput {
@@ -33,153 +31,12 @@ interface UserAddressManagerProps {
   loading?: boolean;
 }
 
-// Styled Components
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[4]};
-`;
-
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: ${theme.spacing[4]};
-`;
-
-const Title = styled.h3`
-  font-size: ${theme.fontSizes.lg};
-  font-weight: ${theme.fontWeights.semibold};
-  color: ${theme.colors.text.primary};
-  margin: 0;
-`;
-
-const AddressList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[4]};
-`;
-
-const AddressCard = styled.div`
-  background: ${theme.colors.white};
-  border: 1px solid ${theme.colors.border.light};
-  border-radius: ${theme.borderRadius.base};
-  padding: ${theme.spacing[4]};
-  transition: border-color ${theme.transitions.fast};
-
-  &:hover {
-    border-color: ${theme.colors.border.medium};
-  }
-`;
-
-const AddressHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: ${theme.spacing[2]};
-`;
-
-const AddressInfo = styled.div`
-  flex: 1;
-`;
-
-const AddressTitle = styled.div`
-  font-weight: ${theme.fontWeights.medium};
-  color: ${theme.colors.text.primary};
-  font-size: ${theme.fontSizes.base};
-  margin-bottom: ${theme.spacing[1]};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-`;
-
-const AddressType = styled.span<{ type: string }>`
-  font-size: ${theme.fontSizes.xs};
-  font-weight: ${theme.fontWeights.medium};
-  padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.sm};
-  text-transform: capitalize;
-  background: ${theme.colors.background.secondary};
-  color: ${theme.colors.text.secondary};
-`;
-
-const AddressText = styled.div`
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.text.secondary};
-  line-height: 1.4;
-  margin-bottom: ${theme.spacing[3]};
-`;
-
-const AddressMeta = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  font-size: ${theme.fontSizes.xs};
-  color: ${theme.colors.text.secondary};
-  margin-top: ${theme.spacing[2]};
-`;
-
-const ActionButtons = styled.div`
-  display: flex;
-  gap: ${theme.spacing[1]};
-`;
-
-const DefaultBadge = styled.div`
-  font-size: ${theme.fontSizes.xs};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${theme.colors.primary};
-  margin-top: ${theme.spacing[1]};
-`;
-
-const EmptyState = styled.div`
-  text-align: center;
-  padding: ${theme.spacing[6]};
-  color: ${theme.colors.text.secondary};
-`;
-
-const EmptyText = styled.p`
-  font-size: ${theme.fontSizes.sm};
-  margin: 0;
-`;
-
-const Modal = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-`;
-
-const ModalContent = styled.div`
-  background: ${theme.colors.white};
-  border-radius: ${theme.borderRadius.base};
-  padding: ${theme.spacing[6]};
-  max-width: 500px;
-  width: 90%;
-  max-height: 90vh;
-  overflow-y: auto;
-`;
-
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: ${theme.spacing[4]};
-  padding-bottom: ${theme.spacing[4]};
-  border-bottom: 1px solid ${theme.colors.border.light};
-`;
-
-const ModalTitle = styled.h3`
-  font-size: ${theme.fontSizes.xl};
-  font-weight: ${theme.fontWeights.semibold};
-  color: ${theme.colors.text.primary};
-  margin: 0;
-`;
+const TYPE_LABEL: Record<string, string> = {
+  home: 'Casa',
+  work: 'Trabajo',
+  billing: 'Facturación',
+  shipping: 'Envío',
+};
 
 export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
   addresses,
@@ -191,9 +48,7 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
   loading = false,
 }) => {
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [editingAddress, setEditingAddress] = useState<UserAddress | null>(
-    null
-  );
+  const [editingAddress, setEditingAddress] = useState<UserAddress | null>(null);
 
   const handleCreateAddress = async (input: AddressInput) => {
     try {
@@ -206,7 +61,6 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
 
   const handleUpdateAddress = async (input: AddressInput) => {
     if (!editingAddress) return;
-
     try {
       await onUpdateAddress(editingAddress.id, input);
       setEditingAddress(null);
@@ -233,25 +87,12 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
     }
   };
 
-  const getTypeLabel = (type: string) => {
-    switch (type) {
-      case 'home':
-        return 'Casa';
-      case 'work':
-        return 'Trabajo';
-      case 'billing':
-        return 'Facturación';
-      case 'shipping':
-        return 'Envío';
-      default:
-        return type;
-    }
-  };
-
   return (
-    <Container>
-      <Header>
-        <Title>Direcciones ({addresses.length})</Title>
+    <div className='flex flex-col gap-4'>
+      <div className='mb-4 flex items-center justify-between'>
+        <h3 className='m-0 text-lg font-semibold text-foreground'>
+          Direcciones ({addresses.length})
+        </h3>
         <Button
           variant='primary'
           size='small'
@@ -259,50 +100,52 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
         >
           Agregar
         </Button>
-      </Header>
+      </div>
 
       {addresses.length === 0 ? (
-        <EmptyState>
-          <EmptyText>No hay direcciones registradas</EmptyText>
-        </EmptyState>
+        <div className='py-6 text-center text-muted-foreground'>
+          <p className='m-0 text-sm'>No hay direcciones registradas</p>
+        </div>
       ) : (
-        <AddressList>
+        <div className='flex flex-col gap-4'>
           {addresses.map(address => (
-            <AddressCard key={address.id}>
-              <AddressHeader>
-                <AddressInfo>
-                  <AddressTitle>
+            <div
+              key={address.id}
+              className='rounded-md border border-border bg-white p-4 transition-colors hover:border-border/80'
+            >
+              <div className='flex items-start justify-between'>
+                <div className='flex-1'>
+                  <div className='mb-1 flex items-center gap-2 font-medium text-foreground'>
                     {address.fullName}
-                    <AddressType type={address.type}>
-                      {getTypeLabel(address.type)}
-                    </AddressType>
-                  </AddressTitle>
+                    <span className='rounded-sm bg-muted px-2 py-1 text-xs font-medium capitalize text-muted-foreground'>
+                      {TYPE_LABEL[address.type] ?? address.type}
+                    </span>
+                  </div>
 
-                  <AddressText>
+                  <div className='mb-3 text-sm leading-[1.4] text-muted-foreground'>
                     {address.address1}
                     <br />
                     {address.address2 ? (
-                      <>
-                        {address.address2}
-                        <br />
-                      </>
+                      <>{address.address2}<br /></>
                     ) : null}
                     {address.city}, {address.state} {address.postalCode}
                     <br />
                     {address.country}
-                  </AddressText>
+                  </div>
 
-                  <AddressMeta>
+                  <div className='mt-2 flex items-center gap-2 text-xs text-muted-foreground'>
                     {address.company ? <span>{address.company}</span> : null}
                     {address.phone ? <span>{address.phone}</span> : null}
-                  </AddressMeta>
+                  </div>
 
                   {address.isDefault ? (
-                    <DefaultBadge>Predeterminada</DefaultBadge>
+                    <div className='mt-1 text-xs font-medium text-brand-purple'>
+                      Predeterminada
+                    </div>
                   ) : null}
-                </AddressInfo>
+                </div>
 
-                <ActionButtons>
+                <div className='flex gap-1'>
                   <Button
                     variant='ghost'
                     size='small'
@@ -311,7 +154,6 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
                   >
                     Editar
                   </Button>
-
                   <Button
                     variant='ghost'
                     size='small'
@@ -320,8 +162,7 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
                   >
                     Eliminar
                   </Button>
-
-                  {!address.isDefault && (
+                  {!address.isDefault ? (
                     <Button
                       variant='ghost'
                       size='small'
@@ -330,20 +171,28 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
                     >
                       Predeterminar
                     </Button>
-                  )}
-                </ActionButtons>
-              </AddressHeader>
-            </AddressCard>
+                  ) : null}
+                </div>
+              </div>
+            </div>
           ))}
-        </AddressList>
+        </div>
       )}
 
-      {/* Create Address Modal */}
+      {/* Create Modal */}
       {showCreateForm ? (
-        <Modal onClick={() => setShowCreateForm(false)}>
-          <ModalContent onClick={e => e.stopPropagation()}>
-            <ModalHeader>
-              <ModalTitle>Nueva Dirección</ModalTitle>
+        <div
+          className='fixed inset-0 z-[1000] flex items-center justify-center bg-black/40'
+          onClick={() => setShowCreateForm(false)}
+        >
+          <div
+            className='max-h-[90vh] w-[90%] max-w-[500px] overflow-y-auto rounded-md bg-white p-6'
+            onClick={e => e.stopPropagation()}
+          >
+            <div className='mb-4 flex items-center justify-between border-b border-border pb-4'>
+              <h3 className='m-0 text-xl font-semibold text-foreground'>
+                Nueva Dirección
+              </h3>
               <Button
                 variant='ghost'
                 size='small'
@@ -351,24 +200,31 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
               >
                 Cerrar
               </Button>
-            </ModalHeader>
-
+            </div>
             <UserAddressEditForm
               userId={userId}
               onSave={handleCreateAddress}
               onCancel={() => setShowCreateForm(false)}
               loading={loading}
             />
-          </ModalContent>
-        </Modal>
+          </div>
+        </div>
       ) : null}
 
-      {/* Edit Address Modal */}
+      {/* Edit Modal */}
       {editingAddress ? (
-        <Modal onClick={() => setEditingAddress(null)}>
-          <ModalContent onClick={e => e.stopPropagation()}>
-            <ModalHeader>
-              <ModalTitle>Editar Dirección</ModalTitle>
+        <div
+          className='fixed inset-0 z-[1000] flex items-center justify-center bg-black/40'
+          onClick={() => setEditingAddress(null)}
+        >
+          <div
+            className='max-h-[90vh] w-[90%] max-w-[500px] overflow-y-auto rounded-md bg-white p-6'
+            onClick={e => e.stopPropagation()}
+          >
+            <div className='mb-4 flex items-center justify-between border-b border-border pb-4'>
+              <h3 className='m-0 text-xl font-semibold text-foreground'>
+                Editar Dirección
+              </h3>
               <Button
                 variant='ghost'
                 size='small'
@@ -376,8 +232,7 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
               >
                 Cerrar
               </Button>
-            </ModalHeader>
-
+            </div>
             <UserAddressEditForm
               address={editingAddress}
               userId={userId}
@@ -386,10 +241,10 @@ export const UserAddressManager: React.FC<UserAddressManagerProps> = ({
               loading={loading}
               isEditing={true}
             />
-          </ModalContent>
-        </Modal>
+          </div>
+        </div>
       ) : null}
-    </Container>
+    </div>
   );
 };
 

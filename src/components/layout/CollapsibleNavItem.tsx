@@ -1,7 +1,6 @@
 import type React from 'react';
-import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
-import { theme } from '@/styles/theme';
+import { cn } from '@/lib/utils';
 import { useSidebarTooltip } from '@/hooks/useSidebarTooltip';
 
 interface CollapsibleNavItemProps {
@@ -11,49 +10,6 @@ interface CollapsibleNavItemProps {
   icon: React.ReactNode;
   children: string;
 }
-
-const StyledNavItem = styled(NavLink)<{ isCollapsed: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: ${props => (props.isCollapsed ? 0 : theme.spacing[3])};
-  padding: ${props => (props.isCollapsed ? theme.spacing[4] : theme.spacing[3])}
-    ${props => (props.isCollapsed ? theme.spacing[2] : theme.spacing[6])};
-  color: ${theme.colors.text.secondary};
-  text-decoration: none;
-  transition: all ${theme.transitions.base};
-  font-size: ${theme.fontSizes.base};
-  font-weight: ${theme.fontWeights.normal};
-  border-right: 3px solid transparent;
-  justify-content: ${props => (props.isCollapsed ? 'center' : 'flex-start')};
-  position: relative;
-  min-height: 48px;
-
-  &:hover {
-    background: ${theme.colors.background.accent};
-    color: ${theme.colors.primaryPurple};
-  }
-
-  &.active {
-    background: ${theme.colors.softPurple};
-    color: ${theme.colors.primaryPurple};
-    border-right-color: ${theme.colors.primaryPurple};
-    font-weight: ${theme.fontWeights.medium};
-  }
-
-  svg {
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-  }
-
-  span {
-    opacity: ${props => (props.isCollapsed ? 0 : 1)};
-    transition: opacity ${theme.transitions.base};
-    white-space: nowrap;
-    overflow: hidden;
-    width: ${props => (props.isCollapsed ? 0 : 'auto')};
-  }
-`;
 
 export const CollapsibleNavItem: React.FC<CollapsibleNavItemProps> = ({
   to,
@@ -65,20 +21,37 @@ export const CollapsibleNavItem: React.FC<CollapsibleNavItemProps> = ({
   const { isVisible, showTooltip, hideTooltip } = useSidebarTooltip(300);
 
   return (
-    <StyledNavItem
+    <NavLink
       to={to}
-      end={end || false}
-      isCollapsed={isCollapsed}
+      end={end ?? false}
       onMouseEnter={isCollapsed ? showTooltip : undefined}
       onMouseLeave={isCollapsed ? hideTooltip : undefined}
+      className={({ isActive }) =>
+        cn(
+          'relative flex min-h-12 items-center border-r-[3px] text-base transition-all',
+          isCollapsed
+            ? 'justify-center gap-0 px-2 py-4'
+            : 'justify-start gap-3 px-6 py-3',
+          isActive
+            ? 'border-r-brand-purple bg-brand-purple/10 font-medium text-brand-purple'
+            : 'border-r-transparent text-muted-foreground hover:bg-muted hover:text-brand-purple'
+        )
+      }
     >
       {icon}
-      <span>{children}</span>
+      <span
+        className={cn(
+          'overflow-hidden whitespace-nowrap transition-all',
+          isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
+        )}
+      >
+        {children}
+      </span>
       {isCollapsed && isVisible ? (
-        <span className='absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 rounded bg-foreground px-2 py-1 text-xs whitespace-nowrap text-background pointer-events-none'>
+        <span className='pointer-events-none absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 whitespace-nowrap rounded bg-foreground px-2 py-1 text-xs text-background'>
           {children}
         </span>
       ) : null}
-    </StyledNavItem>
+    </NavLink>
   );
 };

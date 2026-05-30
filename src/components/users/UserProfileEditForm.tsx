@@ -1,8 +1,10 @@
 import type React from 'react';
 import { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import { type UserRole } from '@/generated/graphql';
-// Minimal profile shape this form needs — avoids coupling to full GQL type
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { logger } from '@/utils/logger';
+
 interface ProfileLike {
   firstName?: string | null;
   lastName?: string | null;
@@ -10,11 +12,6 @@ interface ProfileLike {
   dateOfBirth?: string | null;
   role?: UserRole | string | null;
 }
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { theme } from '@/styles/theme';
-
-import { logger } from '@/utils/logger';
 
 interface ProfileSaveInput {
   firstName: string;
@@ -39,66 +36,18 @@ interface FormData {
   role: string;
 }
 
-type FormErrors = FormData;
+type FormErrors = Partial<FormData>;
 
-// Styled Components
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[6]};
-`;
-
-const FormRow = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: ${theme.spacing[4]};
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[2]};
-`;
-
-const Label = styled.label`
-  font-size: ${theme.fontSizes.sm};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${theme.colors.text.secondary};
-  margin-bottom: ${theme.spacing[1]};
-`;
-
-const Required = styled.span`
-  color: ${theme.colors.error};
-  margin-left: ${theme.spacing[1]};
-`;
-
-const ErrorMessage = styled.div`
-  color: ${theme.colors.error};
-  font-size: ${theme.fontSizes.sm};
-  margin-top: ${theme.spacing[1]};
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: ${theme.spacing[3]};
-  justify-content: flex-end;
-  margin-top: ${theme.spacing[6]};
-`;
-
-const Select = styled.select`
-  padding: ${theme.spacing[3]};
-  border: 1px solid ${theme.colors.border.light};
-  border-radius: ${theme.borderRadius.base};
-  font-size: ${theme.fontSizes.base};
-  background: ${theme.colors.white};
-  color: ${theme.colors.text.primary};
-  transition: border-color ${theme.transitions.fast};
-
-  &:focus {
-    outline: none;
-    border-color: ${theme.colors.primary};
+const formatDateOfBirth = (date: string | null | undefined): string => {
+  if (!date) return '';
+  try {
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return '';
+    return d.toISOString().split('T')[0] ?? '';
+  } catch {
+    return '';
   }
-`;
+};
 
 export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
   profile,
@@ -106,41 +55,23 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
   onCancel,
   loading = false,
 }) => {
-  // Helper function to get error message or empty string
-  const getErrorMessage = (fieldName: keyof FormErrors): string => {
-    return errors[fieldName] || '';
-  };
-
-  // Helper function to format dateOfBirth
-  const formatDateOfBirth = (date: string | null | undefined): string => {
-    if (!date) return '';
-    try {
-      const dateObj = new Date(date);
-      if (isNaN(dateObj.getTime())) return '';
-      return dateObj.toISOString().split('T')[0] || '';
-    } catch {
-      return '';
-    }
-  };
   const [formData, setFormData] = useState<FormData>({
-    firstName: profile.firstName || '',
-    lastName: profile.lastName || '',
-    phone: profile.phone || '',
+    firstName: profile.firstName ?? '',
+    lastName: profile.lastName ?? '',
+    phone: profile.phone ?? '',
     dateOfBirth: formatDateOfBirth(profile.dateOfBirth),
-    role: profile.role || 'customer',
+    role: profile.role ?? 'customer',
   });
-
-  const [errors, setErrors] = useState<Partial<FormErrors>>({});
+  const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Partial<FormData>>({});
 
-  // Reset form when profile changes
   useEffect(() => {
     setFormData({
-      firstName: profile.firstName || '',
-      lastName: profile.lastName || '',
-      phone: profile.phone || '',
+      firstName: profile.firstName ?? '',
+      lastName: profile.lastName ?? '',
+      phone: profile.phone ?? '',
       dateOfBirth: formatDateOfBirth(profile.dateOfBirth),
-      role: profile.role || 'customer',
+      role: profile.role ?? 'customer',
     });
     setErrors({});
     setTouched({});
@@ -150,32 +81,22 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
     switch (name) {
       case 'firstName':
         if (!value.trim()) return 'El nombre es requerido';
-        if (value.trim().length < 2)
-          return 'El nombre debe tener al menos 2 caracteres';
+        if (value.trim().length < 2) return 'El nombre debe tener al menos 2 caracteres';
         return '';
-
       case 'lastName':
         if (!value.trim()) return 'El apellido es requerido';
-        if (value.trim().length < 2)
-          return 'El apellido debe tener al menos 2 caracteres';
+        if (value.trim().length < 2) return 'El apellido debe tener al menos 2 caracteres';
         return '';
-
       case 'phone':
-        if (value && !/^[\+]?[1-9][\d]{0,15}$/.test(value.replace(/\s/g, ''))) {
+        if (value && !/^[\+]?[1-9][\d]{0,15}$/.test(value.replace(/\s/g, '')))
           return 'El teléfono debe tener un formato válido';
-        }
         return '';
-
       case 'dateOfBirth':
         if (value) {
-          const birthDate = new Date(value);
-          const today = new Date();
-          const age = today.getFullYear() - birthDate.getFullYear();
-          if (age < 13 || age > 120)
-            return 'La fecha de nacimiento debe ser válida';
+          const age = new Date().getFullYear() - new Date(value).getFullYear();
+          if (age < 13 || age > 120) return 'La fecha de nacimiento debe ser válida';
         }
         return '';
-
       default:
         return '';
     }
@@ -183,42 +104,29 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
 
   const handleChange = (name: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
-
-    // Validate field on change if it has been touched
     if (touched[name]) {
-      const error = validateField(name, value);
-      setErrors(prev => ({ ...prev, [name]: error }));
+      setErrors(prev => ({ ...prev, [name]: validateField(name, value) }));
     }
   };
 
   const handleBlur = (name: keyof FormData) => {
     setTouched(prev => ({ ...prev, [name]: true }));
-    const error = validateField(name, formData[name]);
-    setErrors(prev => ({ ...prev, [name]: error }));
+    setErrors(prev => ({ ...prev, [name]: validateField(name, formData[name]) }));
   };
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<FormData> = {};
-
-    Object.keys(formData).forEach(key => {
-      const fieldName = key as keyof FormData;
-      const error = validateField(fieldName, formData[fieldName]);
-      if (error) {
-        newErrors[fieldName] = error;
-      }
+    const newErrors: FormErrors = {};
+    (Object.keys(formData) as (keyof FormData)[]).forEach(key => {
+      const err = validateField(key, formData[key]);
+      if (err) newErrors[key] = err;
     });
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
+    if (!validateForm()) return;
     try {
       const input: ProfileSaveInput = {
         firstName: formData.firstName.trim(),
@@ -229,7 +137,6 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
           : {}),
         ...(formData.role ? { role: formData.role as UserRole } : {}),
       };
-
       await onSave(input);
     } catch (error) {
       logger.error('Error saving profile:', error);
@@ -237,85 +144,90 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <FormRow>
-        <FormGroup>
-          <Label>
-            Nombre <Required>*</Required>
-          </Label>
+    <form onSubmit={handleSubmit} className='flex flex-col gap-6'>
+      <div className='grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))]'>
+        <div className='flex flex-col gap-2'>
+          <label className='text-sm font-medium text-muted-foreground'>
+            Nombre <span className='ml-1 text-destructive'>*</span>
+          </label>
           <Input
             type='text'
             value={formData.firstName}
             onChange={e => handleChange('firstName', e.target.value)}
             onBlur={() => handleBlur('firstName')}
             placeholder='Nombre'
-            error={getErrorMessage('firstName')}
+            error={errors.firstName}
           />
           {errors.firstName ? (
-            <ErrorMessage>{errors.firstName}</ErrorMessage>
+            <div className='mt-1 text-sm text-destructive'>{errors.firstName}</div>
           ) : null}
-        </FormGroup>
+        </div>
 
-        <FormGroup>
-          <Label>
-            Apellido <Required>*</Required>
-          </Label>
+        <div className='flex flex-col gap-2'>
+          <label className='text-sm font-medium text-muted-foreground'>
+            Apellido <span className='ml-1 text-destructive'>*</span>
+          </label>
           <Input
             type='text'
             value={formData.lastName}
             onChange={e => handleChange('lastName', e.target.value)}
             onBlur={() => handleBlur('lastName')}
             placeholder='Apellido'
-            error={getErrorMessage('lastName')}
+            error={errors.lastName}
           />
           {errors.lastName ? (
-            <ErrorMessage>{errors.lastName}</ErrorMessage>
+            <div className='mt-1 text-sm text-destructive'>{errors.lastName}</div>
           ) : null}
-        </FormGroup>
-      </FormRow>
+        </div>
+      </div>
 
-      <FormRow>
-        <FormGroup>
-          <Label>Teléfono</Label>
+      <div className='grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))]'>
+        <div className='flex flex-col gap-2'>
+          <label className='text-sm font-medium text-muted-foreground'>Teléfono</label>
           <Input
             type='tel'
             value={formData.phone}
             onChange={e => handleChange('phone', e.target.value)}
             onBlur={() => handleBlur('phone')}
             placeholder='+1 234 567 890'
-            error={getErrorMessage('phone')}
+            error={errors.phone}
           />
-          {errors.phone ? <ErrorMessage>{errors.phone}</ErrorMessage> : null}
-        </FormGroup>
+          {errors.phone ? (
+            <div className='mt-1 text-sm text-destructive'>{errors.phone}</div>
+          ) : null}
+        </div>
 
-        <FormGroup>
-          <Label>Fecha de Nacimiento</Label>
+        <div className='flex flex-col gap-2'>
+          <label className='text-sm font-medium text-muted-foreground'>
+            Fecha de Nacimiento
+          </label>
           <Input
             type='date'
             value={formData.dateOfBirth}
             onChange={e => handleChange('dateOfBirth', e.target.value)}
             onBlur={() => handleBlur('dateOfBirth')}
-            error={getErrorMessage('dateOfBirth')}
+            error={errors.dateOfBirth}
           />
           {errors.dateOfBirth ? (
-            <ErrorMessage>{errors.dateOfBirth}</ErrorMessage>
+            <div className='mt-1 text-sm text-destructive'>{errors.dateOfBirth}</div>
           ) : null}
-        </FormGroup>
-      </FormRow>
+        </div>
+      </div>
 
-      <FormGroup>
-        <Label>Rol</Label>
-        <Select
+      <div className='flex flex-col gap-2'>
+        <label className='text-sm font-medium text-muted-foreground'>Rol</label>
+        <select
           value={formData.role}
           onChange={e => handleChange('role', e.target.value)}
+          className='cursor-pointer rounded-md border border-border bg-white px-3 py-2 text-base text-foreground outline-none transition-colors focus:border-brand-purple focus:shadow-[0_0_0_3px_rgba(107,70,193,0.2)]'
         >
           <option value='customer'>Cliente</option>
           <option value='staff'>Staff</option>
           <option value='admin'>Administrador</option>
-        </Select>
-      </FormGroup>
+        </select>
+      </div>
 
-      <ButtonGroup>
+      <div className='mt-6 flex justify-end gap-3'>
         <Button
           type='button'
           variant='ghost'
@@ -324,7 +236,6 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
         >
           Cancelar
         </Button>
-
         <Button
           type='submit'
           variant='primary'
@@ -333,8 +244,8 @@ export const UserProfileEditForm: React.FC<UserProfileEditFormProps> = ({
         >
           Guardar
         </Button>
-      </ButtonGroup>
-    </Form>
+      </div>
+    </form>
   );
 };
 

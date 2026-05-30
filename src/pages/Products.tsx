@@ -1,8 +1,7 @@
 import type React from 'react';
 import { lazy, Suspense, useState, useCallback, useMemo } from 'react';
+import AlertTriangleIcon from 'lucide-react/dist/esm/icons/alert-triangle';
 import { useUIPreferencesStore } from '@/stores/uiPreferencesStore';
-import styled from 'styled-components';
-import { theme } from '@/styles/theme';
 import {
   ProductHeader,
   ProductFilters,
@@ -10,7 +9,6 @@ import {
   ProductListView,
 } from '@/components/products';
 
-// Heavy modals — lazy-loaded so they don't bloat the initial Products chunk
 const CreateProductModal = lazy(() =>
   import('@/components/products/CreateProductModal').then(m => ({
     default: m.CreateProductModal,
@@ -26,6 +24,7 @@ const ProductDetailModal = lazy(() =>
     default: m.ProductDetailModal,
   }))
 );
+
 import {
   useProducts,
   useCreateProduct,
@@ -35,79 +34,11 @@ import {
 import { useCategories } from '@/hooks/useCategories';
 import type { ProductFilterInput } from '@/components/products/types';
 import type { Product } from '@/components/products/types';
-import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { logger } from '@/utils/logger';
 
-// =====================================================
-// PRODUCTS PAGE - GraphQL Integration
-// =====================================================
-// Following Clean Architecture principles and DEVELOPMENT_STANDARDS.md
-// - Single Responsibility: Product management only
-// - Dependency Inversion: Depends on hooks, not implementations
-// - Error handling: Centralized and consistent
-// - State management: Local UI state + GraphQL state
-
-const ProductsContainer = styled.div`
-  padding: ${theme.spacing[6]};
-  max-width: 1400px;
-  margin: 0 auto;
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    padding: ${theme.spacing[4]};
-  }
-`;
-
-const LoadingOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: ${theme.colors.white}80;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: ${theme.zIndex.modal};
-`;
-
-const LoadingSpinner = styled.div`
-  width: 40px;
-  height: 40px;
-  border: 4px solid ${theme.colors.border.light};
-  border-top: 4px solid ${theme.colors.primary};
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-`;
-
-const LoadingText = styled.div`
-  margin-top: ${theme.spacing[4]};
-  color: ${theme.colors.text.secondary};
-  font-size: ${theme.fontSizes.base};
-`;
-
-const ErrorState = styled.div`
-  text-align: center;
-  padding: ${theme.spacing[6]};
-  color: ${theme.colors.error};
-`;
-
 export const Products: React.FC = () => {
-  // =====================================================
-  // STATE MANAGEMENT - Following Clean Architecture
-  // =====================================================
-
-  // UI State - Local component state only
   const { productsViewMode: viewMode, setProductsViewMode: setViewMode } =
     useUIPreferencesStore();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -118,7 +49,6 @@ export const Products: React.FC = () => {
   const [_sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  // Filter State - Mapped to GraphQL filters
   const [filters, setFilters] = useState<{
     search: string;
     categoryId: string;
@@ -137,11 +67,6 @@ export const Products: React.FC = () => {
     tags: [],
   });
 
-  // =====================================================
-  // HELPER FUNCTIONS - Clean and focused
-  // =====================================================
-
-  // Map local filters to GraphQL filter format
   const mapFiltersToGraphQL = useCallback(
     (localFilters: typeof filters): ProductFilterInput => {
       const graphqlFilters: ProductFilterInput = {
@@ -149,31 +74,18 @@ export const Products: React.FC = () => {
         inStock: localFilters.inStock,
         tags: localFilters.tags.length > 0 ? localFilters.tags : null,
       };
-
-      // Add optional filters only if they have values
-      if (localFilters.categoryId) {
+      if (localFilters.categoryId)
         graphqlFilters.categoryId = localFilters.categoryId;
-      }
-      if (localFilters.minPrice !== null) {
+      if (localFilters.minPrice !== null)
         graphqlFilters.minPrice = localFilters.minPrice;
-      }
-      if (localFilters.maxPrice !== null) {
+      if (localFilters.maxPrice !== null)
         graphqlFilters.maxPrice = localFilters.maxPrice;
-      }
-      if (localFilters.search) {
-        graphqlFilters.search = localFilters.search;
-      }
-
+      if (localFilters.search) graphqlFilters.search = localFilters.search;
       return graphqlFilters;
     },
     []
   );
 
-  // =====================================================
-  // GRAPHQL INTEGRATION - Using existing hooks
-  // =====================================================
-
-  // Products data from GraphQL
   const {
     products,
     loading: productsLoading,
@@ -182,12 +94,8 @@ export const Products: React.FC = () => {
     hasMore,
     loadMore,
     refetch: refetchProducts,
-  } = useProducts({
-    filter: mapFiltersToGraphQL(filters),
-    limit: 20,
-  });
+  } = useProducts({ filter: mapFiltersToGraphQL(filters), limit: 20 });
 
-  // Categories data from GraphQL
   const {
     categories: graphqlCategories,
     loading: categoriesLoading,
@@ -195,7 +103,6 @@ export const Products: React.FC = () => {
     refetchCategories,
   } = useCategories();
 
-  // Product mutations
   const { create: _createProduct, loading: _creatingProduct } =
     useCreateProduct();
   const { update: updateProduct, loading: _updatingProduct } =
@@ -203,11 +110,6 @@ export const Products: React.FC = () => {
   const { remove: deleteProduct, loading: _deletingProduct } =
     useDeleteProduct();
 
-  // =====================================================
-  // COMPUTED VALUES - Using useMemo for performance
-  // =====================================================
-
-  // Compute available categories (GraphQL + fallback)
   const availableCategories = useMemo(() => {
     if (graphqlCategories.length > 0) {
       return graphqlCategories
@@ -217,7 +119,6 @@ export const Products: React.FC = () => {
     return [];
   }, [graphqlCategories]);
 
-  // Compute product statistics from real data
   const productStats = useMemo(() => {
     if (!products.length)
       return {
@@ -226,31 +127,20 @@ export const Products: React.FC = () => {
         lowStockProducts: 0,
         outOfStockProducts: 0,
       };
-
-    const activeProducts = products.filter(p => p.isActive).length;
-    const lowStockProducts = products.filter(
-      p => p.stockQuantity <= 10 && p.stockQuantity > 0
-    ).length;
-    const outOfStockProducts = products.filter(
-      p => p.stockQuantity === 0
-    ).length;
-
     return {
       totalProducts: total,
-      activeProducts,
-      lowStockProducts,
-      outOfStockProducts,
+      activeProducts: products.filter(p => p.isActive).length,
+      lowStockProducts: products.filter(
+        p => p.stockQuantity <= 10 && p.stockQuantity > 0
+      ).length,
+      outOfStockProducts: products.filter(p => p.stockQuantity === 0).length,
     };
   }, [products, total]);
-
-  // =====================================================
-  // EVENT HANDLERS - Following Single Responsibility
-  // =====================================================
 
   const handleFilterChange = useCallback(
     (newFilters: Partial<typeof filters>) => {
       setFilters(prev => ({ ...prev, ...newFilters }));
-      setCurrentPage(1); // Reset to first page when filters change
+      setCurrentPage(1);
     },
     []
   );
@@ -275,7 +165,7 @@ export const Products: React.FC = () => {
   const handleCreateProductSuccess = useCallback(
     (product: Product) => {
       logger.debug('Producto creado exitosamente:', product);
-      refetchProducts(); // Refresh products list
+      refetchProducts();
       setIsCreateModalOpen(false);
     },
     [refetchProducts]
@@ -299,7 +189,7 @@ export const Products: React.FC = () => {
   const handleEditProductSuccess = useCallback(
     (product: Product) => {
       logger.debug('Producto editado exitosamente:', product);
-      refetchProducts(); // Refresh products list
+      refetchProducts();
       setIsEditModalOpen(false);
       setEditingProduct(null);
     },
@@ -318,7 +208,6 @@ export const Products: React.FC = () => {
       ) {
         try {
           await deleteProduct(productId);
-          // Product will be automatically removed from list via Apollo cache
         } catch (error) {
           logger.error('Error deleting product:', error);
         }
@@ -332,9 +221,7 @@ export const Products: React.FC = () => {
       try {
         const product = products.find(p => p.id === productId);
         if (!product) return;
-
         await updateProduct(productId, { isActive });
-        // Product will be automatically updated via Apollo cache
       } catch (error) {
         logger.error('Error updating product status:', error);
       }
@@ -345,9 +232,7 @@ export const Products: React.FC = () => {
   const handleViewDetails = useCallback(
     (productId: string) => {
       const product = products.find(p => p.id === productId);
-      if (product) {
-        setSelectedProduct(product as Product);
-      }
+      if (product) setSelectedProduct(product as Product);
     },
     [products]
   );
@@ -358,104 +243,84 @@ export const Products: React.FC = () => {
 
   const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
-    // Page-based GraphQL pagination: wire currentPage → offset in useProducts (Fase 2 backlog)
   }, []);
 
   const handleSort = useCallback((field: string, direction: 'asc' | 'desc') => {
     setSortField(field);
     setSortDirection(direction);
-    // Server-side sorting: pass sort params to useProducts query (Fase 2 backlog)
   }, []);
 
   const handleLoadMore = useCallback(() => {
-    if (hasMore) {
-      loadMore();
-    }
+    if (hasMore) loadMore();
   }, [hasMore, loadMore]);
 
-  const handleViewModeChange = useCallback((mode: 'grid' | 'list') => {
-    setViewMode(mode);
-  }, []);
+  const handleViewModeChange = useCallback(
+    (mode: 'grid' | 'list') => {
+      setViewMode(mode);
+    },
+    [setViewMode]
+  );
 
-  // =====================================================
-  // LOADING AND ERROR STATES - Following standards
-  // =====================================================
-
-  // Initial loading state - only show when loading categories for the first time
   const isInitialLoading = categoriesLoading && graphqlCategories.length === 0;
-
-  // Products loading state
   const isProductsLoading = productsLoading && products.length === 0;
 
-  // Show loading overlay only on initial load
   if (isInitialLoading) {
     return (
-      <ProductsContainer>
-        <LoadingOverlay>
-          <LoadingSpinner />
-          <LoadingText>Cargando módulo de productos...</LoadingText>
-        </LoadingOverlay>
-      </ProductsContainer>
+      <div className='mx-auto max-w-[1400px] px-6 py-6 max-md:px-4'>
+        <div className='fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-white/50'>
+          <div className='h-10 w-10 animate-spin rounded-full border-4 border-border border-t-brand-purple' />
+          <div className='mt-4 text-base text-muted-foreground'>
+            Cargando módulo de productos...
+          </div>
+        </div>
+      </div>
     );
   }
 
-  // Error state for categories - only show if we can't get any categories
   if (categoriesError && graphqlCategories.length === 0) {
     return (
-      <ProductsContainer>
+      <div className='mx-auto max-w-[1400px] px-6 py-6 max-md:px-4'>
         <Card>
-          <ErrorState>
-            <AlertTriangle
-              size={48}
-              style={{ marginBottom: theme.spacing[4] }}
-            />
+          <div className='p-6 text-center text-destructive'>
+            <AlertTriangleIcon size={48} className='mb-4' />
             <h2>Error al cargar categorías</h2>
             <p>{categoriesError}</p>
             <Button
               variant='primary'
               onClick={() => refetchCategories()}
-              style={{ marginTop: theme.spacing[4] }}
+              className='mt-4'
             >
               Reintentar
             </Button>
-          </ErrorState>
+          </div>
         </Card>
-      </ProductsContainer>
+      </div>
     );
   }
 
-  // Error state for products
   if (productsError && products.length === 0) {
     return (
-      <ProductsContainer>
+      <div className='mx-auto max-w-[1400px] px-6 py-6 max-md:px-4'>
         <Card>
-          <ErrorState>
-            <AlertTriangle
-              size={48}
-              style={{ marginBottom: theme.spacing[4] }}
-            />
+          <div className='p-6 text-center text-destructive'>
+            <AlertTriangleIcon size={48} className='mb-4' />
             <h2>Error al cargar productos</h2>
             <p>{productsError.message}</p>
             <Button
               variant='primary'
               onClick={() => refetchProducts()}
-              style={{ marginTop: theme.spacing[4] }}
+              className='mt-4'
             >
               Reintentar
             </Button>
-          </ErrorState>
+          </div>
         </Card>
-      </ProductsContainer>
+      </div>
     );
   }
 
-  // =====================================================
-  // RENDER - Clean and focused
-  // =====================================================
-
   return (
-    <ProductsContainer>
-      {/* Consolidated ProductHeader with all controls */}
+    <div className='mx-auto max-w-[1400px] px-6 py-6 max-md:px-4'>
       <ProductHeader
         title='Productos Happy Baby Style'
         stats={productStats}
@@ -467,53 +332,20 @@ export const Products: React.FC = () => {
         onViewModeChange={handleViewModeChange}
       />
 
-      {/* Subtle loading indicator for category updates */}
       {categoriesLoading && graphqlCategories.length > 0 ? (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: theme.spacing[2],
-            padding: theme.spacing[2],
-            backgroundColor: theme.colors.background.accent,
-            borderRadius: theme.borderRadius.base,
-            marginBottom: theme.spacing[4],
-            fontSize: theme.fontSizes.sm,
-            color: theme.colors.text.secondary,
-          }}
-        >
-          <LoadingSpinner
-            style={{ width: '16px', height: '16px', borderWidth: '2px' }}
-          />
+        <div className='mb-4 flex items-center justify-center gap-2 rounded-md bg-brand-purple/10 py-2 text-sm text-muted-foreground'>
+          <div className='h-4 w-4 animate-spin rounded-full border-2 border-border border-t-brand-purple' />
           Actualizando categorías...
         </div>
       ) : null}
 
-      {/* Subtle loading indicator for product updates */}
       {productsLoading && products.length > 0 ? (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: theme.spacing[2],
-            padding: theme.spacing[2],
-            backgroundColor: theme.colors.background.accent,
-            borderRadius: theme.borderRadius.base,
-            marginBottom: theme.spacing[4],
-            fontSize: theme.fontSizes.sm,
-            color: theme.colors.text.secondary,
-          }}
-        >
-          <LoadingSpinner
-            style={{ width: '16px', height: '16px', borderWidth: '2px' }}
-          />
+        <div className='mb-4 flex items-center justify-center gap-2 rounded-md bg-brand-purple/10 py-2 text-sm text-muted-foreground'>
+          <div className='h-4 w-4 animate-spin rounded-full border-2 border-border border-t-brand-purple' />
           Actualizando productos...
         </div>
       ) : null}
 
-      {/* Product Filters - Clean and focused */}
       <ProductFilters
         filters={(() => {
           const filterObj: {
@@ -531,19 +363,16 @@ export const Products: React.FC = () => {
             inStock: filters.inStock,
             tags: filters.tags,
           };
-
           if (filters.minPrice !== null) filterObj.minPrice = filters.minPrice;
           if (filters.maxPrice !== null) filterObj.maxPrice = filters.maxPrice;
-
           return filterObj;
         })()}
         categories={availableCategories}
-        availableTags={[]} // Tags query pendiente en Fase 2
+        availableTags={[]}
         onFilterChange={handleFilterChange}
         onClearFilters={handleClearFilters}
       />
 
-      {/* Products Display - Single source of truth for view mode */}
       {viewMode === 'grid' ? (
         <ProductGrid
           products={products}
@@ -576,8 +405,7 @@ export const Products: React.FC = () => {
         />
       )}
 
-      {/* Modals — lazy-loaded; only mounted when open */}
-      {isCreateModalOpen && (
+      {isCreateModalOpen ? (
         <Suspense fallback={null}>
           <CreateProductModal
             isOpen={isCreateModalOpen}
@@ -587,9 +415,9 @@ export const Products: React.FC = () => {
             availableTags={[]}
           />
         </Suspense>
-      )}
+      ) : null}
 
-      {isEditModalOpen && (
+      {isEditModalOpen ? (
         <Suspense fallback={null}>
           <EditProductModal
             isOpen={isEditModalOpen}
@@ -600,9 +428,9 @@ export const Products: React.FC = () => {
             availableTags={[]}
           />
         </Suspense>
-      )}
+      ) : null}
 
-      {!!selectedProduct && (
+      {selectedProduct ? (
         <Suspense fallback={null}>
           <ProductDetailModal
             isOpen={!!selectedProduct}
@@ -611,7 +439,7 @@ export const Products: React.FC = () => {
             onEdit={product => handleEditProduct(product.id)}
           />
         </Suspense>
-      )}
-    </ProductsContainer>
+      ) : null}
+    </div>
   );
 };

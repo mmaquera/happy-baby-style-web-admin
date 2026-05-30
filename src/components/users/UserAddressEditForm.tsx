@@ -1,10 +1,8 @@
 import type React from 'react';
 import { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import { type UserAddress } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { theme } from '@/styles/theme';
 import { logger } from '@/utils/logger';
 
 interface AddressSaveInput {
@@ -47,89 +45,10 @@ interface FormData {
   isDefault: boolean;
 }
 
-type FormErrors = Omit<FormData, 'isDefault'>;
+type FormErrors = Partial<Omit<FormData, 'isDefault'>>;
 
-// Styled Components
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[4]};
-`;
-
-const FormRow = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: ${theme.spacing[4]};
-`;
-
-const FormGroup = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[2]};
-`;
-
-const FullWidthFormGroup = styled(FormGroup)`
-  grid-column: 1 / -1;
-`;
-
-const Label = styled.label`
-  font-size: ${theme.fontSizes.sm};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${theme.colors.text.secondary};
-  margin-bottom: ${theme.spacing[1]};
-`;
-
-const Required = styled.span`
-  color: ${theme.colors.error};
-  margin-left: ${theme.spacing[1]};
-`;
-
-const ErrorMessage = styled.div`
-  color: ${theme.colors.error};
-  font-size: ${theme.fontSizes.sm};
-  margin-top: ${theme.spacing[1]};
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: ${theme.spacing[3]};
-  justify-content: flex-end;
-  margin-top: ${theme.spacing[6]};
-`;
-
-const Select = styled.select`
-  padding: ${theme.spacing[3]};
-  border: 1px solid ${theme.colors.border.light};
-  border-radius: ${theme.borderRadius.base};
-  font-size: ${theme.fontSizes.base};
-  background: ${theme.colors.white};
-  color: ${theme.colors.text.primary};
-  transition: border-color ${theme.transitions.fast};
-
-  &:focus {
-    outline: none;
-    border-color: ${theme.colors.primary};
-  }
-`;
-
-const CheckboxContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  margin-top: ${theme.spacing[4]};
-`;
-
-const Checkbox = styled.input`
-  width: 16px;
-  height: 16px;
-  accent-color: ${theme.colors.primary};
-`;
-
-const CheckboxLabel = styled.label`
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.text.primary};
-  cursor: pointer;
-`;
+const selectClass =
+  'cursor-pointer rounded-md border border-border bg-white px-3 py-2 text-base text-foreground outline-none transition-colors focus:border-brand-purple focus:shadow-[0_0_0_3px_rgba(107,70,193,0.2)]';
 
 export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
   address,
@@ -139,106 +58,73 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
   loading = false,
   isEditing = false,
 }) => {
-  // Helper function to get error message or empty string
-  const getErrorMessage = (fieldName: keyof FormErrors): string => {
-    return errors[fieldName] || '';
-  };
   const [formData, setFormData] = useState<FormData>({
-    type: address?.type || 'home',
-    firstName: address?.firstName || '',
-    lastName: address?.lastName || '',
-    company: address?.company || '',
-    address1: address?.address1 || '',
-    address2: address?.address2 || '',
-    city: address?.city || '',
-    state: address?.state || '',
-    postalCode: address?.postalCode || '',
-    country: address?.country || 'España',
-    phone: address?.phone || '',
-    isDefault: address?.isDefault || false,
+    type: address?.type ?? 'home',
+    firstName: address?.firstName ?? '',
+    lastName: address?.lastName ?? '',
+    company: address?.company ?? '',
+    address1: address?.address1 ?? '',
+    address2: address?.address2 ?? '',
+    city: address?.city ?? '',
+    state: address?.state ?? '',
+    postalCode: address?.postalCode ?? '',
+    country: address?.country ?? 'España',
+    phone: address?.phone ?? '',
+    isDefault: address?.isDefault ?? false,
   });
-
-  const [errors, setErrors] = useState<Partial<FormErrors>>({});
+  const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Partial<FormData>>({});
 
-  // Reset form when address changes
   useEffect(() => {
     setFormData({
-      type: address?.type || 'home',
-      firstName: address?.firstName || '',
-      lastName: address?.lastName || '',
-      company: address?.company || '',
-      address1: address?.address1 || '',
-      address2: address?.address2 || '',
-      city: address?.city || '',
-      state: address?.state || '',
-      postalCode: address?.postalCode || '',
-      country: address?.country || 'España',
-      phone: address?.phone || '',
-      isDefault: address?.isDefault || false,
+      type: address?.type ?? 'home',
+      firstName: address?.firstName ?? '',
+      lastName: address?.lastName ?? '',
+      company: address?.company ?? '',
+      address1: address?.address1 ?? '',
+      address2: address?.address2 ?? '',
+      city: address?.city ?? '',
+      state: address?.state ?? '',
+      postalCode: address?.postalCode ?? '',
+      country: address?.country ?? 'España',
+      phone: address?.phone ?? '',
+      isDefault: address?.isDefault ?? false,
     });
     setErrors({});
     setTouched({});
   }, [address]);
 
-  const validateField = (
-    name: keyof FormData,
-    value: string | boolean
-  ): string => {
+  const validateField = (name: keyof FormData, value: string | boolean): string => {
     switch (name) {
       case 'firstName':
-        if (!value || typeof value !== 'string' || !value.trim())
-          return 'El nombre es requerido';
-        if (value.trim().length < 2)
-          return 'El nombre debe tener al menos 2 caracteres';
+        if (!value || typeof value !== 'string' || !value.trim()) return 'El nombre es requerido';
+        if (value.trim().length < 2) return 'El nombre debe tener al menos 2 caracteres';
         return '';
-
       case 'lastName':
-        if (!value || typeof value !== 'string' || !value.trim())
-          return 'El apellido es requerido';
-        if (value.trim().length < 2)
-          return 'El apellido debe tener al menos 2 caracteres';
+        if (!value || typeof value !== 'string' || !value.trim()) return 'El apellido es requerido';
+        if (value.trim().length < 2) return 'El apellido debe tener al menos 2 caracteres';
         return '';
-
       case 'address1':
-        if (!value || typeof value !== 'string' || !value.trim())
-          return 'La dirección es requerida';
-        if (value.trim().length < 5)
-          return 'La dirección debe tener al menos 5 caracteres';
+        if (!value || typeof value !== 'string' || !value.trim()) return 'La dirección es requerida';
+        if (value.trim().length < 5) return 'La dirección debe tener al menos 5 caracteres';
         return '';
-
       case 'city':
-        if (!value || typeof value !== 'string' || !value.trim())
-          return 'La ciudad es requerida';
+        if (!value || typeof value !== 'string' || !value.trim()) return 'La ciudad es requerida';
         return '';
-
       case 'state':
-        if (!value || typeof value !== 'string' || !value.trim())
-          return 'La provincia es requerida';
+        if (!value || typeof value !== 'string' || !value.trim()) return 'La provincia es requerida';
         return '';
-
       case 'postalCode':
-        if (!value || typeof value !== 'string' || !value.trim())
-          return 'El código postal es requerido';
-        if (!/^\d{5}$/.test(value.trim()))
-          return 'El código postal debe tener 5 dígitos';
+        if (!value || typeof value !== 'string' || !value.trim()) return 'El código postal es requerido';
+        if (!/^\d{5}$/.test(value.trim())) return 'El código postal debe tener 5 dígitos';
         return '';
-
       case 'country':
-        if (!value || typeof value !== 'string' || !value.trim())
-          return 'El país es requerido';
+        if (!value || typeof value !== 'string' || !value.trim()) return 'El país es requerido';
         return '';
-
       case 'phone':
-        if (
-          value &&
-          typeof value === 'string' &&
-          !/^[\+]?[1-9][\d]{0,15}$/.test(value.replace(/\s/g, ''))
-        ) {
+        if (value && typeof value === 'string' && !/^[\+]?[1-9][\d]{0,15}$/.test(value.replace(/\s/g, '')))
           return 'El teléfono debe tener un formato válido';
-        }
         return '';
-
       default:
         return '';
     }
@@ -246,274 +132,228 @@ export const UserAddressEditForm: React.FC<UserAddressEditFormProps> = ({
 
   const handleChange = (name: keyof FormData, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [name]: value }));
-
-    // Validate field on change if it has been touched
     if (touched[name]) {
-      const error = validateField(name, value);
-      setErrors(prev => ({ ...prev, [name]: error }));
+      setErrors(prev => ({ ...prev, [name]: validateField(name, value) }));
     }
   };
 
   const handleBlur = (name: keyof FormData) => {
     setTouched(prev => ({ ...prev, [name]: true }));
-    const error = validateField(name, formData[name]);
-    setErrors(prev => ({ ...prev, [name]: error }));
+    setErrors(prev => ({ ...prev, [name]: validateField(name, formData[name]) }));
   };
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<FormErrors> = {};
-
-    Object.keys(formData).forEach(key => {
-      const fieldName = key as keyof FormData;
-      if (fieldName !== 'isDefault') {
-        const error = validateField(fieldName, formData[fieldName]);
-        if (error) {
-          newErrors[fieldName] = error;
-        }
+    const newErrors: FormErrors = {};
+    (Object.keys(formData) as (keyof FormData)[]).forEach(key => {
+      if (key !== 'isDefault') {
+        const err = validateField(key, formData[key]);
+        if (err) newErrors[key as keyof FormErrors] = err;
       }
     });
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
+    if (!validateForm()) return;
     try {
-      const input = {
+      await onSave({
         userId,
         type: formData.type,
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
-        company: formData.company.trim() || undefined,
+        ...(formData.company.trim() ? { company: formData.company.trim() } : {}),
         address1: formData.address1.trim(),
-        address2: formData.address2.trim() || undefined,
+        ...(formData.address2.trim() ? { address2: formData.address2.trim() } : {}),
         city: formData.city.trim(),
         state: formData.state.trim(),
         postalCode: formData.postalCode.trim(),
         country: formData.country.trim(),
-        phone: formData.phone.trim() || undefined,
+        ...(formData.phone.trim() ? { phone: formData.phone.trim() } : {}),
         isDefault: formData.isDefault,
-      };
-
-      await onSave(input);
+      });
     } catch (error) {
       logger.error('Error saving address:', error);
     }
   };
 
+  const Field = ({
+    label,
+    required,
+    error,
+    children,
+    fullWidth,
+  }: {
+    label: string;
+    required?: boolean;
+    error?: string | undefined;
+    children: React.ReactNode;
+    fullWidth?: boolean;
+  }) => (
+    <div className={`flex flex-col gap-2${fullWidth ? ' col-span-full' : ''}`}>
+      <label className='text-sm font-medium text-muted-foreground'>
+        {label}
+        {required ? <span className='ml-1 text-destructive'>*</span> : null}
+      </label>
+      {children}
+      {error ? <div className='mt-1 text-sm text-destructive'>{error}</div> : null}
+    </div>
+  );
+
   return (
-    <Form onSubmit={handleSubmit}>
-      <FormRow>
-        <FormGroup>
-          <Label>Tipo de Dirección</Label>
-          <Select
+    <form onSubmit={handleSubmit} className='flex flex-col gap-4'>
+      <div className='grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))]'>
+        <Field label='Tipo de Dirección'>
+          <select
             value={formData.type}
             onChange={e => handleChange('type', e.target.value)}
+            className={selectClass}
           >
             <option value='home'>Casa</option>
             <option value='work'>Trabajo</option>
             <option value='billing'>Facturación</option>
             <option value='shipping'>Envío</option>
-          </Select>
-        </FormGroup>
+          </select>
+        </Field>
 
-        <FormGroup>
-          <Label>
-            Nombre <Required>*</Required>
-          </Label>
+        <Field label='Nombre' required error={errors.firstName}>
           <Input
             type='text'
             value={formData.firstName}
             onChange={e => handleChange('firstName', e.target.value)}
             onBlur={() => handleBlur('firstName')}
             placeholder='Nombre'
-            error={getErrorMessage('firstName')}
+            error={errors.firstName}
           />
-          {errors.firstName ? (
-            <ErrorMessage>{errors.firstName}</ErrorMessage>
-          ) : null}
-        </FormGroup>
-      </FormRow>
+        </Field>
+      </div>
 
-      <FormRow>
-        <FormGroup>
-          <Label>
-            Apellido <Required>*</Required>
-          </Label>
+      <div className='grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))]'>
+        <Field label='Apellido' required error={errors.lastName}>
           <Input
             type='text'
             value={formData.lastName}
             onChange={e => handleChange('lastName', e.target.value)}
             onBlur={() => handleBlur('lastName')}
             placeholder='Apellido'
-            error={getErrorMessage('lastName')}
+            error={errors.lastName}
           />
-          {errors.lastName ? (
-            <ErrorMessage>{errors.lastName}</ErrorMessage>
-          ) : null}
-        </FormGroup>
-
-        <FormGroup>
-          <Label>Empresa</Label>
+        </Field>
+        <Field label='Empresa'>
           <Input
             type='text'
             value={formData.company}
             onChange={e => handleChange('company', e.target.value)}
             placeholder='Empresa (opcional)'
           />
-        </FormGroup>
-      </FormRow>
+        </Field>
+      </div>
 
-      <FullWidthFormGroup>
-        <Label>
-          Dirección <Required>*</Required>
-        </Label>
-        <Input
-          type='text'
-          value={formData.address1}
-          onChange={e => handleChange('address1', e.target.value)}
-          onBlur={() => handleBlur('address1')}
-          placeholder='Dirección principal'
-          error={getErrorMessage('address1')}
-        />
-        {errors.address1 ? (
-          <ErrorMessage>{errors.address1}</ErrorMessage>
-        ) : null}
-      </FullWidthFormGroup>
+      <div className='grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))]'>
+        <Field label='Dirección' required error={errors.address1} fullWidth>
+          <Input
+            type='text'
+            value={formData.address1}
+            onChange={e => handleChange('address1', e.target.value)}
+            onBlur={() => handleBlur('address1')}
+            placeholder='Dirección principal'
+            error={errors.address1}
+          />
+        </Field>
+        <Field label='Dirección Adicional' fullWidth>
+          <Input
+            type='text'
+            value={formData.address2}
+            onChange={e => handleChange('address2', e.target.value)}
+            placeholder='Apartamento, suite, etc. (opcional)'
+          />
+        </Field>
+      </div>
 
-      <FullWidthFormGroup>
-        <Label>Dirección Adicional</Label>
-        <Input
-          type='text'
-          value={formData.address2}
-          onChange={e => handleChange('address2', e.target.value)}
-          placeholder='Apartamento, suite, etc. (opcional)'
-        />
-      </FullWidthFormGroup>
-
-      <FormRow>
-        <FormGroup>
-          <Label>
-            Ciudad <Required>*</Required>
-          </Label>
+      <div className='grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))]'>
+        <Field label='Ciudad' required error={errors.city}>
           <Input
             type='text'
             value={formData.city}
             onChange={e => handleChange('city', e.target.value)}
             onBlur={() => handleBlur('city')}
             placeholder='Ciudad'
-            error={getErrorMessage('city')}
+            error={errors.city}
           />
-          {errors.city ? <ErrorMessage>{errors.city}</ErrorMessage> : null}
-        </FormGroup>
-
-        <FormGroup>
-          <Label>
-            Provincia <Required>*</Required>
-          </Label>
+        </Field>
+        <Field label='Provincia' required error={errors.state}>
           <Input
             type='text'
             value={formData.state}
             onChange={e => handleChange('state', e.target.value)}
             onBlur={() => handleBlur('state')}
             placeholder='Provincia'
-            error={getErrorMessage('state')}
+            error={errors.state}
           />
-          {errors.state ? <ErrorMessage>{errors.state}</ErrorMessage> : null}
-        </FormGroup>
-      </FormRow>
+        </Field>
+      </div>
 
-      <FormRow>
-        <FormGroup>
-          <Label>
-            Código Postal <Required>*</Required>
-          </Label>
+      <div className='grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))]'>
+        <Field label='Código Postal' required error={errors.postalCode}>
           <Input
             type='text'
             value={formData.postalCode}
             onChange={e => handleChange('postalCode', e.target.value)}
             onBlur={() => handleBlur('postalCode')}
             placeholder='12345'
-            error={getErrorMessage('postalCode')}
+            error={errors.postalCode}
           />
-          {errors.postalCode ? (
-            <ErrorMessage>{errors.postalCode}</ErrorMessage>
-          ) : null}
-        </FormGroup>
-
-        <FormGroup>
-          <Label>
-            País <Required>*</Required>
-          </Label>
+        </Field>
+        <Field label='País' required error={errors.country}>
           <Input
             type='text'
             value={formData.country}
             onChange={e => handleChange('country', e.target.value)}
             onBlur={() => handleBlur('country')}
             placeholder='País'
-            error={getErrorMessage('country')}
+            error={errors.country}
           />
-          {errors.country ? (
-            <ErrorMessage>{errors.country}</ErrorMessage>
-          ) : null}
-        </FormGroup>
-      </FormRow>
+        </Field>
+      </div>
 
-      <FormRow>
-        <FormGroup>
-          <Label>Teléfono</Label>
+      <div className='grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(200px,1fr))]'>
+        <Field label='Teléfono' error={errors.phone}>
           <Input
             type='tel'
             value={formData.phone}
             onChange={e => handleChange('phone', e.target.value)}
             onBlur={() => handleBlur('phone')}
             placeholder='+1 234 567 890'
-            error={getErrorMessage('phone')}
+            error={errors.phone}
           />
-          {errors.phone ? <ErrorMessage>{errors.phone}</ErrorMessage> : null}
-        </FormGroup>
+        </Field>
+        <div className='mt-4 flex items-center gap-2'>
+          <input
+            type='checkbox'
+            id='isDefault'
+            checked={formData.isDefault}
+            onChange={e => handleChange('isDefault', e.target.checked)}
+            className='h-4 w-4 cursor-pointer accent-brand-purple'
+          />
+          <label
+            htmlFor='isDefault'
+            className='cursor-pointer text-sm text-foreground'
+          >
+            Establecer como dirección predeterminada
+          </label>
+        </div>
+      </div>
 
-        <FormGroup>
-          <CheckboxContainer>
-            <Checkbox
-              type='checkbox'
-              id='isDefault'
-              checked={formData.isDefault}
-              onChange={e => handleChange('isDefault', e.target.checked)}
-            />
-            <CheckboxLabel htmlFor='isDefault'>
-              Establecer como dirección predeterminada
-            </CheckboxLabel>
-          </CheckboxContainer>
-        </FormGroup>
-      </FormRow>
-
-      <ButtonGroup>
-        <Button
-          type='button'
-          variant='ghost'
-          onClick={onCancel}
-          disabled={loading}
-        >
+      <div className='mt-6 flex justify-end gap-3'>
+        <Button type='button' variant='ghost' onClick={onCancel} disabled={loading}>
           Cancelar
         </Button>
-
-        <Button
-          type='submit'
-          variant='primary'
-          disabled={loading}
-          isLoading={loading}
-        >
+        <Button type='submit' variant='primary' disabled={loading} isLoading={loading}>
           {isEditing ? 'Actualizar' : 'Crear'}
         </Button>
-      </ButtonGroup>
-    </Form>
+      </div>
+    </form>
   );
 };
 

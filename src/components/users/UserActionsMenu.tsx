@@ -1,20 +1,17 @@
 import type React from 'react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import styled from 'styled-components';
+import MoreVerticalIcon from 'lucide-react/dist/esm/icons/more-vertical';
+import EditIcon from 'lucide-react/dist/esm/icons/edit';
+import EyeIcon from 'lucide-react/dist/esm/icons/eye';
+import UserCheckIcon from 'lucide-react/dist/esm/icons/user-check';
+import UserXIcon from 'lucide-react/dist/esm/icons/user-x';
+import Trash2Icon from 'lucide-react/dist/esm/icons/trash-2';
+import KeyIcon from 'lucide-react/dist/esm/icons/key';
+import ShieldIcon from 'lucide-react/dist/esm/icons/shield';
+import ShieldOffIcon from 'lucide-react/dist/esm/icons/shield-off';
+import { cn } from '@/lib/utils';
 import type { User } from '@/core/domain/user/User';
-import { theme } from '@/styles/theme';
-import {
-  MoreVertical,
-  Edit,
-  Eye,
-  UserCheck,
-  UserX,
-  Trash2,
-  Key,
-  Shield,
-  ShieldOff,
-} from 'lucide-react';
 
 interface UserActionsMenuProps {
   user: User;
@@ -31,142 +28,6 @@ interface UserActionsMenuProps {
   onDemoteFromAdmin?: (user: User) => void;
   disabled?: boolean;
 }
-
-// Styled Components
-const MenuContainer = styled.div`
-  position: relative;
-  display: inline-block;
-  z-index: 1;
-`;
-
-const MenuButton = styled.button`
-  padding: ${theme.spacing[1]};
-  border-radius: 6px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s ease;
-  color: ${theme.colors.warmGray};
-
-  &:hover {
-    background-color: ${theme.colors.background.hover};
-    color: ${theme.colors.darkGray};
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const MenuDropdown = styled.div.withConfig({
-  shouldForwardProp: prop => !['isOpen', 'top', 'left'].includes(prop),
-})<{ isOpen: boolean; top: number; left: number }>`
-  position: fixed !important;
-  top: ${props => props.top}px !important;
-  left: ${props => props.left}px !important;
-  background: ${theme.colors.white};
-  border: 1px solid ${theme.colors.border.light};
-  border-radius: ${theme.borderRadius.md};
-  box-shadow:
-    0 20px 40px rgba(0, 0, 0, 0.15),
-    0 8px 16px rgba(0, 0, 0, 0.1);
-  z-index: 999999 !important;
-  min-width: 200px;
-  max-width: 250px;
-  width: 200px;
-  max-height: calc(100vh - 32px) !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-  visibility: ${props => (props.isOpen ? 'visible' : 'hidden')};
-  transform: ${props =>
-    props.isOpen ? 'translateY(0) scale(1)' : 'translateY(-10px) scale(0.95)'};
-  opacity: ${props => (props.isOpen ? '1' : '0')};
-  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: ${props => (props.isOpen ? 'auto' : 'none')};
-  transform-origin: top right;
-
-  /* Force it to be above everything */
-  contain: layout style paint;
-  isolation: isolate;
-
-  /* Ensure scrollbar styling */
-  &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: ${theme.colors.background.light};
-    border-radius: 3px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: ${theme.colors.border.medium};
-    border-radius: 3px;
-
-    &:hover {
-      background: ${theme.colors.border.dark};
-    }
-  }
-`;
-
-const MenuSection = styled.div`
-  padding: ${theme.spacing[2]} 0;
-
-  &:not(:last-child) {
-    border-bottom: 1px solid ${theme.colors.border.light};
-  }
-`;
-
-const MenuItem = styled.button<{
-  variant?: 'default' | 'success' | 'warning' | 'danger';
-}>`
-  width: 100%;
-  padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  text-align: left;
-  border: none;
-  background: none;
-  font-size: ${theme.fontSizes.sm};
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  transition: background-color ${theme.transitions.base};
-
-  &:hover {
-    background: ${theme.colors.background.light};
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  ${({ variant }) => {
-    switch (variant) {
-      case 'success':
-        return `color: ${theme.colors.success};`;
-      case 'warning':
-        return `color: ${theme.colors.warning};`;
-      case 'danger':
-        return `color: ${theme.colors.error};`;
-      default:
-        return `color: ${theme.colors.text.primary};`;
-    }
-  }}
-`;
-
-const MenuLabel = styled.div`
-  font-size: ${theme.fontSizes.xs};
-  color: ${theme.colors.text.secondary};
-  text-transform: uppercase;
-  font-weight: ${theme.fontWeights.semibold};
-  letter-spacing: 0.5px;
-  padding: ${theme.spacing[1]} ${theme.spacing[3]};
-`;
 
 export const UserActionsMenu: React.FC<UserActionsMenuProps> = ({
   user,
@@ -187,62 +48,38 @@ export const UserActionsMenu: React.FC<UserActionsMenuProps> = ({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const calculateMenuPosition = () => {
-    if (buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const viewportWidth = window.innerWidth;
-      const menuWidth = 200;
-      const padding = 16;
+  const calculateMenuPosition = useCallback(() => {
+    if (!buttonRef.current) return;
+    const rect = buttonRef.current.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    const menuWidth = 200;
+    const padding = 16;
 
-      // Try to get actual menu height if available
-      let menuHeight = 350; // Default estimate
-      if (menuRef.current) {
-        // If menu is already rendered, use its actual height
-        const menuRect = menuRef.current.getBoundingClientRect();
-        if (menuRect.height > 0) {
-          menuHeight = menuRect.height;
-        }
-      }
-
-      // Position relative to viewport (since we're using position: fixed)
-      let top = rect.bottom + 8;
-      let left = rect.left - menuWidth + rect.width; // Align right edge of menu with right edge of button
-
-      // Adjust if menu would go off-screen vertically
-      if (top + menuHeight > viewportHeight - padding) {
-        // Try positioning above the button
-        const topAbove = rect.top - menuHeight - 8;
-        if (topAbove >= padding) {
-          top = topAbove;
-        } else {
-          // If it doesn't fit above either, position it to fit in viewport
-          top = viewportHeight - menuHeight - padding;
-        }
-      }
-
-      // Ensure top is not negative
-      top = Math.max(padding, top);
-
-      // Adjust if menu would go off-screen horizontally
-      if (left + menuWidth > viewportWidth - padding) {
-        left = viewportWidth - menuWidth - padding;
-      }
-      if (left < padding) {
-        left = padding;
-      }
-
-      setMenuPosition({ top, left });
+    let menuHeight = 350;
+    if (menuRef.current) {
+      const menuRect = menuRef.current.getBoundingClientRect();
+      if (menuRect.height > 0) menuHeight = menuRect.height;
     }
-  };
+
+    let top = rect.bottom + 8;
+    let left = rect.left - menuWidth + rect.width;
+
+    if (top + menuHeight > viewportHeight - padding) {
+      const topAbove = rect.top - menuHeight - 8;
+      top = topAbove >= padding ? topAbove : viewportHeight - menuHeight - padding;
+    }
+
+    top = Math.max(padding, top);
+    if (left + menuWidth > viewportWidth - padding) left = viewportWidth - menuWidth - padding;
+    if (left < padding) left = padding;
+
+    setMenuPosition({ top, left });
+  }, []);
 
   const handleMenuClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-
-    // Siempre calcular posición cuando se abre el menú
-    if (!isOpen) {
-      calculateMenuPosition();
-    }
+    if (!isOpen) calculateMenuPosition();
     onToggle();
   };
 
@@ -251,159 +88,144 @@ export const UserActionsMenu: React.FC<UserActionsMenuProps> = ({
     onClose();
   };
 
-  const handleClickOutside = () => {
-    onClose();
-  };
-
-  // Close menu when clicking outside
   useEffect(() => {
-    if (isOpen) {
-      document.addEventListener('click', handleClickOutside);
-      return () => document.removeEventListener('click', handleClickOutside);
-    }
-    return undefined;
-  }, [isOpen]);
+    if (!isOpen) return;
+    const handleClickOutside = () => onClose();
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [isOpen, onClose]);
 
-  // Recalculate position on scroll or resize
   useEffect(() => {
-    if (isOpen) {
-      const handleReposition = () => {
-        calculateMenuPosition();
-      };
+    if (!isOpen) return;
+    window.addEventListener('scroll', calculateMenuPosition, true);
+    window.addEventListener('resize', calculateMenuPosition);
+    return () => {
+      window.removeEventListener('scroll', calculateMenuPosition, true);
+      window.removeEventListener('resize', calculateMenuPosition);
+    };
+  }, [isOpen, calculateMenuPosition]);
 
-      window.addEventListener('scroll', handleReposition, true);
-      window.addEventListener('resize', handleReposition);
-
-      return () => {
-        window.removeEventListener('scroll', handleReposition, true);
-        window.removeEventListener('resize', handleReposition);
-      };
-    }
-    return undefined;
-  }, [isOpen]);
-
-  // Recalculate position after menu is rendered
   useEffect(() => {
-    if (isOpen && menuRef.current) {
-      // Small delay to ensure DOM is updated
-      const timer = setTimeout(() => {
-        calculateMenuPosition();
-      }, 10);
-
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [isOpen]);
+    if (!isOpen || !menuRef.current) return;
+    const timer = setTimeout(calculateMenuPosition, 10);
+    return () => clearTimeout(timer);
+  }, [isOpen, calculateMenuPosition]);
 
   return (
     <>
-      <MenuContainer>
-        <MenuButton
+      <div className='relative z-[1] inline-block'>
+        <button
           ref={buttonRef}
           onClick={handleMenuClick}
           disabled={disabled}
+          className='flex items-center justify-center rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50'
         >
-          <MoreVertical size={16} />
-        </MenuButton>
-      </MenuContainer>
+          <MoreVerticalIcon size={16} />
+        </button>
+      </div>
 
-      {/* Render menu as portal to bypass parent container constraints */}
       {createPortal(
-        <MenuDropdown
+        <div
           ref={menuRef}
-          isOpen={isOpen}
-          top={menuPosition.top}
-          left={menuPosition.left}
+          className={cn(
+            'fixed z-[999999] min-w-[200px] max-w-[250px] overflow-x-hidden overflow-y-auto rounded-md border border-border bg-white shadow-[0_20px_40px_rgba(0,0,0,0.15),0_8px_16px_rgba(0,0,0,0.1)] transition-all duration-150',
+            isOpen
+              ? 'visible scale-100 opacity-100'
+              : 'invisible scale-95 opacity-0 pointer-events-none -translate-y-2.5'
+          )}
+          style={{ top: menuPosition.top, left: menuPosition.left, transformOrigin: 'top right' }}
         >
           {/* Basic Actions */}
-          <MenuSection>
-            <MenuLabel>Acciones Básicas</MenuLabel>
-            <MenuItem onClick={() => handleItemClick(() => onView(user))}>
-              <Eye size={16} />
-              Ver Detalles
-            </MenuItem>
-            <MenuItem onClick={() => handleItemClick(() => onEdit(user))}>
-              <Edit size={16} />
-              Editar Usuario
-            </MenuItem>
-          </MenuSection>
+          <div className='border-b border-border py-2'>
+            <div className='px-3 py-1 text-xs font-semibold uppercase tracking-[0.5px] text-muted-foreground'>
+              Acciones Básicas
+            </div>
+            <button
+              className='flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-foreground transition-colors hover:bg-muted'
+              onClick={() => handleItemClick(() => onView(user))}
+            >
+              <EyeIcon size={16} /> Ver Detalles
+            </button>
+            <button
+              className='flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-foreground transition-colors hover:bg-muted'
+              onClick={() => handleItemClick(() => onEdit(user))}
+            >
+              <EditIcon size={16} /> Editar Usuario
+            </button>
+          </div>
 
-          {/* Status Actions */}
-          <MenuSection>
-            <MenuLabel>Estado</MenuLabel>
+          {/* Status */}
+          <div className='border-b border-border py-2'>
+            <div className='px-3 py-1 text-xs font-semibold uppercase tracking-[0.5px] text-muted-foreground'>
+              Estado
+            </div>
             {user.isActive
               ? onDeactivate && (
-                  <MenuItem
-                    variant='warning'
+                  <button
+                    className='flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-yellow-600 transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50'
                     onClick={() => handleItemClick(() => onDeactivate(user))}
                   >
-                    <UserX size={16} />
-                    Desactivar Usuario
-                  </MenuItem>
+                    <UserXIcon size={16} /> Desactivar Usuario
+                  </button>
                 )
               : onActivate && (
-                  <MenuItem
-                    variant='success'
+                  <button
+                    className='flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-green-600 transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50'
                     onClick={() => handleItemClick(() => onActivate(user))}
                   >
-                    <UserCheck size={16} />
-                    Activar Usuario
-                  </MenuItem>
+                    <UserCheckIcon size={16} /> Activar Usuario
+                  </button>
                 )}
-          </MenuSection>
+          </div>
 
-          {/* Security Actions */}
-          <MenuSection>
-            <MenuLabel>Seguridad</MenuLabel>
+          {/* Security */}
+          <div className={cn('py-2', onDelete ? 'border-b border-border' : '')}>
+            <div className='px-3 py-1 text-xs font-semibold uppercase tracking-[0.5px] text-muted-foreground'>
+              Seguridad
+            </div>
             {onResetPassword ? (
-              <MenuItem
+              <button
+                className='flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-foreground transition-colors hover:bg-muted'
                 onClick={() => handleItemClick(() => onResetPassword(user))}
               >
-                <Key size={16} />
-                Restablecer Contraseña
-              </MenuItem>
+                <KeyIcon size={16} /> Restablecer Contraseña
+              </button>
             ) : null}
-
             {user.role !== 'admin'
               ? onPromoteToAdmin && (
-                  <MenuItem
-                    variant='warning'
-                    onClick={() =>
-                      handleItemClick(() => onPromoteToAdmin(user))
-                    }
+                  <button
+                    className='flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-yellow-600 transition-colors hover:bg-muted'
+                    onClick={() => handleItemClick(() => onPromoteToAdmin(user))}
                   >
-                    <Shield size={16} />
-                    Promover a Admin
-                  </MenuItem>
+                    <ShieldIcon size={16} /> Promover a Admin
+                  </button>
                 )
               : onDemoteFromAdmin && (
-                  <MenuItem
-                    variant='warning'
-                    onClick={() =>
-                      handleItemClick(() => onDemoteFromAdmin(user))
-                    }
+                  <button
+                    className='flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-yellow-600 transition-colors hover:bg-muted'
+                    onClick={() => handleItemClick(() => onDemoteFromAdmin(user))}
                   >
-                    <ShieldOff size={16} />
-                    Remover Admin
-                  </MenuItem>
+                    <ShieldOffIcon size={16} /> Remover Admin
+                  </button>
                 )}
-          </MenuSection>
+          </div>
 
-          {/* Danger Actions */}
+          {/* Danger */}
           {onDelete ? (
-            <MenuSection>
-              <MenuLabel>Zona Peligrosa</MenuLabel>
-              <MenuItem
-                variant='danger'
+            <div className='py-2'>
+              <div className='px-3 py-1 text-xs font-semibold uppercase tracking-[0.5px] text-muted-foreground'>
+                Zona Peligrosa
+              </div>
+              <button
+                className='flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-destructive transition-colors hover:bg-muted'
                 onClick={() => handleItemClick(() => onDelete(user))}
               >
-                <Trash2 size={16} />
-                Eliminar Usuario
-              </MenuItem>
-            </MenuSection>
+                <Trash2Icon size={16} /> Eliminar Usuario
+              </button>
+            </div>
           ) : null}
-        </MenuDropdown>,
-        document.body // Render directly to body to bypass any container overflow issues
+        </div>,
+        document.body
       )}
     </>
   );

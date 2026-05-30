@@ -1,192 +1,18 @@
 import type React from 'react';
-import styled from 'styled-components';
-import {
-  Eye,
-  EyeOff,
-  Lock,
-  Mail,
-  User,
-  Phone,
-  Calendar,
-  Users,
-  Shield,
-} from 'lucide-react';
-import { theme } from '@/styles/theme';
+import EyeIcon from 'lucide-react/dist/esm/icons/eye';
+import EyeOffIcon from 'lucide-react/dist/esm/icons/eye-off';
+import LockIcon from 'lucide-react/dist/esm/icons/lock';
+import MailIcon from 'lucide-react/dist/esm/icons/mail';
+import UserIcon from 'lucide-react/dist/esm/icons/user';
+import PhoneIcon from 'lucide-react/dist/esm/icons/phone';
+import CalendarIcon from 'lucide-react/dist/esm/icons/calendar';
+import UsersIcon from 'lucide-react/dist/esm/icons/users';
+import ShieldIcon from 'lucide-react/dist/esm/icons/shield';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { UserRole } from '@/generated/graphql';
 import { useRegisterForm } from '@/hooks/useRegisterForm';
-
-const FormContainer = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[4]};
-  margin-bottom: ${theme.spacing[6]};
-`;
-
-const FormTitle = styled.h2`
-  font-family: ${theme.fonts.heading};
-  font-size: ${theme.fontSizes['2xl']};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${theme.colors.text.primary};
-  margin: 0 0 ${theme.spacing[2]} 0;
-`;
-
-const FormSubtitle = styled.p`
-  font-size: ${theme.fontSizes.base};
-  color: ${theme.colors.text.secondary};
-  margin: 0 0 ${theme.spacing[4]} 0;
-`;
-
-const FormGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: ${theme.spacing[4]};
-
-  @media (max-width: 640px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const FullWidthField = styled.div`
-  grid-column: 1 / -1;
-`;
-
-const PasswordInputWrapper = styled.div`
-  position: relative;
-  width: 100%;
-`;
-
-const PasswordToggle = styled.button`
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: ${theme.colors.text.secondary};
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-
-  &:hover {
-    color: ${theme.colors.text.primary};
-  }
-`;
-
-const RoleSelector = styled.div`
-  margin-bottom: ${theme.spacing[4]};
-`;
-
-const RoleLabel = styled.label`
-  display: block;
-  font-size: ${theme.fontSizes.sm};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[3]};
-`;
-
-const RoleGrid = styled.div`
-  display: grid;
-  gap: ${theme.spacing[3]};
-`;
-
-const RoleOption = styled.div<{ selected: boolean }>`
-  padding: ${theme.spacing[4]};
-  border: 2px solid
-    ${props =>
-      props.selected ? theme.colors.primary : theme.colors.border.medium};
-  border-radius: ${theme.borderRadius.md};
-  background: ${props =>
-    props.selected
-      ? theme.colors.background.accent
-      : theme.colors.background.primary};
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-
-  &:hover {
-    border-color: ${theme.colors.primary};
-    background: ${props =>
-      props.selected
-        ? theme.colors.background.accent
-        : theme.colors.background.hover};
-  }
-`;
-
-const RoleIcon = styled.div<{ selected?: boolean }>`
-  padding: ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.md};
-  background: ${props =>
-    props.selected ? theme.colors.primary : theme.colors.background.light};
-  color: ${props => (props.selected ? 'white' : theme.colors.text.secondary)};
-`;
-
-const RoleInfo = styled.div`
-  flex: 1;
-`;
-
-const RoleName = styled.div`
-  font-weight: ${theme.fontWeights.semibold};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[1]};
-`;
-
-const RoleDescription = styled.div`
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.text.secondary};
-`;
-
-const CheckboxContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-  padding: ${theme.spacing[3]};
-  border: 1px solid ${theme.colors.border.medium};
-  border-radius: ${theme.borderRadius.md};
-  background: ${theme.colors.background.light};
-`;
-
-const Checkbox = styled.input`
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-`;
-
-const CheckboxLabel = styled.label`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  font-size: ${theme.fontSizes.sm};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${theme.colors.text.primary};
-  cursor: pointer;
-`;
-
-const ErrorMessage = styled.div`
-  background: ${theme.colors.error}10;
-  border: 1px solid ${theme.colors.error}30;
-  color: ${theme.colors.error};
-  padding: ${theme.spacing[3]};
-  border-radius: ${theme.borderRadius.md};
-  font-size: ${theme.fontSizes.sm};
-  text-align: center;
-`;
-
-const SuccessMessage = styled.div`
-  background: ${theme.colors.success}10;
-  border: 1px solid ${theme.colors.success}30;
-  color: ${theme.colors.success};
-  padding: ${theme.spacing[3]};
-  border-radius: ${theme.borderRadius.md};
-  font-size: ${theme.fontSizes.sm};
-  text-align: center;
-`;
 
 export const RegisterForm: React.FC<{ onSuccess?: () => void }> = ({
   onSuccess,
@@ -216,38 +42,44 @@ export const RegisterForm: React.FC<{ onSuccess?: () => void }> = ({
 
   return (
     <>
-      <FormTitle>Crear Nueva Cuenta</FormTitle>
-      <FormSubtitle>
+      <h2 className='font-heading mb-2 text-2xl font-medium text-foreground'>
+        Crear Nueva Cuenta
+      </h2>
+      <p className='mb-4 text-base text-muted-foreground'>
         Completa la información para crear tu cuenta de usuario
-      </FormSubtitle>
+      </p>
 
       {success ? (
-        <SuccessMessage>
+        <div className='mb-4 rounded-md border border-green-300/30 bg-green-500/10 p-3 text-center text-sm text-green-700'>
           ¡Usuario registrado exitosamente! Ya puedes iniciar sesión.
-        </SuccessMessage>
+        </div>
       ) : null}
 
-      {error ? <ErrorMessage>{error}</ErrorMessage> : null}
+      {error ? (
+        <div className='mb-4 rounded-md border border-destructive/30 bg-destructive/10 p-3 text-center text-sm text-destructive'>
+          {error}
+        </div>
+      ) : null}
 
-      <FormContainer onSubmit={onSubmit} noValidate>
-        <FormGrid>
-          <FullWidthField>
+      <form onSubmit={onSubmit} noValidate className='mb-6 flex flex-col gap-4'>
+        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
+          <div className='sm:col-span-2'>
             <Input
               id='email'
               label='Email'
               type='email'
               placeholder='ejemplo@correo.com'
-              leftIcon={<Mail size={18} />}
+              leftIcon={<MailIcon size={18} />}
               error={errors.email?.message}
               {...register('email')}
             />
-          </FullWidthField>
+          </div>
 
           <Input
             id='firstName'
             label='Nombre'
             placeholder='Nombre del usuario'
-            leftIcon={<User size={18} />}
+            leftIcon={<UserIcon size={18} />}
             error={errors.firstName?.message}
             {...register('firstName')}
           />
@@ -256,7 +88,7 @@ export const RegisterForm: React.FC<{ onSuccess?: () => void }> = ({
             id='lastName'
             label='Apellido'
             placeholder='Apellido del usuario'
-            leftIcon={<User size={18} />}
+            leftIcon={<UserIcon size={18} />}
             error={errors.lastName?.message}
             {...register('lastName')}
           />
@@ -265,7 +97,7 @@ export const RegisterForm: React.FC<{ onSuccess?: () => void }> = ({
             id='phone'
             label='Teléfono'
             placeholder='+34 600 000 000'
-            leftIcon={<Phone size={18} />}
+            leftIcon={<PhoneIcon size={18} />}
             {...register('phone')}
           />
 
@@ -278,90 +110,127 @@ export const RegisterForm: React.FC<{ onSuccess?: () => void }> = ({
               setDateOfBirth(e.target.value)
             }
             placeholder='dd/mm/yyyy'
-            leftIcon={<Calendar size={18} />}
+            leftIcon={<CalendarIcon size={18} />}
           />
-        </FormGrid>
+        </div>
 
-        <FormGrid>
-          <PasswordInputWrapper>
-            <Input
-              id='password'
-              label='Contraseña'
-              type={showPassword ? 'text' : 'password'}
-              placeholder='Mínimo 8 caracteres'
-              leftIcon={<Lock size={18} />}
-              error={errors.password?.message}
-              {...register('password')}
-            />
-            <PasswordToggle type='button' onClick={togglePassword}>
-              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-            </PasswordToggle>
-          </PasswordInputWrapper>
+        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
+          <Input
+            id='password'
+            label='Contraseña'
+            type={showPassword ? 'text' : 'password'}
+            placeholder='Mínimo 8 caracteres'
+            leftIcon={<LockIcon size={18} />}
+            rightIcon={
+              showPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />
+            }
+            rightIconClickable
+            onRightIconClick={togglePassword}
+            error={errors.password?.message}
+            {...register('password')}
+          />
 
-          <PasswordInputWrapper>
-            <Input
-              id='confirmPassword'
-              label='Confirmar Contraseña'
-              type={showConfirmPassword ? 'text' : 'password'}
-              placeholder='Repite tu contraseña'
-              leftIcon={<Lock size={18} />}
-              error={errors.confirmPassword?.message}
-              {...register('confirmPassword')}
-            />
-            <PasswordToggle type='button' onClick={toggleConfirmPassword}>
-              {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-            </PasswordToggle>
-          </PasswordInputWrapper>
-        </FormGrid>
+          <Input
+            id='confirmPassword'
+            label='Confirmar Contraseña'
+            type={showConfirmPassword ? 'text' : 'password'}
+            placeholder='Repite tu contraseña'
+            leftIcon={<LockIcon size={18} />}
+            rightIcon={
+              showConfirmPassword ? (
+                <EyeOffIcon size={16} />
+              ) : (
+                <EyeIcon size={16} />
+              )
+            }
+            rightIconClickable
+            onRightIconClick={toggleConfirmPassword}
+            error={errors.confirmPassword?.message}
+            {...register('confirmPassword')}
+          />
+        </div>
 
-        <RoleSelector>
-          <RoleLabel>Rol del Usuario</RoleLabel>
-          <RoleGrid>
-            <RoleOption
-              selected={role === UserRole.customer}
+        {/* Role selector */}
+        <div className='mb-4'>
+          <label className='mb-3 block text-sm font-medium text-foreground'>
+            Rol del Usuario
+          </label>
+          <div className='flex flex-col gap-3'>
+            <div
+              className={cn(
+                'flex cursor-pointer items-center gap-3 rounded-md border-2 p-4 transition-all',
+                role === UserRole.customer
+                  ? 'border-brand-purple bg-brand-purple/10'
+                  : 'border-border bg-background hover:border-brand-purple hover:bg-muted'
+              )}
               onClick={() => setRole(UserRole.customer)}
             >
-              <RoleIcon selected={role === UserRole.customer}>
-                <Users size={20} />
-              </RoleIcon>
-              <RoleInfo>
-                <RoleName>Cliente</RoleName>
-                <RoleDescription>
+              <div
+                className={cn(
+                  'rounded-md p-2',
+                  role === UserRole.customer
+                    ? 'bg-brand-purple text-white'
+                    : 'bg-muted text-muted-foreground'
+                )}
+              >
+                <UsersIcon size={20} />
+              </div>
+              <div className='flex-1'>
+                <div className='mb-1 font-semibold text-foreground'>
+                  Cliente
+                </div>
+                <div className='text-sm text-muted-foreground'>
                   Acceso a funciones básicas de cliente
-                </RoleDescription>
-              </RoleInfo>
-            </RoleOption>
+                </div>
+              </div>
+            </div>
 
-            <RoleOption
-              selected={role === UserRole.staff}
+            <div
+              className={cn(
+                'flex cursor-pointer items-center gap-3 rounded-md border-2 p-4 transition-all',
+                role === UserRole.staff
+                  ? 'border-brand-purple bg-brand-purple/10'
+                  : 'border-border bg-background hover:border-brand-purple hover:bg-muted'
+              )}
               onClick={() => setRole(UserRole.staff)}
             >
-              <RoleIcon selected={role === UserRole.staff}>
-                <Shield size={20} />
-              </RoleIcon>
-              <RoleInfo>
-                <RoleName>Staff</RoleName>
-                <RoleDescription>
+              <div
+                className={cn(
+                  'rounded-md p-2',
+                  role === UserRole.staff
+                    ? 'bg-brand-purple text-white'
+                    : 'bg-muted text-muted-foreground'
+                )}
+              >
+                <ShieldIcon size={20} />
+              </div>
+              <div className='flex-1'>
+                <div className='mb-1 font-semibold text-foreground'>Staff</div>
+                <div className='text-sm text-muted-foreground'>
                   Acceso a gestión de contenido y soporte
-                </RoleDescription>
-              </RoleInfo>
-            </RoleOption>
-          </RoleGrid>
-        </RoleSelector>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <CheckboxContainer>
-          <Checkbox
+        <div className='flex items-center gap-3 rounded-md border border-border bg-muted p-3'>
+          <input
             type='checkbox'
             id='isActiveRegister'
+            className='h-[18px] w-[18px] cursor-pointer'
             checked={isActive}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setIsActive(e.target.checked)
             }
           />
-          <CheckboxLabel htmlFor='isActiveRegister'>
+          <label
+            htmlFor='isActiveRegister'
+            className='flex cursor-pointer items-center gap-2 text-sm font-medium text-foreground'
+          >
             Usuario activo (puede acceder al sistema)
-          </CheckboxLabel>
-        </CheckboxContainer>
+          </label>
+        </div>
 
         <Button
           type='submit'
@@ -372,7 +241,7 @@ export const RegisterForm: React.FC<{ onSuccess?: () => void }> = ({
         >
           {isLoading ? 'Creando cuenta...' : 'Crear Cuenta'}
         </Button>
-      </FormContainer>
+      </form>
     </>
   );
 };

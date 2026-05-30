@@ -1,7 +1,9 @@
 import type React from 'react';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import UploadIcon2 from 'lucide-react/dist/esm/icons/upload';
+import XIcon from 'lucide-react/dist/esm/icons/x';
+import ImageIcon from 'lucide-react/dist/esm/icons/image';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { useUploadNotifications } from '@/hooks/useUploadNotifications';
 import type {
@@ -348,7 +350,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                     }}
                   >
                     <div style={{ marginBottom: '8px' }}>
-                      <Upload size={20} />
+                      <UploadIcon2 size={20} />
                     </div>
                     <span style={{ fontSize: '12px', fontWeight: '500' }}>
                       Subiendo...
@@ -402,7 +404,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                       e.currentTarget.style.transform = 'scale(1)';
                     }}
                   >
-                    <X size={14} />
+                    <XIcon size={14} />
                   </div>
                 </ImagePreviewOverlay>
                 <div
