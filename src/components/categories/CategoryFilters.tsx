@@ -1,24 +1,20 @@
-import type React from 'react';
-import { useState, useCallback, useEffect } from 'react';
-import styled from 'styled-components';
-import { theme } from '@/styles/theme';
+import { memo, useState, useCallback, useEffect } from 'react';
+import SearchIcon from 'lucide-react/dist/esm/icons/search';
+import FilterIcon from 'lucide-react/dist/esm/icons/filter';
+import XIcon from 'lucide-react/dist/esm/icons/x';
+import RefreshCwIcon from 'lucide-react/dist/esm/icons/refresh-cw';
+import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
+import XCircleIcon from 'lucide-react/dist/esm/icons/x-circle';
+import ImageIcon from 'lucide-react/dist/esm/icons/image';
+import FileTextIcon from 'lucide-react/dist/esm/icons/file-text';
+import PackageIcon from 'lucide-react/dist/esm/icons/package';
+import ChevronDownIcon from 'lucide-react/dist/esm/icons/chevron-down';
+import ChevronUpIcon from 'lucide-react/dist/esm/icons/chevron-up';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
-import {
-  Search,
-  Filter,
-  X,
-  RefreshCw,
-  CheckCircle,
-  XCircle,
-  Image as ImageIcon,
-  FileText,
-  Package,
-  ChevronDown,
-  ChevronUp,
-} from 'lucide-react';
-import { type CategoryFilters as CategoryFiltersType } from './types';
+import type { CategoryFilters as CategoryFiltersType } from './types';
 
 interface CategoryFiltersProps {
   filters: CategoryFiltersType;
@@ -27,700 +23,436 @@ interface CategoryFiltersProps {
   loading?: boolean;
 }
 
-const FiltersContainer = styled(Card)`
-  margin-bottom: ${theme.spacing[6]};
-`;
+export const CategoryFilters = memo<CategoryFiltersProps>(
+  ({ filters, onFiltersChange, onClearFilters, loading = false }) => {
+    const [showAdvanced, setShowAdvanced] = useState(false);
+    const [searchValue, setSearchValue] = useState(filters.search ?? '');
 
-const FiltersHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: ${theme.spacing[4]};
-`;
+    useEffect(() => {
+      const id = setTimeout(() => {
+        if (searchValue !== filters.search) {
+          const { search: _s, ...rest } = filters;
+          onFiltersChange(
+            searchValue ? { ...rest, search: searchValue } : rest
+          );
+        }
+      }, 300);
+      return () => clearTimeout(id);
+    }, [searchValue]);
 
-const FiltersTitle = styled.h3`
-  font-family: ${theme.fonts.heading};
-  font-size: ${theme.fontSizes.lg};
-  font-weight: ${theme.fontWeights.semibold};
-  color: ${theme.colors.text.primary};
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-`;
+    useEffect(() => {
+      setSearchValue(filters.search ?? '');
+    }, [filters.search]);
 
-const FiltersActions = styled.div`
-  display: flex;
-  gap: ${theme.spacing[2]};
-  align-items: center;
-`;
+    const handleChange = useCallback(
+      (
+        key: keyof CategoryFiltersType,
+        value: CategoryFiltersType[typeof key]
+      ) => {
+        onFiltersChange({ ...filters, [key]: value });
+      },
+      [filters, onFiltersChange]
+    );
 
-const FiltersForm = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: ${theme.spacing[4]};
-  align-items: end;
-`;
+    const handleRemove = useCallback(
+      (key: keyof CategoryFiltersType) => {
+        const { [key]: _removed, ...rest } = filters;
+        onFiltersChange(rest as CategoryFiltersType);
+      },
+      [filters, onFiltersChange]
+    );
 
-const FilterField = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[2]};
-`;
+    const activeCount = Object.keys(filters).filter(k => {
+      const v = filters[k as keyof CategoryFiltersType];
+      return v !== undefined && v !== '' && v !== null;
+    }).length;
 
-const FilterLabel = styled.label`
-  font-family: ${theme.fonts.primary};
-  font-size: ${theme.fontSizes.sm};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${theme.colors.text.primary};
-`;
-
-const StatusToggleContainer = styled.div`
-  display: flex;
-  gap: ${theme.spacing[2]};
-  align-items: center;
-`;
-
-const StatusToggleButton = styled.button<{
-  isActive: boolean;
-  isSelected: boolean;
-}>`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  border: 1px solid
-    ${({ isSelected, isActive }) =>
-      isSelected
-        ? isActive
-          ? theme.colors.success
-          : theme.colors.warning
-        : theme.colors.border.light};
-  background: ${({ isSelected, isActive }) =>
-    isSelected
-      ? isActive
-        ? `${theme.colors.success}15`
-        : `${theme.colors.warning}15`
-      : theme.colors.white};
-  color: ${({ isSelected, isActive }) =>
-    isSelected
-      ? isActive
-        ? theme.colors.success
-        : theme.colors.warning
-      : theme.colors.text.secondary};
-  border-radius: ${theme.borderRadius.md};
-  font-size: ${theme.fontSizes.sm};
-  font-weight: ${theme.fontWeights.medium};
-  cursor: pointer;
-  transition: all ${theme.transitions.base};
-
-  &:hover {
-    background: ${({ isSelected, isActive }) =>
-      isSelected
-        ? isActive
-          ? `${theme.colors.success}25`
-          : `${theme.colors.warning}25`
-        : theme.colors.background.accent};
-    border-color: ${({ isActive }) =>
-      isActive ? theme.colors.success : theme.colors.warning};
-  }
-
-  svg {
-    width: 16px;
-    height: 16px;
-  }
-`;
-
-const CheckboxContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  cursor: pointer;
-`;
-
-const Checkbox = styled.input`
-  width: 18px;
-  height: 18px;
-  accent-color: ${theme.colors.primaryPurple};
-  cursor: pointer;
-`;
-
-const CheckboxLabel = styled.label`
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.text.secondary};
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-`;
-
-const DateRangeContainer = styled.div`
-  display: flex;
-  gap: ${theme.spacing[2]};
-  align-items: center;
-`;
-
-const DateInput = styled(Input)`
-  flex: 1;
-`;
-
-const DateSeparator = styled.span`
-  color: ${theme.colors.text.secondary};
-  font-size: ${theme.fontSizes.sm};
-`;
-
-const ProductsRangeContainer = styled.div`
-  display: flex;
-  gap: ${theme.spacing[2]};
-  align-items: center;
-`;
-
-const NumberInput = styled(Input)`
-  flex: 1;
-`;
-
-const RangeSeparator = styled.span`
-  color: ${theme.colors.text.secondary};
-  font-size: ${theme.fontSizes.sm};
-`;
-
-const CollapsibleSection = styled.div`
-  margin-top: ${theme.spacing[4]};
-`;
-
-const CollapsibleHeader = styled.button`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  padding: ${theme.spacing[2]} 0;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: ${theme.fontSizes.sm};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${theme.colors.text.secondary};
-  transition: color ${theme.transitions.base};
-
-  &:hover {
-    color: ${theme.colors.text.primary};
-  }
-
-  svg {
-    width: 16px;
-    height: 16px;
-  }
-`;
-
-const CollapsibleContent = styled.div<{ isOpen: boolean }>`
-  display: ${({ isOpen }) => (isOpen ? 'grid' : 'none')};
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: ${theme.spacing[4]};
-  margin-top: ${theme.spacing[4]};
-  padding-top: ${theme.spacing[4]};
-  border-top: 1px solid ${theme.colors.border.light};
-`;
-
-const ActiveFilters = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: ${theme.spacing[2]};
-  margin-top: ${theme.spacing[4]};
-  padding-top: ${theme.spacing[4]};
-  border-top: 1px solid ${theme.colors.border.light};
-`;
-
-const ActiveFilterTag = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  background: ${`${theme.colors.primaryPurple}15`};
-  border: 1px solid ${`${theme.colors.primaryPurple}30`};
-  border-radius: ${theme.borderRadius.md};
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.primaryPurple};
-`;
-
-const RemoveFilterButton = styled.button`
-  background: none;
-  border: none;
-  color: ${theme.colors.primaryPurple};
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: ${theme.borderRadius.sm};
-  transition: all ${theme.transitions.base};
-
-  &:hover {
-    background: ${`${theme.colors.primaryPurple}25`};
-  }
-
-  svg {
-    width: 14px;
-    height: 14px;
-  }
-`;
-
-export const CategoryFilters: React.FC<CategoryFiltersProps> = ({
-  filters,
-  onFiltersChange,
-  onClearFilters,
-  loading = false,
-}) => {
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  const [searchValue, setSearchValue] = useState(filters.search || '');
-
-  // Debounced search effect
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (searchValue !== filters.search) {
-        handleInputChange('search', searchValue);
-      }
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, [searchValue]);
-
-  // Update search value when filters change externally
-  useEffect(() => {
-    setSearchValue(filters.search || '');
-  }, [filters.search]);
-
-  // Handle input changes with immediate application
-  const handleInputChange = useCallback(
-    (
-      key: keyof CategoryFiltersType,
-      value: CategoryFiltersType[typeof key]
-    ) => {
-      const newFilters = { ...filters, [key]: value };
-      onFiltersChange(newFilters);
-    },
-    [filters, onFiltersChange]
-  );
-
-  // Handle search input changes (with debouncing)
-  const handleSearchChange = useCallback((value: string) => {
-    setSearchValue(value);
-  }, []);
-
-  // Clear all filters
-  const handleClearAll = useCallback(() => {
-    onClearFilters();
-  }, [onClearFilters]);
-
-  // Remove specific filter
-  const handleRemoveFilter = useCallback(
-    (key: keyof CategoryFiltersType) => {
-      const { [key]: _removed, ...rest } = filters;
-      onFiltersChange(rest as CategoryFiltersType);
-    },
-    [filters, onFiltersChange]
-  );
-
-  // Get active filters count
-  const activeFiltersCount = Object.keys(filters).filter(key => {
-    const value = filters[key as keyof CategoryFiltersType];
-    return value !== undefined && value !== '' && value !== null;
-  }).length;
-
-  return (
-    <FiltersContainer>
-      <FiltersHeader>
-        <FiltersTitle>
-          <Filter size={20} />
-          Filtros de Categorías
-        </FiltersTitle>
-
-        <FiltersActions>
-          {activeFiltersCount > 0 && (
+    return (
+      <Card className='mb-6 p-4'>
+        {/* Header */}
+        <div className='mb-4 flex items-center justify-between'>
+          <h3 className='font-heading flex items-center gap-2 text-lg font-semibold text-foreground'>
+            <FilterIcon size={20} />
+            Filtros de Categorías
+          </h3>
+          <div className='flex gap-2'>
+            {activeCount > 0 ? (
+              <Button
+                variant='ghost'
+                size='sm'
+                onClick={onClearFilters}
+                disabled={loading}
+              >
+                <XIcon size={16} className='mr-1' />
+                Limpiar Todo
+              </Button>
+            ) : null}
             <Button
-              variant='ghost'
-              size='small'
-              onClick={handleClearAll}
+              variant='outline'
+              size='sm'
+              onClick={onClearFilters}
               disabled={loading}
             >
-              <X size={16} />
-              Limpiar Todo
+              <RefreshCwIcon size={16} className='mr-1' />
+              Restablecer
             </Button>
-          )}
-
-          <Button
-            variant='outline'
-            size='small'
-            onClick={handleClearAll}
-            disabled={loading}
-          >
-            <RefreshCw size={16} />
-            Restablecer
-          </Button>
-        </FiltersActions>
-      </FiltersHeader>
-
-      <FiltersForm>
-        {/* Search Filter */}
-        <FilterField>
-          <FilterLabel htmlFor='search'>Buscar categorías</FilterLabel>
-          <Input
-            id='search'
-            type='text'
-            placeholder='Buscar por nombre, descripción o slug...'
-            value={searchValue}
-            onChange={e => handleSearchChange(e.target.value)}
-            disabled={loading}
-            icon={<Search size={16} />}
-          />
-        </FilterField>
-
-        {/* Status Filter */}
-        <FilterField>
-          <FilterLabel>Estado de la categoría</FilterLabel>
-          <StatusToggleContainer>
-            <StatusToggleButton
-              isActive={true}
-              isSelected={filters.isActive === true}
-              onClick={() =>
-                handleInputChange(
-                  'isActive',
-                  filters.isActive === true ? undefined : true
-                )
-              }
-              disabled={loading}
-            >
-              <CheckCircle size={16} />
-              Activas
-            </StatusToggleButton>
-
-            <StatusToggleButton
-              isActive={false}
-              isSelected={filters.isActive === false}
-              onClick={() =>
-                handleInputChange(
-                  'isActive',
-                  filters.isActive === false ? undefined : false
-                )
-              }
-              disabled={loading}
-            >
-              <XCircle size={16} />
-              Inactivas
-            </StatusToggleButton>
-          </StatusToggleContainer>
-        </FilterField>
-
-        {/* Content Filters */}
-        <FilterField>
-          <FilterLabel>Contenido</FilterLabel>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: theme.spacing[2],
-            }}
-          >
-            <CheckboxContainer>
-              <Checkbox
-                type='checkbox'
-                id='hasImage'
-                checked={filters.hasImage === true}
-                onChange={e =>
-                  handleInputChange(
-                    'hasImage',
-                    e.target.checked ? true : undefined
-                  )
-                }
-              />
-              <CheckboxLabel htmlFor='hasImage'>
-                <ImageIcon size={14} />
-                Con imagen
-              </CheckboxLabel>
-            </CheckboxContainer>
-
-            <CheckboxContainer>
-              <Checkbox
-                type='checkbox'
-                id='hasDescription'
-                checked={filters.hasDescription === true}
-                onChange={e =>
-                  handleInputChange(
-                    'hasDescription',
-                    e.target.checked ? true : undefined
-                  )
-                }
-              />
-              <CheckboxLabel htmlFor='hasDescription'>
-                <FileText size={14} />
-                Con descripción
-              </CheckboxLabel>
-            </CheckboxContainer>
           </div>
-        </FilterField>
-      </FiltersForm>
+        </div>
 
-      {/* Advanced Filters Section */}
-      <CollapsibleSection>
-        <CollapsibleHeader
-          onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-        >
-          {showAdvancedFilters ? (
-            <ChevronUp size={16} />
-          ) : (
-            <ChevronDown size={16} />
-          )}
-          Filtros Avanzados
-        </CollapsibleHeader>
+        {/* Main filters */}
+        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+          {/* Search */}
+          <div>
+            <label className='mb-1.5 block text-sm font-medium text-foreground'>
+              Buscar categorías
+            </label>
+            <Input
+              id='search'
+              type='text'
+              placeholder='Buscar por nombre, descripción o slug...'
+              value={searchValue}
+              onChange={e => setSearchValue(e.target.value)}
+              disabled={loading}
+              icon={<SearchIcon size={16} />}
+            />
+          </div>
 
-        <CollapsibleContent isOpen={showAdvancedFilters}>
-          {/* Products Filter */}
-          <FilterField>
-            <FilterLabel>Productos</FilterLabel>
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: theme.spacing[2],
-              }}
-            >
-              <CheckboxContainer>
-                <Checkbox
+          {/* Status */}
+          <div>
+            <label className='mb-1.5 block text-sm font-medium text-foreground'>
+              Estado de la categoría
+            </label>
+            <div className='flex gap-2'>
+              <button
+                onClick={() =>
+                  handleChange(
+                    'isActive',
+                    filters.isActive === true ? undefined : true
+                  )
+                }
+                disabled={loading}
+                className={cn(
+                  'flex items-center gap-1.5 rounded-md border px-3 py-2 text-sm font-medium transition-colors',
+                  filters.isActive === true
+                    ? 'border-green-500 bg-green-50 text-green-700'
+                    : 'border-border bg-background text-muted-foreground hover:border-green-400 hover:text-green-600'
+                )}
+              >
+                <CheckCircleIcon size={16} />
+                Activas
+              </button>
+              <button
+                onClick={() =>
+                  handleChange(
+                    'isActive',
+                    filters.isActive === false ? undefined : false
+                  )
+                }
+                disabled={loading}
+                className={cn(
+                  'flex items-center gap-1.5 rounded-md border px-3 py-2 text-sm font-medium transition-colors',
+                  filters.isActive === false
+                    ? 'border-amber-500 bg-amber-50 text-amber-700'
+                    : 'border-border bg-background text-muted-foreground hover:border-amber-400 hover:text-amber-600'
+                )}
+              >
+                <XCircleIcon size={16} />
+                Inactivas
+              </button>
+            </div>
+          </div>
+
+          {/* Content checkboxes */}
+          <div>
+            <label className='mb-1.5 block text-sm font-medium text-foreground'>
+              Contenido
+            </label>
+            <div className='flex flex-col gap-2'>
+              <label className='flex items-center gap-2 text-sm text-muted-foreground'>
+                <input
                   type='checkbox'
-                  id='hasProducts'
-                  checked={filters.hasProducts === true}
+                  checked={filters.hasImage === true}
                   onChange={e =>
-                    handleInputChange(
-                      'hasProducts',
+                    handleChange(
+                      'hasImage',
                       e.target.checked ? true : undefined
                     )
                   }
+                  disabled={loading}
+                  className='rounded border-border'
                 />
-                <CheckboxLabel htmlFor='hasProducts'>
-                  <Package size={14} />
-                  Con productos
-                </CheckboxLabel>
-              </CheckboxContainer>
-
-              <ProductsRangeContainer>
-                <NumberInput
-                  type='number'
-                  placeholder='Mín. productos'
-                  value={filters.minProducts || ''}
+                <ImageIcon size={14} />
+                Con imagen
+              </label>
+              <label className='flex items-center gap-2 text-sm text-muted-foreground'>
+                <input
+                  type='checkbox'
+                  checked={filters.hasDescription === true}
                   onChange={e =>
-                    handleInputChange(
-                      'minProducts',
-                      e.target.value ? Number(e.target.value) : undefined
+                    handleChange(
+                      'hasDescription',
+                      e.target.checked ? true : undefined
                     )
                   }
-                  min='0'
+                  disabled={loading}
+                  className='rounded border-border'
                 />
-                <RangeSeparator>-</RangeSeparator>
-                <NumberInput
-                  type='number'
-                  placeholder='Máx. productos'
-                  value={filters.maxProducts || ''}
-                  onChange={e =>
-                    handleInputChange(
-                      'maxProducts',
-                      e.target.value ? Number(e.target.value) : undefined
-                    )
-                  }
-                  min='0'
-                />
-              </ProductsRangeContainer>
+                <FileTextIcon size={14} />
+                Con descripción
+              </label>
             </div>
-          </FilterField>
+          </div>
+        </div>
 
-          {/* Date Filters */}
-          <FilterField>
-            <FilterLabel>Fecha de Creación</FilterLabel>
-            <DateRangeContainer>
-              <DateInput
-                type='date'
-                value={filters.createdAfter || ''}
-                onChange={e =>
-                  handleInputChange('createdAfter', e.target.value || undefined)
-                }
-              />
-              <DateSeparator>-</DateSeparator>
-              <DateInput
-                type='date'
-                value={filters.createdBefore || ''}
-                onChange={e =>
-                  handleInputChange(
-                    'createdBefore',
-                    e.target.value || undefined
-                  )
-                }
-              />
-            </DateRangeContainer>
-          </FilterField>
+        {/* Advanced filters toggle */}
+        <div className='mt-4'>
+          <button
+            onClick={() => setShowAdvanced(v => !v)}
+            className='flex items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground'
+          >
+            {showAdvanced ? (
+              <ChevronUpIcon size={16} />
+            ) : (
+              <ChevronDownIcon size={16} />
+            )}
+            Filtros Avanzados
+          </button>
 
-          <FilterField>
-            <FilterLabel>Fecha de Actualización</FilterLabel>
-            <DateRangeContainer>
-              <DateInput
-                type='date'
-                value={filters.updatedAfter || ''}
-                onChange={e =>
-                  handleInputChange('updatedAfter', e.target.value || undefined)
-                }
-              />
-              <DateSeparator>-</DateSeparator>
-              <DateInput
-                type='date'
-                value={filters.updatedBefore || ''}
-                onChange={e =>
-                  handleInputChange(
-                    'updatedBefore',
-                    e.target.value || undefined
-                  )
-                }
-              />
-            </DateRangeContainer>
-          </FilterField>
+          {showAdvanced ? (
+            <div className='mt-4 grid grid-cols-1 gap-4 border-t border-border pt-4 sm:grid-cols-2 lg:grid-cols-3'>
+              {/* Products */}
+              <div>
+                <label className='mb-1.5 block text-sm font-medium text-foreground'>
+                  Productos
+                </label>
+                <div className='flex flex-col gap-2'>
+                  <label className='flex items-center gap-2 text-sm text-muted-foreground'>
+                    <input
+                      type='checkbox'
+                      checked={filters.hasProducts === true}
+                      onChange={e =>
+                        handleChange(
+                          'hasProducts',
+                          e.target.checked ? true : undefined
+                        )
+                      }
+                      disabled={loading}
+                      className='rounded border-border'
+                    />
+                    <PackageIcon size={14} />
+                    Con productos
+                  </label>
+                  <div className='flex items-center gap-2'>
+                    <input
+                      type='number'
+                      placeholder='Mín.'
+                      value={filters.minProducts ?? ''}
+                      onChange={e =>
+                        handleChange(
+                          'minProducts',
+                          e.target.value ? Number(e.target.value) : undefined
+                        )
+                      }
+                      min='0'
+                      disabled={loading}
+                      className='w-20 rounded border border-border bg-background px-2 py-1.5 text-sm'
+                    />
+                    <span className='text-muted-foreground'>—</span>
+                    <input
+                      type='number'
+                      placeholder='Máx.'
+                      value={filters.maxProducts ?? ''}
+                      onChange={e =>
+                        handleChange(
+                          'maxProducts',
+                          e.target.value ? Number(e.target.value) : undefined
+                        )
+                      }
+                      min='0'
+                      disabled={loading}
+                      className='w-20 rounded border border-border bg-background px-2 py-1.5 text-sm'
+                    />
+                  </div>
+                </div>
+              </div>
 
-          {/* Sort Order Filter */}
-          <FilterField>
-            <FilterLabel>Orden de Clasificación</FilterLabel>
-            <Input
-              type='number'
-              placeholder='Orden específico'
-              value={filters.sortOrder || ''}
-              onChange={e =>
-                handleInputChange(
-                  'sortOrder',
-                  e.target.value ? Number(e.target.value) : undefined
-                )
-              }
-              min='0'
-            />
-          </FilterField>
-        </CollapsibleContent>
-      </CollapsibleSection>
+              {/* Created date range */}
+              <div>
+                <label className='mb-1.5 block text-sm font-medium text-foreground'>
+                  Fecha de Creación
+                </label>
+                <div className='flex items-center gap-2'>
+                  <input
+                    type='date'
+                    value={filters.createdAfter ?? ''}
+                    onChange={e =>
+                      handleChange('createdAfter', e.target.value || undefined)
+                    }
+                    disabled={loading}
+                    className='rounded border border-border bg-background px-2 py-1.5 text-sm'
+                  />
+                  <span className='text-muted-foreground'>—</span>
+                  <input
+                    type='date'
+                    value={filters.createdBefore ?? ''}
+                    onChange={e =>
+                      handleChange('createdBefore', e.target.value || undefined)
+                    }
+                    disabled={loading}
+                    className='rounded border border-border bg-background px-2 py-1.5 text-sm'
+                  />
+                </div>
+              </div>
 
-      {/* Active Filters Display */}
-      {activeFiltersCount > 0 && (
-        <ActiveFilters>
-          {filters.search ? (
-            <ActiveFilterTag>
-              Búsqueda: "{filters.search}"
-              <RemoveFilterButton onClick={() => handleRemoveFilter('search')}>
-                <X size={14} />
-              </RemoveFilterButton>
-            </ActiveFilterTag>
+              {/* Updated date range */}
+              <div>
+                <label className='mb-1.5 block text-sm font-medium text-foreground'>
+                  Fecha de Actualización
+                </label>
+                <div className='flex items-center gap-2'>
+                  <input
+                    type='date'
+                    value={filters.updatedAfter ?? ''}
+                    onChange={e =>
+                      handleChange('updatedAfter', e.target.value || undefined)
+                    }
+                    disabled={loading}
+                    className='rounded border border-border bg-background px-2 py-1.5 text-sm'
+                  />
+                  <span className='text-muted-foreground'>—</span>
+                  <input
+                    type='date'
+                    value={filters.updatedBefore ?? ''}
+                    onChange={e =>
+                      handleChange('updatedBefore', e.target.value || undefined)
+                    }
+                    disabled={loading}
+                    className='rounded border border-border bg-background px-2 py-1.5 text-sm'
+                  />
+                </div>
+              </div>
+
+              {/* Sort order */}
+              <div>
+                <label
+                  htmlFor='sortOrder'
+                  className='mb-1.5 block text-sm font-medium text-foreground'
+                >
+                  Orden de Clasificación
+                </label>
+                <Input
+                  id='sortOrder'
+                  type='number'
+                  placeholder='Orden específico'
+                  value={filters.sortOrder ?? ''}
+                  onChange={e =>
+                    handleChange(
+                      'sortOrder',
+                      e.target.value ? Number(e.target.value) : undefined
+                    )
+                  }
+                  disabled={loading}
+                />
+              </div>
+            </div>
           ) : null}
+        </div>
 
-          {filters.isActive === true && (
-            <ActiveFilterTag>
-              Solo activas
-              <RemoveFilterButton
-                onClick={() => handleRemoveFilter('isActive')}
-              >
-                <X size={14} />
-              </RemoveFilterButton>
-            </ActiveFilterTag>
-          )}
-
-          {filters.isActive === false && (
-            <ActiveFilterTag>
-              Solo inactivas
-              <RemoveFilterButton
-                onClick={() => handleRemoveFilter('isActive')}
-              >
-                <X size={14} />
-              </RemoveFilterButton>
-            </ActiveFilterTag>
-          )}
-
-          {filters.hasImage ? (
-            <ActiveFilterTag>
-              Con imagen
-              <RemoveFilterButton
-                onClick={() => handleRemoveFilter('hasImage')}
-              >
-                <X size={14} />
-              </RemoveFilterButton>
-            </ActiveFilterTag>
-          ) : null}
-
-          {filters.hasDescription ? (
-            <ActiveFilterTag>
-              Con descripción
-              <RemoveFilterButton
-                onClick={() => handleRemoveFilter('hasDescription')}
-              >
-                <X size={14} />
-              </RemoveFilterButton>
-            </ActiveFilterTag>
-          ) : null}
-
-          {filters.hasProducts ? (
-            <ActiveFilterTag>
-              Con productos
-              <RemoveFilterButton
-                onClick={() => handleRemoveFilter('hasProducts')}
-              >
-                <X size={14} />
-              </RemoveFilterButton>
-            </ActiveFilterTag>
-          ) : null}
-
-          {filters.minProducts ? (
-            <ActiveFilterTag>
-              Min. productos: {filters.minProducts}
-              <RemoveFilterButton
-                onClick={() => handleRemoveFilter('minProducts')}
-              >
-                <X size={14} />
-              </RemoveFilterButton>
-            </ActiveFilterTag>
-          ) : null}
-
-          {filters.maxProducts ? (
-            <ActiveFilterTag>
-              Max. productos: {filters.maxProducts}
-              <RemoveFilterButton
-                onClick={() => handleRemoveFilter('maxProducts')}
-              >
-                <X size={14} />
-              </RemoveFilterButton>
-            </ActiveFilterTag>
-          ) : null}
-
-          {filters.createdAfter ? (
-            <ActiveFilterTag>
-              Creado después: {filters.createdAfter}
-              <RemoveFilterButton
-                onClick={() => handleRemoveFilter('createdAfter')}
-              >
-                <X size={14} />
-              </RemoveFilterButton>
-            </ActiveFilterTag>
-          ) : null}
-
-          {filters.createdBefore ? (
-            <ActiveFilterTag>
-              Creado antes: {filters.createdBefore}
-              <RemoveFilterButton
-                onClick={() => handleRemoveFilter('createdBefore')}
-              >
-                <X size={14} />
-              </RemoveFilterButton>
-            </ActiveFilterTag>
-          ) : null}
-
-          {filters.sortOrder ? (
-            <ActiveFilterTag>
-              Orden: {filters.sortOrder}
-              <RemoveFilterButton
-                onClick={() => handleRemoveFilter('sortOrder')}
-              >
-                <X size={14} />
-              </RemoveFilterButton>
-            </ActiveFilterTag>
-          ) : null}
-        </ActiveFilters>
-      )}
-    </FiltersContainer>
-  );
-};
+        {/* Active filter tags */}
+        {activeCount > 0 ? (
+          <div className='mt-4 flex flex-wrap gap-2 border-t border-border pt-4'>
+            {filters.search ? (
+              <span className='flex items-center gap-1.5 rounded border border-brand-purple/30 bg-brand-purple/10 px-2 py-1 text-sm text-brand-purple'>
+                Búsqueda: &ldquo;{filters.search}&rdquo;
+                <button
+                  onClick={() => handleRemove('search')}
+                  className='ml-0.5 hover:opacity-70'
+                >
+                  <XIcon size={14} />
+                </button>
+              </span>
+            ) : null}
+            {filters.isActive === true ? (
+              <span className='flex items-center gap-1.5 rounded border border-brand-purple/30 bg-brand-purple/10 px-2 py-1 text-sm text-brand-purple'>
+                Solo activas
+                <button
+                  onClick={() => handleRemove('isActive')}
+                  className='ml-0.5 hover:opacity-70'
+                >
+                  <XIcon size={14} />
+                </button>
+              </span>
+            ) : null}
+            {filters.isActive === false ? (
+              <span className='flex items-center gap-1.5 rounded border border-brand-purple/30 bg-brand-purple/10 px-2 py-1 text-sm text-brand-purple'>
+                Solo inactivas
+                <button
+                  onClick={() => handleRemove('isActive')}
+                  className='ml-0.5 hover:opacity-70'
+                >
+                  <XIcon size={14} />
+                </button>
+              </span>
+            ) : null}
+            {filters.hasImage ? (
+              <span className='flex items-center gap-1.5 rounded border border-brand-purple/30 bg-brand-purple/10 px-2 py-1 text-sm text-brand-purple'>
+                Con imagen
+                <button
+                  onClick={() => handleRemove('hasImage')}
+                  className='ml-0.5 hover:opacity-70'
+                >
+                  <XIcon size={14} />
+                </button>
+              </span>
+            ) : null}
+            {filters.hasDescription ? (
+              <span className='flex items-center gap-1.5 rounded border border-brand-purple/30 bg-brand-purple/10 px-2 py-1 text-sm text-brand-purple'>
+                Con descripción
+                <button
+                  onClick={() => handleRemove('hasDescription')}
+                  className='ml-0.5 hover:opacity-70'
+                >
+                  <XIcon size={14} />
+                </button>
+              </span>
+            ) : null}
+            {filters.hasProducts ? (
+              <span className='flex items-center gap-1.5 rounded border border-brand-purple/30 bg-brand-purple/10 px-2 py-1 text-sm text-brand-purple'>
+                Con productos
+                <button
+                  onClick={() => handleRemove('hasProducts')}
+                  className='ml-0.5 hover:opacity-70'
+                >
+                  <XIcon size={14} />
+                </button>
+              </span>
+            ) : null}
+            {filters.minProducts ? (
+              <span className='flex items-center gap-1.5 rounded border border-brand-purple/30 bg-brand-purple/10 px-2 py-1 text-sm text-brand-purple'>
+                Min. productos: {filters.minProducts}
+                <button
+                  onClick={() => handleRemove('minProducts')}
+                  className='ml-0.5 hover:opacity-70'
+                >
+                  <XIcon size={14} />
+                </button>
+              </span>
+            ) : null}
+            {filters.maxProducts ? (
+              <span className='flex items-center gap-1.5 rounded border border-brand-purple/30 bg-brand-purple/10 px-2 py-1 text-sm text-brand-purple'>
+                Max. productos: {filters.maxProducts}
+                <button
+                  onClick={() => handleRemove('maxProducts')}
+                  className='ml-0.5 hover:opacity-70'
+                >
+                  <XIcon size={14} />
+                </button>
+              </span>
+            ) : null}
+          </div>
+        ) : null}
+      </Card>
+    );
+  }
+);
+CategoryFilters.displayName = 'CategoryFilters';

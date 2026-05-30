@@ -1,22 +1,19 @@
-import type React from 'react';
-import styled from 'styled-components';
-import { theme } from '@/styles/theme';
-import { Button } from '@/components/ui/Button';
+import { memo } from 'react';
+import XIcon from 'lucide-react/dist/esm/icons/x';
+import EyeIcon from 'lucide-react/dist/esm/icons/eye';
+import HashIcon from 'lucide-react/dist/esm/icons/hash';
+import ImageIcon from 'lucide-react/dist/esm/icons/image';
+import SettingsIcon from 'lucide-react/dist/esm/icons/settings';
+import PackageIcon from 'lucide-react/dist/esm/icons/package';
+import SortAscIcon from 'lucide-react/dist/esm/icons/sort-asc';
+import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
+import XCircleIcon from 'lucide-react/dist/esm/icons/x-circle';
+import LinkIcon from 'lucide-react/dist/esm/icons/link';
+import Edit3Icon from 'lucide-react/dist/esm/icons/edit-3';
+import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
 import type { Category } from './types';
-import {
-  X,
-  Eye,
-  Hash,
-  Image as ImageIcon,
-  Settings,
-  Package,
-  SortAsc,
-  CheckCircle,
-  XCircle,
-  Link,
-  Edit3,
-} from 'lucide-react';
 
 interface CategoryDetailModalProps {
   isOpen: boolean;
@@ -25,416 +22,214 @@ interface CategoryDetailModalProps {
   onEdit: (category: Category) => void;
 }
 
-// Styled Components
-const ModalOverlay = styled.div<{ isOpen: boolean }>`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  display: ${({ isOpen }) => (isOpen ? 'flex' : 'none')};
-  align-items: center;
-  justify-content: center;
-  z-index: ${theme.zIndex?.modal || 1000};
-  padding: ${theme.spacing[4]};
-`;
+const formatDate = (dateString: string | Date) =>
+  new Date(dateString).toLocaleDateString('es-ES', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 
-const ModalContainer = styled(Card)`
-  width: 100%;
-  max-width: 800px;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  padding: 0;
-`;
+const InfoCard = ({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) => (
+  <div className='rounded-md border border-border bg-muted/30 p-4'>
+    <div className='mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground'>
+      {label}
+    </div>
+    <div className='text-base font-medium text-foreground'>{children}</div>
+  </div>
+);
 
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: ${theme.spacing[6]};
-  border-bottom: 1px solid ${theme.colors.border.light};
-  position: sticky;
-  top: 0;
-  background: ${theme.colors.white};
-  z-index: 1;
-`;
+const SectionTitle = ({
+  icon,
+  children,
+}: {
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) => (
+  <h3 className='font-heading mb-4 flex items-center gap-2 border-b border-border pb-2 text-lg font-medium text-foreground'>
+    {icon}
+    {children}
+  </h3>
+);
 
-const ModalTitle = styled.h2`
-  font-family: ${theme.fonts.heading};
-  font-size: ${theme.fontSizes.xl};
-  font-weight: ${theme.fontWeights.semibold};
-  color: ${theme.colors.text.primary};
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-`;
+export const CategoryDetailModal = memo<CategoryDetailModalProps>(
+  ({ isOpen, onClose, category, onEdit }) => {
+    if (!isOpen || !category) return null;
 
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  color: ${theme.colors.text.secondary};
-  cursor: pointer;
-  padding: ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.md};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all ${theme.transitions?.base || '0.2s ease'};
+    return (
+      <div
+        className='fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm'
+        onClick={onClose}
+      >
+        <Card
+          className='max-h-[90vh] w-full max-w-3xl overflow-y-auto p-0 shadow-2xl'
+          onClick={e => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className='sticky top-0 z-10 flex items-center justify-between border-b border-border bg-card px-6 py-4'>
+            <h2 className='font-heading flex items-center gap-2 text-xl font-semibold text-foreground'>
+              <EyeIcon size={24} />
+              Detalle de Categoría
+            </h2>
+            <button
+              onClick={onClose}
+              className='rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'
+            >
+              <XIcon size={20} />
+            </button>
+          </div>
 
-  &:hover {
-    background: ${theme.colors.background.accent};
-    color: ${theme.colors.text.primary};
-  }
-`;
-
-const ModalBody = styled.div`
-  padding: ${theme.spacing[6]};
-`;
-
-const Section = styled.div`
-  margin-bottom: ${theme.spacing[6]};
-`;
-
-const SectionTitle = styled.h3`
-  font-family: ${theme.fonts.heading};
-  font-size: ${theme.fontSizes.lg};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${theme.colors.text.primary};
-  margin: 0 0 ${theme.spacing[4]} 0;
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  padding-bottom: ${theme.spacing[2]};
-  border-bottom: 1px solid ${theme.colors.border.light};
-`;
-
-const InfoGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: ${theme.spacing[4]};
-`;
-
-const InfoCard = styled.div`
-  background: ${theme.colors.background.light};
-  border: 1px solid ${theme.colors.border.light};
-  border-radius: ${theme.borderRadius.md};
-  padding: ${theme.spacing[4]};
-`;
-
-const InfoLabel = styled.div`
-  font-family: ${theme.fonts.primary};
-  font-size: ${theme.fontSizes.xs};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${theme.colors.text.secondary};
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: ${theme.spacing[1]};
-`;
-
-const InfoValue = styled.div`
-  font-family: ${theme.fonts.primary};
-  font-size: ${theme.fontSizes.base};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${theme.colors.text.primary};
-`;
-
-const StatusBadge = styled.span<{ isActive: boolean }>`
-  display: inline-flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-  padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.full};
-  font-size: ${theme.fontSizes.xs};
-  font-weight: ${theme.fontWeights.medium};
-  background: ${({ isActive }) =>
-    isActive ? `${theme.colors.success}20` : `${theme.colors.error}20`};
-  color: ${({ isActive }) =>
-    isActive ? theme.colors.success : theme.colors.error};
-  border: 1px solid
-    ${({ isActive }) =>
-      isActive ? `${theme.colors.success}40` : `${theme.colors.error}40`};
-`;
-
-const ImagePreview = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-  margin-top: ${theme.spacing[2]};
-`;
-
-const ImageThumbnail = styled.img`
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: ${theme.borderRadius.md};
-  border: 2px solid ${theme.colors.border.light};
-`;
-
-const NoImage = styled.div`
-  width: 60px;
-  height: 60px;
-  background: ${theme.colors.background.accent};
-  border: 2px dashed ${theme.colors.border.medium};
-  border-radius: ${theme.borderRadius.md};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${theme.colors.text.secondary};
-`;
-
-const ProductsSection = styled.div`
-  margin-top: ${theme.spacing[4]};
-`;
-
-const EmptyState = styled.div`
-  text-align: center;
-  padding: ${theme.spacing[8]};
-  color: ${theme.colors.text.secondary};
-`;
-
-const ModalFooter = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: ${theme.spacing[6]};
-  border-top: 1px solid ${theme.colors.border.light};
-  background: ${theme.colors.background.light};
-`;
-
-const FooterLeft = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  color: ${theme.colors.text.secondary};
-  font-size: ${theme.fontSizes.sm};
-`;
-
-const FooterRight = styled.div`
-  display: flex;
-  gap: ${theme.spacing[3]};
-`;
-
-export const CategoryDetailModal: React.FC<CategoryDetailModalProps> = ({
-  isOpen,
-  onClose,
-  category,
-  onEdit,
-}) => {
-  if (!isOpen || !category) return null;
-
-  const formatDate = (dateString: string | Date) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
-  const handleEdit = () => {
-    onEdit(category);
-  };
-
-  return (
-    <ModalOverlay isOpen={isOpen}>
-      <ModalContainer>
-        <ModalHeader>
-          <ModalTitle>
-            <Eye size={24} />
-            Detalle de Categoría
-          </ModalTitle>
-          <CloseButton onClick={onClose}>
-            <X size={20} />
-          </CloseButton>
-        </ModalHeader>
-
-        <ModalBody>
-          {/* Información del Sistema */}
-          <Section>
-            <SectionTitle>
-              <Settings size={20} />
-              Información del Sistema
-            </SectionTitle>
-            <InfoGrid>
-              <InfoCard>
-                <InfoLabel>ID de Categoría</InfoLabel>
-                <InfoValue>{category.id}</InfoValue>
-              </InfoCard>
-              <InfoCard>
-                <InfoLabel>Estado</InfoLabel>
-                <StatusBadge isActive={category.isActive}>
-                  {category.isActive ? (
-                    <>
-                      <CheckCircle size={14} />
-                      Activa
-                    </>
-                  ) : (
-                    <>
-                      <XCircle size={14} />
-                      Inactiva
-                    </>
-                  )}
-                </StatusBadge>
-              </InfoCard>
-              <InfoCard>
-                <InfoLabel>Fecha de Creación</InfoLabel>
-                <InfoValue>{formatDate(category.createdAt)}</InfoValue>
-              </InfoCard>
-              <InfoCard>
-                <InfoLabel>Última Actualización</InfoLabel>
-                <InfoValue>{formatDate(category.updatedAt)}</InfoValue>
-              </InfoCard>
-            </InfoGrid>
-          </Section>
-
-          {/* Información Básica */}
-          <Section>
-            <SectionTitle>
-              <Hash size={20} />
-              Información Básica
-            </SectionTitle>
-            <InfoGrid>
-              <InfoCard>
-                <InfoLabel>Nombre</InfoLabel>
-                <InfoValue>{category.name}</InfoValue>
-              </InfoCard>
-              <InfoCard>
-                <InfoLabel>Slug</InfoLabel>
-                <InfoValue>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: theme.spacing[1],
-                    }}
+          <div className='p-6'>
+            {/* System info */}
+            <section className='mb-6'>
+              <SectionTitle icon={<SettingsIcon size={20} />}>
+                Información del Sistema
+              </SectionTitle>
+              <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
+                <InfoCard label='ID de Categoría'>{category.id}</InfoCard>
+                <InfoCard label='Estado'>
+                  <span
+                    className={cn(
+                      'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium',
+                      category.isActive
+                        ? 'border-green-300 bg-green-50 text-green-700'
+                        : 'border-red-300 bg-red-50 text-red-700'
+                    )}
                   >
-                    <Link size={14} />
+                    {category.isActive ? (
+                      <>
+                        <CheckCircleIcon size={14} />
+                        Activa
+                      </>
+                    ) : (
+                      <>
+                        <XCircleIcon size={14} />
+                        Inactiva
+                      </>
+                    )}
+                  </span>
+                </InfoCard>
+                <InfoCard label='Fecha de Creación'>
+                  {formatDate(category.createdAt)}
+                </InfoCard>
+                <InfoCard label='Última Actualización'>
+                  {formatDate(category.updatedAt)}
+                </InfoCard>
+              </div>
+            </section>
+
+            {/* Basic info */}
+            <section className='mb-6'>
+              <SectionTitle icon={<HashIcon size={20} />}>
+                Información Básica
+              </SectionTitle>
+              <div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
+                <InfoCard label='Nombre'>{category.name}</InfoCard>
+                <InfoCard label='Slug'>
+                  <span className='flex items-center gap-1'>
+                    <LinkIcon size={14} />
                     {category.slug}
-                  </div>
-                </InfoValue>
-              </InfoCard>
-              <InfoCard>
-                <InfoLabel>Descripción</InfoLabel>
-                <InfoValue>
-                  {category.description || (
-                    <span
-                      style={{
-                        color: theme.colors.text.secondary,
-                        fontStyle: 'italic',
-                      }}
-                    >
+                  </span>
+                </InfoCard>
+                <InfoCard label='Descripción'>
+                  {category.description ? (
+                    category.description
+                  ) : (
+                    <span className='italic text-muted-foreground'>
                       Sin descripción
                     </span>
                   )}
-                </InfoValue>
-              </InfoCard>
-              <InfoCard>
-                <InfoLabel>Orden de Clasificación</InfoLabel>
-                <InfoValue>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: theme.spacing[1],
-                    }}
-                  >
-                    <SortAsc size={14} />
-                    {category.sortOrder}
-                  </div>
-                </InfoValue>
-              </InfoCard>
-            </InfoGrid>
-          </Section>
-
-          {/* Imagen */}
-          <Section>
-            <SectionTitle>
-              <ImageIcon size={20} />
-              Imagen
-            </SectionTitle>
-            <ImagePreview>
-              {category.image ? (
-                <>
-                  <ImageThumbnail src={category.image} alt={category.name} />
-                  <div>
-                    <InfoLabel>URL de Imagen</InfoLabel>
-                    <InfoValue style={{ wordBreak: 'break-all' }}>
-                      {category.image}
-                    </InfoValue>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <NoImage>
-                    <ImageIcon size={24} />
-                  </NoImage>
-                  <div>
-                    <InfoLabel>Imagen</InfoLabel>
-                    <InfoValue style={{ color: theme.colors.text.secondary }}>
-                      No se ha configurado imagen
-                    </InfoValue>
-                  </div>
-                </>
-              )}
-            </ImagePreview>
-          </Section>
-
-          {/* Productos */}
-          <Section>
-            <SectionTitle>
-              <Package size={20} />
-              Productos en esta Categoría
-            </SectionTitle>
-            {category.productCount > 0 ? (
-              <ProductsSection>
-                <InfoCard>
-                  <InfoLabel>Total de productos</InfoLabel>
-                  <InfoValue>{category.productCount}</InfoValue>
                 </InfoCard>
-              </ProductsSection>
-            ) : (
-              <EmptyState>
-                <Package
-                  size={48}
-                  style={{ marginBottom: theme.spacing[2], opacity: 0.5 }}
-                />
-                <div>No hay productos en esta categoría</div>
-                <div
-                  style={{
-                    fontSize: theme.fontSizes.xs,
-                    marginTop: theme.spacing[1],
-                  }}
-                >
-                  Los productos aparecerán aquí cuando sean agregados
-                </div>
-              </EmptyState>
-            )}
-          </Section>
-        </ModalBody>
+                <InfoCard label='Orden de Clasificación'>
+                  <span className='flex items-center gap-1'>
+                    <SortAscIcon size={14} />
+                    {category.sortOrder}
+                  </span>
+                </InfoCard>
+              </div>
+            </section>
 
-        <ModalFooter>
-          <FooterLeft>
-            <div>ID: {category.id}</div>
-            <div>•</div>
-            <div>Slug: {category.slug}</div>
-          </FooterLeft>
-          <FooterRight>
-            <Button variant='outline' onClick={handleEdit}>
-              <Edit3 size={16} />
-              Editar
-            </Button>
-            <Button variant='outline' onClick={onClose}>
-              Cerrar
-            </Button>
-          </FooterRight>
-        </ModalFooter>
-      </ModalContainer>
-    </ModalOverlay>
-  );
-};
+            {/* Image */}
+            <section className='mb-6'>
+              <SectionTitle icon={<ImageIcon size={20} />}>Imagen</SectionTitle>
+              <div className='flex items-center gap-4'>
+                {category.image ? (
+                  <>
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      className='h-16 w-16 rounded-md border-2 border-border object-cover'
+                    />
+                    <div>
+                      <p className='mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground'>
+                        URL de Imagen
+                      </p>
+                      <p className='break-all text-sm text-foreground'>
+                        {category.image}
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className='flex h-16 w-16 items-center justify-center rounded-md border-2 border-dashed border-border bg-muted text-muted-foreground'>
+                      <ImageIcon size={24} />
+                    </div>
+                    <p className='text-sm italic text-muted-foreground'>
+                      No se ha configurado imagen
+                    </p>
+                  </>
+                )}
+              </div>
+            </section>
+
+            {/* Products */}
+            <section className='mb-6'>
+              <SectionTitle icon={<PackageIcon size={20} />}>
+                Productos en esta Categoría
+              </SectionTitle>
+              {category.productCount > 0 ? (
+                <InfoCard label='Total de productos'>
+                  {category.productCount}
+                </InfoCard>
+              ) : (
+                <div className='py-8 text-center text-muted-foreground'>
+                  <PackageIcon size={48} className='mx-auto mb-2 opacity-50' />
+                  <p>No hay productos en esta categoría</p>
+                  <p className='mt-1 text-xs'>
+                    Los productos aparecerán aquí cuando sean agregados
+                  </p>
+                </div>
+              )}
+            </section>
+          </div>
+
+          {/* Footer */}
+          <div className='flex items-center justify-between border-t border-border bg-muted/30 px-6 py-4'>
+            <div className='flex items-center gap-2 text-sm text-muted-foreground'>
+              <span>ID: {category.id}</span>
+              <span>•</span>
+              <span>Slug: {category.slug}</span>
+            </div>
+            <div className='flex gap-3'>
+              <Button variant='outline' onClick={() => onEdit(category)}>
+                <Edit3Icon size={16} className='mr-1.5' />
+                Editar
+              </Button>
+              <Button variant='outline' onClick={onClose}>
+                Cerrar
+              </Button>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+);
+CategoryDetailModal.displayName = 'CategoryDetailModal';

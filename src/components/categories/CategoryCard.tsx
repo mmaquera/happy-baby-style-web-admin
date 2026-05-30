@@ -1,10 +1,13 @@
-import type React from 'react';
-import styled from 'styled-components';
-import { theme } from '@/styles/theme';
+import { memo } from 'react';
+import FolderIcon from 'lucide-react/dist/esm/icons/folder';
+import EditIcon from 'lucide-react/dist/esm/icons/edit';
+import Trash2Icon from 'lucide-react/dist/esm/icons/trash-2';
+import EyeIcon from 'lucide-react/dist/esm/icons/eye';
+import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
+import XCircleIcon from 'lucide-react/dist/esm/icons/x-circle';
+import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/Card';
-import { Folder, Edit, Trash2, Eye, CheckCircle, XCircle } from 'lucide-react';
-
-import { type Category } from './types';
+import type { Category } from './types';
 
 interface CategoryCardProps {
   category: Category;
@@ -14,175 +17,91 @@ interface CategoryCardProps {
   onToggleStatus: (categoryId: string, isActive: boolean) => void;
 }
 
-const CategoryCardContainer = styled(Card)`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  transition:
-    transform ${theme.transitions.base},
-    box-shadow ${theme.transitions.base};
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: ${theme.shadows.lg};
-  }
-`;
-
-const CategoryImage = styled.div`
-  width: 100%;
-  height: 160px;
-  border-radius: ${theme.borderRadius.lg} ${theme.borderRadius.lg} 0 0;
-  overflow: hidden;
-  background: ${theme.colors.background.light};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: ${theme.spacing[4]};
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-`;
-
-const CategoryContent = styled.div`
-  flex: 1;
-  padding: 0 ${theme.spacing[4]} ${theme.spacing[4]};
-  display: flex;
-  flex-direction: column;
-`;
-
-const CategoryName = styled.h3`
-  font-family: ${theme.fonts.heading};
-  font-size: ${theme.fontSizes.lg};
-  font-weight: ${theme.fontWeights.semibold};
-  color: ${theme.colors.text.primary};
-  margin: 0 0 ${theme.spacing[2]} 0;
-  line-height: 1.3;
-`;
-
-const CategoryDescription = styled.p`
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.text.secondary};
-  margin: 0 0 ${theme.spacing[3]} 0;
-  line-height: 1.5;
-  flex: 1;
-`;
-
-const CategoryMeta = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: ${theme.spacing[4]};
-`;
-
-const CategorySlug = styled.span`
-  font-family: ${theme.fonts.primary};
-  font-size: ${theme.fontSizes.xs};
-  color: ${theme.colors.text.secondary};
-  background: ${theme.colors.background.accent};
-  padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.md};
-`;
-
-const CategoryStatus = styled.div<{ isActive: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-  font-size: ${theme.fontSizes.xs};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${({ isActive }) =>
-    isActive ? theme.colors.success : theme.colors.warning};
-`;
-
-const CategoryActions = styled.div`
-  display: flex;
-  gap: ${theme.spacing[2]};
-  justify-content: flex-end;
-  padding-top: ${theme.spacing[3]};
-  border-top: 1px solid ${theme.colors.border.light};
-`;
-
-const ActionButton = styled.button`
-  background: none;
-  border: none;
-  color: ${theme.colors.text.secondary};
-  cursor: pointer;
-  padding: ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.sm};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all ${theme.transitions.base};
-
-  &:hover {
-    background: ${theme.colors.background.accent};
-    color: ${theme.colors.text.primary};
-  }
-`;
-
-export const CategoryCard: React.FC<CategoryCardProps> = ({
-  category,
-  onEdit,
-  onDelete,
-  onViewDetails,
-  onToggleStatus,
-}) => {
-  return (
-    <CategoryCardContainer>
-      <CategoryImage>
+export const CategoryCard = memo<CategoryCardProps>(
+  ({ category, onEdit, onDelete, onViewDetails, onToggleStatus }) => (
+    <Card className='flex h-full flex-col transition-all hover:-translate-y-1 hover:shadow-lg'>
+      {/* Image */}
+      <div className='flex h-40 w-full items-center justify-center overflow-hidden rounded-t-lg bg-muted'>
         {category.image ? (
-          <img src={category.image} alt={category.name} />
+          <img
+            src={category.image}
+            alt={category.name}
+            className='h-full w-full object-cover'
+          />
         ) : (
-          <Folder size={48} color={theme.colors.warmGray} />
+          <FolderIcon size={48} className='text-muted-foreground/40' />
         )}
-      </CategoryImage>
+      </div>
 
-      <CategoryContent>
-        <CategoryName>{category.name}</CategoryName>
+      {/* Content */}
+      <div className='flex flex-1 flex-col p-4'>
+        <h3 className='font-heading mb-2 text-lg font-semibold leading-snug text-foreground'>
+          {category.name}
+        </h3>
 
         {category.description ? (
-          <CategoryDescription>{category.description}</CategoryDescription>
+          <p className='mb-3 flex-1 text-sm leading-relaxed text-muted-foreground'>
+            {category.description}
+          </p>
         ) : null}
 
-        <CategoryMeta>
-          <CategorySlug>{category.slug}</CategorySlug>
-          <CategoryStatus isActive={category.isActive}>
+        {/* Meta */}
+        <div className='mb-4 flex items-center justify-between'>
+          <span className='rounded bg-muted px-2 py-0.5 font-mono text-xs text-muted-foreground'>
+            {category.slug}
+          </span>
+          <span
+            className={cn(
+              'flex items-center gap-1 text-xs font-medium',
+              category.isActive ? 'text-green-600' : 'text-amber-600'
+            )}
+          >
             {category.isActive ? (
-              <CheckCircle size={14} />
+              <CheckCircleIcon size={14} />
             ) : (
-              <XCircle size={14} />
+              <XCircleIcon size={14} />
             )}
             {category.isActive ? 'Activa' : 'Inactiva'}
-          </CategoryStatus>
-        </CategoryMeta>
+          </span>
+        </div>
 
-        <CategoryActions>
-          <ActionButton
+        {/* Actions */}
+        <div className='flex justify-end gap-2 border-t border-border pt-3'>
+          <button
             onClick={() => onViewDetails(category.id)}
             title='Ver detalles'
+            className='rounded p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'
           >
-            <Eye size={16} />
-          </ActionButton>
-          <ActionButton onClick={() => onEdit(category.id)} title='Editar'>
-            <Edit size={16} />
-          </ActionButton>
-          <ActionButton
+            <EyeIcon size={16} />
+          </button>
+          <button
+            onClick={() => onEdit(category.id)}
+            title='Editar'
+            className='rounded p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'
+          >
+            <EditIcon size={16} />
+          </button>
+          <button
             onClick={() => onToggleStatus(category.id, !category.isActive)}
             title='Cambiar estado'
+            className='rounded p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'
           >
             {category.isActive ? (
-              <XCircle size={16} />
+              <XCircleIcon size={16} />
             ) : (
-              <CheckCircle size={16} />
+              <CheckCircleIcon size={16} />
             )}
-          </ActionButton>
-          <ActionButton onClick={() => onDelete(category.id)} title='Eliminar'>
-            <Trash2 size={16} />
-          </ActionButton>
-        </CategoryActions>
-      </CategoryContent>
-    </CategoryCardContainer>
-  );
-};
+          </button>
+          <button
+            onClick={() => onDelete(category.id)}
+            title='Eliminar'
+            className='rounded p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive'
+          >
+            <Trash2Icon size={16} />
+          </button>
+        </div>
+      </div>
+    </Card>
+  )
+);
+CategoryCard.displayName = 'CategoryCard';

@@ -1,25 +1,23 @@
-import type React from 'react';
-import styled from 'styled-components';
-import { theme } from '@/styles/theme';
+import { memo } from 'react';
+import FolderIcon from 'lucide-react/dist/esm/icons/folder';
+import PlusIcon from 'lucide-react/dist/esm/icons/plus';
+import SettingsIcon from 'lucide-react/dist/esm/icons/settings';
+import DownloadIcon from 'lucide-react/dist/esm/icons/download';
+import UploadIcon from 'lucide-react/dist/esm/icons/upload';
+import PrinterIcon from 'lucide-react/dist/esm/icons/printer';
+import Grid3X3Icon from 'lucide-react/dist/esm/icons/grid-3x3';
+import ListIcon from 'lucide-react/dist/esm/icons/list';
 import { Button } from '@/components/ui/Button';
-import {
-  Folder,
-  Plus,
-  Settings,
-  Download,
-  Upload,
-  Printer,
-  Grid3X3,
-  List,
-} from 'lucide-react';
+
+interface CategoryHeaderStats {
+  totalCategories?: number;
+  activeCategories?: number;
+  inactiveCategories?: number;
+}
 
 interface CategoryHeaderProps {
   title?: string;
-  stats?: {
-    totalCategories?: number;
-    activeCategories?: number;
-    inactiveCategories?: number;
-  };
+  stats?: CategoryHeaderStats;
   viewMode?: 'grid' | 'list';
   onViewModeChange?: (mode: 'grid' | 'list') => void;
   onAddCategory?: () => void;
@@ -29,303 +27,171 @@ interface CategoryHeaderProps {
   showActions?: boolean;
 }
 
-const HeaderContainer = styled.div`
-  margin-bottom: ${theme.spacing[6]};
-`;
+const StatCard = memo<{
+  label: string;
+  value: number;
+  colorClass: string;
+}>(({ label, value, colorClass }) => (
+  <div className='rounded-lg border border-border bg-card p-4 text-center transition-transform hover:-translate-y-0.5'>
+    <div className={`mb-3 flex justify-center ${colorClass}`}>
+      <FolderIcon size={24} />
+    </div>
+    <div className='font-heading mb-1 text-4xl font-bold text-foreground'>
+      {value.toLocaleString()}
+    </div>
+    <div className='text-sm text-muted-foreground'>{label}</div>
+  </div>
+));
+StatCard.displayName = 'StatCard';
 
-const MainHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: ${theme.spacing[4]};
-  flex-wrap: wrap;
-  gap: ${theme.spacing[4]};
-`;
+export const CategoryHeader = memo<CategoryHeaderProps>(
+  ({
+    title = 'Categorías Happy Baby Style',
+    stats,
+    viewMode = 'list',
+    onViewModeChange,
+    onAddCategory,
+    onBulkActions,
+    onExport,
+    onImport,
+    showActions = true,
+  }) => {
+    const hasStats =
+      stats && Object.values(stats).some(value => value !== undefined);
 
-const HeaderLeft = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-`;
-
-const HeaderIcon = styled.div`
-  width: 48px;
-  height: 48px;
-  background: ${theme.colors.softPurple};
-  border-radius: ${theme.borderRadius.full};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${theme.colors.primaryPurple};
-`;
-
-const HeaderContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[1]};
-`;
-
-const HeaderTitle = styled.h1`
-  font-family: ${theme.fonts.heading};
-  font-size: ${theme.fontSizes['3xl']};
-  font-weight: ${theme.fontWeights.bold};
-  color: ${theme.colors.text.primary};
-  margin: 0;
-  line-height: 1.2;
-`;
-
-const HeaderSubtitle = styled.p`
-  font-size: ${theme.fontSizes.base};
-  color: ${theme.colors.text.secondary};
-  margin: 0;
-`;
-
-const HeaderActions = styled.div`
-  display: flex;
-  gap: ${theme.spacing[3]};
-  flex-wrap: wrap;
-  align-items: center;
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: ${theme.spacing[4]};
-  margin-bottom: ${theme.spacing[4]};
-`;
-
-const StatCard = styled.div`
-  background: ${theme.colors.white};
-  border-radius: ${theme.borderRadius.lg};
-  padding: ${theme.spacing[4]};
-  text-align: center;
-  border: 1px solid ${theme.colors.border.light};
-  transition: transform ${theme.transitions.base};
-
-  &:hover {
-    transform: translateY(-2px);
-  }
-`;
-
-const StatIcon = styled.div<{ variant: 'primary' | 'success' | 'warning' }>`
-  color: ${({ variant }) => {
-    switch (variant) {
-      case 'success':
-        return theme.colors.success;
-      case 'warning':
-        return theme.colors.warning;
-      default:
-        return theme.colors.primaryPurple;
-    }
-  }};
-  margin-bottom: ${theme.spacing[3]};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-const StatValue = styled.div`
-  font-family: ${theme.fonts.heading};
-  font-size: ${theme.fontSizes['4xl']};
-  font-weight: ${theme.fontWeights.bold};
-  color: ${theme.colors.text.primary};
-  margin-bottom: ${theme.spacing[1]};
-`;
-
-const StatLabel = styled.div`
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.text.secondary};
-  margin-bottom: ${theme.spacing[2]};
-`;
-
-const StatChange = styled.div<{ isPositive: boolean }>`
-  font-size: ${theme.fontSizes.xs};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${({ isPositive }) =>
-    isPositive ? theme.colors.success : theme.colors.warning};
-`;
-
-const QuickActionsContainer = styled.div`
-  display: flex;
-  gap: ${theme.spacing[3]};
-  align-items: center;
-  padding: ${theme.spacing[4]};
-  background: ${theme.colors.white};
-  border-radius: ${theme.borderRadius.lg};
-  border: 1px solid ${theme.colors.border.light};
-`;
-
-const QuickActionsLabel = styled.span`
-  font-size: ${theme.fontSizes.sm};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${theme.colors.text.secondary};
-`;
-
-const QuickActionButton = styled(Button)`
-  font-size: ${theme.fontSizes.sm};
-`;
-
-export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
-  title = 'Categorías Happy Baby Style',
-  stats,
-  viewMode = 'list',
-  onViewModeChange,
-  onAddCategory,
-  onBulkActions,
-  onExport,
-  onImport,
-  showActions = true,
-}) => {
-  const hasStats =
-    stats && Object.values(stats).some(value => value !== undefined);
-
-  return (
-    <HeaderContainer>
-      <MainHeader>
-        <HeaderLeft>
-          <HeaderIcon>
-            <Folder size={24} />
-          </HeaderIcon>
-          <HeaderContent>
-            <HeaderTitle>{title}</HeaderTitle>
-            <HeaderSubtitle>
-              Organiza tu catálogo de productos por categorías
-            </HeaderSubtitle>
-          </HeaderContent>
-        </HeaderLeft>
-
-        <HeaderActions>
-          {onViewModeChange ? (
-            <div style={{ display: 'flex', gap: theme.spacing[2] }}>
-              <Button
-                variant={viewMode === 'list' ? 'primary' : 'outline'}
-                size='small'
-                onClick={() => onViewModeChange('list')}
-              >
-                <List size={16} />
-                Lista
-              </Button>
-              <Button
-                variant={viewMode === 'grid' ? 'primary' : 'outline'}
-                size='small'
-                onClick={() => onViewModeChange('grid')}
-              >
-                <Grid3X3 size={16} />
-                Grid
-              </Button>
+    return (
+      <div className='mb-6'>
+        {/* Main header row */}
+        <div className='mb-4 flex flex-wrap items-center justify-between gap-4'>
+          <div className='flex items-center gap-3'>
+            <div className='flex h-12 w-12 items-center justify-center rounded-full bg-brand-purple/10 text-brand-purple'>
+              <FolderIcon size={24} />
             </div>
-          ) : null}
+            <div>
+              <h1 className='font-heading text-3xl font-bold text-foreground'>
+                {title}
+              </h1>
+              <p className='text-base text-muted-foreground'>
+                Organiza tu catálogo de productos por categorías
+              </p>
+            </div>
+          </div>
 
-          {onImport ? (
-            <Button variant='ghost' size='medium' onClick={onImport}>
-              <Upload size={16} />
-              Importar
+          <div className='flex flex-wrap items-center gap-3'>
+            {onViewModeChange ? (
+              <div className='flex gap-2'>
+                <Button
+                  variant={viewMode === 'list' ? 'primary' : 'outline'}
+                  size='sm'
+                  onClick={() => onViewModeChange('list')}
+                >
+                  <ListIcon size={16} className='mr-1' />
+                  Lista
+                </Button>
+                <Button
+                  variant={viewMode === 'grid' ? 'primary' : 'outline'}
+                  size='sm'
+                  onClick={() => onViewModeChange('grid')}
+                >
+                  <Grid3X3Icon size={16} className='mr-1' />
+                  Grid
+                </Button>
+              </div>
+            ) : null}
+
+            {onImport ? (
+              <Button variant='ghost' size='sm' onClick={onImport}>
+                <UploadIcon size={16} className='mr-1' />
+                Importar
+              </Button>
+            ) : null}
+
+            {onExport ? (
+              <Button variant='ghost' size='sm' onClick={onExport}>
+                <DownloadIcon size={16} className='mr-1' />
+                Exportar
+              </Button>
+            ) : null}
+
+            {onBulkActions ? (
+              <Button variant='outline' size='sm' onClick={onBulkActions}>
+                <SettingsIcon size={16} className='mr-1' />
+                Acciones Masivas
+              </Button>
+            ) : null}
+
+            {onAddCategory ? (
+              <Button variant='primary' size='sm' onClick={onAddCategory}>
+                <PlusIcon size={16} className='mr-1' />
+                Nueva Categoría
+              </Button>
+            ) : null}
+          </div>
+        </div>
+
+        {/* Stats grid */}
+        {hasStats ? (
+          <div className='mb-4 grid grid-cols-1 gap-4 sm:grid-cols-3'>
+            {stats.totalCategories !== undefined ? (
+              <StatCard
+                label='Total de Categorías'
+                value={stats.totalCategories}
+                colorClass='text-brand-purple'
+              />
+            ) : null}
+            {stats.activeCategories !== undefined ? (
+              <StatCard
+                label='Categorías Activas'
+                value={stats.activeCategories}
+                colorClass='text-green-600'
+              />
+            ) : null}
+            {stats.inactiveCategories !== undefined ? (
+              <StatCard
+                label='Categorías Inactivas'
+                value={stats.inactiveCategories}
+                colorClass='text-amber-600'
+              />
+            ) : null}
+          </div>
+        ) : null}
+
+        {/* Quick actions bar */}
+        {showActions ? (
+          <div className='flex flex-wrap items-center gap-3 rounded-lg border border-border bg-card p-4'>
+            <span className='text-sm font-medium text-muted-foreground'>
+              Acciones rápidas:
+            </span>
+
+            {onAddCategory ? (
+              <Button variant='outline' size='sm' onClick={onAddCategory}>
+                <PlusIcon size={14} className='mr-1' />
+                Agregar Categoría
+              </Button>
+            ) : null}
+
+            {onBulkActions ? (
+              <Button variant='outline' size='sm' onClick={onBulkActions}>
+                <SettingsIcon size={14} className='mr-1' />
+                Acciones Masivas
+              </Button>
+            ) : null}
+
+            {onExport ? (
+              <Button variant='ghost' size='sm' onClick={onExport}>
+                <DownloadIcon size={14} className='mr-1' />
+                Exportar Lista
+              </Button>
+            ) : null}
+
+            <Button variant='ghost' size='sm' onClick={() => window.print()}>
+              <PrinterIcon size={14} className='mr-1' />
+              Imprimir
             </Button>
-          ) : null}
-
-          {onExport ? (
-            <Button variant='ghost' size='medium' onClick={onExport}>
-              <Download size={16} />
-              Exportar
-            </Button>
-          ) : null}
-
-          {onBulkActions ? (
-            <Button variant='secondary' size='medium' onClick={onBulkActions}>
-              <Settings size={16} />
-              Acciones Masivas
-            </Button>
-          ) : null}
-
-          {onAddCategory ? (
-            <Button variant='primary' size='medium' onClick={onAddCategory}>
-              <Plus size={16} />
-              Nueva Categoría
-            </Button>
-          ) : null}
-        </HeaderActions>
-      </MainHeader>
-
-      {hasStats ? (
-        <StatsGrid>
-          {stats.totalCategories !== undefined && (
-            <StatCard>
-              <StatIcon variant='primary'>
-                <Folder size={24} />
-              </StatIcon>
-              <StatValue>{stats.totalCategories.toLocaleString()}</StatValue>
-              <StatLabel>Total de Categorías</StatLabel>
-              <StatChange isPositive={true}>+5% este mes</StatChange>
-            </StatCard>
-          )}
-
-          {stats.activeCategories !== undefined && (
-            <StatCard>
-              <StatIcon variant='success'>
-                <Folder size={24} />
-              </StatIcon>
-              <StatValue>{stats.activeCategories.toLocaleString()}</StatValue>
-              <StatLabel>Categorías Activas</StatLabel>
-              <StatChange isPositive={true}>+3% este mes</StatChange>
-            </StatCard>
-          )}
-
-          {stats.inactiveCategories !== undefined && (
-            <StatCard>
-              <StatIcon variant='warning'>
-                <Folder size={24} />
-              </StatIcon>
-              <StatValue>{stats.inactiveCategories.toLocaleString()}</StatValue>
-              <StatLabel>Categorías Inactivas</StatLabel>
-              <StatChange isPositive={false}>+1% este mes</StatChange>
-            </StatCard>
-          )}
-        </StatsGrid>
-      ) : null}
-
-      {showActions ? (
-        <QuickActionsContainer>
-          <QuickActionsLabel>Acciones rápidas:</QuickActionsLabel>
-
-          {onAddCategory ? (
-            <QuickActionButton
-              variant='outline'
-              size='small'
-              onClick={onAddCategory}
-            >
-              <Plus size={14} />
-              Agregar Categoría
-            </QuickActionButton>
-          ) : null}
-
-          {onBulkActions ? (
-            <QuickActionButton
-              variant='outline'
-              size='small'
-              onClick={onBulkActions}
-            >
-              <Settings size={14} />
-              Acciones Masivas
-            </QuickActionButton>
-          ) : null}
-
-          {onExport ? (
-            <QuickActionButton variant='ghost' size='small' onClick={onExport}>
-              <Download size={14} />
-              Exportar Lista
-            </QuickActionButton>
-          ) : null}
-
-          <QuickActionButton
-            variant='ghost'
-            size='small'
-            onClick={() => window.print()}
-          >
-            <Printer size={14} />
-            Imprimir
-          </QuickActionButton>
-        </QuickActionsContainer>
-      ) : null}
-    </HeaderContainer>
-  );
-};
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+);
+CategoryHeader.displayName = 'CategoryHeader';

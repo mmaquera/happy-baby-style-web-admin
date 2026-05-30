@@ -1,14 +1,19 @@
 import type React from 'react';
 import { lazy, Suspense, useState, useCallback, useEffect } from 'react';
 import { useUIPreferencesStore } from '@/stores/uiPreferencesStore';
-import styled from 'styled-components';
-import { theme } from '@/styles/theme';
 import {
   CategoryHeader,
   CategoryGrid,
   CategoryListView,
   CategoryFilters,
 } from '@/components/categories';
+import type {
+  CategoryFilters as CategoryFiltersType,
+  Category,
+} from '@/components/categories/types';
+import { useCategoryActions } from '@/hooks/useCategoryActions';
+import { logger } from '@/utils/logger';
+import { Button } from '@/components/ui/Button';
 
 const CreateCategoryModal = lazy(() =>
   import('@/components/categories/CreateCategoryModal').then(m => ({
@@ -25,126 +30,8 @@ const CategoryDetailModal = lazy(() =>
     default: m.CategoryDetailModal,
   }))
 );
-import type {
-  CategoryFilters as CategoryFiltersType,
-  Category,
-} from '@/components/categories/types';
-import { useCategoryActions } from '@/hooks/useCategoryActions';
-import { logger } from '@/utils/logger';
 
-const CategoriesContainer = styled.div`
-  padding: ${theme.spacing[6]};
-  max-width: 1400px;
-  margin: 0 auto;
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    padding: ${theme.spacing[4]};
-  }
-`;
-
-const LoadingOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: ${theme.colors.white}80;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: ${theme.zIndex.modal};
-`;
-
-const LoadingSpinner = styled.div`
-  width: 48px;
-  height: 48px;
-  border: 4px solid ${theme.colors.background.accent};
-  border-top: 4px solid ${theme.colors.primaryPurple};
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-`;
-
-const LoadingText = styled.p`
-  margin-top: ${theme.spacing[4]};
-  font-size: ${theme.fontSizes.lg};
-  color: ${theme.colors.text.secondary};
-  text-align: center;
-`;
-
-const UpdateIndicator = styled.div`
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: ${theme.colors.primaryPurple};
-  color: ${theme.colors.white};
-  padding: ${theme.spacing[3]} ${theme.spacing[4]};
-  border-radius: ${theme.borderRadius.lg};
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: ${theme.zIndex?.modal || 1000};
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  font-size: ${theme.fontSizes.sm};
-  font-weight: ${theme.fontWeights.medium};
-  animation: slideIn 0.3s ease-out;
-
-  @keyframes slideIn {
-    from {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-`;
-
-const UpdateSpinner = styled.div`
-  width: 16px;
-  height: 16px;
-  border: 2px solid ${theme.colors.white}40;
-  border-top: 2px solid ${theme.colors.white};
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-
-  @keyframes spin {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
-`;
-
-const ErrorContainer = styled.div`
-  background: ${theme.colors.error}15;
-  border: 1px solid ${theme.colors.error}30;
-  border-radius: ${theme.borderRadius.lg};
-  padding: ${theme.spacing[4]};
-  margin-bottom: ${theme.spacing[4]};
-  text-align: center;
-`;
-
-const ErrorTitle = styled.h3`
-  color: ${theme.colors.error};
-  margin: 0 0 ${theme.spacing[2]} 0;
-`;
-
-const ErrorMessage = styled.p`
-  color: ${theme.colors.error};
-  margin: 0;
-`;
+const PAGE_SIZE = 20;
 
 export const Categories: React.FC = () => {
   const { categoriesViewMode: viewMode, setCategoriesViewMode: setViewMode } =
@@ -155,11 +42,9 @@ export const Categories: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null
   );
-  const [showFilters, _setShowFilters] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [filters, setFilters] = useState<CategoryFiltersType>({});
   const [currentPage, setCurrentPage] = useState(1);
-  const PAGE_SIZE = 20;
 
   const {
     categories,
@@ -238,6 +123,7 @@ export const Categories: React.FC = () => {
 
   const handleDeleteCategory = useCallback(
     async (categoryId: string) => {
+      // eslint-disable-next-line no-alert
       if (!window.confirm('¿Eliminar esta categoría?')) return;
       setIsUpdating(true);
       await deleteCategory(categoryId);
@@ -289,38 +175,28 @@ export const Categories: React.FC = () => {
     []
   );
 
-  const handleBulkActions = useCallback(() => {
-    logger.debug('Bulk actions — not yet implemented');
-  }, []);
-
-  const handleExport = useCallback(() => {
-    logger.debug('Export — not yet implemented');
-  }, []);
-
-  const handleImport = useCallback(() => {
-    logger.debug('Import — not yet implemented');
-  }, []);
-
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   if (loading && categories.length === 0) {
     return (
-      <LoadingOverlay>
-        <div style={{ textAlign: 'center' }}>
-          <LoadingSpinner />
-          <LoadingText>Cargando categorías...</LoadingText>
+      <div className='fixed inset-0 z-50 flex items-center justify-center bg-background/80'>
+        <div className='text-center'>
+          <div className='mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-muted border-t-primary' />
+          <p className='text-lg text-muted-foreground'>
+            Cargando categorías...
+          </p>
         </div>
-      </LoadingOverlay>
+      </div>
     );
   }
 
   return (
-    <CategoriesContainer>
+    <div className='mx-auto max-w-screen-xl p-6'>
       {isUpdating ? (
-        <UpdateIndicator>
-          <UpdateSpinner />
+        <div className='fixed right-5 top-5 z-50 flex items-center gap-2 rounded-lg bg-brand-purple px-4 py-3 text-sm font-medium text-white shadow-lg'>
+          <div className='h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white' />
           Actualizando categorías...
-        </UpdateIndicator>
+        </div>
       ) : null}
 
       <CategoryHeader
@@ -329,26 +205,33 @@ export const Categories: React.FC = () => {
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         onAddCategory={handleAddCategory}
-        onBulkActions={handleBulkActions}
-        onExport={handleExport}
-        onImport={handleImport}
+        onBulkActions={() => logger.debug('Bulk actions — not yet implemented')}
+        onExport={() => logger.debug('Export — not yet implemented')}
+        onImport={() => logger.debug('Import — not yet implemented')}
       />
 
-      {showFilters ? (
-        <CategoryFilters
-          filters={filters}
-          onFiltersChange={handleFiltersChange}
-          onClearFilters={handleClearFilters}
-          loading={loading}
-        />
-      ) : null}
+      <CategoryFilters
+        filters={filters}
+        onFiltersChange={handleFiltersChange}
+        onClearFilters={handleClearFilters}
+        loading={loading}
+      />
 
       {error ? (
-        <ErrorContainer>
-          <ErrorTitle>Error al cargar categorías</ErrorTitle>
-          <ErrorMessage>{error}</ErrorMessage>
-          <button onClick={clearError}>Reintentar</button>
-        </ErrorContainer>
+        <div className='mb-4 rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-center'>
+          <h3 className='mb-1 font-medium text-destructive'>
+            Error al cargar categorías
+          </h3>
+          <p className='text-sm text-destructive'>{error}</p>
+          <Button
+            variant='outline'
+            size='sm'
+            className='mt-3'
+            onClick={clearError}
+          >
+            Reintentar
+          </Button>
+        </div>
       ) : null}
 
       {viewMode === 'grid' ? (
@@ -381,7 +264,7 @@ export const Categories: React.FC = () => {
         />
       )}
 
-      {isCreateModalOpen && (
+      {isCreateModalOpen ? (
         <Suspense fallback={null}>
           <CreateCategoryModal
             isOpen={isCreateModalOpen}
@@ -389,9 +272,9 @@ export const Categories: React.FC = () => {
             onSuccess={handleCreateCategorySuccess}
           />
         </Suspense>
-      )}
+      ) : null}
 
-      {isEditModalOpen && (
+      {isEditModalOpen ? (
         <Suspense fallback={null}>
           <EditCategoryModal
             isOpen={isEditModalOpen}
@@ -403,9 +286,9 @@ export const Categories: React.FC = () => {
             category={selectedCategory}
           />
         </Suspense>
-      )}
+      ) : null}
 
-      {isDetailModalOpen && (
+      {isDetailModalOpen ? (
         <Suspense fallback={null}>
           <CategoryDetailModal
             isOpen={isDetailModalOpen}
@@ -417,7 +300,7 @@ export const Categories: React.FC = () => {
             onEdit={handleEditFromDetail}
           />
         </Suspense>
-      )}
-    </CategoriesContainer>
+      ) : null}
+    </div>
   );
 };

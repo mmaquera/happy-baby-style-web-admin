@@ -1,22 +1,12 @@
-import type React from 'react';
-import styled from 'styled-components';
-import { theme } from '@/styles/theme';
-import { Button } from '@/components/ui/Button';
-import {
-  List,
-  Grid3X3,
-  Eye,
-  Edit,
-  Trash2,
-  Folder,
-  CheckCircle,
-  XCircle,
-  Filter,
-  Download,
-  Settings,
-} from 'lucide-react';
-
-import { type Category } from './types';
+import { memo } from 'react';
+import EyeIcon from 'lucide-react/dist/esm/icons/eye';
+import EditIcon from 'lucide-react/dist/esm/icons/edit';
+import Trash2Icon from 'lucide-react/dist/esm/icons/trash-2';
+import FolderIcon from 'lucide-react/dist/esm/icons/folder';
+import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
+import XCircleIcon from 'lucide-react/dist/esm/icons/x-circle';
+import { cn } from '@/lib/utils';
+import type { Category } from './types';
 
 interface CategoryListViewProps {
   categories: Category[];
@@ -35,457 +25,256 @@ interface CategoryListViewProps {
   onFilter: (filters: Record<string, unknown>) => void;
 }
 
-const ListViewContainer = styled.div`
-  background: ${theme.colors.white};
-  border-radius: ${theme.borderRadius.lg};
-  border: 1px solid ${theme.colors.border.light};
-  overflow: hidden;
-`;
+const ActionBtn = ({
+  onClick,
+  title,
+  className,
+  children,
+}: {
+  onClick: () => void;
+  title: string;
+  className?: string;
+  children: React.ReactNode;
+}) => (
+  <button
+    onClick={onClick}
+    title={title}
+    className={cn(
+      'flex items-center justify-center rounded p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground',
+      className
+    )}
+  >
+    {children}
+  </button>
+);
 
-const ListViewHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: ${theme.spacing[4]};
-  border-bottom: 1px solid ${theme.colors.border.light};
-  background: ${theme.colors.background.light};
-  flex-wrap: wrap;
-  gap: ${theme.spacing[3]};
-`;
-
-const ViewToggleContainer = styled.div`
-  display: flex;
-  gap: ${theme.spacing[2]};
-  align-items: center;
-`;
-
-const ViewToggleButton = styled.button<{ isActive: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[2]};
-  padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  border: 1px solid
-    ${({ isActive }) =>
-      isActive ? theme.colors.primaryPurple : theme.colors.border.light};
-  background: ${({ isActive }) =>
-    isActive ? theme.colors.primaryPurple : theme.colors.white};
-  color: ${({ isActive }) =>
-    isActive ? theme.colors.white : theme.colors.text.secondary};
-  border-radius: ${theme.borderRadius.md};
-  font-size: ${theme.fontSizes.sm};
-  font-weight: ${theme.fontWeights.medium};
-  cursor: pointer;
-  transition: all ${theme.transitions.base};
-
-  &:hover {
-    background: ${({ isActive }) =>
-      isActive ? theme.colors.primaryPurple : theme.colors.background.accent};
-    border-color: ${theme.colors.primaryPurple};
-  }
-
-  svg {
-    width: 16px;
-    height: 16px;
-  }
-`;
-
-const CategoryCount = styled.div`
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.text.secondary};
-  font-weight: ${theme.fontWeights.medium};
-`;
-
-const HeaderActions = styled.div`
-  display: flex;
-  gap: ${theme.spacing[2]};
-  align-items: center;
-  flex-wrap: wrap;
-`;
-
-const CategoryTable = styled.div`
-  overflow-x: auto;
-`;
-
-const TableHeader = styled.div`
-  display: grid;
-  grid-template-columns: 60px 2fr 1fr 120px 100px 120px 120px 120px;
-  gap: ${theme.spacing[4]};
-  padding: ${theme.spacing[4]};
-  background: ${theme.colors.background.light};
-  border-bottom: 1px solid ${theme.colors.border.light};
-  font-weight: ${theme.fontWeights.medium};
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.text.secondary};
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-
-  @media (max-width: ${theme.breakpoints.lg}) {
-    grid-template-columns: 60px 2fr 1fr 120px 100px 120px;
-  }
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    grid-template-columns: 60px 2fr 1fr 120px;
-  }
-`;
-
-const CategoryRow = styled.div`
-  display: grid;
-  grid-template-columns: 60px 2fr 1fr 120px 100px 120px 120px 120px;
-  gap: ${theme.spacing[4]};
-  padding: ${theme.spacing[4]};
-  border-bottom: 1px solid ${theme.colors.border.light};
-  align-items: center;
-  transition: background ${theme.transitions.base};
-
-  &:hover {
-    background: ${theme.colors.background.accent};
-  }
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  @media (max-width: ${theme.breakpoints.lg}) {
-    grid-template-columns: 60px 2fr 1fr 120px 100px 120px;
-  }
-
-  @media (max-width: ${theme.breakpoints.md}) {
-    grid-template-columns: 60px 2fr 1fr 120px;
-  }
-`;
-
-const CategoryImage = styled.div`
-  width: 48px;
-  height: 48px;
-  border-radius: ${theme.borderRadius.md};
-  overflow: hidden;
-  background: ${theme.colors.background.light};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-`;
-
-const CategoryInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${theme.spacing[1]};
-`;
-
-const CategoryName = styled.div`
-  font-weight: ${theme.fontWeights.medium};
-  color: ${theme.colors.text.primary};
-  font-size: ${theme.fontSizes.base};
-`;
-
-const CategoryDescription = styled.div`
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.text.secondary};
-  line-height: 1.4;
-`;
-
-const CategorySlug = styled.div`
-  font-family: ${theme.fonts.primary};
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.text.secondary};
-  background: ${theme.colors.background.accent};
-  padding: ${theme.spacing[1]} ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.sm};
-  text-align: center;
-`;
-
-const CategoryStatus = styled.div<{ isActive: boolean }>`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacing[1]};
-  font-size: ${theme.fontSizes.sm};
-  font-weight: ${theme.fontWeights.medium};
-  color: ${({ isActive }) =>
-    isActive ? theme.colors.success : theme.colors.warning};
-  justify-content: center;
-`;
-
-const CategorySortOrder = styled.div`
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.text.secondary};
-  text-align: center;
-  font-weight: ${theme.fontWeights.medium};
-`;
-
-const CategoryDate = styled.div`
-  font-size: ${theme.fontSizes.sm};
-  color: ${theme.colors.text.secondary};
-  text-align: center;
-`;
-
-const CategoryActions = styled.div`
-  display: flex;
-  gap: ${theme.spacing[2]};
-  justify-content: center;
-  align-items: center;
-`;
-
-const ActionButton = styled.button`
-  background: none;
-  border: none;
-  color: ${theme.colors.text.secondary};
-  cursor: pointer;
-  padding: ${theme.spacing[2]};
-  border-radius: ${theme.borderRadius.sm};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all ${theme.transitions.base};
-
-  &:hover {
-    background: ${theme.colors.background.accent};
-    color: ${theme.colors.text.primary};
-  }
-
-  svg {
-    width: 16px;
-    height: 16px;
-  }
-`;
-
-const PaginationContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: ${theme.spacing[3]};
-  padding: ${theme.spacing[4]};
-  border-top: 1px solid ${theme.colors.border.light};
-  background: ${theme.colors.background.light};
-`;
-
-const PageButton = styled.button<{ isActive?: boolean }>`
-  padding: ${theme.spacing[2]} ${theme.spacing[3]};
-  border: 1px solid
-    ${({ isActive }) =>
-      isActive ? theme.colors.primaryPurple : theme.colors.border.light};
-  background: ${({ isActive }) =>
-    isActive ? theme.colors.primaryPurple : theme.colors.white};
-  color: ${({ isActive }) =>
-    isActive ? theme.colors.white : theme.colors.text.secondary};
-  border-radius: ${theme.borderRadius.md};
-  cursor: pointer;
-  transition: all ${theme.transitions.base};
-  font-size: ${theme.fontSizes.sm};
-
-  &:hover {
-    background: ${({ isActive }) =>
-      isActive ? theme.colors.primaryPurple : theme.colors.background.accent};
-    border-color: ${theme.colors.primaryPurple};
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-export const CategoryListView: React.FC<CategoryListViewProps> = ({
-  categories,
-  loading = false,
-  error = null,
-  total,
-  currentPage,
-  totalPages,
-  hasMore: _hasMore,
-  onPageChange,
-  onEdit,
-  onDelete,
-  onToggleStatus,
-  onViewDetails,
-  onSort: _onSort,
-  onFilter: _onFilter,
-}) => {
-  if (loading) {
-    return (
-      <ListViewContainer>
-        <div style={{ padding: theme.spacing[12], textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', marginBottom: theme.spacing[4] }}>
-            ⏳
+export const CategoryListView = memo<CategoryListViewProps>(
+  ({
+    categories,
+    loading = false,
+    error = null,
+    total,
+    currentPage,
+    totalPages,
+    onPageChange,
+    onEdit,
+    onDelete,
+    onToggleStatus,
+    onViewDetails,
+  }) => {
+    if (loading) {
+      return (
+        <div className='overflow-hidden rounded-lg border border-border bg-card'>
+          <div className='py-12 text-center'>
+            <div className='text-2xl'>⏳</div>
+            <h3 className='mt-4 font-medium text-foreground'>
+              Cargando categorías...
+            </h3>
           </div>
-          <h3>Cargando categorías...</h3>
         </div>
-      </ListViewContainer>
-    );
-  }
+      );
+    }
 
-  if (error) {
-    return (
-      <ListViewContainer>
-        <div style={{ padding: theme.spacing[12], textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', marginBottom: theme.spacing[4] }}>
-            ❌
+    if (error) {
+      return (
+        <div className='overflow-hidden rounded-lg border border-border bg-card'>
+          <div className='py-12 text-center'>
+            <div className='text-2xl'>❌</div>
+            <h3 className='mt-4 font-medium text-foreground'>
+              Error al cargar categorías
+            </h3>
+            <p className='text-sm text-muted-foreground'>{error}</p>
           </div>
-          <h3>Error al cargar categorías</h3>
-          <p>{error}</p>
         </div>
-      </ListViewContainer>
-    );
-  }
+      );
+    }
 
-  if (categories.length === 0) {
-    return (
-      <ListViewContainer>
-        <div style={{ padding: theme.spacing[12], textAlign: 'center' }}>
-          <div style={{ fontSize: '2rem', marginBottom: theme.spacing[4] }}>
-            📁
+    if (categories.length === 0) {
+      return (
+        <div className='overflow-hidden rounded-lg border border-border bg-card'>
+          <div className='py-12 text-center'>
+            <div className='text-2xl'>📁</div>
+            <h3 className='mt-4 font-medium text-foreground'>
+              No hay categorías
+            </h3>
+            <p className='text-sm text-muted-foreground'>
+              No se encontraron categorías para mostrar
+            </p>
           </div>
-          <h3>No hay categorías</h3>
-          <p>No se encontraron categorías para mostrar</p>
         </div>
-      </ListViewContainer>
-    );
-  }
+      );
+    }
 
-  return (
-    <ListViewContainer>
-      <ListViewHeader>
-        <ViewToggleContainer>
-          <ViewToggleButton isActive={true}>
-            <List size={16} /> Lista
-          </ViewToggleButton>
-          <ViewToggleButton isActive={false}>
-            <Grid3X3 size={16} /> Grid
-          </ViewToggleButton>
-        </ViewToggleContainer>
-        <CategoryCount>
-          Mostrando {categories.length} de {total} categorías
-        </CategoryCount>
-        <HeaderActions>
-          <Button variant='outline' size='small'>
-            <Filter size={14} />
-            Filtros
-          </Button>
-          <Button variant='outline' size='small'>
-            <Download size={14} />
-            Exportar
-          </Button>
-          <Button variant='outline' size='small'>
-            <Settings size={14} />
-            Acciones
-          </Button>
-        </HeaderActions>
-      </ListViewHeader>
+    return (
+      <div className='overflow-hidden rounded-lg border border-border bg-card'>
+        {/* Header */}
+        <div className='flex flex-wrap items-center justify-between gap-3 border-b border-border bg-muted/30 px-4 py-3'>
+          <p className='text-sm text-muted-foreground'>
+            Mostrando {categories.length} de {total} categorías
+          </p>
+        </div>
 
-      <CategoryTable>
-        <TableHeader>
-          <div>Imagen</div>
-          <div>Información</div>
-          <div>Slug</div>
-          <div>Estado</div>
-          <div>Orden</div>
-          <div>Creado</div>
-          <div>Actualizado</div>
-          <div>Acciones</div>
-        </TableHeader>
+        {/* Table */}
+        <div className='overflow-x-auto'>
+          <table className='w-full text-sm'>
+            <thead>
+              <tr className='border-b border-border bg-muted/20 text-xs font-medium uppercase tracking-wide text-muted-foreground'>
+                <th className='px-4 py-3 text-left'>Imagen</th>
+                <th className='px-4 py-3 text-left'>Información</th>
+                <th className='px-4 py-3 text-left'>Slug</th>
+                <th className='px-4 py-3 text-center'>Estado</th>
+                <th className='px-4 py-3 text-center'>Orden</th>
+                <th className='px-4 py-3 text-center'>Creado</th>
+                <th className='px-4 py-3 text-center'>Actualizado</th>
+                <th className='px-4 py-3 text-center'>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {categories.map(category => (
+                <tr
+                  key={category.id}
+                  className='border-b border-border/50 transition-colors hover:bg-muted/20'
+                >
+                  <td className='px-4 py-3'>
+                    <div className='flex h-10 w-10 items-center justify-center overflow-hidden rounded-md bg-muted'>
+                      {category.image ? (
+                        <img
+                          src={category.image}
+                          alt={category.name}
+                          className='h-full w-full object-cover'
+                        />
+                      ) : (
+                        <FolderIcon
+                          size={20}
+                          className='text-muted-foreground/50'
+                        />
+                      )}
+                    </div>
+                  </td>
 
-        {categories.map(category => (
-          <CategoryRow key={category.id}>
-            <CategoryImage>
-              {category.image ? (
-                <img src={category.image} alt={category.name} />
-              ) : (
-                <Folder size={24} color={theme.colors.warmGray} />
-              )}
-            </CategoryImage>
+                  <td className='px-4 py-3'>
+                    <p className='font-medium text-foreground'>
+                      {category.name}
+                    </p>
+                    {category.description ? (
+                      <p className='mt-0.5 max-w-xs truncate text-xs text-muted-foreground'>
+                        {category.description}
+                      </p>
+                    ) : null}
+                  </td>
 
-            <CategoryInfo>
-              <CategoryName>{category.name}</CategoryName>
-              {category.description ? (
-                <CategoryDescription>
-                  {category.description}
-                </CategoryDescription>
-              ) : null}
-            </CategoryInfo>
+                  <td className='px-4 py-3'>
+                    <span className='rounded bg-muted px-2 py-0.5 font-mono text-xs text-muted-foreground'>
+                      {category.slug}
+                    </span>
+                  </td>
 
-            <CategorySlug>{category.slug}</CategorySlug>
+                  <td className='px-4 py-3'>
+                    <span
+                      className={cn(
+                        'flex items-center justify-center gap-1 text-xs font-medium',
+                        category.isActive ? 'text-green-600' : 'text-amber-600'
+                      )}
+                    >
+                      {category.isActive ? (
+                        <CheckCircleIcon size={14} />
+                      ) : (
+                        <XCircleIcon size={14} />
+                      )}
+                      {category.isActive ? 'Activa' : 'Inactiva'}
+                    </span>
+                  </td>
 
-            <CategoryStatus isActive={category.isActive}>
-              {category.isActive ? (
-                <CheckCircle size={14} />
-              ) : (
-                <XCircle size={14} />
-              )}
-              {category.isActive ? 'Activa' : 'Inactiva'}
-            </CategoryStatus>
+                  <td className='px-4 py-3 text-center text-muted-foreground'>
+                    {category.sortOrder}
+                  </td>
 
-            <CategorySortOrder>{category.sortOrder}</CategorySortOrder>
+                  <td className='px-4 py-3 text-center text-muted-foreground'>
+                    {new Date(category.createdAt).toLocaleDateString()}
+                  </td>
 
-            <CategoryDate>
-              {new Date(category.createdAt).toLocaleDateString()}
-            </CategoryDate>
+                  <td className='px-4 py-3 text-center text-muted-foreground'>
+                    {new Date(category.updatedAt).toLocaleDateString()}
+                  </td>
 
-            <CategoryDate>
-              {new Date(category.updatedAt).toLocaleDateString()}
-            </CategoryDate>
+                  <td className='px-4 py-3'>
+                    <div className='flex items-center justify-center gap-1'>
+                      <ActionBtn
+                        onClick={() => onViewDetails(category.id)}
+                        title='Ver detalles'
+                      >
+                        <EyeIcon size={16} />
+                      </ActionBtn>
+                      <ActionBtn
+                        onClick={() => onEdit(category.id)}
+                        title='Editar'
+                      >
+                        <EditIcon size={16} />
+                      </ActionBtn>
+                      <ActionBtn
+                        onClick={() =>
+                          onToggleStatus(category.id, !category.isActive)
+                        }
+                        title='Cambiar estado'
+                      >
+                        {category.isActive ? (
+                          <XCircleIcon size={16} />
+                        ) : (
+                          <CheckCircleIcon size={16} />
+                        )}
+                      </ActionBtn>
+                      <ActionBtn
+                        onClick={() => onDelete(category.id)}
+                        title='Eliminar'
+                        className='hover:bg-destructive/10 hover:text-destructive'
+                      >
+                        <Trash2Icon size={16} />
+                      </ActionBtn>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-            <CategoryActions>
-              <ActionButton
-                onClick={() => onViewDetails(category.id)}
-                title='Ver detalles'
-              >
-                <Eye size={16} />
-              </ActionButton>
-              <ActionButton onClick={() => onEdit(category.id)} title='Editar'>
-                <Edit size={16} />
-              </ActionButton>
-              <ActionButton
-                onClick={() => onToggleStatus(category.id, !category.isActive)}
-                title='Cambiar estado'
-              >
-                {category.isActive ? (
-                  <XCircle size={16} />
-                ) : (
-                  <CheckCircle size={16} />
-                )}
-              </ActionButton>
-              <ActionButton
-                onClick={() => onDelete(category.id)}
-                title='Eliminar'
-              >
-                <Trash2 size={16} />
-              </ActionButton>
-            </CategoryActions>
-          </CategoryRow>
-        ))}
-      </CategoryTable>
-
-      {totalPages > 1 && (
-        <PaginationContainer>
-          <PageButton
-            onClick={() => onPageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Anterior
-          </PageButton>
-
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-            <PageButton
-              key={page}
-              isActive={page === currentPage}
-              onClick={() => onPageChange(page)}
+        {/* Pagination */}
+        {totalPages > 1 ? (
+          <div className='flex items-center justify-center gap-2 border-t border-border bg-muted/30 p-4'>
+            <button
+              onClick={() => onPageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className='rounded border border-border bg-background px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-primary hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50'
             >
-              {page}
-            </PageButton>
-          ))}
+              Anterior
+            </button>
 
-          <PageButton
-            onClick={() => onPageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-          >
-            Siguiente
-          </PageButton>
-        </PaginationContainer>
-      )}
-    </ListViewContainer>
-  );
-};
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+              <button
+                key={page}
+                onClick={() => onPageChange(page)}
+                className={cn(
+                  'rounded border px-3 py-1.5 text-sm transition-colors',
+                  page === currentPage
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-border bg-background text-muted-foreground hover:border-primary hover:bg-muted'
+                )}
+              >
+                {page}
+              </button>
+            ))}
+
+            <button
+              onClick={() => onPageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className='rounded border border-border bg-background px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-primary hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50'
+            >
+              Siguiente
+            </button>
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+);
+CategoryListView.displayName = 'CategoryListView';
