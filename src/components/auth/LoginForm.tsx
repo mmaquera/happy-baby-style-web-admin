@@ -64,13 +64,7 @@ export const LoginForm: React.FC = () => {
           placeholder='admin@happybabystyle.com'
           leftIcon={<MailIcon size={18} />}
           fullWidth
-          {...register('email', {
-            required: 'El correo electrónico es requerido',
-            pattern: {
-              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-              message: 'Ingresa un correo electrónico válido',
-            },
-          })}
+          {...register('email')}
           error={errors.email?.message ?? ''}
         />
 
@@ -88,13 +82,7 @@ export const LoginForm: React.FC = () => {
             showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
           }
           fullWidth
-          {...register('password', {
-            required: 'La contraseña es requerida',
-            minLength: {
-              value: 6,
-              message: 'La contraseña debe tener al menos 6 caracteres',
-            },
-          })}
+          {...register('password')}
           error={errors.password?.message ?? ''}
         />
 

@@ -1,21 +1,18 @@
 import type React from 'react';
-import { theme } from '@/styles/theme';
+import XIcon from 'lucide-react/dist/esm/icons/x';
+import PlusIcon from 'lucide-react/dist/esm/icons/plus';
+import ImageIcon from 'lucide-react/dist/esm/icons/image';
+import PackageIcon from 'lucide-react/dist/esm/icons/package';
+import TagIcon from 'lucide-react/dist/esm/icons/tag';
+import HashIcon from 'lucide-react/dist/esm/icons/hash';
+import FileTextIcon from 'lucide-react/dist/esm/icons/file-text';
+import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
+import SettingsIcon from 'lucide-react/dist/esm/icons/settings';
+import BadgeDollarSignIcon from 'lucide-react/dist/esm/icons/badge-dollar-sign';
+import RefreshCwIcon from 'lucide-react/dist/esm/icons/refresh-cw';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { ImageUpload } from '../ImageUpload';
-import {
-  X,
-  Plus,
-  Image as ImageIcon,
-  Package,
-  Tag,
-  Hash,
-  FileText,
-  CheckCircle,
-  Settings,
-  BadgeDollarSign,
-  RefreshCw,
-} from 'lucide-react';
 import type { Category, TagWithMetadata } from '../types';
 import type { UseProductFormReturn } from './useProductForm';
 import {
@@ -44,16 +41,13 @@ import {
 export interface ProductFormFieldsProps {
   form: UseProductFormReturn;
   isLoading: boolean;
-  // External data
   activeTags: TagWithMetadata;
   availableCategories: Category[];
   categoriesLoading: boolean;
   categoriesError: string | null;
   tagsLoading: boolean;
   availableTags?: string[] | undefined;
-  // Callbacks requiring external hooks
   onCreateTag: () => Promise<void>;
-  // Rendering config
   entityType: 'product-draft' | 'product-edit';
   skuHint: string;
   showImagePreview?: boolean;
@@ -105,7 +99,7 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
       {/* Información Básica */}
       <FormSection>
         <SectionTitle>
-          <FileText size={20} />
+          <FileTextIcon size={20} />
           Información Básica
         </SectionTitle>
 
@@ -119,7 +113,7 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
               value={formData.name}
               onChange={e => handleInputChange('name', e.target.value)}
               error={errors['name'] ?? ''}
-              leftIcon={<Package size={16} />}
+              leftIcon={<PackageIcon size={16} />}
             />
           </FormRow>
 
@@ -133,7 +127,7 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
                 value={formData.sku}
                 onChange={e => handleInputChange('sku', e.target.value)}
                 error={errors['sku'] ?? ''}
-                leftIcon={<Hash size={16} />}
+                leftIcon={<HashIcon size={16} />}
                 style={{ flex: 1 }}
               />
               <GenerateSkuButton
@@ -143,21 +137,12 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
                 onClick={handleGenerateSku}
                 title='Generar nuevo SKU automáticamente'
               >
-                <RefreshCw size={14} />
+                <RefreshCwIcon size={14} />
                 Generar
               </GenerateSkuButton>
             </SkuFieldContainer>
-            <div
-              style={{
-                fontSize: theme.fontSizes.xs,
-                color: theme.colors.text.secondary,
-                marginTop: theme.spacing[1],
-                display: 'flex',
-                alignItems: 'center',
-                gap: theme.spacing[1],
-              }}
-            >
-              <CheckCircle size={12} />
+            <div className='mt-1 flex items-center gap-1 text-xs text-muted-foreground'>
+              <CheckCircleIcon size={12} />
               {skuHint}
             </div>
           </FormRow>
@@ -187,37 +172,18 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
               ))}
             </Select>
             {categoriesLoading && availableCategories.length === 0 ? (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: theme.spacing[2],
-                  marginTop: theme.spacing[1],
-                  fontSize: theme.fontSizes.sm,
-                  color: theme.colors.text.secondary,
-                }}
-              >
-                <LoadingSpinner />
+              <div className='mt-1 flex items-center gap-2 text-sm text-muted-foreground'>
+                <LoadingSpinner className='h-4 w-4 border-2' />
                 Cargando categorías...
               </div>
             ) : null}
             {categoriesError && availableCategories.length === 0 ? (
-              <span
-                style={{
-                  color: theme.colors.error,
-                  fontSize: theme.fontSizes.sm,
-                }}
-              >
+              <span className='text-sm text-destructive'>
                 Error: {categoriesError}
               </span>
             ) : null}
             {errors['categoryId'] ? (
-              <span
-                style={{
-                  color: theme.colors.error,
-                  fontSize: theme.fontSizes.sm,
-                }}
-              >
+              <span className='text-sm text-destructive'>
                 {errors['categoryId']}
               </span>
             ) : null}
@@ -238,7 +204,7 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
       {/* Precios y Stock */}
       <FormSection>
         <SectionTitle>
-          <BadgeDollarSign size={20} />
+          <BadgeDollarSignIcon size={20} />
           Precios y Stock
         </SectionTitle>
 
@@ -255,7 +221,7 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
               value={formData.price}
               onChange={e => handleInputChange('price', e.target.value)}
               error={errors['price'] ?? ''}
-              leftIcon={<BadgeDollarSign size={16} />}
+              leftIcon={<BadgeDollarSignIcon size={16} />}
             />
           </FormRow>
 
@@ -269,7 +235,7 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
               value={formData.salePrice}
               onChange={e => handleInputChange('salePrice', e.target.value)}
               error={errors['salePrice'] ?? ''}
-              leftIcon={<BadgeDollarSign size={16} />}
+              leftIcon={<BadgeDollarSignIcon size={16} />}
             />
           </FormRow>
 
@@ -284,7 +250,7 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
               value={formData.stockQuantity}
               onChange={e => handleInputChange('stockQuantity', e.target.value)}
               error={errors['stockQuantity'] ?? ''}
-              leftIcon={<Package size={16} />}
+              leftIcon={<PackageIcon size={16} />}
             />
           </FormRow>
 
@@ -308,7 +274,7 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
       {/* Etiquetas */}
       <FormSection>
         <SectionTitle>
-          <Tag size={20} />
+          <TagIcon size={20} />
           Etiquetas y Categorización
         </SectionTitle>
 
@@ -325,14 +291,14 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
                 {...(meta?.color ? { color: meta.color } : {})}
                 title={meta?.description ?? 'Etiqueta del producto'}
               >
-                <Tag size={12} />
+                <TagIcon size={12} />
                 {tag}
               </TagChip>
             );
           })}
         </TagsContainer>
 
-        {allTagNames.length === 0 && (availableTags ?? []).length > 0 && (
+        {allTagNames.length === 0 && (availableTags ?? []).length > 0 ? (
           <TagsContainer>
             {(availableTags ?? []).map(tag => (
               <TagChip
@@ -340,30 +306,24 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
                 isSelected={formData.tags.includes(tag)}
                 onClick={() => handleTagToggle(tag)}
               >
-                <Tag size={12} />
+                <TagIcon size={12} />
                 {tag}
               </TagChip>
             ))}
           </TagsContainer>
-        )}
+        ) : null}
 
-        <div style={{ marginTop: theme.spacing[4] }}>
+        <div className='mt-4'>
           <FormLabel>Crear Nueva Etiqueta</FormLabel>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: theme.spacing[3],
-            }}
-          >
-            <div style={{ display: 'flex', gap: theme.spacing[2] }}>
+          <div className='flex flex-col gap-3'>
+            <div className='flex gap-2'>
               <Input
                 placeholder='Nombre de la etiqueta'
                 value={newTagName}
                 onChange={e => setNewTagName(e.target.value)}
-                leftIcon={<Tag size={16} />}
+                leftIcon={<TagIcon size={16} />}
               />
-              <div style={{ display: 'flex', gap: theme.spacing[1] }}>
+              <div className='flex gap-1'>
                 {['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'].map(
                   color => (
                     <button
@@ -393,7 +353,7 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
               placeholder='Descripción (opcional)'
               value={newTagDescription}
               onChange={e => setNewTagDescription(e.target.value)}
-              leftIcon={<Tag size={16} />}
+              leftIcon={<TagIcon size={16} />}
             />
             <Button
               type='button'
@@ -403,7 +363,7 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
               disabled={!newTagName.trim() || tagsLoading}
               isLoading={tagsLoading}
             >
-              <Plus size={16} />
+              <PlusIcon size={16} />
               Crear Etiqueta
             </Button>
           </div>
@@ -418,59 +378,22 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
         </SectionTitle>
 
         {showImagePreview && formData.images.length > 0 ? (
-          <div style={{ marginBottom: theme.spacing[4] }}>
+          <div className='mb-4'>
             <FormLabel>Imágenes Actuales del Producto</FormLabel>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
-                gap: theme.spacing[3],
-                marginTop: theme.spacing[2],
-              }}
-            >
+            <div className='mt-2 grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(120px,1fr))]'>
               {formData.images.map((image, index) => (
-                <div key={index} style={{ position: 'relative' }}>
+                <div key={index} className='group relative'>
                   <img
                     src={image}
                     alt={`Imagen ${index + 1}`}
-                    style={{
-                      width: '100%',
-                      height: '120px',
-                      objectFit: 'cover',
-                      borderRadius: theme.borderRadius.md,
-                      border: `2px solid ${theme.colors.border.light}`,
-                    }}
+                    className='h-[120px] w-full rounded-xl border-2 border-border/10 object-cover'
                   />
                   <button
                     type='button'
                     onClick={() => removeImage(index)}
-                    style={{
-                      position: 'absolute',
-                      top: '4px',
-                      right: '4px',
-                      background: theme.colors.error,
-                      color: theme.colors.white,
-                      border: 'none',
-                      borderRadius: '50%',
-                      width: '24px',
-                      height: '24px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '12px',
-                      transition: 'all 0.2s ease',
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.background = `${theme.colors.error}dd`;
-                      e.currentTarget.style.transform = 'scale(1.1)';
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.background = theme.colors.error;
-                      e.currentTarget.style.transform = 'scale(1)';
-                    }}
+                    className='absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full border-none bg-destructive text-white transition-all hover:scale-110 hover:bg-destructive/90'
                   >
-                    <X size={14} />
+                    <XIcon size={14} />
                   </button>
                 </div>
               ))}
@@ -488,46 +411,22 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
           disabled={isLoading}
         />
 
-        {formData.images.length > 0 && (
-          <div
-            style={{
-              marginTop: '12px',
-              padding: '12px',
-              background: 'rgba(34, 197, 94, 0.1)',
-              borderRadius: '8px',
-              border: '1px solid rgba(34, 197, 94, 0.2)',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                color: 'rgba(34, 197, 94, 0.8)',
-                fontSize: '14px',
-                fontWeight: '500',
-              }}
-            >
-              <div
-                style={{
-                  width: '8px',
-                  height: '8px',
-                  background: 'rgba(34, 197, 94, 0.8)',
-                  borderRadius: '50%',
-                }}
-              />
+        {formData.images.length > 0 ? (
+          <div className='mt-3 rounded-lg border border-green-500/20 bg-green-500/10 p-3'>
+            <div className='flex items-center gap-2 text-sm font-medium text-green-700'>
+              <div className='h-2 w-2 rounded-full bg-green-500/80' />
               {formData.images.length} imagen
               {formData.images.length !== 1 ? 'es' : ''} lista
               {formData.images.length !== 1 ? 's' : ''} para el producto
             </div>
           </div>
-        )}
+        ) : null}
       </FormSection>
 
       {/* Atributos Personalizados */}
       <FormSection>
         <SectionTitle>
-          <Settings size={20} />
+          <SettingsIcon size={20} />
           Atributos Personalizados
         </SectionTitle>
 
@@ -567,7 +466,7 @@ export const ProductFormFields: React.FC<ProductFormFieldsProps> = ({
               onClick={addAttribute}
               disabled={!newAttributeKey.trim() || !newAttributeValue.trim()}
             >
-              <Plus size={14} />
+              <PlusIcon size={14} />
               Agregar
             </AddAttributeButton>
           </AttributeRow>

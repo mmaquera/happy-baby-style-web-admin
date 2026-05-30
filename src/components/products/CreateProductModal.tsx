@@ -1,6 +1,10 @@
 import type React from 'react';
 import { useCallback, useEffect } from 'react';
-import { Package, X, Plus, AlertTriangle, CheckCircle } from 'lucide-react';
+import PackageIcon from 'lucide-react/dist/esm/icons/package';
+import XIcon from 'lucide-react/dist/esm/icons/x';
+import PlusIcon from 'lucide-react/dist/esm/icons/plus';
+import AlertTriangleIcon from 'lucide-react/dist/esm/icons/alert-triangle';
+import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
 import { Button } from '@/components/ui/Button';
 import type { Category, Product } from './types';
 import { useProductActions } from '@/hooks/useProductActions';
@@ -196,11 +200,11 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
 
         <ModalHeader>
           <ModalTitle>
-            <Package size={24} />
+            <PackageIcon size={24} />
             Crear Nuevo Producto
           </ModalTitle>
           <CloseButton onClick={onClose}>
-            <X size={20} />
+            <XIcon size={20} />
           </CloseButton>
         </ModalHeader>
 
@@ -208,13 +212,13 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
           <ModalBody>
             {(errors['submit'] ?? createError) ? (
               <ErrorMessage>
-                <AlertTriangle size={16} />
+                <AlertTriangleIcon size={16} />
                 {errors['submit'] ?? createError}
               </ErrorMessage>
             ) : null}
             {successMessage ? (
               <SuccessMessage>
-                <CheckCircle size={16} />
+                <CheckCircleIcon size={16} />
                 {successMessage}
               </SuccessMessage>
             ) : null}
@@ -244,7 +248,7 @@ export const CreateProductModal: React.FC<CreateProductModalProps> = ({
               disabled={isCreating}
               isLoading={isCreating}
             >
-              <Plus size={16} />
+              <PlusIcon size={16} />
               Crear Producto
             </Button>
           </ModalFooter>

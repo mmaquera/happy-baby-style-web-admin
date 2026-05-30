@@ -1,6 +1,10 @@
 import type React from 'react';
 import { useCallback, useEffect } from 'react';
-import { Edit3, X, Save, AlertTriangle, CheckCircle } from 'lucide-react';
+import Edit3Icon from 'lucide-react/dist/esm/icons/edit-3';
+import XIcon from 'lucide-react/dist/esm/icons/x';
+import SaveIcon from 'lucide-react/dist/esm/icons/save';
+import AlertTriangleIcon from 'lucide-react/dist/esm/icons/alert-triangle';
+import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
 import { Button } from '@/components/ui/Button';
 import type { Category, Product } from './types';
 import { useProductActions } from '@/hooks/useProductActions';
@@ -206,11 +210,11 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
 
         <ModalHeader>
           <ModalTitle>
-            <Edit3 size={24} />
+            <Edit3Icon size={24} />
             Editar Producto
           </ModalTitle>
           <CloseButton onClick={onClose}>
-            <X size={20} />
+            <XIcon size={20} />
           </CloseButton>
         </ModalHeader>
 
@@ -218,13 +222,13 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
           <ModalBody>
             {(errors['submit'] ?? updateError) ? (
               <ErrorMessage>
-                <AlertTriangle size={16} />
+                <AlertTriangleIcon size={16} />
                 {errors['submit'] ?? updateError}
               </ErrorMessage>
             ) : null}
             {successMessage ? (
               <SuccessMessage>
-                <CheckCircle size={16} />
+                <CheckCircleIcon size={16} />
                 {successMessage}
               </SuccessMessage>
             ) : null}
@@ -255,7 +259,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
               disabled={isUpdating}
               isLoading={isUpdating}
             >
-              <Save size={16} />
+              <SaveIcon size={16} />
               Guardar Cambios
             </Button>
           </ModalFooter>

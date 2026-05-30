@@ -1,4 +1,4 @@
-import { createApolloClientWithUnifiedMiddleware } from '@/services/graphql/UnifiedGraphQLMiddleware';
+import { createApolloClientWithUnifiedMiddleware } from './UnifiedGraphQLMiddleware';
 import { defaultGraphQLConfig } from '@/config/auth';
 import { typePolicies } from './typePolicies';
 
