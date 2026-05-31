@@ -10,13 +10,15 @@ import {
 import PackageIcon from 'lucide-react/dist/esm/icons/package';
 import CalendarIcon from 'lucide-react/dist/esm/icons/calendar';
 import { Button } from '@/components/ui/Button';
-import { useOrderActions } from '@/hooks/useOrderActions';
-import { OrderCard } from '@/components/orders/OrderCard';
-import { OrderFilters } from '@/components/orders/OrderFilters';
-import type { Order, OrderStatus } from '@happy-baby/domain-order';
+import {
+  useOrderActions,
+  OrderCard,
+  OrderFilters,
+} from '@happy-baby/feature-orders';
+import type { Order, OrderStatus } from '@happy-baby/feature-orders';
 
 const OrderDetailModal = lazy(() =>
-  import('@/components/orders/OrderDetailModal').then(m => ({
+  import('@happy-baby/feature-orders').then(m => ({
     default: m.OrderDetailModal,
   }))
 );

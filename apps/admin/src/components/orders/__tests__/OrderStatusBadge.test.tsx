@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { OrderStatusBadge, STATUS_CONFIG } from '../OrderStatusBadge';
+import { OrderStatusBadge, STATUS_CONFIG } from '@happy-baby/feature-orders';
 
 describe('OrderStatusBadge', () => {
   const statuses = [

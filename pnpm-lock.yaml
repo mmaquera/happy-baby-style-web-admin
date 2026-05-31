@@ -219,6 +219,12 @@ importers:
 
   libs/domain/user: {}
 
+  libs/features/categories: {}
+
+  libs/features/orders: {}
+
+  libs/features/products: {}
+
   libs/infrastructure/graphql: {}
 
   libs/infrastructure/monitoring: {}

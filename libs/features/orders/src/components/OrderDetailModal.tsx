@@ -2,8 +2,8 @@ import { memo } from 'react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import type { Order } from '@happy-baby/domain-order';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
+import { Card } from '@happy-baby/shared-ui';
+import { Button } from '@happy-baby/shared-ui';
 import { OrderStatusBadge } from './OrderStatusBadge';
 
 const currencyFormatter = new Intl.NumberFormat('es-CO', {

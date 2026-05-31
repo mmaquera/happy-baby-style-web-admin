@@ -3,7 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@happy-baby/feature-orders": ["../orders/src/index.ts"],
+      "@happy-baby/feature-orders": [
+        "../../../libs/features/orders/src/index.ts"
+      ],
       "@happy-baby/feature-categories": [
         "../../../libs/features/categories/src/index.ts"
       ],
@@ -45,5 +47,5 @@
       "@happy-baby/shared-stores": ["../../../libs/shared/stores/src/index.ts"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "../../../src/types/lucide-icons.d.ts"]
 }

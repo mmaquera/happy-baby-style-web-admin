@@ -7,6 +7,7 @@
       "@happy-baby/feature-products": [
         "../../../libs/features/products/src/index.ts"
       ],
+      "@happy-baby/feature-orders": ["../../features/orders/src/index.ts"],
       "@happy-baby/feature-categories": [
         "../../../libs/features/categories/src/index.ts"
       ]

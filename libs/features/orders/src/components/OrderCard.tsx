@@ -3,8 +3,8 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import EyeIcon from 'lucide-react/dist/esm/icons/eye';
 import type { Order, OrderStatus } from '@happy-baby/domain-order';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
+import { Card } from '@happy-baby/shared-ui';
+import { Button } from '@happy-baby/shared-ui';
 import { OrderStatusBadge, STATUS_CONFIG } from './OrderStatusBadge';
 
 const currencyFormatter = new Intl.NumberFormat('es-CO', {

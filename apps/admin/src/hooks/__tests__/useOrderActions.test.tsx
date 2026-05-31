@@ -1,5 +1,8 @@
+import React from 'react';
 import { renderHook, act } from '@testing-library/react';
 import { useOrderActions } from '../useOrderActions';
+import { OrderContext } from '@happy-baby/feature-orders';
+import type { OrderUseCases } from '@happy-baby/feature-orders';
 import { ok, err, DomainError } from '@happy-baby/domain-shared';
 import type { Order } from '@happy-baby/domain-order';
 
@@ -14,14 +17,15 @@ const mockUpdateStatusExecute = vi.fn();
 const mockCancelExecute = vi.fn();
 const mockGetExecute = vi.fn();
 
-vi.mock('@/app/di/orders', () => ({
-  useOrderUseCases: () => ({
-    list: { execute: mockListExecute },
-    updateStatus: { execute: mockUpdateStatusExecute },
-    cancel: { execute: mockCancelExecute },
-    get: { execute: mockGetExecute },
-  }),
-}));
+const mockUseCases = {
+  list: { execute: mockListExecute },
+  updateStatus: { execute: mockUpdateStatusExecute },
+  cancel: { execute: mockCancelExecute },
+  get: { execute: mockGetExecute },
+} as unknown as OrderUseCases;
+
+const wrapper = ({ children }: { children: React.ReactNode }) =>
+  React.createElement(OrderContext.Provider, { value: mockUseCases }, children);
 
 import { toast } from 'react-hot-toast';
 
@@ -57,7 +61,7 @@ describe('useOrderActions', () => {
   });
 
   it('initializes with empty state', () => {
-    const { result } = renderHook(() => useOrderActions());
+    const { result } = renderHook(() => useOrderActions(), { wrapper });
     expect(result.current.orders).toEqual([]);
     expect(result.current.total).toBe(0);
     expect(result.current.loading).toBe(false);
@@ -70,7 +74,7 @@ describe('useOrderActions', () => {
       mockListExecute.mockResolvedValueOnce(
         ok({ items: [order], total: 1, hasMore: false })
       );
-      const { result } = renderHook(() => useOrderActions());
+      const { result } = renderHook(() => useOrderActions(), { wrapper });
 
       await act(async () => {
         await result.current.loadOrders();
@@ -81,7 +85,7 @@ describe('useOrderActions', () => {
     });
 
     it('uses default limit=20, offset=0', async () => {
-      const { result } = renderHook(() => useOrderActions());
+      const { result } = renderHook(() => useOrderActions(), { wrapper });
 
       await act(async () => {
         await result.current.loadOrders();
@@ -91,7 +95,7 @@ describe('useOrderActions', () => {
     });
 
     it('passes filter when provided', async () => {
-      const { result } = renderHook(() => useOrderActions());
+      const { result } = renderHook(() => useOrderActions(), { wrapper });
 
       await act(async () => {
         await result.current.loadOrders({ status: 'pending' }, 10, 5);
@@ -108,7 +112,7 @@ describe('useOrderActions', () => {
       mockListExecute.mockResolvedValueOnce(
         err(new DomainError('Error carga', 'ERR'))
       );
-      const { result } = renderHook(() => useOrderActions());
+      const { result } = renderHook(() => useOrderActions(), { wrapper });
 
       await act(async () => {
         await result.current.loadOrders();
@@ -123,7 +127,7 @@ describe('useOrderActions', () => {
       mockListExecute.mockResolvedValueOnce(
         err(new DomainError('fail', 'ERR'))
       );
-      const { result } = renderHook(() => useOrderActions());
+      const { result } = renderHook(() => useOrderActions(), { wrapper });
 
       await act(async () => {
         await result.current.loadOrders();
@@ -143,7 +147,7 @@ describe('useOrderActions', () => {
       const updated = makeOrder('order-1', 'confirmed');
       mockUpdateStatusExecute.mockResolvedValueOnce(ok(updated));
 
-      const { result } = renderHook(() => useOrderActions());
+      const { result } = renderHook(() => useOrderActions(), { wrapper });
       await act(async () => {
         await result.current.loadOrders();
       });
@@ -155,7 +159,7 @@ describe('useOrderActions', () => {
     });
 
     it('shows success toast', async () => {
-      const { result } = renderHook(() => useOrderActions());
+      const { result } = renderHook(() => useOrderActions(), { wrapper });
 
       await act(async () => {
         const success = await result.current.updateStatus(
@@ -174,7 +178,7 @@ describe('useOrderActions', () => {
       mockUpdateStatusExecute.mockResolvedValueOnce(
         err(new DomainError('Error estado', 'ERR'))
       );
-      const { result } = renderHook(() => useOrderActions());
+      const { result } = renderHook(() => useOrderActions(), { wrapper });
 
       await act(async () => {
         const success = await result.current.updateStatus(
@@ -195,7 +199,7 @@ describe('useOrderActions', () => {
         ok({ items: [order], total: 1, hasMore: false })
       );
 
-      const { result } = renderHook(() => useOrderActions());
+      const { result } = renderHook(() => useOrderActions(), { wrapper });
       await act(async () => {
         await result.current.loadOrders();
       });
@@ -207,7 +211,7 @@ describe('useOrderActions', () => {
     });
 
     it('shows success toast', async () => {
-      const { result } = renderHook(() => useOrderActions());
+      const { result } = renderHook(() => useOrderActions(), { wrapper });
 
       await act(async () => {
         const success = await result.current.cancelOrder('order-1');
@@ -223,7 +227,7 @@ describe('useOrderActions', () => {
       mockCancelExecute.mockResolvedValueOnce(
         err(new DomainError('No se puede cancelar', 'ERR'))
       );
-      const { result } = renderHook(() => useOrderActions());
+      const { result } = renderHook(() => useOrderActions(), { wrapper });
 
       await act(async () => {
         const success = await result.current.cancelOrder('order-1');

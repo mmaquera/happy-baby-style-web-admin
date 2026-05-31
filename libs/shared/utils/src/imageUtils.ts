@@ -1,4 +1,4 @@
-import { logger } from '@/utils/logger';
+import { logger } from '@happy-baby/infrastructure-monitoring';
 
 /**
  * Utility functions for handling image URLs and paths

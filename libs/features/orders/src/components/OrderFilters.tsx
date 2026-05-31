@@ -2,8 +2,8 @@ import { memo } from 'react';
 import FilterIcon from 'lucide-react/dist/esm/icons/filter';
 import SearchIcon from 'lucide-react/dist/esm/icons/search';
 import type { OrderStatus } from '@happy-baby/domain-order';
-import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
+import { Input } from '@happy-baby/shared-ui';
+import { Button } from '@happy-baby/shared-ui';
 import { STATUS_CONFIG } from './OrderStatusBadge';
 
 const STATUS_OPTIONS = Object.entries(STATUS_CONFIG).map(
