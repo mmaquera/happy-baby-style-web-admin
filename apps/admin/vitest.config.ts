@@ -106,6 +106,8 @@ export default defineConfig({
     include: [
       'apps/admin/src/**/__tests__/**/*.{test,spec}.{ts,tsx}',
       'apps/admin/src/**/*.{test,spec}.{ts,tsx}',
+      'libs/**/__tests__/**/*.{test,spec}.{ts,tsx}',
+      'libs/**/*.{test,spec}.{ts,tsx}',
     ],
     exclude: ['node_modules', 'dist'],
     clearMocks: true,
