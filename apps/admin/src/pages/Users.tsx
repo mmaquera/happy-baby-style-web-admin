@@ -11,7 +11,7 @@ import UsersIcon from 'lucide-react/dist/esm/icons/users';
 import ShieldIcon from 'lucide-react/dist/esm/icons/shield';
 import UserPlusIcon from 'lucide-react/dist/esm/icons/user-plus';
 import type { User, UserRole, CreateUserInput } from '@happy-baby/domain-user';
-import type { CreateUserProfileInput } from '@/generated/graphql';
+import type { CreateUserProfileInput } from '@happy-baby/infrastructure-graphql';
 import { useUserActions } from '@happy-baby/feature-users';
 import { useUserStats } from '@happy-baby/feature-users';
 import { useProviderUtils } from '@happy-baby/feature-auth';

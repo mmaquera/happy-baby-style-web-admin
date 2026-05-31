@@ -86,6 +86,7 @@ export const ProductDetail: React.FC = () => {
 
   const handleDelete = useCallback(() => {
     if (
+      // eslint-disable-next-line no-alert
       window.confirm('¿Estás seguro de que quieres eliminar este producto?')
     ) {
       logger.debug('Delete product:', product.id);

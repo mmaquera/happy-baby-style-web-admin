@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { useCategoryFilters } from '@happy-baby/feature-categories';
-import type { Category } from '@/generated/graphql';
+import type { Category } from '@happy-baby/infrastructure-graphql';
 
 const makeCategory = (overrides: Partial<Category> = {}): Category => ({
   __typename: 'Category',

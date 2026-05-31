@@ -6,7 +6,6 @@ import { ProductProvider } from '@/app/di/products';
 import {
   CreateProductDocument,
   DeleteProductDocument,
-  UpdateProductDocument,
 } from '@happy-baby/infrastructure-graphql';
 
 vi.mock('react-hot-toast', () => ({

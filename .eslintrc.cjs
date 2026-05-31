@@ -15,45 +15,11 @@ module.exports = {
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs', '*.config.js', '*.config.ts'],
   parser: '@typescript-eslint/parser',
-  plugins: ['react-refresh', '@typescript-eslint', 'react', 'prettier', 'boundaries'],
+  plugins: ['react-refresh', '@typescript-eslint', 'react', 'prettier', '@nx'],
   settings: {
     react: {
       version: 'detect',
     },
-    // TypeScript path alias resolution — used by eslint-plugin-boundaries
-    // to resolve @/ imports to their real src/ paths before matching elements.
-    'import/resolver': {
-      typescript: {
-        alwaysTryTypes: true,
-        project: './apps/admin/tsconfig.json',
-      },
-    },
-    // ─── Architectural boundaries (Clean Architecture) ───────────────────
-    // Patterns are relative to boundaries/root-path (= ./apps/admin/src).
-    // Rule: domain ← application ← infrastructure ← app/di ← presentation
-    // Dependency arrow means "can import from"; arrows only go inward.
-    'boundaries/root-path': './apps/admin/src',
-    'boundaries/elements': [
-      { type: 'domain',         pattern: 'core/domain/**' },
-      { type: 'application',    pattern: 'core/application/**' },
-      { type: 'shared',         pattern: 'core/shared/**' },
-      { type: 'infrastructure', pattern: 'infrastructure/**' },
-      { type: 'app-di',         pattern: 'app/**' },
-      { type: 'generated',      pattern: 'generated/**' },
-      // legacy paths (migrating in Fase 2 — no dependency restrictions yet)
-      // src/graphql/ holds .graphql schema files (not TS) — excluded from boundaries
-      { type: 'legacy',         pattern: 'services/**' },
-      // presentation (components, hooks, pages, contexts)
-      {
-        type: 'presentation',
-        pattern: ['components/**', 'pages/**', 'hooks/**', 'contexts/**'],
-      },
-      // shared utilities (no app logic, no React)
-      { type: 'utils',   pattern: 'utils/**' },
-      { type: 'types',   pattern: 'types/**' },
-      { type: 'config',  pattern: 'config/**' },
-      { type: 'styles',  pattern: 'styles/**' },
-    ],
   },
   rules: {
     // SOLID Principles enforcement
@@ -161,37 +127,49 @@ module.exports = {
     // comma-dangle, semi, quotes — plugin:prettier/recommended disables them.
     'prettier/prettier': 'error',
 
-    // ─── Architectural dependency rules (Clean Architecture) ─────────────
-    // default: 'allow' keeps legacy files unrestricted; only the clean layers
-    // get explicit disallow rules. Tighten as Fase 2 migrates each module.
-    'boundaries/dependencies': [
+    // ─── NX module boundary enforcement ──────────────────────────────────
+    // Enforces the Clean Architecture layer rules using NX project graph tags.
+    // Tags are declared in each lib's project.json. Violations block the lint.
+    '@nx/enforce-module-boundaries': [
       'error',
       {
-        default: 'allow',
-        rules: [
-          // domain is the innermost layer — no outward imports allowed
+        enforceBuildableLibDependency: true,
+        allow: [],
+        depConstraints: [
+          // app can import from any lib layer
           {
-            from: { type: 'domain' },
-            disallow: {
-              to: { type: ['application', 'infrastructure', 'app-di', 'presentation', 'legacy'] },
-            },
+            sourceTag: 'type:app',
+            onlyDependOnLibsWithTags: ['type:feature', 'type:application', 'type:infrastructure', 'type:ui', 'type:domain', 'type:util'],
           },
-          // use cases depend only on domain/shared — never on infrastructure or UI
+          // feature libs: no direct infrastructure imports (go through application/domain)
           {
-            from: { type: 'application' },
-            disallow: {
-              to: { type: ['infrastructure', 'app-di', 'presentation', 'legacy'] },
-            },
+            sourceTag: 'type:feature',
+            onlyDependOnLibsWithTags: ['type:application', 'type:domain', 'type:ui', 'type:util', 'type:feature'],
           },
-          // infrastructure adapters must not reach into the composition root or UI
+          // use cases: only depend on domain (no infrastructure, no UI)
           {
-            from: { type: 'infrastructure' },
-            disallow: { to: { type: ['app-di', 'presentation'] } },
+            sourceTag: 'type:application',
+            onlyDependOnLibsWithTags: ['type:domain'],
           },
-          // presentation must go through app/di — never reach infrastructure directly
+          // infrastructure adapters: only domain + util (no feature, no application)
           {
-            from: { type: 'presentation' },
-            disallow: { to: { type: 'infrastructure' } },
+            sourceTag: 'type:infrastructure',
+            onlyDependOnLibsWithTags: ['type:domain', 'type:util'],
+          },
+          // UI components: only util (no domain logic, no infrastructure)
+          {
+            sourceTag: 'type:ui',
+            onlyDependOnLibsWithTags: ['type:util'],
+          },
+          // domain: pure — no external dependencies
+          {
+            sourceTag: 'type:domain',
+            onlyDependOnLibsWithTags: [],
+          },
+          // util: can only depend on other util libs
+          {
+            sourceTag: 'type:util',
+            onlyDependOnLibsWithTags: ['type:util'],
           },
         ],
       },
@@ -266,10 +244,14 @@ module.exports = {
       },
     },
     {
-      files: ['*.test.ts', '*.test.tsx', '*.spec.ts', '*.spec.tsx'],
+      files: ['*.test.ts', '*.test.tsx', '*.spec.ts', '*.spec.tsx', 'setupTests.ts'],
       rules: {
         '@typescript-eslint/no-explicit-any': 'off',
+        '@typescript-eslint/consistent-type-imports': 'off',
+        '@typescript-eslint/no-extra-non-null-assertion': 'off',
+        'react/display-name': 'off',
         'no-console': 'off',
+        'object-shorthand': 'off',
         // describe() callbacks grow with each test case — this is expected
         'max-lines-per-function': 'off',
       }

@@ -1,5 +1,5 @@
 import { userMapper, type UserDTO } from '@happy-baby/infrastructure-graphql';
-import { UserRole as GQLUserRole } from '@/generated/graphql';
+import { UserRole as GQLUserRole } from '@happy-baby/infrastructure-graphql';
 
 const BASE_DTO: UserDTO = {
   id: 'user-1',

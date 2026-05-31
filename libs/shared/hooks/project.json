@@ -1,0 +1,15 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "shared-hooks",
+  "projectType": "library",
+  "sourceRoot": "libs/shared/hooks/src",
+  "tags": ["type:util", "scope:shared"],
+  "targets": {
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit --project libs/shared/hooks/tsconfig.json"
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import { productMapper } from '@happy-baby/infrastructure-graphql';
-import type { Product as GQLProduct } from '@/generated/graphql';
+import type { Product as GQLProduct } from '@happy-baby/infrastructure-graphql';
 import type {
   CreateProductInput,
   UpdateProductInput,

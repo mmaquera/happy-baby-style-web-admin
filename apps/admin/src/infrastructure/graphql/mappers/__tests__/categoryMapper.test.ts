@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { categoryMapper } from '@happy-baby/infrastructure-graphql';
-import type { Category as GQLCategory } from '@/generated/graphql';
+import type { Category as GQLCategory } from '@happy-baby/infrastructure-graphql';
 
 const GQL_CATEGORY: GQLCategory = {
   __typename: 'Category',
