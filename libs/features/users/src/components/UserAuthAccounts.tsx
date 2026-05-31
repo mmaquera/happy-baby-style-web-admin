@@ -5,14 +5,15 @@ import ShieldIcon from 'lucide-react/dist/esm/icons/shield';
 import AlertTriangleIcon from 'lucide-react/dist/esm/icons/alert-triangle';
 import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
 import XCircleIcon from 'lucide-react/dist/esm/icons/x-circle';
-import { cn } from '@/lib/utils';
-import { type UserAccount, AuthProvider } from '@/types/unified';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
+import { cn } from '@happy-baby/shared-utils';
+import type { UserAccount } from '@happy-baby/infrastructure-graphql';
+import { AuthProvider } from '@happy-baby/infrastructure-graphql';
+import { Card } from '@happy-baby/shared-ui';
+import { Button } from '@happy-baby/shared-ui';
 import {
   useAccountManagement,
   useProviderUtils,
-} from '@/hooks/useAuthManagement';
+} from '@happy-baby/feature-auth';
 
 interface UserAuthAccountsProps {
   accounts: UserAccount[];

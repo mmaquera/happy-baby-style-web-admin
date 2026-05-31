@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MockedProvider } from '@apollo/client/testing';
-import { RegisterForm } from '../RegisterForm';
-import { RegisterUserDocument } from '@/generated/graphql';
+import { RegisterForm } from '@happy-baby/feature-auth';
+import { RegisterUserDocument } from '@happy-baby/infrastructure-graphql';
 
 vi.mock('react-hot-toast', () => ({
   default: { success: vi.fn(), error: vi.fn() },

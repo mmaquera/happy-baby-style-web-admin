@@ -9,14 +9,15 @@ import EyeIcon from 'lucide-react/dist/esm/icons/eye';
 import LockIcon from 'lucide-react/dist/esm/icons/lock';
 import UnlockIcon from 'lucide-react/dist/esm/icons/unlock';
 import UsersIcon from 'lucide-react/dist/esm/icons/users';
-import { cn } from '@/lib/utils';
-import { type User, AuthProvider } from '@/types/unified';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
+import { cn } from '@happy-baby/shared-utils';
+import type { User } from '@happy-baby/infrastructure-graphql';
+import { AuthProvider } from '@happy-baby/infrastructure-graphql';
+import { Card } from '@happy-baby/shared-ui';
+import { Button } from '@happy-baby/shared-ui';
 import {
   useAccountManagement,
   useUserImpersonation,
-} from '@/hooks/useAuthManagement';
+} from '@happy-baby/feature-auth';
 
 interface GoogleUserFeaturesProps {
   user: User;

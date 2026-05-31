@@ -1,12 +1,9 @@
-// Authentication Services Index - Following Clean Architecture
-// Single entry point for all authentication-related services
-
 export {
   UnifiedAuthService,
   AuthServiceFactory,
   AuthError,
   LocalTokenStorage,
-} from './UnifiedAuthService';
+} from '@happy-baby/feature-auth';
 
 export type {
   IAuthToken,
@@ -14,4 +11,4 @@ export type {
   IAuthResponse,
   IAuthError,
   ITokenStorage,
-} from '../../types/auth';
+} from '@happy-baby/feature-auth';

@@ -10,16 +10,16 @@ import {
   LogoutUserDocument,
   GetCurrentUserDocument,
   RegisterUserDocument,
-} from '@/generated/graphql';
-import { UserRole } from '@/types/unified';
+} from '@happy-baby/infrastructure-graphql';
+import { UserRole } from '@happy-baby/infrastructure-graphql';
 import {
   type IAuthToken,
   type IAuthUser,
   type IAuthResponse,
   type IAuthError,
   type ITokenStorage,
-} from '@/types/auth';
-import { logger } from '@/utils/logger';
+} from '../types/auth';
+import { logger } from '@happy-baby/infrastructure-monitoring';
 
 // Local storage implementation
 export class LocalTokenStorage implements ITokenStorage {

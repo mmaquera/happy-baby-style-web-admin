@@ -14,11 +14,11 @@ import GlobeIcon from 'lucide-react/dist/esm/icons/globe';
 import ActivityIcon from 'lucide-react/dist/esm/icons/activity';
 import AlertTriangleIcon from 'lucide-react/dist/esm/icons/alert-triangle';
 import InfoIcon from 'lucide-react/dist/esm/icons/info';
-import { cn } from '@/lib/utils';
-import { type UserSession } from '@/types/unified';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { useSessionManagement } from '@/hooks/useAuthManagement';
+import { cn } from '@happy-baby/shared-utils';
+import type { UserSession } from '@happy-baby/infrastructure-graphql';
+import { Card } from '@happy-baby/shared-ui';
+import { Button } from '@happy-baby/shared-ui';
+import { useSessionManagement } from '@happy-baby/feature-auth';
 
 interface UserSessionsManagerProps {
   userId: string;

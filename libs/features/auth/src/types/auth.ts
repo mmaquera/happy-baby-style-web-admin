@@ -1,7 +1,39 @@
 // Unified Authentication Types - Following Clean Architecture
 // Single source of truth for all authentication-related types
 
-import { type UserRole } from './unified';
+import type {
+  AuthProvider,
+  UserRole,
+} from '@happy-baby/infrastructure-graphql';
+
+export interface UserAccount {
+  id: string;
+  userId: string;
+  provider: AuthProvider;
+  providerAccountId: string;
+  accessToken?: string | null;
+  refreshToken?: string | null;
+  tokenType?: string | null;
+  scope?: string | null;
+  idToken?: string | null;
+  expiresAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserSession {
+  id: string;
+  userId: string;
+  sessionToken: string;
+  expiresAt: string;
+  userAgent?: string | null;
+  ipAddress?: string | null;
+  isActive: boolean;
+  accessToken: string;
+  refreshToken?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
 
 // Core authentication interfaces
 export interface IAuthToken {

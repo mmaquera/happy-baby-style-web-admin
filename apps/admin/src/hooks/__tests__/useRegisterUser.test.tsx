@@ -4,7 +4,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { MockedProvider } from '@apollo/client/testing';
 import { useRegisterUser } from '../useRegisterUser';
-import { RegisterUserDocument } from '@/generated/graphql';
+import { RegisterUserDocument } from '@happy-baby/infrastructure-graphql';
 
 // Mock react-hot-toast
 vi.mock('react-hot-toast', () => ({

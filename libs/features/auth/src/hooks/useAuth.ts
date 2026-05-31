@@ -13,9 +13,9 @@ import {
   type RegisterCredentials,
   type IAuthUser,
   AuthError,
-} from '../services/auth/AuthService';
-import { UserRole } from '../types/unified';
-import { logger } from '@/utils/logger';
+} from '../services/AuthService';
+import { UserRole } from '@happy-baby/infrastructure-graphql';
+import { logger } from '@happy-baby/infrastructure-monitoring';
 
 interface AuthState {
   user: IAuthUser | null;

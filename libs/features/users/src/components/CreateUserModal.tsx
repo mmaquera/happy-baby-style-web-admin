@@ -13,10 +13,13 @@ import EyeIcon from 'lucide-react/dist/esm/icons/eye';
 import EyeOffIcon from 'lucide-react/dist/esm/icons/eye-off';
 import LockIcon from 'lucide-react/dist/esm/icons/lock';
 import UserIcon from 'lucide-react/dist/esm/icons/user';
-import { cn } from '@/lib/utils';
-import { type CreateUserProfileInput, UserRole } from '@/generated/graphql';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { cn } from '@happy-baby/shared-utils';
+import {
+  type CreateUserProfileInput,
+  UserRole,
+} from '@happy-baby/infrastructure-graphql';
+import { Button } from '@happy-baby/shared-ui';
+import { Input } from '@happy-baby/shared-ui';
 import {
   createUserFormSchema,
   type CreateUserFormValues,

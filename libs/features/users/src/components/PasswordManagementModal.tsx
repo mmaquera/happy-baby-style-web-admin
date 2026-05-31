@@ -12,17 +12,17 @@ import AlertTriangleIcon from 'lucide-react/dist/esm/icons/alert-triangle';
 import ClockIcon from 'lucide-react/dist/esm/icons/clock';
 import LockIcon from 'lucide-react/dist/esm/icons/lock';
 import AlertCircleIcon from 'lucide-react/dist/esm/icons/alert-circle';
-import { cn } from '@/lib/utils';
+import { cn } from '@happy-baby/shared-utils';
 import type { User } from '@happy-baby/domain-user';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { useAccountManagement } from '@/hooks/useAuthManagement';
-import { useSetUserPassword } from '@/hooks/useSetUserPassword';
-import { usePasswordHistory } from '@/hooks/usePasswordHistory';
+import { Card } from '@happy-baby/shared-ui';
+import { Button } from '@happy-baby/shared-ui';
+import { Input } from '@happy-baby/shared-ui';
+import { useAccountManagement } from '@happy-baby/feature-auth';
+import { useSetUserPassword } from '@happy-baby/feature-auth';
+import { usePasswordHistory } from '@happy-baby/feature-auth';
 import { PasswordHistoryCard } from './PasswordHistoryCard';
 import toast from 'react-hot-toast';
-import { logger } from '@/utils/logger';
+import { logger } from '@happy-baby/infrastructure-monitoring';
 
 interface PasswordManagementModalProps {
   user: User;

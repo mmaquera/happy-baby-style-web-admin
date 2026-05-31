@@ -4,7 +4,8 @@ import { useRegisterForm } from '../useRegisterForm';
 const mockRegister = vi.fn();
 const mockClearError = vi.fn();
 
-vi.mock('../useRegisterUser', () => ({
+// Mock the actual lib file so the import inside useRegisterForm is intercepted
+vi.mock('../../../../../libs/features/auth/src/hooks/useRegisterUser', () => ({
   useRegisterUser: () => ({
     register: mockRegister,
     isLoading: false,
@@ -13,7 +14,7 @@ vi.mock('../useRegisterUser', () => ({
   }),
 }));
 
-vi.mock('@/generated/graphql', () => ({
+vi.mock('@happy-baby/infrastructure-graphql', () => ({
   UserRole: { customer: 'customer', admin: 'admin', staff: 'staff' },
 }));
 

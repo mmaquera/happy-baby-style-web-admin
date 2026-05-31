@@ -19,7 +19,7 @@ const mockNavigate = vi.fn();
 const mockLogin = vi.fn();
 const mockClearAuthError = vi.fn();
 
-vi.mock('../../contexts/AuthContext', () => ({
+vi.mock('../../../../../libs/features/auth/src/context/AuthContext', () => ({
   useAuth: () => ({
     login: mockLogin,
     isLoading: false,

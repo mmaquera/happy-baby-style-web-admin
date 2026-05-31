@@ -10,7 +10,7 @@ vi.mock('react-hot-toast', () => ({
 
 const mockMutate = vi.fn();
 
-vi.mock('@/generated/graphql', () => ({
+vi.mock('@happy-baby/infrastructure-graphql', () => ({
   useSetUserPasswordMutation: () => [
     mockMutate,
     { loading: false, error: null },
@@ -19,7 +19,8 @@ vi.mock('@/generated/graphql', () => ({
 
 const mockIsAuthenticated = vi.fn(() => true);
 
-vi.mock('../../contexts/AuthContext', () => ({
+// Mock the actual lib AuthContext so the import inside useSetUserPassword is intercepted
+vi.mock('../../../../../libs/features/auth/src/context/AuthContext', () => ({
   useAuth: () => ({ isAuthenticated: mockIsAuthenticated() }),
 }));
 

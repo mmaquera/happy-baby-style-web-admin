@@ -11,7 +11,8 @@
       "@happy-baby/feature-orders": ["../../features/orders/src/index.ts"],
       "@happy-baby/feature-categories": [
         "../../../libs/features/categories/src/index.ts"
-      ]
+      ],
+      "@happy-baby/feature-auth": ["../../../libs/features/auth/src/index.ts"]
     }
   },
   "include": ["src"]

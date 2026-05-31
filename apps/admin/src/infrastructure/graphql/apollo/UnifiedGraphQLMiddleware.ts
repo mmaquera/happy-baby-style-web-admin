@@ -10,8 +10,11 @@ import { createUploadLink } from 'apollo-upload-client';
 import { setContext } from '@apollo/client/link/context';
 import { onError } from '@apollo/client/link/error';
 import { RetryLink } from '@apollo/client/link/retry';
-import { LocalTokenStorage } from '@/services/auth/UnifiedAuthService';
-import { type GraphQLMiddlewareConfig, type ITokenStorage } from '@/types/auth';
+import { LocalTokenStorage } from '@happy-baby/feature-auth';
+import type {
+  GraphQLMiddlewareConfig,
+  ITokenStorage,
+} from '@happy-baby/feature-auth';
 import { logger } from '@/utils/logger';
 
 export class UnifiedGraphQLMiddleware {

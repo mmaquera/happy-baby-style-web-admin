@@ -1,9 +1,9 @@
 import type React from 'react';
 import { useState, useEffect } from 'react';
-import { type UserRole } from '@/generated/graphql';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { logger } from '@/utils/logger';
+import { type UserRole } from '@happy-baby/infrastructure-graphql';
+import { Button } from '@happy-baby/shared-ui';
+import { Input } from '@happy-baby/shared-ui';
+import { logger } from '@happy-baby/infrastructure-monitoring';
 
 interface ProfileLike {
   firstName?: string | null;

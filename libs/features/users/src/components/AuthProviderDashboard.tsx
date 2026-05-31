@@ -6,14 +6,14 @@ import GlobeIcon from 'lucide-react/dist/esm/icons/globe';
 import ClockIcon from 'lucide-react/dist/esm/icons/clock';
 import MapPinIcon from 'lucide-react/dist/esm/icons/map-pin';
 import RefreshCwIcon from 'lucide-react/dist/esm/icons/refresh-cw';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
+import { Card } from '@happy-baby/shared-ui';
+import { Button } from '@happy-baby/shared-ui';
 import {
   useAuthProviderStats,
   useProviderUtils,
   type AuthProviderStats,
-} from '@/hooks/useAuthManagement';
-import { logger } from '@/utils/logger';
+} from '@happy-baby/feature-auth';
+import { logger } from '@happy-baby/infrastructure-monitoring';
 
 const formatDate = (date: string) =>
   new Date(date).toLocaleDateString('es-ES', {

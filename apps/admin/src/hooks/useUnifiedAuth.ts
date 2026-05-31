@@ -8,12 +8,9 @@ import {
   type ApolloClient,
   type NormalizedCacheObject,
 } from '@apollo/client';
-import {
-  AuthServiceFactory,
-  AuthError,
-} from '../services/auth/UnifiedAuthService';
-import { UserRole } from '../types/unified';
-import { type IAuthUser } from '../types/auth';
+import { AuthServiceFactory, AuthError } from '@happy-baby/feature-auth';
+import { UserRole } from '@happy-baby/infrastructure-graphql';
+import { type IAuthUser } from '@happy-baby/feature-auth';
 import { logger } from '@/utils/logger';
 
 // Hook state interface

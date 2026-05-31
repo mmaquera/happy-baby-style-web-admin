@@ -12,18 +12,18 @@ import KeyIcon from 'lucide-react/dist/esm/icons/key';
 import ActivityIcon from 'lucide-react/dist/esm/icons/activity';
 import AtSignIcon from 'lucide-react/dist/esm/icons/at-sign';
 import EditIcon from 'lucide-react/dist/esm/icons/edit';
-import { cn } from '@/lib/utils';
-import { type User } from '@/types';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
+import { cn } from '@happy-baby/shared-utils';
+import type { User } from '@happy-baby/infrastructure-graphql';
+import { Card } from '@happy-baby/shared-ui';
+import { Button } from '@happy-baby/shared-ui';
 import { UserAuthAccounts } from './UserAuthAccounts';
 import { UserSessionsManager } from './UserSessionsManager';
 import { GoogleUserFeatures } from './GoogleUserFeatures';
 import { UserProfileEditForm } from './UserProfileEditForm';
 import { UserAddressManager } from './UserAddressManager';
-import { useUserSessions } from '@/hooks/useAuthManagement';
-import { useUserProfile } from '@/hooks/useUserProfile';
-import { AuthProvider } from '@/types';
+import { useUserSessions } from '@happy-baby/feature-auth';
+import { useUserProfile } from '../hooks/useUserProfile';
+import { AuthProvider } from '@happy-baby/infrastructure-graphql';
 
 interface UserDetailModalProps {
   user: User;

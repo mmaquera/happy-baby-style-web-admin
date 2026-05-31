@@ -6,8 +6,8 @@ import ClockIcon from 'lucide-react/dist/esm/icons/clock';
 import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
 import AlertTriangleIcon from 'lucide-react/dist/esm/icons/alert-triangle';
 import ShieldIcon from 'lucide-react/dist/esm/icons/shield';
-import { cn } from '@/lib/utils';
-import { type PasswordAction } from '@/hooks/usePasswordHistory';
+import { cn } from '@happy-baby/shared-utils';
+import { type PasswordAction } from '@happy-baby/feature-auth';
 
 interface PasswordHistoryCardProps {
   actions: PasswordAction[];

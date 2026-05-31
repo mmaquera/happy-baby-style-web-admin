@@ -1,7 +1,7 @@
 // Authentication Configuration - Following Clean Architecture
 // Centralized configuration for all authentication-related settings
 
-import { type GraphQLMiddlewareConfig } from '../types/auth';
+import { type GraphQLMiddlewareConfig } from '@happy-baby/feature-auth';
 import { getCurrentGraphQLEndpoint } from './endpoints';
 
 // Environment detection - Using VITE directly

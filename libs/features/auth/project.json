@@ -1,0 +1,15 @@
+{
+  "name": "feature-auth",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/features/auth/src",
+  "projectType": "library",
+  "tags": ["type:feature", "scope:auth"],
+  "targets": {
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p libs/features/auth/tsconfig.json"
+      }
+    }
+  }
+}

@@ -10,6 +10,17 @@ export { UserStatsGrid } from './components/UserStatsGrid';
 export { UserActionsMenu } from './components/UserActionsMenu';
 export { EditUserModal } from './components/EditUserModal';
 export type { EditUserSubmitData } from './components/EditUserModal';
+export { CreateUserModal } from './components/CreateUserModal';
+export { UserDetailModal } from './components/UserDetailModal';
+export { UserAuthAccounts } from './components/UserAuthAccounts';
+export { UserSessionsManager } from './components/UserSessionsManager';
+export { PasswordManagementModal } from './components/PasswordManagementModal';
+export { PasswordHistoryCard } from './components/PasswordHistoryCard';
+export { AuthProviderDashboard } from './components/AuthProviderDashboard';
+export { GoogleUserFeatures } from './components/GoogleUserFeatures';
+export { UserProfileEditForm } from './components/UserProfileEditForm';
+export { UserAddressEditForm } from './components/UserAddressEditForm';
+export { UserAddressManager } from './components/UserAddressManager';
 
 // Hooks
 export { useUserActions } from './hooks/useUserActions';

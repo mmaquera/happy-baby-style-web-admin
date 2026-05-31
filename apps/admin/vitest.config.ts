@@ -84,6 +84,10 @@ export default defineConfig({
         __dirname,
         '../../libs/features/orders/src/index.ts'
       ),
+      '@happy-baby/feature-auth': path.resolve(
+        __dirname,
+        '../../libs/features/auth/src/index.ts'
+      ),
     },
   },
   test: {

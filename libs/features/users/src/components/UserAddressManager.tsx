@@ -1,9 +1,9 @@
 import type React from 'react';
 import { useState } from 'react';
-import { type UserAddress } from '@/types';
-import { Button } from '@/components/ui/Button';
+import type { UserAddress } from '@happy-baby/infrastructure-graphql';
+import { Button } from '@happy-baby/shared-ui';
 import { UserAddressEditForm } from './UserAddressEditForm';
-import { logger } from '@/utils/logger';
+import { logger } from '@happy-baby/infrastructure-monitoring';
 
 interface AddressInput {
   userId: string;

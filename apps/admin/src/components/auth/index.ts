@@ -1,12 +1,10 @@
-export { default as ProtectedRoute } from './ProtectedRoute';
-export { ProtectedRoute as ProtectedRouteComponent } from './ProtectedRoute';
-export { default as LogoutConfirmModal } from './LogoutConfirmModal';
-export { LogoutConfirmModal as LogoutConfirmModalComponent } from './LogoutConfirmModal';
-export { default as SessionInfo } from './SessionInfo';
-export { SessionInfo as SessionInfoComponent } from './SessionInfo';
-export { default as ForgotPasswordModal } from './ForgotPasswordModal';
-export { ForgotPasswordModal as ForgotPasswordModalComponent } from './ForgotPasswordModal';
-export { default as RegisterForm } from './RegisterForm';
-export { RegisterForm as RegisterFormComponent } from './RegisterForm';
-export { default as RegisterModal } from './RegisterModal';
-export { RegisterModal as RegisterModalComponent } from './RegisterModal';
+export {
+  ProtectedRoute,
+  LogoutConfirmModal,
+  SessionInfo,
+  ForgotPasswordModal,
+  RegisterForm,
+  RegisterModal,
+  LoginForm,
+  LoginLogo,
+} from '@happy-baby/feature-auth';

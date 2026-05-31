@@ -1,5 +1,5 @@
 import { logger } from '@/utils/logger';
-import type { IAuthUser } from '@/types/auth';
+import type { IAuthUser } from '@happy-baby/feature-auth';
 
 // AuthCache Service - Following SOLID principles and Clean Architecture
 // Single Responsibility: Manages authentication cache only

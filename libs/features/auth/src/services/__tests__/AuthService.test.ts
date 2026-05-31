@@ -5,7 +5,7 @@ import {
   type LoginCredentials,
   AuthError,
 } from '../AuthService';
-import { UserRole } from '../../../types/unified';
+import { UserRole } from '@happy-baby/infrastructure-graphql';
 
 // Mock Apollo Client
 const mockApolloClient = {

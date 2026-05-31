@@ -14,13 +14,13 @@ import type { User, UserRole, CreateUserInput } from '@happy-baby/domain-user';
 import type { CreateUserProfileInput } from '@/generated/graphql';
 import { useUserActions } from '@/hooks/useUserActions';
 import { useUserStats } from '@/hooks/useUsersGraphQL';
-import { useProviderUtils } from '@/hooks/useAuthManagement';
-import { AuthProvider } from '@/types';
+import { useProviderUtils } from '@happy-baby/feature-auth';
+import { AuthProvider } from '@happy-baby/infrastructure-graphql';
 import { Button } from '@/components/ui/Button';
-import { AuthProviderDashboard } from '@/components/users/AuthProviderDashboard';
-import { UserStatsGrid } from '@/components/users/UserStatsGrid';
-import { UserFilters } from '@/components/users/UserFilters';
-import { UserGridItem } from '@/components/users/UserGridItem';
+import { AuthProviderDashboard } from '@happy-baby/feature-users';
+import { UserStatsGrid } from '@happy-baby/feature-users';
+import { UserFilters } from '@happy-baby/feature-users';
+import { UserGridItem } from '@happy-baby/feature-users';
 import type { EditUserSubmitData } from '@happy-baby/feature-users';
 
 const EditUserModal = lazy(() =>
@@ -29,17 +29,17 @@ const EditUserModal = lazy(() =>
   }))
 );
 const CreateUserModal = lazy(() =>
-  import('@/components/users/CreateUserModal').then(m => ({
+  import('@happy-baby/feature-users').then(m => ({
     default: m.CreateUserModal,
   }))
 );
 const UserDetailModal = lazy(() =>
-  import('@/components/users/UserDetailModal').then(m => ({
+  import('@happy-baby/feature-users').then(m => ({
     default: m.UserDetailModal,
   }))
 );
 const PasswordManagementModal = lazy(() =>
-  import('@/components/users/PasswordManagementModal').then(m => ({
+  import('@happy-baby/feature-users').then(m => ({
     default: m.PasswordManagementModal,
   }))
 );

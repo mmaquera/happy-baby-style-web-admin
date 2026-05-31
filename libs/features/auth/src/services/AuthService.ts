@@ -9,9 +9,9 @@ import {
   RefreshTokenDocument,
   LogoutUserDocument,
   GetCurrentUserDocument,
-} from '@/generated/graphql';
-import { type UserRole } from '../../types/unified';
-import { logger } from '@/utils/logger';
+} from '@happy-baby/infrastructure-graphql';
+import type { UserRole } from '@happy-baby/infrastructure-graphql';
+import { logger } from '@happy-baby/infrastructure-monitoring';
 
 // Interfaces following Interface Segregation Principle
 export interface IAuthToken {

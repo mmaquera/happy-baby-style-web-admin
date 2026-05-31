@@ -1,0 +1,522 @@
+// AuthContext - Following SOLID principles and Clean Architecture
+// Single Responsibility: Manages authentication state only
+// Open/Closed: Extensible for new auth providers
+// Liskov Substitution: Consistent interface implementation
+// Interface Segregation: Specific interfaces for different concerns
+// Dependency Inversion: Depends on abstractions
+
+import type React from 'react';
+import {
+  createContext,
+  useContext,
+  useReducer,
+  useCallback,
+  useMemo,
+  useEffect,
+} from 'react';
+import { useApolloClient, type NormalizedCacheObject } from '@apollo/client';
+import type { ApolloClient } from '@apollo/client';
+import { toast } from 'react-hot-toast';
+import { AuthError, AuthServiceFactory } from '../services/UnifiedAuthService';
+import { type IAuthUser } from '../types/auth';
+import { UserRole } from '@happy-baby/infrastructure-graphql';
+import { logger } from '@happy-baby/infrastructure-monitoring';
+
+// Types following Interface Segregation Principle
+interface AuthState {
+  user: IAuthUser | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+  isInitialized: boolean;
+}
+
+interface AuthContextValue extends AuthState {
+  login: (credentials: { email: string; password: string }) => Promise<boolean>;
+  logout: () => Promise<void>;
+  refreshToken: () => Promise<void>;
+  clearError: () => void;
+  hasRole: (role: UserRole) => boolean;
+  hasAnyRole: (roles: UserRole[]) => boolean;
+}
+
+// Action types for reducer
+type AuthAction =
+  | { type: 'AUTH_INIT_START' }
+  | {
+      type: 'AUTH_INIT_SUCCESS';
+      payload: { user: IAuthUser | null; isAuthenticated: boolean };
+    }
+  | { type: 'AUTH_INIT_FAILURE'; payload: string }
+  | { type: 'LOGIN_START' }
+  | { type: 'LOGIN_SUCCESS'; payload: { user: IAuthUser } }
+  | { type: 'LOGIN_FAILURE'; payload: string }
+  | { type: 'LOGOUT_SUCCESS' }
+  | { type: 'CLEAR_ERROR' }
+  | { type: 'SET_LOADING'; payload: boolean };
+
+// Initial state
+const initialState: AuthState = {
+  user: null,
+  isAuthenticated: false,
+  isLoading: true,
+  error: null,
+  isInitialized: false,
+};
+
+// Reducer function following Single Responsibility Principle
+function authReducer(state: AuthState, action: AuthAction): AuthState {
+  switch (action.type) {
+    case 'AUTH_INIT_START':
+      return { ...state, isLoading: true, error: null };
+
+    case 'AUTH_INIT_SUCCESS':
+      return {
+        ...state,
+        user: action.payload.user,
+        isAuthenticated: action.payload.isAuthenticated,
+        isLoading: false,
+        error: null,
+        isInitialized: true,
+      };
+
+    case 'AUTH_INIT_FAILURE':
+      return {
+        ...state,
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+        error: action.payload,
+        isInitialized: true,
+      };
+
+    case 'LOGIN_START':
+      return { ...state, isLoading: true, error: null };
+
+    case 'LOGIN_SUCCESS':
+      return {
+        ...state,
+        user: action.payload.user,
+        isAuthenticated: true,
+        isLoading: false,
+        error: null,
+      };
+
+    case 'LOGIN_FAILURE':
+      return {
+        ...state,
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+        error: action.payload,
+      };
+
+    case 'LOGOUT_SUCCESS':
+      return {
+        ...state,
+        user: null,
+        isAuthenticated: false,
+        isLoading: false,
+        error: null,
+      };
+
+    case 'CLEAR_ERROR':
+      return { ...state, error: null };
+
+    case 'SET_LOADING':
+      return { ...state, isLoading: action.payload };
+
+    default:
+      return state;
+  }
+}
+
+// Create context
+export const AuthContext = createContext<AuthContextValue | undefined>(
+  undefined
+);
+
+// Provider component following Dependency Inversion Principle
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const client = useApolloClient() as ApolloClient<NormalizedCacheObject>;
+  const [state, dispatch] = useReducer(authReducer, initialState);
+
+  // Memoized auth service instance
+  const authService = useMemo(() => {
+    return AuthServiceFactory.createUnifiedAuthService(client);
+  }, [client]);
+
+  // Initialize authentication state
+  useEffect(() => {
+    const initializeAuth = async () => {
+      try {
+        dispatch({ type: 'AUTH_INIT_START' });
+
+        // First check if we have stored tokens and if they need refresh
+        if (authService.isAuthenticated()) {
+          // Tokens exist and are valid, try to get current user
+          try {
+            const user = await authService.getCurrentUser();
+            if (user) {
+              dispatch({
+                type: 'AUTH_INIT_SUCCESS',
+                payload: { user, isAuthenticated: true },
+              });
+              return;
+            }
+          } catch (error) {
+            logger.debug('Failed to get current user, trying token refresh...');
+          }
+
+          // If getCurrentUser failed, try to refresh the token
+          const tokens = authService.getStoredTokens();
+          if (tokens?.refreshToken) {
+            try {
+              await authService.refreshToken(tokens.refreshToken);
+              const user = await authService.getCurrentUser();
+              if (user) {
+                dispatch({
+                  type: 'AUTH_INIT_SUCCESS',
+                  payload: { user, isAuthenticated: true },
+                });
+                return;
+              }
+            } catch (refreshError) {
+              logger.debug('Token refresh failed, clearing tokens');
+              // Use the logout method which handles token clearing
+              await authService.logout();
+            }
+          }
+        }
+
+        // If we reach here, no valid authentication
+        dispatch({
+          type: 'AUTH_INIT_SUCCESS',
+          payload: { user: null, isAuthenticated: false },
+        });
+      } catch (error) {
+        logger.error('Auth initialization failed:', error);
+        dispatch({
+          type: 'AUTH_INIT_FAILURE',
+          payload:
+            error instanceof Error ? error.message : 'Authentication failed',
+        });
+      }
+    };
+
+    initializeAuth();
+  }, [authService]);
+
+  // ✅ Función para procesar errores del servidor siguiendo estándares
+  const processLoginError = useCallback((errorMessage: string): string => {
+    const errorLower = errorMessage.toLowerCase();
+
+    if (
+      errorLower.includes('invalid email') ||
+      errorLower.includes('invalid password')
+    ) {
+      return 'Credenciales incorrectas. Verifica tu email y contraseña.';
+    }
+
+    if (errorLower.includes('network') || errorLower.includes('connection')) {
+      return 'Error de conexión. Verifica tu internet e intenta nuevamente.';
+    }
+
+    if (errorLower.includes('server') || errorLower.includes('internal')) {
+      return 'Error del servidor. Intenta nuevamente en unos momentos.';
+    }
+
+    if (errorLower.includes('timeout')) {
+      return 'La solicitud tardó demasiado. Intenta nuevamente.';
+    }
+
+    if (
+      errorLower.includes('unauthorized') ||
+      errorLower.includes('unauthenticated')
+    ) {
+      return 'Sesión expirada. Por favor, inicia sesión nuevamente.';
+    }
+
+    return 'Error al iniciar sesión. Intenta nuevamente.';
+  }, []);
+
+  // ✅ Login function mejorado siguiendo estándares de ERROR_HANDLING_STANDARDS.md
+  const login = useCallback(
+    async (credentials: {
+      email: string;
+      password: string;
+    }): Promise<boolean> => {
+      try {
+        dispatch({ type: 'LOGIN_START' });
+
+        const response = await authService.login(credentials);
+
+        // ✅ PASO 4: Validar respuesta del servidor
+        if (!response.success || !response.user) {
+          const errorMessage =
+            response.message || 'Login failed - invalid response';
+          dispatch({
+            type: 'LOGIN_FAILURE',
+            payload: errorMessage,
+          });
+          // ✅ Toast de error para feedback inmediato
+          toast.error(errorMessage, {
+            duration: 5000,
+            position: 'top-right',
+          });
+          return false;
+        }
+
+        // ✅ PASO 5: Éxito
+        dispatch({
+          type: 'LOGIN_SUCCESS',
+          payload: { user: response.user },
+        });
+
+        // ✅ Toast de éxito para feedback inmediato
+        toast.success('¡Bienvenido! Sesión iniciada correctamente', {
+          duration: 3000,
+          position: 'top-right',
+        });
+
+        return true;
+      } catch (error) {
+        // ✅ PASO 6: Manejo de errores mejorado
+        let errorMessage = 'An unexpected error occurred during login';
+        let errorCode = 'LOGIN_FAILED';
+
+        if (error instanceof AuthError) {
+          errorMessage = error.message;
+          errorCode = error.code;
+        } else if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+
+        // ✅ Procesar errores del servidor para mensajes más descriptivos
+        const processedError = processLoginError(errorMessage);
+
+        // Log error for debugging (following development standards)
+        logger.error('Login error:', {
+          code: errorCode,
+          message: errorMessage,
+          processedError,
+          error: error instanceof Error ? error.stack : error,
+        });
+
+        dispatch({
+          type: 'LOGIN_FAILURE',
+          payload: processedError,
+        });
+
+        // ✅ Toast de error para feedback inmediato
+        toast.error(processedError, {
+          duration: 5000,
+          position: 'top-right',
+        });
+
+        return false;
+      }
+    },
+    [authService, processLoginError]
+  );
+
+  // Logout function
+  const logout = useCallback(async () => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+
+      await authService.logout();
+
+      dispatch({ type: 'LOGOUT_SUCCESS' });
+    } catch (error) {
+      logger.error('Logout failed:', error);
+
+      // Evaluar si debemos limpiar el estado local basado en el tipo de error
+      if (error instanceof AuthError) {
+        // Si es un error de autenticación, limpiar estado local
+        if (
+          error.code === 'UNAUTHENTICATED' ||
+          error.code === 'TOKEN_EXPIRED'
+        ) {
+          dispatch({ type: 'LOGOUT_SUCCESS' });
+        } else {
+          // Para otros errores de auth, mantener estado pero mostrar error
+          dispatch({ type: 'SET_LOADING', payload: false });
+          throw error; // Re-lanzar para que el hook pueda manejarlo
+        }
+      } else {
+        // Para errores de red o servidor, limpiar estado local como fallback
+        // pero registrar el error para debugging
+        logger.warn(
+          'Server logout failed, clearing local state as fallback:',
+          error
+        );
+        dispatch({ type: 'LOGOUT_SUCCESS' });
+      }
+    }
+  }, [authService]);
+
+  // Register es manejado por useRegisterUser (mutación GraphQL directa).
+  // Este fallback en AuthContext sólo hace login; se retirará al consolidar el flujo de auth.
+  const register = useCallback(
+    async (credentials: {
+      email: string;
+      password: string;
+      firstName?: string;
+      lastName?: string;
+    }): Promise<boolean> => {
+      try {
+        dispatch({ type: 'SET_LOADING', payload: true });
+
+        const success = await login({
+          email: credentials.email,
+          password: credentials.password,
+        });
+
+        dispatch({ type: 'SET_LOADING', payload: false });
+        return success;
+      } catch (_error) {
+        dispatch({ type: 'SET_LOADING', payload: false });
+        return false;
+      }
+    },
+    [login]
+  );
+
+  // Refresh token function
+  const refreshToken = useCallback(async () => {
+    try {
+      const tokens = authService.getStoredTokens();
+      if (!tokens?.refreshToken) {
+        throw new Error('No refresh token available');
+      }
+
+      await authService.refreshToken(tokens.refreshToken);
+
+      // Re-fetch current user
+      const user = await authService.getCurrentUser();
+      dispatch({
+        type: 'LOGIN_SUCCESS',
+        payload: { user: user! },
+      });
+    } catch (error) {
+      logger.error('Token refresh failed:', error);
+      // If refresh fails, logout user
+      await logout();
+    }
+  }, [authService, logout]);
+
+  // Clear error function
+  const clearError = useCallback(() => {
+    dispatch({ type: 'CLEAR_ERROR' });
+  }, []);
+
+  // Auto-refresh token effect
+  useEffect(() => {
+    if (!state.isAuthenticated || !state.user) return;
+
+    const checkTokenExpiry = async () => {
+      try {
+        if (authService.shouldRefreshToken()) {
+          const tokens = authService.getStoredTokens();
+          if (tokens?.refreshToken) {
+            await authService.refreshToken(tokens.refreshToken);
+            logger.debug('Token refreshed automatically');
+          }
+        }
+      } catch (error) {
+        logger.error('Auto token refresh failed:', error);
+        // If refresh fails, logout the user
+        await logout();
+      }
+    };
+
+    // Check every minute
+    const interval = setInterval(checkTokenExpiry, 60000);
+
+    // Also check immediately
+    checkTokenExpiry();
+
+    return () => clearInterval(interval);
+  }, [state.isAuthenticated, state.user, authService, logout]);
+
+  // Role checking utilities
+  const hasRole = useCallback(
+    (role: UserRole): boolean => {
+      return state.user?.role === role;
+    },
+    [state.user]
+  );
+
+  const hasAnyRole = useCallback(
+    (roles: UserRole[]): boolean => {
+      return state.user ? roles.includes(state.user.role) : false;
+    },
+    [state.user]
+  );
+
+  // Memoized context value to prevent unnecessary re-renders
+  const contextValue = useMemo<AuthContextValue>(
+    () => ({
+      ...state,
+      login,
+      logout,
+      register,
+      refreshToken,
+      clearError,
+      hasRole,
+      hasAnyRole,
+    }),
+    [
+      state,
+      login,
+      logout,
+      register,
+      refreshToken,
+      clearError,
+      hasRole,
+      hasAnyRole,
+    ]
+  );
+
+  return (
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+  );
+};
+
+// Custom hook for using auth context
+export const useAuth = (): AuthContextValue => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
+// Custom hook for role-based access control
+export const useRoleAccess = (requiredRoles: UserRole[]) => {
+  const { user, isAuthenticated, hasAnyRole } = useAuth();
+
+  const hasAccess = useMemo(() => {
+    if (!isAuthenticated || !user) return false;
+    return hasAnyRole(requiredRoles);
+  }, [isAuthenticated, user, hasAnyRole, requiredRoles]);
+
+  return {
+    hasAccess,
+    user,
+    isAuthenticated,
+  };
+};
+
+// Custom hook for admin access
+export const useAdminAccess = () => {
+  return useRoleAccess([UserRole.admin]);
+};
+
+// Custom hook for staff access
+export const useStaffAccess = () => {
+  return useRoleAccess([UserRole.admin, UserRole.staff]);
+};
