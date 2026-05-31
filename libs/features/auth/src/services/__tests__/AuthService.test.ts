@@ -1,4 +1,8 @@
-import { type ApolloClient, InMemoryCache } from '@apollo/client';
+import {
+  type ApolloClient,
+  InMemoryCache,
+  type NormalizedCacheObject,
+} from '@apollo/client';
 import {
   AuthServiceFactory,
   GraphQLAuthService,
@@ -22,7 +26,7 @@ const mockApolloClient = {
   onClearStore: vi.fn(),
   onResetStore: vi.fn(),
   cache: new InMemoryCache(),
-} as unknown as ApolloClient<unknown>;
+} as unknown as ApolloClient<NormalizedCacheObject>;
 
 // Mock localStorage
 const localStorageMock = {
@@ -52,7 +56,7 @@ describe('AuthService', () => {
         const mockUser = {
           id: '1',
           email: 'test@example.com',
-          role: UserRole.ADMIN,
+          role: UserRole.admin,
           isActive: true,
           emailVerified: true,
           createdAt: new Date(),
@@ -201,7 +205,7 @@ describe('AuthService', () => {
         const mockUser = {
           id: '1',
           email: 'test@example.com',
-          role: UserRole.ADMIN,
+          role: UserRole.admin,
           isActive: true,
           emailVerified: true,
           createdAt: new Date(),
@@ -217,6 +221,8 @@ describe('AuthService', () => {
 
         vi.mocked(mockApolloClient.query).mockResolvedValue({
           data: { currentUser: mockUser },
+          loading: false,
+          networkStatus: 7,
         });
 
         const result = await authService.getCurrentUser();

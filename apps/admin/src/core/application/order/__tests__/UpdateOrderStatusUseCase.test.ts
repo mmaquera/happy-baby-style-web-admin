@@ -28,7 +28,7 @@ describe('UpdateOrderStatusUseCase', () => {
     expect(isErr(result)).toBe(true);
     if (isErr(result)) {
       expect(result.error).toBeInstanceOf(ValidationError);
-      expect(result.error.fields?.['id']).toBeDefined();
+      expect((result.error as ValidationError).fields?.['id']).toBeDefined();
     }
     expect(repo.updateStatus).not.toHaveBeenCalled();
   });
@@ -42,7 +42,9 @@ describe('UpdateOrderStatusUseCase', () => {
     expect(isErr(result)).toBe(true);
     if (isErr(result)) {
       expect(result.error).toBeInstanceOf(ValidationError);
-      expect(result.error.fields?.['status']).toBeDefined();
+      expect(
+        (result.error as ValidationError).fields?.['status']
+      ).toBeDefined();
     }
     expect(repo.updateStatus).not.toHaveBeenCalled();
   });

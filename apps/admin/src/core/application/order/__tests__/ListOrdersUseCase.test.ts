@@ -36,7 +36,7 @@ describe('ListOrdersUseCase', () => {
 
     if (isOk(result)) {
       expect(result.value.items).toHaveLength(1);
-      expect(result.value.items[0].id).toBe(MOCK_ORDER.id);
+      expect(result.value.items[0]!.id).toBe(MOCK_ORDER.id);
       expect(result.value.total).toBe(1);
       expect(result.value.hasMore).toBe(false);
     }

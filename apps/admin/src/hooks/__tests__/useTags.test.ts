@@ -90,7 +90,7 @@ describe('useTags', () => {
 
     it('fails when tag already exists', async () => {
       const { result } = renderHook(() => useTags());
-      const existingTag = Object.keys(result.current.allTags)[0];
+      const existingTag = Object.keys(result.current.allTags)[0]!;
 
       let response:
         | Awaited<ReturnType<typeof result.current.createTag>>
@@ -112,13 +112,13 @@ describe('useTags', () => {
   describe('updateTag', () => {
     it('updates an existing tag', async () => {
       const { result } = renderHook(() => useTags());
-      const tagName = Object.keys(result.current.allTags)[0];
+      const tagName = Object.keys(result.current.allTags)[0]!;
 
       await act(async () => {
         await result.current.updateTag(tagName, { color: '#123456' });
       });
 
-      expect(result.current.allTags[tagName].color).toBe('#123456');
+      expect(result.current.allTags[tagName]!.color).toBe('#123456');
     });
 
     it('fails when tag does not exist', async () => {
@@ -165,7 +165,7 @@ describe('useTags', () => {
 
     it('fails when trying to delete a default tag', async () => {
       const { result } = renderHook(() => useTags());
-      const defaultTag = Object.keys(result.current.allTags)[0];
+      const defaultTag = Object.keys(result.current.allTags)[0]!;
 
       let response:
         | Awaited<ReturnType<typeof result.current.deleteTag>>
@@ -182,12 +182,14 @@ describe('useTags', () => {
   describe('incrementUsage', () => {
     it('increments usage count of an existing tag', () => {
       const { result } = renderHook(() => useTags());
-      const tagName = Object.keys(result.current.allTags)[0];
-      const initialCount = result.current.allTags[tagName].usageCount;
+      const tagName = Object.keys(result.current.allTags)[0]!;
+      const initialCount = result.current.allTags[tagName]!.usageCount;
 
       act(() => result.current.incrementUsage(tagName));
 
-      expect(result.current.allTags[tagName].usageCount).toBe(initialCount + 1);
+      expect(result.current.allTags[tagName]!.usageCount).toBe(
+        initialCount + 1
+      );
     });
 
     it('does nothing for non-existent tag', () => {

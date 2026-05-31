@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MockedProvider } from '@apollo/client/testing';
 import { RegisterForm } from '@happy-baby/feature-auth';
@@ -289,8 +288,8 @@ describe('RegisterForm', () => {
     const [passwordToggle, confirmPasswordToggle] =
       screen.getAllByRole('button');
 
-    fireEvent.click(passwordToggle);
-    fireEvent.click(confirmPasswordToggle);
+    fireEvent.click(passwordToggle!);
+    fireEvent.click(confirmPasswordToggle!);
 
     expect(passwordInput).toHaveAttribute('type', 'text');
     expect(confirmPasswordInput).toHaveAttribute('type', 'text');

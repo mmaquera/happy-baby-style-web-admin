@@ -4,7 +4,10 @@
 import { renderHook, act } from '@testing-library/react';
 import { MockedProvider } from '@apollo/client/testing';
 import { useRegisterUser } from '../useRegisterUser';
-import { RegisterUserDocument } from '@happy-baby/infrastructure-graphql';
+import {
+  RegisterUserDocument,
+  UserRole,
+} from '@happy-baby/infrastructure-graphql';
 
 // Mock react-hot-toast
 vi.mock('react-hot-toast', () => ({
@@ -20,7 +23,7 @@ const mockRegisterUserMutation = {
       input: {
         email: 'test@example.com',
         password: 'password123',
-        role: 'customer',
+        role: UserRole.customer,
         firstName: 'John',
         lastName: 'Doe',
         isActive: true,
@@ -40,7 +43,7 @@ const mockRegisterUserMutation = {
           user: {
             id: '1',
             email: 'test@example.com',
-            role: 'customer',
+            role: UserRole.customer,
             isActive: true,
             emailVerified: false,
             lastLoginAt: null,
@@ -74,7 +77,7 @@ const mockErrorMutation = {
       input: {
         email: 'test@example.com',
         password: 'password123',
-        role: 'customer',
+        role: UserRole.customer,
         firstName: 'John',
         lastName: 'Doe',
         isActive: true,
@@ -116,7 +119,7 @@ describe('useRegisterUser', () => {
       const success = await result.current.register({
         email: 'test@example.com',
         password: 'password123',
-        role: 'customer',
+        role: UserRole.customer,
         firstName: 'John',
         lastName: 'Doe',
         isActive: true,
@@ -143,7 +146,7 @@ describe('useRegisterUser', () => {
       const success = await result.current.register({
         email: 'test@example.com',
         password: 'password123',
-        role: 'customer',
+        role: UserRole.customer,
         firstName: 'John',
         lastName: 'Doe',
         isActive: true,
@@ -168,7 +171,7 @@ describe('useRegisterUser', () => {
       const success = await result.current.register({
         email: '',
         password: '',
-        role: 'customer',
+        role: UserRole.customer,
         firstName: '',
         lastName: '',
         isActive: true,

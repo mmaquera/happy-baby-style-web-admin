@@ -155,7 +155,7 @@ describe('useOrderActions', () => {
         await result.current.updateStatus('order-1', 'confirmed');
       });
 
-      expect(result.current.orders[0].status).toBe('confirmed');
+      expect(result.current.orders[0]!.status).toBe('confirmed');
     });
 
     it('shows success toast', async () => {
@@ -207,7 +207,7 @@ describe('useOrderActions', () => {
         await result.current.cancelOrder('order-1');
       });
 
-      expect(result.current.orders[0].status).toBe('cancelled');
+      expect(result.current.orders[0]!.status).toBe('cancelled');
     });
 
     it('shows success toast', async () => {

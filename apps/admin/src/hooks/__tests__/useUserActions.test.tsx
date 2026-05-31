@@ -217,7 +217,7 @@ describe('useUserActions', () => {
         await result.current.activateUser('u-1');
       });
 
-      expect(result.current.users[0].isActive).toBe(true);
+      expect(result.current.users[0]!.isActive).toBe(true);
     });
 
     it('shows success toast', async () => {
@@ -259,7 +259,7 @@ describe('useUserActions', () => {
         await result.current.deactivateUser('u-1');
       });
 
-      expect(result.current.users[0].isActive).toBe(false);
+      expect(result.current.users[0]!.isActive).toBe(false);
     });
 
     it('shows success toast', async () => {

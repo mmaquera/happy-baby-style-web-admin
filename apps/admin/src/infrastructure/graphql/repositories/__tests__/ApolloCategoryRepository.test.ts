@@ -55,7 +55,7 @@ describe('ApolloCategoryRepository', () => {
       expect(isOk(result)).toBe(true);
       if (isOk(result)) {
         expect(result.value.items).toHaveLength(1);
-        expect(result.value.items[0].id).toBe('cat-1');
+        expect(result.value.items[0]!.id).toBe('cat-1');
       }
     });
 

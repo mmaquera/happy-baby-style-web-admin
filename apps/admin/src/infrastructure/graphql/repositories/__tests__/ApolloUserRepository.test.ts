@@ -62,7 +62,7 @@ describe('ApolloUserRepository', () => {
       expect(isOk(result)).toBe(true);
       if (isOk(result)) {
         expect(result.value.items).toHaveLength(1);
-        expect(result.value.items[0].id).toBe('u-1');
+        expect(result.value.items[0]!.id).toBe('u-1');
       }
     });
 

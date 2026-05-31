@@ -39,7 +39,7 @@ describe('categoryMapper.toDomain', () => {
   it('productCount es 0 si products es undefined', () => {
     const domain = categoryMapper.toDomain({
       ...GQL_CATEGORY,
-      products: undefined,
+      products: undefined as unknown as GQLCategory['products'],
     });
     expect(domain.productCount).toBe(0);
   });
@@ -78,7 +78,7 @@ describe('categoryMapper.toDomain', () => {
     const domain = categoryMapper.toDomain({
       ...GQL_CATEGORY,
       description: undefined,
-    });
+    } as unknown as GQLCategory);
     expect(domain.description).toBeNull();
   });
 });

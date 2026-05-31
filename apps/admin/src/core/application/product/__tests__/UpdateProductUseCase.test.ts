@@ -34,7 +34,7 @@ describe('UpdateProductUseCase', () => {
     expect(isErr(result)).toBe(true);
     if (isErr(result)) {
       expect(result.error).toBeInstanceOf(ValidationError);
-      expect(result.error.fields?.['id']).toBeDefined();
+      expect((result.error as ValidationError).fields?.['id']).toBeDefined();
     }
     expect(repo.update).not.toHaveBeenCalled();
   });
@@ -55,7 +55,7 @@ describe('UpdateProductUseCase', () => {
 
     expect(isErr(result)).toBe(true);
     if (isErr(result)) {
-      expect(result.error.fields?.['price']).toBeDefined();
+      expect((result.error as ValidationError).fields?.['price']).toBeDefined();
     }
     expect(repo.update).not.toHaveBeenCalled();
   });

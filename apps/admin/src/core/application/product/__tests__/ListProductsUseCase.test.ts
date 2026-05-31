@@ -27,7 +27,7 @@ describe('ListProductsUseCase', () => {
   });
 
   it('returns result from repository', async () => {
-    const { useCase, repo } = makeUseCase();
+    const { useCase } = makeUseCase();
 
     const result = await useCase.execute();
 

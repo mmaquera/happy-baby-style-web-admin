@@ -1,9 +1,13 @@
-import { orderMapper, type OrderDTO } from '@happy-baby/infrastructure-graphql';
+import {
+  orderMapper,
+  type OrderDTO,
+  OrderStatus,
+} from '@happy-baby/infrastructure-graphql';
 
 const BASE_DTO: OrderDTO = {
   id: 'order-1',
   orderNumber: 'ORD-001',
-  status: 'pending' as const,
+  status: OrderStatus.pending,
   subtotal: '80000',
   taxAmount: '8000',
   shippingAmount: '5000',
@@ -133,11 +137,11 @@ describe('orderMapper.toDomain', () => {
     const order = orderMapper.toDomain(dto);
 
     expect(order.items).toHaveLength(1);
-    expect(order.items[0].id).toBe('item-1');
-    expect(order.items[0].quantity).toBe(2);
-    expect(order.items[0].unitPrice).toBe(40000);
-    expect(order.items[0].totalPrice).toBe(80000);
-    expect(order.items[0].product?.name).toBe('Body Orgánico');
+    expect(order.items[0]!.id).toBe('item-1');
+    expect(order.items[0]!.quantity).toBe(2);
+    expect(order.items[0]!.unitPrice).toBe(40000);
+    expect(order.items[0]!.totalPrice).toBe(80000);
+    expect(order.items[0]!.product?.name).toBe('Body Orgánico');
   });
 
   it('sets item.product to null when absent', () => {
@@ -156,11 +160,14 @@ describe('orderMapper.toDomain', () => {
 
     const order = orderMapper.toDomain(dto);
 
-    expect(order.items[0].product).toBeNull();
+    expect(order.items[0]!.product).toBeNull();
   });
 
   it('defaults items to empty array when absent', () => {
-    const order = orderMapper.toDomain({ ...BASE_DTO, items: undefined });
+    const order = orderMapper.toDomain({
+      ...BASE_DTO,
+      items: undefined,
+    } as unknown as OrderDTO);
 
     expect(order.items).toEqual([]);
   });

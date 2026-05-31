@@ -4,22 +4,19 @@ import {
   AuthCacheFactory,
   authCache,
 } from '../AuthCache';
-import type { IAuthUser } from '@/types/auth';
+import type { IAuthUser } from '@happy-baby/feature-auth';
+import { UserRole } from '@happy-baby/infrastructure-graphql';
 
-const makeUser = (role = 'customer'): IAuthUser => ({
+const makeUser = (role: UserRole | string = UserRole.customer): IAuthUser => ({
   id: 'u-1',
   email: 'test@example.com',
-  role,
+  role: role as UserRole,
   isActive: true,
   emailVerified: true,
-  lastLoginAt: null,
   profile: {
     id: 'p-1',
     firstName: 'Juan',
     lastName: 'García',
-    phone: null,
-    dateOfBirth: null,
-    avatar: null,
   },
 });
 

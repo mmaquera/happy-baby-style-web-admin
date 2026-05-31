@@ -155,7 +155,7 @@ describe('useCategoryFilters', () => {
       act(() => result.current.updateFilter('search', 'ropa'));
       const filtered = result.current.getFilteredAndSortedCategories(cats);
       expect(filtered).toHaveLength(1);
-      expect(filtered[0].id).toBe('1');
+      expect(filtered[0]!.id).toBe('1');
     });
 
     it('filters by isActive', () => {
@@ -167,7 +167,7 @@ describe('useCategoryFilters', () => {
       act(() => result.current.updateFilter('isActive', false));
       const filtered = result.current.getFilteredAndSortedCategories(cats);
       expect(filtered).toHaveLength(1);
-      expect(filtered[0].id).toBe('2');
+      expect(filtered[0]!.id).toBe('2');
     });
 
     it('sorts by name ascending', () => {
@@ -178,8 +178,8 @@ describe('useCategoryFilters', () => {
       const { result } = renderHook(() => useCategoryFilters(2));
       act(() => result.current.handleSort('name'));
       const sorted = result.current.getFilteredAndSortedCategories(cats);
-      expect(sorted[0].name).toBe('Accesorios');
-      expect(sorted[1].name).toBe('Zapatos');
+      expect(sorted[0]!.name).toBe('Accesorios');
+      expect(sorted[1]!.name).toBe('Zapatos');
     });
 
     it('sorts descending after double handleSort', () => {
@@ -191,7 +191,7 @@ describe('useCategoryFilters', () => {
       act(() => result.current.handleSort('name'));
       act(() => result.current.handleSort('name'));
       const sorted = result.current.getFilteredAndSortedCategories(cats);
-      expect(sorted[0].name).toBe('Zapatos');
+      expect(sorted[0]!.name).toBe('Zapatos');
     });
   });
 

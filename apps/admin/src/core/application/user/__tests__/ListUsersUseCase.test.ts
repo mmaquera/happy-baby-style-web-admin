@@ -1,6 +1,6 @@
 import { ListUsersUseCase } from '@happy-baby/application-user';
 import { isOk, isErr } from '@happy-baby/domain-shared';
-import { createMockRepository, MOCK_USER_PAGE } from './fixtures';
+import { createMockRepository } from './fixtures';
 
 describe('ListUsersUseCase', () => {
   const makeUseCase = () => {

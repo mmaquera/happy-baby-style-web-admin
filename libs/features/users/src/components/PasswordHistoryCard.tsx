@@ -79,7 +79,7 @@ export const PasswordHistoryCard: React.FC<PasswordHistoryCardProps> = ({
     {actions.length > 0 ? (
       <div className='flex flex-col gap-3'>
         {actions.map(action => {
-          const status = STATUS_CONFIG[action.status];
+          const status = STATUS_CONFIG[action.status]!;
           return (
             <div
               key={action.id}

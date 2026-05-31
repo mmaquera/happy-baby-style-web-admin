@@ -43,7 +43,10 @@
       "@happy-baby/feature-products": ["libs/features/products/src/index.ts"],
       "@happy-baby/feature-categories": [
         "libs/features/categories/src/index.ts"
-      ]
+      ],
+      "@happy-baby/feature-users": ["libs/features/users/src/index.ts"],
+      "@happy-baby/feature-orders": ["libs/features/orders/src/index.ts"],
+      "@happy-baby/feature-auth": ["libs/features/auth/src/index.ts"]
     }
   },
   "include": ["apps/admin/src/**/*", "libs/**/*.ts", "libs/**/*.tsx"],

@@ -89,7 +89,6 @@ describe('userMapper.toDomain', () => {
         firstName: 'X',
         lastName: 'Y',
         fullName: 'X Y',
-        isDefault: false,
       },
     };
     const user = userMapper.toDomain(dto);
@@ -121,13 +120,16 @@ describe('userMapper.toDomain', () => {
     };
     const user = userMapper.toDomain(dto);
     expect(user.addresses).toHaveLength(1);
-    expect(user.addresses[0].address1).toBe('Calle 123 #45-67');
-    expect(user.addresses[0].city).toBe('Bogotá');
-    expect(user.addresses[0].isDefault).toBe(true);
+    expect(user.addresses[0]!.address1).toBe('Calle 123 #45-67');
+    expect(user.addresses[0]!.city).toBe('Bogotá');
+    expect(user.addresses[0]!.isDefault).toBe(true);
   });
 
   it('defaults addresses to empty array when absent', () => {
-    const user = userMapper.toDomain({ ...BASE_DTO, addresses: undefined });
+    const user = userMapper.toDomain({
+      ...BASE_DTO,
+      addresses: undefined,
+    } as unknown as UserDTO);
     expect(user.addresses).toEqual([]);
   });
 });

@@ -43,7 +43,9 @@ describe('ListCategoriesUseCase', () => {
   });
 
   it('propaga error del repositorio', async () => {
-    repo.findAll.mockResolvedValueOnce(err(new DomainError('DB error')));
+    repo.findAll.mockResolvedValueOnce(
+      err(new DomainError('DB error', 'DB_ERROR'))
+    );
     const result = await useCase.execute();
     expect(isErr(result)).toBe(true);
     if (isErr(result)) expect(result.error.message).toBe('DB error');

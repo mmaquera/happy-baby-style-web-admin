@@ -224,7 +224,7 @@ describe('useCategoryActions', () => {
         });
       });
 
-      expect(result.current.categories[0].name).toBe('Ropa actualizada');
+      expect(result.current.categories[0]!.name).toBe('Ropa actualizada');
     });
 
     it('shows success toast on update', async () => {

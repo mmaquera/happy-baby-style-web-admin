@@ -18,7 +18,7 @@ describe('createUserSchema', () => {
   });
 
   it('accepts user without optional fields', () => {
-    const { password: _, role: __, phone: ___, ...minimal } = validData;
+    const { password: _, role: __, ...minimal } = validData;
     expect(createUserSchema.safeParse(minimal).success).toBe(true);
   });
 

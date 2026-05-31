@@ -28,7 +28,7 @@ describe('CancelOrderUseCase', () => {
     expect(isErr(result)).toBe(true);
     if (isErr(result)) {
       expect(result.error).toBeInstanceOf(ValidationError);
-      expect(result.error.fields?.['id']).toBeDefined();
+      expect((result.error as ValidationError).fields?.['id']).toBeDefined();
     }
     expect(repo.cancel).not.toHaveBeenCalled();
   });

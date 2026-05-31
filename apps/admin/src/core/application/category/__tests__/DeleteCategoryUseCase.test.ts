@@ -31,7 +31,9 @@ describe('DeleteCategoryUseCase', () => {
   });
 
   it('propaga error del repositorio', async () => {
-    repo.delete.mockResolvedValueOnce(err(new DomainError('No encontrado')));
+    repo.delete.mockResolvedValueOnce(
+      err(new DomainError('No encontrado', 'NOT_FOUND'))
+    );
     const result = await useCase.execute('cat-99');
     expect(isErr(result)).toBe(true);
     if (isErr(result)) expect(result.error.message).toBe('No encontrado');

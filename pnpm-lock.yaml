@@ -219,6 +219,8 @@ importers:
 
   libs/domain/user: {}
 
+  libs/features/auth: {}
+
   libs/features/categories: {}
 
   libs/features/orders: {}

@@ -36,7 +36,7 @@ describe('CreateProductUseCase', () => {
 
     await useCase.execute(validInput);
 
-    const [passedInput] = repo.create.mock.calls[0];
+    const [passedInput] = repo.create.mock.calls[0]!;
     expect(passedInput.name).toBe('Body Orgánico');
     expect(passedInput.sku).toBe('BODY-001');
     expect(passedInput.price).toBe(100);
@@ -50,7 +50,7 @@ describe('CreateProductUseCase', () => {
     expect(isErr(result)).toBe(true);
     if (isErr(result)) {
       expect(result.error).toBeInstanceOf(ValidationError);
-      expect(result.error.fields?.['name']).toBeDefined();
+      expect((result.error as ValidationError).fields?.['name']).toBeDefined();
     }
     expect(repo.create).not.toHaveBeenCalled();
   });
@@ -62,7 +62,7 @@ describe('CreateProductUseCase', () => {
 
     expect(isErr(result)).toBe(true);
     if (isErr(result)) {
-      expect(result.error.fields?.['price']).toBeDefined();
+      expect((result.error as ValidationError).fields?.['price']).toBeDefined();
     }
     expect(repo.create).not.toHaveBeenCalled();
   });
@@ -87,7 +87,9 @@ describe('CreateProductUseCase', () => {
 
     expect(isErr(result)).toBe(true);
     if (isErr(result)) {
-      expect(result.error.fields?.['salePrice']).toBeDefined();
+      expect(
+        (result.error as ValidationError).fields?.['salePrice']
+      ).toBeDefined();
     }
     expect(repo.create).not.toHaveBeenCalled();
   });
@@ -102,7 +104,7 @@ describe('CreateProductUseCase', () => {
 
     expect(isErr(result)).toBe(true);
     if (isErr(result)) {
-      expect(result.error.fields?.['sku']).toBeDefined();
+      expect((result.error as ValidationError).fields?.['sku']).toBeDefined();
     }
     expect(repo.create).not.toHaveBeenCalled();
   });
