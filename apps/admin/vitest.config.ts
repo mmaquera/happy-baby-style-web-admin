@@ -2,9 +2,13 @@ import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
+// Workspace root is two levels up from apps/admin/
+const workspaceRoot = path.resolve(__dirname, '../..');
+
 export default defineConfig({
   plugins: [react()],
-  root: path.resolve(__dirname, '.'),
+  // Root at workspace level so V8 coverage can instrument libs/ files
+  root: workspaceRoot,
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -98,9 +102,10 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: [path.resolve(__dirname, './src/setupTests.ts')],
+    // Paths are now relative to workspaceRoot
     include: [
-      'src/**/__tests__/**/*.{test,spec}.{ts,tsx}',
-      'src/**/*.{test,spec}.{ts,tsx}',
+      'apps/admin/src/**/__tests__/**/*.{test,spec}.{ts,tsx}',
+      'apps/admin/src/**/*.{test,spec}.{ts,tsx}',
     ],
     exclude: ['node_modules', 'dist'],
     clearMocks: true,
@@ -108,23 +113,28 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov', 'html', 'json-summary'],
-      include: ['src/**/*.{ts,tsx}'],
+      reportsDirectory: path.resolve(__dirname, 'coverage'),
+      include: ['apps/admin/src/**/*.{ts,tsx}', 'libs/**/*.{ts,tsx}'],
       exclude: [
-        'src/**/*.d.ts',
-        'src/**/*.stories.{ts,tsx}',
-        'src/**/*.test.{ts,tsx}',
-        'src/**/*.spec.{ts,tsx}',
-        'src/**/__tests__/**',
-        'src/**/__mocks__/**',
-        'src/**/index.{ts,tsx}',
-        'src/main.tsx',
-        'src/App.tsx',
+        '**/*.test.{ts,tsx}',
+        '**/*.spec.{ts,tsx}',
+        '**/__tests__/**',
+        '**/__mocks__/**',
+        '**/*.d.ts',
+        '**/*.stories.{ts,tsx}',
+        '**/index.{ts,tsx}',
+        '**/generated/**',
+        '**/main.tsx',
+        '**/App.tsx',
+        '**/node_modules/**',
+        '**/*.config.{ts,js}',
+        '**/setupTests.ts',
       ],
       thresholds: {
-        branches: 68,
-        functions: 43,
-        lines: 14,
-        statements: 14,
+        branches: 78,
+        functions: 40,
+        lines: 22,
+        statements: 22,
       },
     },
   },

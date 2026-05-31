@@ -10,6 +10,11 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  VITE_GRAPHQL_URL: http://localhost:3001/graphql
+  VITE_AUTH_SECRET: test-secret
+  VITE_LOG_LEVEL: error
+
 jobs:
   quality:
     name: Quality Checks
@@ -17,16 +22,15 @@ jobs:
     timeout-minutes: 15
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - uses: actions/checkout@v4
         with:
-          version: 10
+          fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
@@ -43,13 +47,16 @@ jobs:
       - name: Format check
         run: pnpm format:check
 
-      - name: Test
-        run: pnpm test
-        env:
-          # Variables de entorno para tests (sin valores reales)
-          VITE_GRAPHQL_URL: http://localhost:3001/graphql
-          VITE_AUTH_SECRET: test-secret
-          VITE_LOG_LEVEL: error
+      - name: Tests + coverage
+        run: pnpm test:coverage
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: apps/admin/coverage/
+          retention-days: 7
 
   build:
     name: Build
@@ -58,16 +65,13 @@ jobs:
     needs: quality
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v4
         with:
-          version: 10
+          version: 11
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: pnpm
