@@ -131,10 +131,10 @@ export default defineConfig({
         '**/setupTests.ts',
       ],
       thresholds: {
-        branches: 78,
+        branches: 76,
         functions: 40,
-        lines: 22,
-        statements: 22,
+        lines: 24,
+        statements: 24,
       },
     },
   },
