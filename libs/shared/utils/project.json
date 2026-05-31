@@ -1,0 +1,15 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "shared-utils",
+  "projectType": "library",
+  "sourceRoot": "libs/shared/utils/src",
+  "tags": ["type:util", "scope:shared"],
+  "targets": {
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit --project libs/shared/utils/tsconfig.json"
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
-import { useUIPreferencesStore } from '../uiPreferencesStore';
-import { useSidebarStore } from '../sidebarStore';
+import { useUIPreferencesStore } from '@happy-baby/shared-stores';
+import { useSidebarStore } from '@happy-baby/shared-stores';
 
 describe('useUIPreferencesStore', () => {
   beforeEach(() => {

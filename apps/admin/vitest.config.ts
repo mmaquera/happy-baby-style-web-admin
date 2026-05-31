@@ -56,6 +56,18 @@ export default defineConfig({
         __dirname,
         '../../libs/infrastructure/monitoring/src/index.ts'
       ),
+      '@happy-baby/shared-utils': path.resolve(
+        __dirname,
+        '../../libs/shared/utils/src/index.ts'
+      ),
+      '@happy-baby/shared-ui': path.resolve(
+        __dirname,
+        '../../libs/shared/ui/src/index.ts'
+      ),
+      '@happy-baby/shared-stores': path.resolve(
+        __dirname,
+        '../../libs/shared/stores/src/index.ts'
+      ),
     },
   },
   test: {

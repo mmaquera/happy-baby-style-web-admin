@@ -1,7 +1,7 @@
 import type React from 'react';
 import { lazy, Suspense, useState, useCallback, useMemo } from 'react';
 import AlertTriangleIcon from 'lucide-react/dist/esm/icons/alert-triangle';
-import { useUIPreferencesStore } from '@/stores/uiPreferencesStore';
+import { useUIPreferencesStore } from '@happy-baby/shared-stores';
 import {
   ProductHeader,
   ProductFilters,

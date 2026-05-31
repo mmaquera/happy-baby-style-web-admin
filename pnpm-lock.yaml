@@ -225,6 +225,12 @@ importers:
 
   libs/infrastructure/storage: {}
 
+  libs/shared/stores: {}
+
+  libs/shared/ui: {}
+
+  libs/shared/utils: {}
+
 packages:
 
   '@adobe/css-tools@4.5.0':

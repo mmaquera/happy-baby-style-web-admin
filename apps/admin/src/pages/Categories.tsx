@@ -1,6 +1,6 @@
 import type React from 'react';
 import { lazy, Suspense, useState, useCallback, useEffect } from 'react';
-import { useUIPreferencesStore } from '@/stores/uiPreferencesStore';
+import { useUIPreferencesStore } from '@happy-baby/shared-stores';
 import {
   CategoryHeader,
   CategoryGrid,

@@ -1,0 +1,15 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "shared-ui",
+  "projectType": "library",
+  "sourceRoot": "libs/shared/ui/src",
+  "tags": ["type:ui", "scope:shared"],
+  "targets": {
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit --project libs/shared/ui/tsconfig.json"
+      }
+    }
+  }
+}

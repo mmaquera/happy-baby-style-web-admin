@@ -1,5 +1,5 @@
 import type { ReactNode, FC } from 'react';
-import { useSidebarStore } from '@/stores/sidebarStore';
+import { useSidebarStore } from '@happy-baby/shared-stores';
 
 export const useSidebar = useSidebarStore;
 

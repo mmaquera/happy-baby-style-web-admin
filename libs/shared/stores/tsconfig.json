@@ -1,0 +1,10 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@happy-baby/shared-stores": ["../../../libs/shared/stores/src/index.ts"]
+    }
+  },
+  "include": ["src"]
+}
