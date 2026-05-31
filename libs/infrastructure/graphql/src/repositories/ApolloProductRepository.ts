@@ -13,7 +13,7 @@ import { productMapper } from '../mappers/productMapper';
 import type {
   Product as GQLProduct,
   ProductFilterInput,
-} from '@/generated/graphql';
+} from '../generated/graphql';
 import {
   GetProductsDocument,
   GetProductDocument,
@@ -33,7 +33,7 @@ import {
   type DeleteProductMutationVariables,
   type UploadImageMutation,
   type UploadImageMutationVariables,
-} from '@/generated/graphql';
+} from '../generated/graphql';
 
 export class ApolloProductRepository implements ProductRepository {
   constructor(private readonly client: ApolloClient<NormalizedCacheObject>) {}

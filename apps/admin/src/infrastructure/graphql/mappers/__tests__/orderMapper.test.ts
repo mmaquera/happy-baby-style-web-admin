@@ -1,4 +1,4 @@
-import { orderMapper, type OrderDTO } from '../orderMapper';
+import { orderMapper, type OrderDTO } from '@happy-baby/infrastructure-graphql';
 
 const BASE_DTO: OrderDTO = {
   id: 'order-1',

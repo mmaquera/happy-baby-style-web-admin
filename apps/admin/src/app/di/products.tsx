@@ -1,7 +1,7 @@
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { useApolloClient } from '@apollo/client';
 import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
-import { ApolloProductRepository } from '@/infrastructure/graphql/repositories/ApolloProductRepository';
+import { ApolloProductRepository } from '@happy-baby/infrastructure-graphql';
 import { ListProductsUseCase } from '@happy-baby/application-product';
 import { CreateProductUseCase } from '@happy-baby/application-product';
 import { UpdateProductUseCase } from '@happy-baby/application-product';

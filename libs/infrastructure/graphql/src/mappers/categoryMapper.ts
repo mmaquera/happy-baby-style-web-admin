@@ -2,7 +2,7 @@ import type {
   Category as GQLCategory,
   CreateCategoryInput as GQLCreateCategoryInput,
   UpdateCategoryInput as GQLUpdateCategoryInput,
-} from '@/generated/graphql';
+} from '../generated/graphql';
 import type {
   Category,
   CreateCategoryInput,

@@ -13,7 +13,7 @@ import { categoryMapper } from '../mappers/categoryMapper';
 import type {
   Category as GQLCategory,
   CategoryFilterInput,
-} from '@/generated/graphql';
+} from '../generated/graphql';
 import {
   GetCategoriesDocument,
   GetCategoryDocument,
@@ -30,7 +30,7 @@ import {
   type UpdateCategoryMutationVariables,
   type DeleteCategoryMutation,
   type DeleteCategoryMutationVariables,
-} from '@/generated/graphql';
+} from '../generated/graphql';
 
 export class ApolloCategoryRepository implements CategoryRepository {
   constructor(private readonly client: ApolloClient<NormalizedCacheObject>) {}

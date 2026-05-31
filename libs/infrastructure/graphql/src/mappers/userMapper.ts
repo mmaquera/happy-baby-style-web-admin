@@ -6,7 +6,7 @@ import type {
   UpdateUserInput,
   UserRole,
 } from '@happy-baby/domain-user';
-import { UserRole as GQLUserRole } from '@/generated/graphql';
+import { UserRole as GQLUserRole } from '../generated/graphql';
 
 // Minimal address shape returned by any query (subset of full GQLUserAddress)
 interface UserAddressDTO {

@@ -219,6 +219,12 @@ importers:
 
   libs/domain/user: {}
 
+  libs/infrastructure/graphql: {}
+
+  libs/infrastructure/monitoring: {}
+
+  libs/infrastructure/storage: {}
+
 packages:
 
   '@adobe/css-tools@4.5.0':

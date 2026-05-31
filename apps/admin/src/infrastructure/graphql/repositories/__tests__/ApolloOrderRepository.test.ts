@@ -1,4 +1,4 @@
-import { ApolloOrderRepository } from '../ApolloOrderRepository';
+import { ApolloOrderRepository } from '@happy-baby/infrastructure-graphql';
 import { isOk, isErr } from '@happy-baby/domain-shared';
 import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 

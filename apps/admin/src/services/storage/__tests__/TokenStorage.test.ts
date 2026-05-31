@@ -3,7 +3,7 @@ import {
   SessionTokenStorage,
   TokenStorageFactory,
   tokenStorage,
-} from '../TokenStorage';
+} from '@happy-baby/infrastructure-storage';
 
 const localMock = {
   getItem: vi.fn(),

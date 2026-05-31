@@ -1,4 +1,4 @@
-import type { OrderStatus } from '@/generated/graphql';
+import type { OrderStatus } from '../generated/graphql';
 import type {
   Order,
   OrderItem,

@@ -32,6 +32,15 @@
       ],
       "@happy-baby/application-category": [
         "../../libs/application/category/src/index.ts"
+      ],
+      "@happy-baby/infrastructure-graphql": [
+        "../../libs/infrastructure/graphql/src/index.ts"
+      ],
+      "@happy-baby/infrastructure-storage": [
+        "../../libs/infrastructure/storage/src/index.ts"
+      ],
+      "@happy-baby/infrastructure-monitoring": [
+        "../../libs/infrastructure/monitoring/src/index.ts"
       ]
     }
   },

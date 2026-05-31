@@ -1,4 +1,4 @@
-import { ApolloCategoryRepository } from '../ApolloCategoryRepository';
+import { ApolloCategoryRepository } from '@happy-baby/infrastructure-graphql';
 import { isOk, isErr } from '@happy-baby/domain-shared';
 import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 

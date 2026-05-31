@@ -44,6 +44,18 @@ export default defineConfig({
         __dirname,
         '../../libs/application/category/src/index.ts'
       ),
+      '@happy-baby/infrastructure-graphql': path.resolve(
+        __dirname,
+        '../../libs/infrastructure/graphql/src/index.ts'
+      ),
+      '@happy-baby/infrastructure-storage': path.resolve(
+        __dirname,
+        '../../libs/infrastructure/storage/src/index.ts'
+      ),
+      '@happy-baby/infrastructure-monitoring': path.resolve(
+        __dirname,
+        '../../libs/infrastructure/monitoring/src/index.ts'
+      ),
     },
   },
   test: {

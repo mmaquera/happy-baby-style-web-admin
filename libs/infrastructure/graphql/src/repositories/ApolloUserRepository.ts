@@ -32,7 +32,7 @@ import {
   type ActivateUserMutationVariables,
   type DeactivateUserMutation,
   type DeactivateUserMutationVariables,
-} from '@/generated/graphql';
+} from '../generated/graphql';
 
 export class ApolloUserRepository implements UserRepository {
   constructor(private readonly client: ApolloClient<NormalizedCacheObject>) {}

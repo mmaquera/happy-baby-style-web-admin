@@ -9,7 +9,7 @@ import type {
 import type { Result } from '@happy-baby/domain-shared';
 import { ok, err } from '@happy-baby/domain-shared';
 import { orderMapper } from '../mappers/orderMapper';
-import { OrderStatus as GQLOrderStatus } from '@/generated/graphql';
+import { OrderStatus as GQLOrderStatus } from '../generated/graphql';
 import {
   GetOrdersDocument,
   GetOrderDocument,
@@ -23,7 +23,7 @@ import {
   type UpdateOrderStatusMutationVariables,
   type CancelOrderMutation,
   type CancelOrderMutationVariables,
-} from '@/generated/graphql';
+} from '../generated/graphql';
 
 const domainStatusToGQL: Record<OrderStatus, GQLOrderStatus> = {
   pending: GQLOrderStatus.pending,

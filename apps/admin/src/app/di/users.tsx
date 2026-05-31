@@ -1,7 +1,7 @@
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { useApolloClient } from '@apollo/client';
 import type { ApolloClient, NormalizedCacheObject } from '@apollo/client';
-import { ApolloUserRepository } from '@/infrastructure/graphql/repositories/ApolloUserRepository';
+import { ApolloUserRepository } from '@happy-baby/infrastructure-graphql';
 import { ListUsersUseCase } from '@happy-baby/application-user';
 import { GetUserUseCase } from '@happy-baby/application-user';
 import { CreateUserUseCase } from '@happy-baby/application-user';

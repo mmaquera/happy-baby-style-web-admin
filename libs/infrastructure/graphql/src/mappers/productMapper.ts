@@ -2,7 +2,7 @@ import type {
   Product as GQLProduct,
   CreateProductInput as GQLCreateInput,
   UpdateProductInput as GQLUpdateInput,
-} from '@/generated/graphql';
+} from '../generated/graphql';
 import type {
   Product,
   CreateProductInput,
