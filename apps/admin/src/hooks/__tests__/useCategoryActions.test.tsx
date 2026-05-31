@@ -1,6 +1,6 @@
 import React from 'react';
 import { renderHook, act } from '@testing-library/react';
-import { useCategoryActions } from '../useCategoryActions';
+import { useCategoryActions } from '@happy-baby/feature-categories';
 import { CategoryContext } from '@happy-baby/feature-categories';
 import type { CategoryUseCases } from '@happy-baby/feature-categories';
 import { ok, err } from '@happy-baby/domain-shared';

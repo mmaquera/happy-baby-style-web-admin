@@ -1,6 +1,6 @@
 import React from 'react';
 import { renderHook, act } from '@testing-library/react';
-import { useUserActions } from '../useUserActions';
+import { useUserActions } from '@happy-baby/feature-users';
 import { UserContext } from '@happy-baby/feature-users';
 import type { UserUseCases } from '@happy-baby/feature-users';
 import { ok, err, DomainError } from '@happy-baby/domain-shared';

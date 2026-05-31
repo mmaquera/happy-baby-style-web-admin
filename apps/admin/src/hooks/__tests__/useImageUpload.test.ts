@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useImageUpload } from '../useImageUpload';
+import { useImageUpload } from '@happy-baby/feature-products';
 
 const mockUploadMutate = vi.fn();
 

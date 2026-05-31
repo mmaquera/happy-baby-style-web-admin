@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react';
-import { useUploadNotifications } from '../useUploadNotifications';
+import { useUploadNotifications } from '@happy-baby/feature-products';
 
 vi.mock('react-hot-toast', () => ({
   toast: {

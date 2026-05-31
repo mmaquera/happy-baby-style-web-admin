@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useSidebarTooltip } from '../useSidebarTooltip';
+import { useSidebarTooltip } from '@happy-baby/shared-hooks';
 
 describe('useSidebarTooltip', () => {
   beforeEach(() => {

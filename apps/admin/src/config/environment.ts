@@ -1,4 +1,4 @@
-import { logger } from '@/utils/logger';
+import { logger } from '@happy-baby/infrastructure-monitoring';
 
 // Environment Configuration - Following SOLID principles and Clean Architecture
 // Single Responsibility: Manages environment configuration only

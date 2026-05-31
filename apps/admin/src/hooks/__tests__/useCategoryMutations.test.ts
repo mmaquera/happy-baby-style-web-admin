@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
-import { useCreateCategory } from '../useCreateCategory';
-import { useUpdateCategory } from '../useUpdateCategory';
+import { useCreateCategory } from '@happy-baby/feature-categories';
+import { useUpdateCategory } from '@happy-baby/feature-categories';
 
 vi.mock('react-hot-toast', () => ({
   toast: { success: vi.fn(), error: vi.fn() },

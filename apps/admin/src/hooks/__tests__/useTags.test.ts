@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useTags } from '../useTags';
+import { useTags } from '@happy-baby/feature-products';
 
 describe('useTags', () => {
   it('initializes with default tags and empty custom tags', () => {

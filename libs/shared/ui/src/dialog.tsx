@@ -2,7 +2,7 @@ import type * as React from 'react';
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
 
 import { cn } from '@happy-baby/shared-utils';
-import { Button } from '@/components/ui/Button';
+import { Button } from './Button';
 import XIcon from 'lucide-react/dist/esm/icons/x';
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {

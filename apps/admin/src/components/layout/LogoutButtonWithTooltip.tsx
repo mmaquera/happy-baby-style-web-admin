@@ -1,7 +1,7 @@
 import type React from 'react';
 import LogOutIcon from 'lucide-react/dist/esm/icons/log-out';
 import { cn } from '@/lib/utils';
-import { useSidebarTooltip } from '@/hooks/useSidebarTooltip';
+import { useSidebarTooltip } from '@happy-baby/shared-hooks';
 
 interface LogoutButtonWithTooltipProps {
   onClick: () => void;

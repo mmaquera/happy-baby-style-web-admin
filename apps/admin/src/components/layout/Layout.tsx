@@ -2,7 +2,7 @@ import type React from 'react';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { SidebarToggle } from './SidebarToggle';
-import { useSidebar } from '@/contexts/SidebarContext';
+import { useSidebarStore as useSidebar } from '@happy-baby/shared-stores';
 
 interface LayoutProps {
   children: React.ReactNode;

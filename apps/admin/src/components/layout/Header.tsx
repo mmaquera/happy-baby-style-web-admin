@@ -7,10 +7,10 @@ import SettingsIcon from 'lucide-react/dist/esm/icons/settings';
 import LogOutIcon from 'lucide-react/dist/esm/icons/log-out';
 import ChevronDownIcon from 'lucide-react/dist/esm/icons/chevron-down';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@happy-baby/feature-auth';
 import { useLogout } from '@/hooks/useLogout';
-import { LogoutConfirmModal } from '@/components/auth/LogoutConfirmModal';
-import { useSidebar } from '@/contexts/SidebarContext';
+import { LogoutConfirmModal } from '@happy-baby/feature-auth';
+import { useSidebarStore as useSidebar } from '@happy-baby/shared-stores';
 
 const getUserInitials = (name: string) => {
   if (!name) return 'U';

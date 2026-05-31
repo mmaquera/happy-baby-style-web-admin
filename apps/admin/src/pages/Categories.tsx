@@ -6,14 +6,14 @@ import {
   CategoryGrid,
   CategoryListView,
   CategoryFilters,
-} from '@/components/categories';
+} from '@happy-baby/feature-categories';
 import type {
   CategoryFiltersState as CategoryFiltersType,
   Category,
 } from '@happy-baby/feature-categories';
-import { useCategoryActions } from '@/hooks/useCategoryActions';
-import { logger } from '@/utils/logger';
-import { Button } from '@/components/ui/Button';
+import { useCategoryActions } from '@happy-baby/feature-categories';
+import { logger } from '@happy-baby/infrastructure-monitoring';
+import { Button } from '@happy-baby/shared-ui';
 
 const CreateCategoryModal = lazy(() =>
   import('@happy-baby/feature-categories').then(m => ({

@@ -1,7 +1,7 @@
 import type React from 'react';
 import ChevronLeftIcon from 'lucide-react/dist/esm/icons/chevron-left';
 import ChevronRightIcon from 'lucide-react/dist/esm/icons/chevron-right';
-import { useSidebar } from '@/contexts/SidebarContext';
+import { useSidebarStore as useSidebar } from '@happy-baby/shared-stores';
 
 export const SidebarToggle: React.FC = () => {
   const { isCollapsed, toggleSidebar } = useSidebar();

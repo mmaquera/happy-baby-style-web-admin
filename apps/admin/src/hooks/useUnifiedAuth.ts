@@ -11,7 +11,7 @@ import {
 import { AuthServiceFactory, AuthError } from '@happy-baby/feature-auth';
 import { UserRole } from '@happy-baby/infrastructure-graphql';
 import { type IAuthUser } from '@happy-baby/feature-auth';
-import { logger } from '@/utils/logger';
+import { logger } from '@happy-baby/infrastructure-monitoring';
 
 // Hook state interface
 interface AuthState {

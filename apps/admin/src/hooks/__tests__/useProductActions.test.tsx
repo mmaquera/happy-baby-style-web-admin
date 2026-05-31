@@ -1,6 +1,6 @@
 import React from 'react';
 import { renderHook, act } from '@testing-library/react';
-import { useProductActions } from '../useProductActions';
+import { useProductActions } from '@happy-baby/feature-products';
 import { ProductContext } from '@happy-baby/feature-products';
 import type { ProductUseCases } from '@happy-baby/feature-products';
 import {

@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useSVGUpload } from '../useSVGUpload';
+import { useSVGUpload } from '@happy-baby/feature-categories';
 
 const mockUploadSvgMutate = vi.fn();
 

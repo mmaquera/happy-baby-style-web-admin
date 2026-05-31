@@ -6,8 +6,8 @@ import TrendingUpIcon from 'lucide-react/dist/esm/icons/trending-up';
 import DollarSignIcon from 'lucide-react/dist/esm/icons/dollar-sign';
 import AlertTriangleIcon from 'lucide-react/dist/esm/icons/alert-triangle';
 import { cn } from '@/lib/utils';
-import { Card } from '@/components/ui/Card';
-import { SessionInfo } from '@/components/auth/SessionInfo';
+import { Card } from '@happy-baby/shared-ui';
+import { SessionInfo } from '@happy-baby/feature-auth';
 
 const STATS = [
   {

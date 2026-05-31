@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useForgotPassword } from '../useForgotPassword';
+import { useForgotPassword } from '@happy-baby/feature-auth';
 
 vi.useFakeTimers();
 

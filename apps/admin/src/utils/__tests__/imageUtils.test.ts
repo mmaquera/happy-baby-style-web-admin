@@ -3,7 +3,7 @@ import {
   convertImageUrlsToRelativePaths,
   isValidBackendImageUrl,
   validateBackendImageUrls,
-} from '../imageUtils';
+} from '@happy-baby/shared-utils';
 
 describe('convertToRelativePath', () => {
   it('returns null for null input', () => {

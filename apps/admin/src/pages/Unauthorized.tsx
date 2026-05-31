@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import ShieldIcon from 'lucide-react/dist/esm/icons/shield';
 import ArrowLeftIcon from 'lucide-react/dist/esm/icons/arrow-left';
 import HomeIcon from 'lucide-react/dist/esm/icons/home';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
+import { Card } from '@happy-baby/shared-ui';
+import { Button } from '@happy-baby/shared-ui';
 
 export const Unauthorized: React.FC = () => {
   const navigate = useNavigate();

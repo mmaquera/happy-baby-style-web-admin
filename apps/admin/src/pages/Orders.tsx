@@ -9,7 +9,7 @@ import {
 } from 'react';
 import PackageIcon from 'lucide-react/dist/esm/icons/package';
 import CalendarIcon from 'lucide-react/dist/esm/icons/calendar';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@happy-baby/shared-ui';
 import {
   useOrderActions,
   OrderCard,

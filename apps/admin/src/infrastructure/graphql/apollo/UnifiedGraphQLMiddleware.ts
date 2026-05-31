@@ -15,7 +15,7 @@ import type {
   GraphQLMiddlewareConfig,
   ITokenStorage,
 } from '@happy-baby/feature-auth';
-import { logger } from '@/utils/logger';
+import { logger } from '@happy-baby/infrastructure-monitoring';
 
 export class UnifiedGraphQLMiddleware {
   private tokenStorage: ITokenStorage;

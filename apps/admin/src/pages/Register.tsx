@@ -1,11 +1,9 @@
 import type React from 'react';
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Card } from '@/components/ui/Card';
-import { LoginLogo } from '@/components/auth/LoginLogo';
-import { RegisterForm } from '@/components/auth/RegisterForm';
-import { useAuth } from '@/contexts/AuthContext';
-import { logger } from '@/utils/logger';
+import { Card } from '@happy-baby/shared-ui';
+import { LoginLogo, RegisterForm, useAuth } from '@happy-baby/feature-auth';
+import { logger } from '@happy-baby/infrastructure-monitoring';
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();

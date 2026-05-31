@@ -1,4 +1,4 @@
-import { logger } from '@/utils/logger';
+import { logger } from '@happy-baby/infrastructure-monitoring';
 import type { IAuthUser } from '@happy-baby/feature-auth';
 
 // AuthCache Service - Following SOLID principles and Clean Architecture

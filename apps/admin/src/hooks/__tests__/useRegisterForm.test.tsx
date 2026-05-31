@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useRegisterForm } from '../useRegisterForm';
+import { useRegisterForm } from '@happy-baby/feature-auth';
 
 const mockRegister = vi.fn();
 const mockClearError = vi.fn();

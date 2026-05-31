@@ -1,6 +1,6 @@
 import React from 'react';
 import { renderHook, act } from '@testing-library/react';
-import { useOrderActions } from '../useOrderActions';
+import { useOrderActions } from '@happy-baby/feature-orders';
 import { OrderContext } from '@happy-baby/feature-orders';
 import type { OrderUseCases } from '@happy-baby/feature-orders';
 import { ok, err, DomainError } from '@happy-baby/domain-shared';

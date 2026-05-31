@@ -9,7 +9,7 @@ vi.mock('react-hot-toast', () => ({
 
 const mockLogout = vi.fn();
 
-vi.mock('../../contexts/AuthContext', () => ({
+vi.mock('@happy-baby/feature-auth', () => ({
   useAuth: () => ({ logout: mockLogout }),
 }));
 

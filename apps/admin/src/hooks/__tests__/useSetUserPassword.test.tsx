@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useSetUserPassword } from '../useSetUserPassword';
+import { useSetUserPassword } from '@happy-baby/feature-auth';
 
 vi.mock('react-hot-toast', () => ({
   default: { success: vi.fn(), error: vi.fn() },

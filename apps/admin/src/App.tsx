@@ -1,19 +1,18 @@
 import type React from 'react';
 import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
-import { TooltipProvider } from '@/components/ui';
+import { ErrorBoundary } from '@happy-baby/shared-ui';
+import { TooltipProvider } from '@happy-baby/shared-ui';
 import { Toaster } from 'react-hot-toast';
 import { ApolloProvider } from '@apollo/client';
-import { client } from './services/graphql';
-import { AuthProvider } from '@/contexts/AuthContext';
-import { SidebarProvider } from '@/contexts/SidebarContext';
+import { client } from './infrastructure/graphql/apollo/apolloClient';
+import { AuthProvider } from '@happy-baby/feature-auth';
 import { ProductProvider } from '@/app/di/products';
 import { CategoryProvider } from '@/app/di/categories';
 import { UserProvider } from '@/app/di/users';
 import { OrderProvider } from '@/app/di/orders';
 import { Layout } from '@/components/layout/Layout';
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { ProtectedRoute } from '@happy-baby/feature-auth';
 import { Login } from '@/pages/Login';
 import { Unauthorized } from '@/pages/Unauthorized';
 
@@ -41,110 +40,108 @@ function App() {
               <OrderProvider>
                 <UserProvider>
                   <AuthProvider>
-                    <SidebarProvider>
-                      <Router>
-                        <Suspense fallback={<PageLoader />}>
-                          <Routes>
-                            <Route path='/login' element={<Login />} />
-                            <Route
-                              path='/unauthorized'
-                              element={<Unauthorized />}
-                            />
+                    <Router>
+                      <Suspense fallback={<PageLoader />}>
+                        <Routes>
+                          <Route path='/login' element={<Login />} />
+                          <Route
+                            path='/unauthorized'
+                            element={<Unauthorized />}
+                          />
 
-                            <Route
-                              path='/'
-                              element={
-                                <ProtectedRoute>
-                                  <Layout>
-                                    <Dashboard />
-                                  </Layout>
-                                </ProtectedRoute>
-                              }
-                            />
-                            <Route
-                              path='/products'
-                              element={
-                                <ProtectedRoute>
-                                  <Layout>
-                                    <Products />
-                                  </Layout>
-                                </ProtectedRoute>
-                              }
-                            />
-                            <Route
-                              path='/categories'
-                              element={
-                                <ProtectedRoute>
-                                  <Layout>
-                                    <Categories />
-                                  </Layout>
-                                </ProtectedRoute>
-                              }
-                            />
-                            <Route
-                              path='/orders'
-                              element={
-                                <ProtectedRoute>
-                                  <Layout>
-                                    <Orders />
-                                  </Layout>
-                                </ProtectedRoute>
-                              }
-                            />
-                            <Route
-                              path='/users'
-                              element={
-                                <ProtectedRoute>
-                                  <Layout>
-                                    <UsersPage />
-                                  </Layout>
-                                </ProtectedRoute>
-                              }
-                            />
-                            <Route
-                              path='/images'
-                              element={
-                                <ProtectedRoute>
-                                  <Layout>
-                                    <ComingSoon page='Imágenes' />
-                                  </Layout>
-                                </ProtectedRoute>
-                              }
-                            />
-                            <Route
-                              path='/analytics'
-                              element={
-                                <ProtectedRoute>
-                                  <Layout>
-                                    <ComingSoon page='Estadísticas' />
-                                  </Layout>
-                                </ProtectedRoute>
-                              }
-                            />
-                            <Route
-                              path='/settings'
-                              element={
-                                <ProtectedRoute>
-                                  <Layout>
-                                    <ComingSoon page='Configuración' />
-                                  </Layout>
-                                </ProtectedRoute>
-                              }
-                            />
-                            <Route
-                              path='*'
-                              element={
-                                <ProtectedRoute>
-                                  <Layout>
-                                    <NotFound />
-                                  </Layout>
-                                </ProtectedRoute>
-                              }
-                            />
-                          </Routes>
-                        </Suspense>
-                      </Router>
-                    </SidebarProvider>
+                          <Route
+                            path='/'
+                            element={
+                              <ProtectedRoute>
+                                <Layout>
+                                  <Dashboard />
+                                </Layout>
+                              </ProtectedRoute>
+                            }
+                          />
+                          <Route
+                            path='/products'
+                            element={
+                              <ProtectedRoute>
+                                <Layout>
+                                  <Products />
+                                </Layout>
+                              </ProtectedRoute>
+                            }
+                          />
+                          <Route
+                            path='/categories'
+                            element={
+                              <ProtectedRoute>
+                                <Layout>
+                                  <Categories />
+                                </Layout>
+                              </ProtectedRoute>
+                            }
+                          />
+                          <Route
+                            path='/orders'
+                            element={
+                              <ProtectedRoute>
+                                <Layout>
+                                  <Orders />
+                                </Layout>
+                              </ProtectedRoute>
+                            }
+                          />
+                          <Route
+                            path='/users'
+                            element={
+                              <ProtectedRoute>
+                                <Layout>
+                                  <UsersPage />
+                                </Layout>
+                              </ProtectedRoute>
+                            }
+                          />
+                          <Route
+                            path='/images'
+                            element={
+                              <ProtectedRoute>
+                                <Layout>
+                                  <ComingSoon page='Imágenes' />
+                                </Layout>
+                              </ProtectedRoute>
+                            }
+                          />
+                          <Route
+                            path='/analytics'
+                            element={
+                              <ProtectedRoute>
+                                <Layout>
+                                  <ComingSoon page='Estadísticas' />
+                                </Layout>
+                              </ProtectedRoute>
+                            }
+                          />
+                          <Route
+                            path='/settings'
+                            element={
+                              <ProtectedRoute>
+                                <Layout>
+                                  <ComingSoon page='Configuración' />
+                                </Layout>
+                              </ProtectedRoute>
+                            }
+                          />
+                          <Route
+                            path='*'
+                            element={
+                              <ProtectedRoute>
+                                <Layout>
+                                  <NotFound />
+                                </Layout>
+                              </ProtectedRoute>
+                            }
+                          />
+                        </Routes>
+                      </Suspense>
+                    </Router>
                     <Toaster
                       position='top-right'
                       toastOptions={{

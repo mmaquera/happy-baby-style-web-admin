@@ -235,6 +235,8 @@ importers:
 
   libs/infrastructure/storage: {}
 
+  libs/shared/hooks: {}
+
   libs/shared/stores: {}
 
   libs/shared/ui: {}

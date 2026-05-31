@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '@happy-baby/feature-auth';
 import toast from 'react-hot-toast';
-import { logger } from '@/utils/logger';
+import { logger } from '@happy-baby/infrastructure-monitoring';
 
 // Types
 interface UseLogoutReturn {

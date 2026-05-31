@@ -45,3 +45,4 @@ export {
 } from './select';
 export { Separator } from './separator';
 export { Textarea } from './textarea';
+export { ErrorBoundary } from './ErrorBoundary';

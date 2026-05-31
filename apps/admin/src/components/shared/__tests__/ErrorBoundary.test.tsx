@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { ErrorBoundary } from '../ErrorBoundary';
+import { ErrorBoundary } from '@happy-baby/shared-ui';
 
-vi.mock('@/utils/logger', () => ({
+vi.mock('@happy-baby/infrastructure-monitoring', () => ({
   logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
 }));
 
@@ -74,7 +74,7 @@ describe('ErrorBoundary', () => {
   });
 
   it('logs error via logger when child throws', async () => {
-    const { logger } = await import('@/utils/logger');
+    const { logger } = await import('@happy-baby/infrastructure-monitoring');
 
     render(
       <ErrorBoundary>

@@ -11,10 +11,10 @@ import PackageIcon from 'lucide-react/dist/esm/icons/package';
 import SettingsIcon from 'lucide-react/dist/esm/icons/settings';
 import DownloadIcon from 'lucide-react/dist/esm/icons/download';
 import { cn } from '@/lib/utils';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
+import { Card } from '@happy-baby/shared-ui';
+import { Button } from '@happy-baby/shared-ui';
 import { useParams, useNavigate } from 'react-router-dom';
-import { logger } from '@/utils/logger';
+import { logger } from '@happy-baby/infrastructure-monitoring';
 
 const mockProduct = {
   id: '1',

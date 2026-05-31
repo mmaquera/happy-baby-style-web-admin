@@ -7,7 +7,7 @@ import {
   ProductFilters,
   ProductGrid,
   ProductListView,
-} from '@/components/products';
+} from '@happy-baby/feature-products';
 
 const CreateProductModal = lazy(() =>
   import('@happy-baby/feature-products').then(m => ({
@@ -30,12 +30,12 @@ import {
   useCreateProduct,
   useUpdateProduct,
   useDeleteProduct,
-} from '@/hooks/useProductsGraphQL';
-import { useCategories } from '@/hooks/useCategories';
+} from '@happy-baby/feature-products';
+import { useCategories } from '@happy-baby/feature-categories';
 import type { ProductFilterInput, Product } from '@happy-baby/feature-products';
-import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
-import { logger } from '@/utils/logger';
+import { Button } from '@happy-baby/shared-ui';
+import { Card } from '@happy-baby/shared-ui';
+import { logger } from '@happy-baby/infrastructure-monitoring';
 
 export const Products: React.FC = () => {
   const { productsViewMode: viewMode, setProductsViewMode: setViewMode } =

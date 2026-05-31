@@ -1,7 +1,7 @@
 import React from 'react';
 import { renderHook, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { useLoginForm } from '../useLoginForm';
+import { useLoginForm } from '@happy-baby/feature-auth';
 
 vi.mock('react-router-dom', async () => {
   const actual =

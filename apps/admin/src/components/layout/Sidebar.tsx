@@ -10,8 +10,8 @@ import BabyIcon from 'lucide-react/dist/esm/icons/baby';
 import FolderIcon from 'lucide-react/dist/esm/icons/folder';
 import { cn } from '@/lib/utils';
 import { useLogout } from '@/hooks/useLogout';
-import { LogoutConfirmModal } from '@/components/auth/LogoutConfirmModal';
-import { useSidebar } from '@/contexts/SidebarContext';
+import { LogoutConfirmModal } from '@happy-baby/feature-auth';
+import { useSidebarStore as useSidebar } from '@happy-baby/shared-stores';
 import { CollapsibleNavItem } from './CollapsibleNavItem';
 import { LogoutButtonWithTooltip } from './LogoutButtonWithTooltip';
 

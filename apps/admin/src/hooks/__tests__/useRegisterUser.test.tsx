@@ -3,7 +3,7 @@
 
 import { renderHook, act } from '@testing-library/react';
 import { MockedProvider } from '@apollo/client/testing';
-import { useRegisterUser } from '../useRegisterUser';
+import { useRegisterUser } from '@happy-baby/feature-auth';
 import {
   RegisterUserDocument,
   UserRole,
