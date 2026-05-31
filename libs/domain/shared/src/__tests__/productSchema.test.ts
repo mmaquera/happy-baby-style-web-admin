@@ -1,4 +1,8 @@
-import { productSchema, updateProductSchema } from '@happy-baby/domain-shared';
+import {
+  productSchema,
+  updateProductSchema,
+  productFormSchema,
+} from '@happy-baby/domain-shared';
 
 describe('productSchema', () => {
   const validData = {
@@ -140,6 +144,93 @@ describe('productSchema', () => {
   it('accepts empty images array', () => {
     const result = productSchema.safeParse({ ...validData, images: [] });
     expect(result.success).toBe(true);
+  });
+});
+
+describe('productFormSchema', () => {
+  const validFormData = {
+    name: 'Pelele azul',
+    sku: 'PELELE-001',
+    price: '29.99',
+    salePrice: '19.99',
+    categoryId: 'cat-123',
+    stockQuantity: '50',
+    description: 'Ropa bebé',
+    tags: ['bebé'],
+    isActive: true,
+    images: ['https://example.com/img.jpg'],
+    attributes: {},
+  };
+
+  it('coerces string price to number', () => {
+    const result = productFormSchema.safeParse(validFormData);
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.price).toBe(29.99);
+  });
+
+  it('rejects empty price string', () => {
+    const result = productFormSchema.safeParse({ ...validFormData, price: '' });
+    expect(result.success).toBe(false);
+    const errors = result.error?.flatten().fieldErrors;
+    expect(errors?.price).toBeDefined();
+  });
+
+  it('rejects price of zero', () => {
+    const result = productFormSchema.safeParse({
+      ...validFormData,
+      price: '0',
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it('accepts empty salePrice string (treated as undefined)', () => {
+    const result = productFormSchema.safeParse({
+      ...validFormData,
+      salePrice: '',
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('rejects salePrice >= price', () => {
+    const result = productFormSchema.safeParse({
+      ...validFormData,
+      price: '10',
+      salePrice: '10',
+    });
+    expect(result.success).toBe(false);
+    expect(result.error?.flatten().fieldErrors.salePrice).toBeDefined();
+  });
+
+  it('rejects empty categoryId', () => {
+    const result = productFormSchema.safeParse({
+      ...validFormData,
+      categoryId: '',
+    });
+    expect(result.success).toBe(false);
+    expect(result.error?.flatten().fieldErrors.categoryId).toBeDefined();
+  });
+
+  it('rejects images with blob: URLs', () => {
+    const result = productFormSchema.safeParse({
+      ...validFormData,
+      images: ['blob:http://localhost/fake-url'],
+    });
+    expect(result.success).toBe(false);
+    expect(result.error?.flatten().fieldErrors.images).toBeDefined();
+  });
+
+  it('coerces stockQuantity string to number', () => {
+    const result = productFormSchema.safeParse({
+      ...validFormData,
+      stockQuantity: '10',
+    });
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.stockQuantity).toBe(10);
+  });
+
+  it('rejects SKU shorter than 3 characters', () => {
+    const result = productFormSchema.safeParse({ ...validFormData, sku: 'AB' });
+    expect(result.success).toBe(false);
   });
 });
 

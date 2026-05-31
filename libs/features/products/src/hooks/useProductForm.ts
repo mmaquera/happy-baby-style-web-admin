@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { productFormSchema } from '@happy-baby/domain-shared';
 import type { Product, ProductFormData } from '../types/product';
 import type { UploadResult } from '../types/upload';
 
@@ -149,32 +150,18 @@ export const useProductForm = (
   }, [errors]);
 
   const validateForm = useCallback((): boolean => {
+    const result = productFormSchema.safeParse(formData);
+    if (result.success) {
+      setErrors({});
+      return true;
+    }
     const newErrors: Record<string, string> = {};
-    if (!formData.name.trim())
-      newErrors['name'] = 'El nombre del producto es requerido';
-    if (!formData.sku.trim()) newErrors['sku'] = 'El SKU es requerido';
-    else if (formData.sku.trim().length < 3)
-      newErrors['sku'] = 'El SKU debe tener al menos 3 caracteres';
-    else if (!/^[A-Z0-9-_]+$/i.test(formData.sku.trim()))
-      newErrors['sku'] =
-        'El SKU solo puede contener letras, números, guiones y guiones bajos';
-    if (!formData.price || parseFloat(formData.price) <= 0)
-      newErrors['price'] = 'El precio debe ser mayor a 0';
-    if (
-      formData.salePrice &&
-      parseFloat(formData.salePrice) >= parseFloat(formData.price)
-    )
-      newErrors['salePrice'] =
-        'El precio de oferta debe ser menor al precio regular';
-    if (!formData.categoryId)
-      newErrors['categoryId'] = 'Debe seleccionar una categoría';
-    if (parseInt(formData.stockQuantity) < 0)
-      newErrors['stockQuantity'] = 'El stock no puede ser negativo';
-    if (formData.images.some(img => img.startsWith('blob:')))
-      newErrors['images'] =
-        'Todas las imágenes deben ser subidas antes de guardar el producto';
+    for (const issue of result.error.issues) {
+      const key = issue.path[0] as string | undefined;
+      if (key && !newErrors[key]) newErrors[key] = issue.message;
+    }
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return false;
   }, [formData]);
 
   const resetForm = useCallback((autoSku = false) => {

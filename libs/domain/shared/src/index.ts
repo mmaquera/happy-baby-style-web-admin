@@ -9,10 +9,15 @@ export {
   ValidationError,
 } from './Result';
 
-export { productSchema, updateProductSchema } from './validation/productSchema';
+export {
+  productSchema,
+  updateProductSchema,
+  productFormSchema,
+} from './validation/productSchema';
 export type {
   ProductSchemaInput,
   UpdateProductSchemaInput,
+  ProductFormSchemaInput,
 } from './validation/productSchema';
 
 export {
