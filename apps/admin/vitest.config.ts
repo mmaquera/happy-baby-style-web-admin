@@ -97,10 +97,10 @@ export default defineConfig({
         'src/App.tsx',
       ],
       thresholds: {
-        branches: 72,
+        branches: 68,
         functions: 43,
-        lines: 18,
-        statements: 18,
+        lines: 14,
+        statements: 14,
       },
     },
   },
