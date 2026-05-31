@@ -3,7 +3,7 @@ import { useSVGUpload } from '../useSVGUpload';
 
 const mockUploadSvgMutate = vi.fn();
 
-vi.mock('@/generated/graphql', () => ({
+vi.mock('@happy-baby/infrastructure-graphql', () => ({
   useUploadSvgMutation: () => [mockUploadSvgMutate, { loading: false }],
 }));
 

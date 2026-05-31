@@ -102,6 +102,10 @@ export default defineConfig(({ command, mode }) => {
           __dirname,
           '../../libs/features/products/src/index.ts'
         ),
+        '@happy-baby/feature-categories': path.resolve(
+          __dirname,
+          '../../libs/features/categories/src/index.ts'
+        ),
       },
     },
 

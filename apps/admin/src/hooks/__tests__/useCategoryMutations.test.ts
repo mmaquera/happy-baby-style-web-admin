@@ -12,7 +12,7 @@ const mockCreateMutate = vi.fn();
 const mockUpdateMutate = vi.fn();
 const mockUploadSvgMutate = vi.fn();
 
-vi.mock('@/generated/graphql', () => ({
+vi.mock('@happy-baby/infrastructure-graphql', () => ({
   useCreateCategoryMutation: () => [
     mockCreateMutate,
     { loading: false, error: null },

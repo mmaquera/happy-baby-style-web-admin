@@ -7,6 +7,9 @@
       "@happy-baby/shared-utils": ["../../../libs/shared/utils/src/index.ts"],
       "@happy-baby/feature-products": [
         "../../../libs/features/products/src/index.ts"
+      ],
+      "@happy-baby/feature-categories": [
+        "../../../libs/features/categories/src/index.ts"
       ]
     }
   },

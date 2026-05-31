@@ -3,12 +3,12 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import FileTextIcon from 'lucide-react/dist/esm/icons/file-text';
 import XIcon from 'lucide-react/dist/esm/icons/x';
 import ImageIcon from 'lucide-react/dist/esm/icons/image';
-import { useSVGUpload } from '@/hooks/useSVGUpload';
+import { useSVGUpload } from '../hooks/useSVGUpload';
 import {
   type SVGUploadProps,
   type SVGUploadResult,
   SVG_UPLOAD_DEFAULTS,
-} from './SVGUpload.types';
+} from '../types/svgUpload';
 import {
   SVGUploadContainer,
   SVGUploadZone,
@@ -36,7 +36,7 @@ import {
   SVGLoadingSpinner,
   SVGValidationMessage,
   SVGClearButton,
-} from './SVGUpload.styles';
+} from './SVGUploadStyles';
 
 const formatFileSize = (bytes: number): string => {
   if (bytes === 0) return '0 Bytes';

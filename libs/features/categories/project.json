@@ -1,0 +1,15 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "feature-categories",
+  "projectType": "library",
+  "sourceRoot": "libs/features/categories/src",
+  "tags": ["type:feature", "scope:categories"],
+  "targets": {
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit --project libs/features/categories/tsconfig.json"
+      }
+    }
+  }
+}

@@ -2,7 +2,7 @@ import { memo } from 'react';
 import FolderIcon from 'lucide-react/dist/esm/icons/folder';
 import AlertTriangleIcon from 'lucide-react/dist/esm/icons/alert-triangle';
 import { CategoryCard } from './CategoryCard';
-import type { Category } from './types';
+import type { Category } from '../types/category';
 
 interface CategoryGridProps {
   categories: Category[];

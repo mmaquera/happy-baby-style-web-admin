@@ -7,7 +7,7 @@ import UploadIcon from 'lucide-react/dist/esm/icons/upload';
 import PrinterIcon from 'lucide-react/dist/esm/icons/printer';
 import Grid3X3Icon from 'lucide-react/dist/esm/icons/grid-3x3';
 import ListIcon from 'lucide-react/dist/esm/icons/list';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@happy-baby/shared-ui';
 
 interface CategoryHeaderStats {
   totalCategories?: number;

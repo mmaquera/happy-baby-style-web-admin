@@ -11,10 +11,10 @@ import PackageIcon from 'lucide-react/dist/esm/icons/package';
 import ChevronDownIcon from 'lucide-react/dist/esm/icons/chevron-down';
 import ChevronUpIcon from 'lucide-react/dist/esm/icons/chevron-up';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Card } from '@/components/ui/Card';
-import type { CategoryFilters as CategoryFiltersType } from './types';
+import { Button } from '@happy-baby/shared-ui';
+import { Input } from '@happy-baby/shared-ui';
+import { Card } from '@happy-baby/shared-ui';
+import type { CategoryFilters as CategoryFiltersType } from '../types/category';
 
 interface CategoryFiltersProps {
   filters: CategoryFiltersType;

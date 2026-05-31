@@ -1,12 +1,9 @@
-// =====================================================
-// SVG UPLOAD MODULE EXPORTS - Categories Module
-// =====================================================
-// Following Clean Architecture principles and module organization
-
-// Main component
-export { SVGUpload } from './SVGUpload';
-
-// Types
+export {
+  SVGUpload,
+  useSVGUpload,
+  SVG_UPLOAD_DEFAULTS,
+  SVG_VALIDATION_RULES,
+} from '@happy-baby/feature-categories';
 export type {
   SVGUploadProps,
   SVGUploadResult,
@@ -14,10 +11,4 @@ export type {
   SVGUploadError,
   SVGValidationResult,
   UseSVGUploadReturn,
-} from './SVGUpload.types';
-
-// Constants
-export { SVG_UPLOAD_DEFAULTS, SVG_VALIDATION_RULES } from './SVGUpload.types';
-
-// Hook
-export { useSVGUpload } from '@/hooks/useSVGUpload';
+} from '@happy-baby/feature-categories';

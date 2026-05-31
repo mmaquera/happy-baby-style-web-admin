@@ -6,8 +6,8 @@ import EyeIcon from 'lucide-react/dist/esm/icons/eye';
 import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
 import XCircleIcon from 'lucide-react/dist/esm/icons/x-circle';
 import { cn } from '@/lib/utils';
-import { Card } from '@/components/ui/Card';
-import type { Category } from './types';
+import { Card } from '@happy-baby/shared-ui';
+import type { Category } from '../types/category';
 
 interface CategoryCardProps {
   category: Category;

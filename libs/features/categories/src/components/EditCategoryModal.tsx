@@ -9,13 +9,13 @@ import SettingsIcon from 'lucide-react/dist/esm/icons/settings';
 import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
 import CalendarIcon from 'lucide-react/dist/esm/icons/calendar';
 import ClockIcon from 'lucide-react/dist/esm/icons/clock';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Card } from '@/components/ui/Card';
-import { useUpdateCategory } from '@/hooks/useUpdateCategory';
-import type { UpdateCategoryInput } from '@/generated/graphql';
-import { SVGUpload } from './SVGUpload/SVGUpload';
-import type { Category } from './types';
+import { Button } from '@happy-baby/shared-ui';
+import { Input } from '@happy-baby/shared-ui';
+import { Card } from '@happy-baby/shared-ui';
+import { useUpdateCategory } from '../hooks/useUpdateCategory';
+import type { UpdateCategoryInput } from '@happy-baby/infrastructure-graphql';
+import { SVGUpload } from './SVGUpload';
+import type { Category } from '../types/category';
 import {
   createCategoryFormSchema,
   type CreateCategoryFormData,

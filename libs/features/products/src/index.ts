@@ -9,6 +9,8 @@ export { ProductGrid } from './components/ProductGrid';
 export { ProductHeader } from './components/ProductHeader';
 export { ProductListView } from './components/ProductListView';
 export { ProductDetailModal } from './components/ProductDetailModal';
+export { CreateProductModal } from './components/CreateProductModal';
+export { EditProductModal } from './components/EditProductModal';
 export { ProductFormFields } from './components/ProductFormFields';
 export { ImageUpload } from './components/ImageUpload';
 

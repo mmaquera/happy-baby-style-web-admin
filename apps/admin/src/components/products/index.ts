@@ -38,6 +38,7 @@ export type {
   ProductImportResult,
 } from '@happy-baby/feature-products';
 
-// Stays in admin (cross-feature: uses useCategories)
-export { CreateProductModal } from './CreateProductModal';
-export { EditProductModal } from './EditProductModal';
+export {
+  CreateProductModal,
+  EditProductModal,
+} from '@happy-baby/feature-products';

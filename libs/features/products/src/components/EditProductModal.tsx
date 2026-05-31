@@ -5,12 +5,13 @@ import XIcon from 'lucide-react/dist/esm/icons/x';
 import SaveIcon from 'lucide-react/dist/esm/icons/save';
 import AlertTriangleIcon from 'lucide-react/dist/esm/icons/alert-triangle';
 import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
-import { Button } from '@/components/ui/Button';
-import type { Category, Product } from '@happy-baby/feature-products';
+import { Button } from '@happy-baby/shared-ui';
+import type { Category, Product } from '../types/product';
+import { useProductActions } from '../hooks/useProductActions';
+import { useProductForm } from '../hooks/useProductForm';
+import { ProductFormFields } from './ProductFormFields';
+import { useTags } from '../hooks/useTags';
 import {
-  useProductActions,
-  useProductForm,
-  ProductFormFields,
   ModalOverlay,
   ModalContainer,
   ModalHeader,
@@ -22,15 +23,14 @@ import {
   SuccessMessage,
   LoadingOverlay,
   LoadingSpinner,
-  useTags,
-} from '@happy-baby/feature-products';
-import { useCategories } from '@/hooks/useCategories';
+} from './ProductFormStyles';
+import { useCategories } from '@happy-baby/feature-categories';
 import { toast } from 'react-hot-toast';
 import {
   convertImageUrlsToRelativePaths,
   validateBackendImageUrls,
-} from '@/utils/imageUtils';
-import { logger } from '@/utils/logger';
+} from '@happy-baby/shared-utils';
+import { logger } from '@happy-baby/infrastructure-monitoring';
 
 interface EditProductModalProps {
   isOpen: boolean;

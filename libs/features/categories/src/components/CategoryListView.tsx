@@ -6,7 +6,7 @@ import FolderIcon from 'lucide-react/dist/esm/icons/folder';
 import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
 import XCircleIcon from 'lucide-react/dist/esm/icons/x-circle';
 import { cn } from '@/lib/utils';
-import type { Category } from './types';
+import type { Category } from '../types/category';
 
 interface CategoryListViewProps {
   categories: Category[];

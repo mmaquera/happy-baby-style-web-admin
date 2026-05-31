@@ -10,12 +10,12 @@ import {
 } from '@/components/products';
 
 const CreateProductModal = lazy(() =>
-  import('@/components/products/CreateProductModal').then(m => ({
+  import('@happy-baby/feature-products').then(m => ({
     default: m.CreateProductModal,
   }))
 );
 const EditProductModal = lazy(() =>
-  import('@/components/products/EditProductModal').then(m => ({
+  import('@happy-baby/feature-products').then(m => ({
     default: m.EditProductModal,
   }))
 );

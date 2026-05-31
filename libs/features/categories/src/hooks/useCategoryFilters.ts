@@ -1,0 +1,380 @@
+import { useCallback, useState, useMemo } from 'react';
+import {
+  type PaginationInput,
+  type Category,
+} from '@happy-baby/infrastructure-graphql';
+
+type CategoryWithExtras = Category & { productsCount?: number };
+import {
+  type CategoryFilters,
+  type CategoryFilterInput,
+} from '../types/category';
+
+// Local types for internal state management
+export interface LocalPaginationInput {
+  limit: number;
+  offset: number;
+}
+
+export interface SortConfig {
+  field: string;
+  direction: 'asc' | 'desc';
+}
+
+export interface UseCategoryFiltersReturn {
+  // Filters
+  filters: CategoryFilters;
+  setFilters: (filters: CategoryFilters) => void;
+  updateFilter: (
+    key: keyof CategoryFilters,
+    value: CategoryFilters[keyof CategoryFilters]
+  ) => void;
+  clearFilters: () => void;
+
+  // Sorting
+  sortConfig: SortConfig;
+  setSortConfig: (config: SortConfig) => void;
+  handleSort: (field: string) => void;
+
+  // Pagination
+  pagination: LocalPaginationInput;
+  setPagination: (pagination: LocalPaginationInput) => void;
+  setPaginationFromGraphQL: (pagination: PaginationInput) => void;
+  goToPage: (page: number) => void;
+  nextPage: () => void;
+  prevPage: () => void;
+
+  // Computed values
+  currentPage: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+
+  // Utilities
+  resetToDefaults: () => void;
+  getFilteredAndSortedCategories: (categories: Category[]) => Category[];
+  mapFiltersToGraphQL: (filters: CategoryFilters) => CategoryFilterInput;
+}
+
+const DEFAULT_FILTERS: CategoryFilters = {
+  search: '',
+};
+
+const DEFAULT_SORT: SortConfig = {
+  field: 'sortOrder',
+  direction: 'asc',
+};
+
+const DEFAULT_PAGINATION: LocalPaginationInput = {
+  limit: 10,
+  offset: 0,
+};
+
+export const useCategoryFilters = (totalItems: number = 0) => {
+  // Helper function to map GraphQL pagination to local pagination
+  const mapGraphQLPaginationToLocal = useCallback(
+    (graphqlPagination: PaginationInput): LocalPaginationInput => {
+      return {
+        limit: graphqlPagination.limit ?? 10,
+        offset: graphqlPagination.offset ?? 0,
+      };
+    },
+    []
+  );
+
+  // Helper function to map local filters to GraphQL format
+  const mapFiltersToGraphQL = useCallback(
+    (localFilters: CategoryFilters): CategoryFilterInput => {
+      const graphqlFilters: CategoryFilterInput = {};
+
+      // Only add properties that are not null or undefined
+      if (localFilters.isActive !== undefined) {
+        graphqlFilters.isActive = localFilters.isActive;
+      }
+
+      if (localFilters.search) {
+        graphqlFilters.search = localFilters.search;
+      }
+
+      if (localFilters.hasImage !== undefined) {
+        graphqlFilters.hasImage = localFilters.hasImage;
+      }
+
+      if (localFilters.hasDescription !== undefined) {
+        graphqlFilters.hasDescription = localFilters.hasDescription;
+      }
+
+      if (localFilters.hasProducts !== undefined) {
+        graphqlFilters.hasProducts = localFilters.hasProducts;
+      }
+
+      if (localFilters.minProducts !== undefined) {
+        graphqlFilters.minProducts = localFilters.minProducts;
+      }
+
+      if (localFilters.maxProducts !== undefined) {
+        graphqlFilters.maxProducts = localFilters.maxProducts;
+      }
+
+      if (localFilters.createdAfter) {
+        graphqlFilters.createdAfter = localFilters.createdAfter;
+      }
+
+      if (localFilters.createdBefore) {
+        graphqlFilters.createdBefore = localFilters.createdBefore;
+      }
+
+      if (localFilters.updatedAfter) {
+        graphqlFilters.updatedAfter = localFilters.updatedAfter;
+      }
+
+      if (localFilters.updatedBefore) {
+        graphqlFilters.updatedBefore = localFilters.updatedBefore;
+      }
+
+      if (localFilters.sortOrder !== undefined) {
+        graphqlFilters.sortOrder = localFilters.sortOrder;
+      }
+
+      return graphqlFilters;
+    },
+    []
+  );
+
+  // Filters state
+  const [filters, setFilters] = useState<CategoryFilters>(DEFAULT_FILTERS);
+
+  // Sorting state
+  const [sortConfig, setSortConfig] = useState<SortConfig>(DEFAULT_SORT);
+
+  // Pagination state
+  const [pagination, setPagination] =
+    useState<LocalPaginationInput>(DEFAULT_PAGINATION);
+
+  // Set pagination from GraphQL input
+  const setPaginationFromGraphQL = useCallback(
+    (graphqlPagination: PaginationInput) => {
+      const localPagination = mapGraphQLPaginationToLocal(graphqlPagination);
+      setPagination(localPagination);
+    },
+    [mapGraphQLPaginationToLocal]
+  );
+
+  // Update specific filter
+  const updateFilter = useCallback(
+    (
+      key: keyof CategoryFilters,
+      value: CategoryFilters[keyof CategoryFilters]
+    ) => {
+      setFilters(prev => ({ ...prev, [key]: value }));
+      // Reset to first page when filters change
+      setPagination(prev => ({ ...prev, offset: 0 }));
+    },
+    []
+  );
+
+  // Clear all filters
+  const clearFilters = useCallback(() => {
+    setFilters(DEFAULT_FILTERS);
+    setPagination(prev => ({ ...prev, offset: 0 }));
+  }, []);
+
+  // Handle sorting
+  const handleSort = useCallback((field: string) => {
+    setSortConfig(prev => ({
+      field,
+      direction:
+        prev.field === field && prev.direction === 'asc' ? 'desc' : 'asc',
+    }));
+  }, []);
+
+  // Pagination helpers
+  const currentPage = useMemo(() => {
+    return Math.floor(pagination.offset / pagination.limit) + 1;
+  }, [pagination.offset, pagination.limit]);
+
+  const totalPages = useMemo(() => {
+    return Math.ceil(totalItems / pagination.limit);
+  }, [totalItems, pagination.limit]);
+
+  const hasNextPage = useMemo(() => {
+    return currentPage < totalPages;
+  }, [currentPage, totalPages]);
+
+  const hasPrevPage = useMemo(() => {
+    return currentPage > 1;
+  }, [currentPage]);
+
+  // Go to specific page
+  const goToPage = useCallback(
+    (page: number) => {
+      const newOffset = (page - 1) * pagination.limit;
+      setPagination(prev => ({ ...prev, offset: newOffset }));
+    },
+    [pagination.limit]
+  );
+
+  // Next page
+  const nextPage = useCallback(() => {
+    if (hasNextPage) {
+      goToPage(currentPage + 1);
+    }
+  }, [hasNextPage, currentPage, goToPage]);
+
+  // Previous page
+  const prevPage = useCallback(() => {
+    if (hasPrevPage) {
+      goToPage(currentPage - 1);
+    }
+  }, [hasPrevPage, currentPage, goToPage]);
+
+  // Reset to defaults
+  const resetToDefaults = useCallback(() => {
+    setFilters(DEFAULT_FILTERS);
+    setSortConfig(DEFAULT_SORT);
+    setPagination(DEFAULT_PAGINATION);
+  }, []);
+
+  // Filter and sort categories (for client-side operations)
+  const getFilteredAndSortedCategories = useCallback(
+    (categories: Category[]) => {
+      let filtered = [...categories];
+
+      // Apply filters
+      if (filters.isActive !== undefined) {
+        filtered = filtered.filter(cat => cat.isActive === filters.isActive);
+      }
+
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        filtered = filtered.filter(
+          cat =>
+            cat.name.toLowerCase().includes(searchLower) ||
+            (cat.description &&
+              cat.description.toLowerCase().includes(searchLower)) ||
+            cat.slug.toLowerCase().includes(searchLower)
+        );
+      }
+
+      if (filters.hasImage !== undefined) {
+        filtered = filtered.filter(cat =>
+          filters.hasImage ? !!cat.image : !cat.image
+        );
+      }
+
+      if (filters.hasDescription !== undefined) {
+        filtered = filtered.filter(cat =>
+          filters.hasDescription ? !!cat.description : !cat.description
+        );
+      }
+
+      if (filters.hasProducts !== undefined) {
+        filtered = filtered.filter(cat =>
+          filters.hasProducts
+            ? ((cat as CategoryWithExtras).productsCount || 0) > 0
+            : ((cat as CategoryWithExtras).productsCount || 0) === 0
+        );
+      }
+
+      if (filters.minProducts !== undefined) {
+        filtered = filtered.filter(
+          cat =>
+            ((cat as CategoryWithExtras).productsCount || 0) >=
+            filters.minProducts!
+        );
+      }
+
+      if (filters.maxProducts !== undefined) {
+        filtered = filtered.filter(
+          cat =>
+            ((cat as CategoryWithExtras).productsCount || 0) <=
+            filters.maxProducts!
+        );
+      }
+
+      if (filters.createdAfter) {
+        filtered = filtered.filter(
+          cat => new Date(cat.createdAt) >= new Date(filters.createdAfter!)
+        );
+      }
+
+      if (filters.createdBefore) {
+        filtered = filtered.filter(
+          cat => new Date(cat.createdAt) <= new Date(filters.createdBefore!)
+        );
+      }
+
+      if (filters.updatedAfter) {
+        filtered = filtered.filter(
+          cat => new Date(cat.updatedAt) >= new Date(filters.updatedAfter!)
+        );
+      }
+
+      if (filters.updatedBefore) {
+        filtered = filtered.filter(
+          cat => new Date(cat.updatedAt) <= new Date(filters.updatedBefore!)
+        );
+      }
+
+      if (filters.sortOrder !== undefined) {
+        filtered = filtered.filter(cat => cat.sortOrder === filters.sortOrder);
+      }
+
+      // Apply sorting
+      filtered.sort((a, b) => {
+        const aValue = (a as Record<string, unknown>)[sortConfig.field];
+        const bValue = (b as Record<string, unknown>)[sortConfig.field];
+
+        if (aValue === bValue) return 0;
+
+        let comparison = 0;
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+          comparison = aValue.localeCompare(bValue);
+        } else if (typeof aValue === 'number' && typeof bValue === 'number') {
+          comparison = aValue - bValue;
+        } else if (aValue instanceof Date && bValue instanceof Date) {
+          comparison = aValue.getTime() - bValue.getTime();
+        } else {
+          comparison = String(aValue).localeCompare(String(bValue));
+        }
+
+        return sortConfig.direction === 'asc' ? comparison : -comparison;
+      });
+
+      return filtered;
+    },
+    [filters, sortConfig]
+  );
+
+  return {
+    // Filters
+    filters,
+    setFilters,
+    updateFilter,
+    clearFilters,
+
+    // Sorting
+    sortConfig,
+    setSortConfig,
+    handleSort,
+
+    // Pagination
+    pagination,
+    setPagination,
+    setPaginationFromGraphQL,
+    goToPage,
+    nextPage,
+    prevPage,
+
+    // Computed values
+    currentPage,
+    totalPages,
+    hasNextPage,
+    hasPrevPage,
+
+    // Utilities
+    resetToDefaults,
+    getFilteredAndSortedCategories,
+    mapFiltersToGraphQL,
+  };
+};

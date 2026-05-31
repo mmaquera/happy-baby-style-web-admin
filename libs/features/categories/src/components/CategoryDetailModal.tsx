@@ -11,9 +11,9 @@ import XCircleIcon from 'lucide-react/dist/esm/icons/x-circle';
 import LinkIcon from 'lucide-react/dist/esm/icons/link';
 import Edit3Icon from 'lucide-react/dist/esm/icons/edit-3';
 import { cn } from '@/lib/utils';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import type { Category } from './types';
+import { Card } from '@happy-baby/shared-ui';
+import { Button } from '@happy-baby/shared-ui';
+import type { Category } from '../types/category';
 
 interface CategoryDetailModalProps {
   isOpen: boolean;

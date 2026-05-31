@@ -1,5 +1,8 @@
+import React from 'react';
 import { renderHook, act } from '@testing-library/react';
 import { useCategoryActions } from '../useCategoryActions';
+import { CategoryContext } from '@happy-baby/feature-categories';
+import type { CategoryUseCases } from '@happy-baby/feature-categories';
 import { ok, err } from '@happy-baby/domain-shared';
 import { DomainError } from '@happy-baby/domain-shared';
 import type { Category } from '@happy-baby/domain-category';
@@ -16,14 +19,19 @@ const mockDeleteExecute = vi.fn();
 const mockUpdateExecute = vi.fn();
 const mockCreateExecute = vi.fn();
 
-vi.mock('@/app/di/categories', () => ({
-  useCategoryUseCases: () => ({
-    list: { execute: mockListExecute },
-    delete: { execute: mockDeleteExecute },
-    update: { execute: mockUpdateExecute },
-    create: { execute: mockCreateExecute },
-  }),
-}));
+const mockUseCases = {
+  list: { execute: mockListExecute },
+  delete: { execute: mockDeleteExecute },
+  update: { execute: mockUpdateExecute },
+  create: { execute: mockCreateExecute },
+} as unknown as CategoryUseCases;
+
+const wrapper = ({ children }: { children: React.ReactNode }) =>
+  React.createElement(
+    CategoryContext.Provider,
+    { value: mockUseCases },
+    children
+  );
 
 import { toast } from 'react-hot-toast';
 
@@ -52,7 +60,7 @@ describe('useCategoryActions', () => {
   });
 
   it('initializes with empty state', () => {
-    const { result } = renderHook(() => useCategoryActions());
+    const { result } = renderHook(() => useCategoryActions(), { wrapper });
     expect(result.current.categories).toEqual([]);
     expect(result.current.total).toBe(0);
     expect(result.current.hasMore).toBe(false);
@@ -67,7 +75,7 @@ describe('useCategoryActions', () => {
         ok({ items: [cat], total: 1, hasMore: false })
       );
 
-      const { result } = renderHook(() => useCategoryActions());
+      const { result } = renderHook(() => useCategoryActions(), { wrapper });
 
       await act(async () => {
         await result.current.loadCategories();
@@ -79,7 +87,7 @@ describe('useCategoryActions', () => {
     });
 
     it('calls list.execute with default limit=50, offset=0', async () => {
-      const { result } = renderHook(() => useCategoryActions());
+      const { result } = renderHook(() => useCategoryActions(), { wrapper });
 
       await act(async () => {
         await result.current.loadCategories();
@@ -89,7 +97,7 @@ describe('useCategoryActions', () => {
     });
 
     it('passes filter when provided', async () => {
-      const { result } = renderHook(() => useCategoryActions());
+      const { result } = renderHook(() => useCategoryActions(), { wrapper });
 
       await act(async () => {
         await result.current.loadCategories({ isActive: true }, 10, 5);
@@ -107,7 +115,7 @@ describe('useCategoryActions', () => {
         err(new DomainError('Error al cargar', 'LOAD_FAILED'))
       );
 
-      const { result } = renderHook(() => useCategoryActions());
+      const { result } = renderHook(() => useCategoryActions(), { wrapper });
 
       await act(async () => {
         await result.current.loadCategories();
@@ -118,7 +126,7 @@ describe('useCategoryActions', () => {
     });
 
     it('resets loading to false even on success', async () => {
-      const { result } = renderHook(() => useCategoryActions());
+      const { result } = renderHook(() => useCategoryActions(), { wrapper });
 
       await act(async () => {
         await result.current.loadCategories();
@@ -133,7 +141,7 @@ describe('useCategoryActions', () => {
       mockListExecute.mockResolvedValueOnce(
         err(new DomainError('fail', 'ERR'))
       );
-      const { result } = renderHook(() => useCategoryActions());
+      const { result } = renderHook(() => useCategoryActions(), { wrapper });
 
       await act(async () => {
         await result.current.loadCategories();
@@ -153,7 +161,7 @@ describe('useCategoryActions', () => {
         ok({ items: [cat1, cat2], total: 2, hasMore: false })
       );
 
-      const { result } = renderHook(() => useCategoryActions());
+      const { result } = renderHook(() => useCategoryActions(), { wrapper });
 
       await act(async () => {
         await result.current.loadCategories();
@@ -168,7 +176,7 @@ describe('useCategoryActions', () => {
     });
 
     it('shows success toast on delete', async () => {
-      const { result } = renderHook(() => useCategoryActions());
+      const { result } = renderHook(() => useCategoryActions(), { wrapper });
 
       await act(async () => {
         const success = await result.current.deleteCategory('cat-1');
@@ -184,7 +192,7 @@ describe('useCategoryActions', () => {
       mockDeleteExecute.mockResolvedValueOnce(
         err(new DomainError('No se puede eliminar', 'DELETE_FAILED'))
       );
-      const { result } = renderHook(() => useCategoryActions());
+      const { result } = renderHook(() => useCategoryActions(), { wrapper });
 
       await act(async () => {
         const success = await result.current.deleteCategory('cat-1');
@@ -204,7 +212,7 @@ describe('useCategoryActions', () => {
       const updated = { ...cat, name: 'Ropa actualizada' };
       mockUpdateExecute.mockResolvedValueOnce(ok(updated));
 
-      const { result } = renderHook(() => useCategoryActions());
+      const { result } = renderHook(() => useCategoryActions(), { wrapper });
 
       await act(async () => {
         await result.current.loadCategories();
@@ -220,7 +228,7 @@ describe('useCategoryActions', () => {
     });
 
     it('shows success toast on update', async () => {
-      const { result } = renderHook(() => useCategoryActions());
+      const { result } = renderHook(() => useCategoryActions(), { wrapper });
 
       await act(async () => {
         const success = await result.current.updateCategory('cat-1', {
@@ -238,7 +246,7 @@ describe('useCategoryActions', () => {
       mockUpdateExecute.mockResolvedValueOnce(
         err(new DomainError('Error al actualizar', 'UPDATE_FAILED'))
       );
-      const { result } = renderHook(() => useCategoryActions());
+      const { result } = renderHook(() => useCategoryActions(), { wrapper });
 
       await act(async () => {
         const success = await result.current.updateCategory('cat-1', {

@@ -6,12 +6,12 @@ import FolderPlusIcon from 'lucide-react/dist/esm/icons/folder-plus';
 import HashIcon from 'lucide-react/dist/esm/icons/hash';
 import SettingsIcon from 'lucide-react/dist/esm/icons/settings';
 import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Card } from '@/components/ui/Card';
-import { useCreateCategory } from '@/hooks/useCreateCategory';
-import type { CreateCategoryInput } from '@/generated/graphql';
-import { SVGUpload } from './SVGUpload/SVGUpload';
+import { Button } from '@happy-baby/shared-ui';
+import { Input } from '@happy-baby/shared-ui';
+import { Card } from '@happy-baby/shared-ui';
+import { useCreateCategory } from '../hooks/useCreateCategory';
+import type { CreateCategoryInput } from '@happy-baby/infrastructure-graphql';
+import { SVGUpload } from './SVGUpload';
 import {
   createCategoryFormSchema,
   type CreateCategoryFormData,

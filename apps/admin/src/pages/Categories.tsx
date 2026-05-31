@@ -8,25 +8,25 @@ import {
   CategoryFilters,
 } from '@/components/categories';
 import type {
-  CategoryFilters as CategoryFiltersType,
+  CategoryFiltersState as CategoryFiltersType,
   Category,
-} from '@/components/categories/types';
+} from '@happy-baby/feature-categories';
 import { useCategoryActions } from '@/hooks/useCategoryActions';
 import { logger } from '@/utils/logger';
 import { Button } from '@/components/ui/Button';
 
 const CreateCategoryModal = lazy(() =>
-  import('@/components/categories/CreateCategoryModal').then(m => ({
+  import('@happy-baby/feature-categories').then(m => ({
     default: m.CreateCategoryModal,
   }))
 );
 const EditCategoryModal = lazy(() =>
-  import('@/components/categories/EditCategoryModal').then(m => ({
+  import('@happy-baby/feature-categories').then(m => ({
     default: m.EditCategoryModal,
   }))
 );
 const CategoryDetailModal = lazy(() =>
-  import('@/components/categories/CategoryDetailModal').then(m => ({
+  import('@happy-baby/feature-categories').then(m => ({
     default: m.CategoryDetailModal,
   }))
 );
