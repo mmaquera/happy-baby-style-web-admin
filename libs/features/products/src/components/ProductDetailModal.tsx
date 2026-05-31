@@ -21,15 +21,15 @@ import UserIcon from 'lucide-react/dist/esm/icons/user';
 import ThumbsUpIcon from 'lucide-react/dist/esm/icons/thumbs-up';
 import DatabaseIcon from 'lucide-react/dist/esm/icons/database';
 import ShoppingBagIcon from 'lucide-react/dist/esm/icons/shopping-bag';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/Button';
+import { cn } from '@happy-baby/shared-utils';
+import { Button } from '@happy-baby/shared-ui';
 import type {
   Product,
   ProductReview,
   InventoryTransaction,
   StockAlert,
   AppEvent,
-} from './types';
+} from '../types/product';
 
 interface ProductDetailModalProps {
   isOpen: boolean;

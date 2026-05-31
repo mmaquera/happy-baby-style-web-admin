@@ -1,2 +1,2 @@
-export { ImageUpload } from './ImageUpload';
-export type { ImageUploadProps } from '@/types/upload';
+export { ImageUpload } from '@happy-baby/feature-products';
+export type { ImageUploadProps } from '@happy-baby/feature-products';

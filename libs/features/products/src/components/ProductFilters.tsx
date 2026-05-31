@@ -4,9 +4,9 @@ import SearchIcon from 'lucide-react/dist/esm/icons/search';
 import FilterIcon from 'lucide-react/dist/esm/icons/filter';
 import XIcon from 'lucide-react/dist/esm/icons/x';
 import TagIcon from 'lucide-react/dist/esm/icons/tag';
-import { cn } from '@/lib/utils';
-import { Input } from '@/components/ui/Input';
-import { Button } from '@/components/ui/Button';
+import { cn } from '@happy-baby/shared-utils';
+import { Input } from '@happy-baby/shared-ui';
+import { Button } from '@happy-baby/shared-ui';
 
 interface ProductFiltersProps {
   filters: {

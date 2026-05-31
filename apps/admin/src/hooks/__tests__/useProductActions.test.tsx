@@ -1,5 +1,8 @@
+import React from 'react';
 import { renderHook, act } from '@testing-library/react';
 import { useProductActions } from '../useProductActions';
+import { ProductContext } from '@happy-baby/feature-products';
+import type { ProductUseCases } from '@happy-baby/feature-products';
 import {
   ok,
   err,
@@ -19,16 +22,20 @@ const mockUpdateExecute = vi.fn();
 const mockDeleteExecute = vi.fn();
 const mockUploadImageExecute = vi.fn();
 
-vi.mock('@/app/di/products', () => ({
-  useProductUseCases: () => ({
-    create: { execute: mockCreateExecute },
-    update: { execute: mockUpdateExecute },
-    delete: { execute: mockDeleteExecute },
-    uploadImage: { execute: mockUploadImageExecute },
-    list: { execute: vi.fn() },
-    get: { execute: vi.fn() },
-  }),
-}));
+const mockUseCases = {
+  create: { execute: mockCreateExecute },
+  update: { execute: mockUpdateExecute },
+  delete: { execute: mockDeleteExecute },
+  uploadImage: { execute: mockUploadImageExecute },
+  list: { execute: vi.fn() },
+} as unknown as ProductUseCases;
+
+const wrapper = ({ children }: { children: React.ReactNode }) =>
+  React.createElement(
+    ProductContext.Provider,
+    { value: mockUseCases },
+    children
+  );
 
 import { toast } from 'react-hot-toast';
 
@@ -66,7 +73,7 @@ describe('useProductActions', () => {
   });
 
   it('initializes with correct defaults', () => {
-    const { result } = renderHook(() => useProductActions());
+    const { result } = renderHook(() => useProductActions(), { wrapper });
     expect(result.current.loading).toBe(false);
     expect(result.current.error).toBeNull();
   });
@@ -75,7 +82,7 @@ describe('useProductActions', () => {
     mockCreateExecute.mockResolvedValueOnce(
       err(new DomainError('fallo', 'ERR'))
     );
-    const { result } = renderHook(() => useProductActions());
+    const { result } = renderHook(() => useProductActions(), { wrapper });
 
     await act(async () => {
       await result.current.createProduct({
@@ -95,7 +102,7 @@ describe('useProductActions', () => {
       mockCreateExecute.mockResolvedValueOnce(
         ok(makeDomainProduct({ name: 'Pelele' }))
       );
-      const { result } = renderHook(() => useProductActions());
+      const { result } = renderHook(() => useProductActions(), { wrapper });
 
       let product: ReturnType<
         typeof result.current.createProduct
@@ -115,7 +122,7 @@ describe('useProductActions', () => {
     });
 
     it('shows success toast', async () => {
-      const { result } = renderHook(() => useProductActions());
+      const { result } = renderHook(() => useProductActions(), { wrapper });
       await act(async () => {
         await result.current.createProduct({
           name: 'x',
@@ -132,7 +139,7 @@ describe('useProductActions', () => {
       mockCreateExecute.mockResolvedValueOnce(
         err(new DomainError('SKU duplicado', 'DUPLICATE'))
       );
-      const { result } = renderHook(() => useProductActions());
+      const { result } = renderHook(() => useProductActions(), { wrapper });
 
       let product: unknown;
       await act(async () => {
@@ -152,7 +159,7 @@ describe('useProductActions', () => {
       mockCreateExecute.mockResolvedValueOnce(
         err(new ValidationError('Campo requerido'))
       );
-      const { result } = renderHook(() => useProductActions());
+      const { result } = renderHook(() => useProductActions(), { wrapper });
 
       await act(async () => {
         await result.current.createProduct({
@@ -171,7 +178,7 @@ describe('useProductActions', () => {
       mockUpdateExecute.mockResolvedValueOnce(
         ok(makeDomainProduct({ name: 'Actualizado' }))
       );
-      const { result } = renderHook(() => useProductActions());
+      const { result } = renderHook(() => useProductActions(), { wrapper });
 
       let product: unknown;
       await act(async () => {
@@ -191,7 +198,7 @@ describe('useProductActions', () => {
       mockUpdateExecute.mockResolvedValueOnce(
         err(new DomainError('No encontrado', 'NOT_FOUND'))
       );
-      const { result } = renderHook(() => useProductActions());
+      const { result } = renderHook(() => useProductActions(), { wrapper });
 
       let product: unknown;
       await act(async () => {
@@ -205,7 +212,7 @@ describe('useProductActions', () => {
 
   describe('deleteProduct', () => {
     it('returns true and shows success toast', async () => {
-      const { result } = renderHook(() => useProductActions());
+      const { result } = renderHook(() => useProductActions(), { wrapper });
 
       let success: boolean | undefined;
       await act(async () => {
@@ -222,7 +229,7 @@ describe('useProductActions', () => {
       mockDeleteExecute.mockResolvedValueOnce(
         err(new DomainError('Error delete', 'ERR'))
       );
-      const { result } = renderHook(() => useProductActions());
+      const { result } = renderHook(() => useProductActions(), { wrapper });
 
       let success: boolean | undefined;
       await act(async () => {
@@ -236,7 +243,7 @@ describe('useProductActions', () => {
 
   describe('toggleProductStatus', () => {
     it('shows activate toast when isActive=true', async () => {
-      const { result } = renderHook(() => useProductActions());
+      const { result } = renderHook(() => useProductActions(), { wrapper });
       await act(async () => {
         await result.current.toggleProductStatus('prod-1', true);
       });
@@ -246,7 +253,7 @@ describe('useProductActions', () => {
     });
 
     it('shows deactivate toast when isActive=false', async () => {
-      const { result } = renderHook(() => useProductActions());
+      const { result } = renderHook(() => useProductActions(), { wrapper });
       await act(async () => {
         await result.current.toggleProductStatus('prod-1', false);
       });
@@ -259,7 +266,7 @@ describe('useProductActions', () => {
       mockUpdateExecute.mockResolvedValueOnce(
         err(new DomainError('Error estado', 'ERR'))
       );
-      const { result } = renderHook(() => useProductActions());
+      const { result } = renderHook(() => useProductActions(), { wrapper });
 
       let ok: boolean | undefined;
       await act(async () => {
@@ -271,7 +278,7 @@ describe('useProductActions', () => {
 
   describe('updateProductStock', () => {
     it('shows success toast', async () => {
-      const { result } = renderHook(() => useProductActions());
+      const { result } = renderHook(() => useProductActions(), { wrapper });
       await act(async () => {
         await result.current.updateProductStock('prod-1', 50);
       });
@@ -284,7 +291,7 @@ describe('useProductActions', () => {
       mockUpdateExecute.mockResolvedValueOnce(
         err(new DomainError('Error stock', 'ERR'))
       );
-      const { result } = renderHook(() => useProductActions());
+      const { result } = renderHook(() => useProductActions(), { wrapper });
 
       let success: boolean | undefined;
       await act(async () => {
@@ -297,7 +304,7 @@ describe('useProductActions', () => {
   describe('bulkUpdateProducts', () => {
     it('processes activate operation and shows success toast', async () => {
       mockUpdateExecute.mockResolvedValue(ok(makeDomainProduct()));
-      const { result } = renderHook(() => useProductActions());
+      const { result } = renderHook(() => useProductActions(), { wrapper });
 
       await act(async () => {
         await result.current.bulkUpdateProducts([
@@ -311,7 +318,7 @@ describe('useProductActions', () => {
 
     it('processes delete operation', async () => {
       mockDeleteExecute.mockResolvedValue(ok(true));
-      const { result } = renderHook(() => useProductActions());
+      const { result } = renderHook(() => useProductActions(), { wrapper });
 
       await act(async () => {
         await result.current.bulkUpdateProducts([
@@ -324,7 +331,7 @@ describe('useProductActions', () => {
 
     it('shows error toast for rejected tasks', async () => {
       mockUpdateExecute.mockRejectedValue(new Error('Network error'));
-      const { result } = renderHook(() => useProductActions());
+      const { result } = renderHook(() => useProductActions(), { wrapper });
 
       await act(async () => {
         await result.current.bulkUpdateProducts([
@@ -338,7 +345,7 @@ describe('useProductActions', () => {
 
   describe('uploadProductImage', () => {
     it('returns url on success', async () => {
-      const { result } = renderHook(() => useProductActions());
+      const { result } = renderHook(() => useProductActions(), { wrapper });
 
       let url: string | null | undefined;
       await act(async () => {
@@ -355,7 +362,7 @@ describe('useProductActions', () => {
       mockUploadImageExecute.mockResolvedValueOnce(
         err(new DomainError('Error upload', 'ERR'))
       );
-      const { result } = renderHook(() => useProductActions());
+      const { result } = renderHook(() => useProductActions(), { wrapper });
 
       let url: string | null | undefined;
       await act(async () => {
@@ -370,7 +377,7 @@ describe('useProductActions', () => {
   });
 
   it('validateProductInput always returns empty array', () => {
-    const { result } = renderHook(() => useProductActions());
+    const { result } = renderHook(() => useProductActions(), { wrapper });
     expect(result.current.validateProductInput()).toEqual([]);
   });
 });

@@ -6,19 +6,11 @@ import PlusIcon from 'lucide-react/dist/esm/icons/plus';
 import AlertTriangleIcon from 'lucide-react/dist/esm/icons/alert-triangle';
 import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
 import { Button } from '@/components/ui/Button';
-import type { Category, Product } from './types';
-import { useProductActions } from '@/hooks/useProductActions';
-import { useCategories } from '@/hooks/useCategories';
-import { useTags } from '@/hooks/useTags';
-import { toast } from 'react-hot-toast';
+import type { Category, Product } from '@happy-baby/feature-products';
 import {
-  convertImageUrlsToRelativePaths,
-  validateBackendImageUrls,
-} from '@/utils/imageUtils';
-import { logger } from '@/utils/logger';
-import { useProductForm } from './ProductForm/useProductForm';
-import { ProductFormFields } from './ProductForm/ProductFormFields';
-import {
+  useProductActions,
+  useProductForm,
+  ProductFormFields,
   ModalOverlay,
   ModalContainer,
   ModalHeader,
@@ -30,7 +22,15 @@ import {
   SuccessMessage,
   LoadingOverlay,
   LoadingSpinner,
-} from './ProductForm/styles';
+  useTags,
+} from '@happy-baby/feature-products';
+import { useCategories } from '@/hooks/useCategories';
+import { toast } from 'react-hot-toast';
+import {
+  convertImageUrlsToRelativePaths,
+  validateBackendImageUrls,
+} from '@/utils/imageUtils';
+import { logger } from '@/utils/logger';
 
 interface CreateProductModalProps {
   isOpen: boolean;

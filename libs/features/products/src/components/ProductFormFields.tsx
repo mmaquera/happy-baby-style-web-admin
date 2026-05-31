@@ -10,11 +10,11 @@ import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
 import SettingsIcon from 'lucide-react/dist/esm/icons/settings';
 import BadgeDollarSignIcon from 'lucide-react/dist/esm/icons/badge-dollar-sign';
 import RefreshCwIcon from 'lucide-react/dist/esm/icons/refresh-cw';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { ImageUpload } from '../ImageUpload';
-import type { Category, TagWithMetadata } from '../types';
-import type { UseProductFormReturn } from './useProductForm';
+import { Button } from '@happy-baby/shared-ui';
+import { Input } from '@happy-baby/shared-ui';
+import { ImageUpload } from './ImageUpload';
+import type { Category, TagWithMetadata } from '../types/product';
+import type { UseProductFormReturn } from '../hooks/useProductForm';
 import {
   FormSection,
   SectionTitle,
@@ -36,7 +36,7 @@ import {
   SkuFieldContainer,
   GenerateSkuButton,
   LoadingSpinner,
-} from './styles';
+} from './ProductFormStyles';
 
 export interface ProductFormFieldsProps {
   form: UseProductFormReturn;

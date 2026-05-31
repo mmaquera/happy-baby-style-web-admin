@@ -98,6 +98,10 @@ export default defineConfig(({ command, mode }) => {
           __dirname,
           '../../libs/shared/stores/src/index.ts'
         ),
+        '@happy-baby/feature-products': path.resolve(
+          __dirname,
+          '../../libs/features/products/src/index.ts'
+        ),
       },
     },
 

@@ -11,8 +11,8 @@ import XCircleIcon from 'lucide-react/dist/esm/icons/x-circle';
 import StarIcon from 'lucide-react/dist/esm/icons/star';
 import SortAscIcon from 'lucide-react/dist/esm/icons/sort-asc';
 import SortDescIcon from 'lucide-react/dist/esm/icons/sort-desc';
-import { cn } from '@/lib/utils';
-import { CURRENCY_SYMBOL } from '@/config/currency';
+import { cn } from '@happy-baby/shared-utils';
+import { CURRENCY_SYMBOL } from '@happy-baby/shared-utils';
 
 interface Product {
   id: string;

@@ -4,9 +4,9 @@ import Grid3X3Icon from 'lucide-react/dist/esm/icons/grid-3x3';
 import ListIcon from 'lucide-react/dist/esm/icons/list';
 import PackageIcon from 'lucide-react/dist/esm/icons/package';
 import AlertTriangleIcon from 'lucide-react/dist/esm/icons/alert-triangle';
-import { cn } from '@/lib/utils';
+import { cn } from '@happy-baby/shared-utils';
 import { ProductCard } from './ProductCard';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@happy-baby/shared-ui';
 
 interface Product {
   id: string;

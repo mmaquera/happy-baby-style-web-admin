@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { ProductCard } from '../ProductCard';
-import type { Product } from '../types';
+import { ProductCard } from '@happy-baby/feature-products';
+import type { Product } from '@happy-baby/feature-products';
 
 // Mock data
 const mockProduct: Product = {

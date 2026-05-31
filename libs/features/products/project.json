@@ -1,0 +1,15 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "feature-products",
+  "projectType": "library",
+  "sourceRoot": "libs/features/products/src",
+  "tags": ["type:feature", "scope:products"],
+  "targets": {
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit --project libs/features/products/tsconfig.json"
+      }
+    }
+  }
+}

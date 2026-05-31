@@ -8,9 +8,9 @@ import EyeIcon from 'lucide-react/dist/esm/icons/eye';
 import EditIcon from 'lucide-react/dist/esm/icons/edit';
 import Trash2Icon from 'lucide-react/dist/esm/icons/trash-2';
 import PackageIcon from 'lucide-react/dist/esm/icons/package';
-import { cn } from '@/lib/utils';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
+import { cn } from '@happy-baby/shared-utils';
+import { Card } from '@happy-baby/shared-ui';
+import { Button } from '@happy-baby/shared-ui';
 
 interface ProductCardProps {
   product: {

@@ -10,8 +10,8 @@ import DownloadIcon from 'lucide-react/dist/esm/icons/download';
 import UploadIcon from 'lucide-react/dist/esm/icons/upload';
 import Grid3X3Icon from 'lucide-react/dist/esm/icons/grid-3x3';
 import ListIcon from 'lucide-react/dist/esm/icons/list';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/Button';
+import { cn } from '@happy-baby/shared-utils';
+import { Button } from '@happy-baby/shared-ui';
 
 interface ProductHeaderProps {
   title?: string;

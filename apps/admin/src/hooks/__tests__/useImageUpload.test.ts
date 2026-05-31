@@ -3,7 +3,7 @@ import { useImageUpload } from '../useImageUpload';
 
 const mockUploadMutate = vi.fn();
 
-vi.mock('@/generated/graphql', () => ({
+vi.mock('@happy-baby/infrastructure-graphql', () => ({
   useUploadImageMutation: () => [mockUploadMutate, { loading: false }],
 }));
 

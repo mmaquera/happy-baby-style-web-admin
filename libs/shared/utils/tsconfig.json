@@ -3,7 +3,10 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@happy-baby/shared-utils": ["../../../libs/shared/utils/src/index.ts"]
+      "@happy-baby/shared-utils": ["../../../libs/shared/utils/src/index.ts"],
+      "@happy-baby/feature-products": [
+        "../../../libs/features/products/src/index.ts"
+      ]
     }
   },
   "include": ["src"]

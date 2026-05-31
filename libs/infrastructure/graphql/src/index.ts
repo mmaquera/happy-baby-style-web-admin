@@ -5,5 +5,9 @@ export { ApolloCategoryRepository } from './repositories/ApolloCategoryRepositor
 
 export { productMapper } from './mappers/productMapper';
 export { orderMapper } from './mappers/orderMapper';
+export type { OrderDTO } from './mappers/orderMapper';
 export { userMapper } from './mappers/userMapper';
+export type { UserDTO } from './mappers/userMapper';
 export { categoryMapper } from './mappers/categoryMapper';
+
+export * from './generated/graphql';

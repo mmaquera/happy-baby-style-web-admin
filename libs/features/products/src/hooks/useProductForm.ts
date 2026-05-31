@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
-import type { Product, ProductFormData } from '../types';
-import type { UploadResult } from '@/types/upload';
+import type { Product, ProductFormData } from '../types/product';
+import type { UploadResult } from '../types/upload';
 
 const generateShortSku = () =>
   `SKU-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;

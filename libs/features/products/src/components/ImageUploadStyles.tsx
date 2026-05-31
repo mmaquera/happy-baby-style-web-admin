@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@happy-baby/shared-utils';
 
 export const UploadContainer: React.FC<
   React.HTMLAttributes<HTMLDivElement>

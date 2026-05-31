@@ -20,7 +20,7 @@ const EditProductModal = lazy(() =>
   }))
 );
 const ProductDetailModal = lazy(() =>
-  import('@/components/products/ProductDetailModal').then(m => ({
+  import('@happy-baby/feature-products').then(m => ({
     default: m.ProductDetailModal,
   }))
 );
@@ -32,8 +32,7 @@ import {
   useDeleteProduct,
 } from '@/hooks/useProductsGraphQL';
 import { useCategories } from '@/hooks/useCategories';
-import type { ProductFilterInput } from '@/components/products/types';
-import type { Product } from '@/components/products/types';
+import type { ProductFilterInput, Product } from '@happy-baby/feature-products';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { logger } from '@/utils/logger';

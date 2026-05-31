@@ -4,13 +4,13 @@ import { useForm } from 'react-hook-form';
 import UploadIcon2 from 'lucide-react/dist/esm/icons/upload';
 import XIcon from 'lucide-react/dist/esm/icons/x';
 import ImageIcon from 'lucide-react/dist/esm/icons/image';
-import { useImageUpload } from '@/hooks/useImageUpload';
-import { useUploadNotifications } from '@/hooks/useUploadNotifications';
+import { useImageUpload } from '../hooks/useImageUpload';
+import { useUploadNotifications } from '../hooks/useUploadNotifications';
 import type {
   ImageUploadProps,
   ImageUploadFormData,
   UploadResult,
-} from '@/types/upload';
+} from '../types/upload';
 import {
   UploadContainer,
   UploadZone,
@@ -23,7 +23,7 @@ import {
   ImagePreview,
   ImagePreviewImg,
   ImagePreviewOverlay,
-} from './ImageUpload.styles';
+} from './ImageUploadStyles';
 
 export const ImageUpload: React.FC<ImageUploadProps> = ({
   onUpload,
