@@ -21,10 +21,10 @@ import { AuthProviderDashboard } from '@/components/users/AuthProviderDashboard'
 import { UserStatsGrid } from '@/components/users/UserStatsGrid';
 import { UserFilters } from '@/components/users/UserFilters';
 import { UserGridItem } from '@/components/users/UserGridItem';
-import type { EditUserSubmitData } from '@/components/users/EditUserModal';
+import type { EditUserSubmitData } from '@happy-baby/feature-users';
 
 const EditUserModal = lazy(() =>
-  import('@/components/users/EditUserModal').then(m => ({
+  import('@happy-baby/feature-users').then(m => ({
     default: m.EditUserModal,
   }))
 );

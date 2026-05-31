@@ -3,6 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "@happy-baby/feature-users": ["../users/src/index.ts"],
       "@happy-baby/feature-orders": [
         "../../../libs/features/orders/src/index.ts"
       ],

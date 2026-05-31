@@ -225,6 +225,8 @@ importers:
 
   libs/features/products: {}
 
+  libs/features/users: {}
+
   libs/infrastructure/graphql: {}
 
   libs/infrastructure/monitoring: {}

@@ -1,5 +1,8 @@
+import React from 'react';
 import { renderHook, act } from '@testing-library/react';
 import { useUserActions } from '../useUserActions';
+import { UserContext } from '@happy-baby/feature-users';
+import type { UserUseCases } from '@happy-baby/feature-users';
 import { ok, err, DomainError } from '@happy-baby/domain-shared';
 import type { User } from '@happy-baby/domain-user';
 
@@ -17,17 +20,18 @@ const mockActivateExecute = vi.fn();
 const mockDeactivateExecute = vi.fn();
 const mockGetExecute = vi.fn();
 
-vi.mock('@/app/di/users', () => ({
-  useUserUseCases: () => ({
-    list: { execute: mockListExecute },
-    create: { execute: mockCreateExecute },
-    update: { execute: mockUpdateExecute },
-    delete: { execute: mockDeleteExecute },
-    activate: { execute: mockActivateExecute },
-    deactivate: { execute: mockDeactivateExecute },
-    get: { execute: mockGetExecute },
-  }),
-}));
+const mockUseCases = {
+  list: { execute: mockListExecute },
+  create: { execute: mockCreateExecute },
+  update: { execute: mockUpdateExecute },
+  delete: { execute: mockDeleteExecute },
+  activate: { execute: mockActivateExecute },
+  deactivate: { execute: mockDeactivateExecute },
+  get: { execute: mockGetExecute },
+} as unknown as UserUseCases;
+
+const wrapper = ({ children }: { children: React.ReactNode }) =>
+  React.createElement(UserContext.Provider, { value: mockUseCases }, children);
 
 import { toast } from 'react-hot-toast';
 
@@ -66,7 +70,7 @@ describe('useUserActions', () => {
   });
 
   it('initializes with empty state', () => {
-    const { result } = renderHook(() => useUserActions());
+    const { result } = renderHook(() => useUserActions(), { wrapper });
     expect(result.current.users).toEqual([]);
     expect(result.current.total).toBe(0);
     expect(result.current.loading).toBe(false);
@@ -79,7 +83,7 @@ describe('useUserActions', () => {
       mockListExecute.mockResolvedValueOnce(
         ok({ items: [user], total: 1, hasMore: false })
       );
-      const { result } = renderHook(() => useUserActions());
+      const { result } = renderHook(() => useUserActions(), { wrapper });
 
       await act(async () => {
         await result.current.loadUsers();
@@ -90,7 +94,7 @@ describe('useUserActions', () => {
     });
 
     it('uses default limit=20, offset=0', async () => {
-      const { result } = renderHook(() => useUserActions());
+      const { result } = renderHook(() => useUserActions(), { wrapper });
       await act(async () => {
         await result.current.loadUsers();
       });
@@ -101,7 +105,7 @@ describe('useUserActions', () => {
       mockListExecute.mockResolvedValueOnce(
         err(new DomainError('No se pudo cargar', 'ERR'))
       );
-      const { result } = renderHook(() => useUserActions());
+      const { result } = renderHook(() => useUserActions(), { wrapper });
 
       await act(async () => {
         await result.current.loadUsers();
@@ -120,7 +124,7 @@ describe('useUserActions', () => {
       const newUser = makeUser('new-user');
       mockCreateExecute.mockResolvedValueOnce(ok(newUser));
 
-      const { result } = renderHook(() => useUserActions());
+      const { result } = renderHook(() => useUserActions(), { wrapper });
       await act(async () => {
         await result.current.loadUsers();
       });
@@ -137,7 +141,7 @@ describe('useUserActions', () => {
     });
 
     it('shows success toast', async () => {
-      const { result } = renderHook(() => useUserActions());
+      const { result } = renderHook(() => useUserActions(), { wrapper });
       await act(async () => {
         await result.current.createUser({
           email: 'x@example.com',
@@ -152,7 +156,7 @@ describe('useUserActions', () => {
       mockCreateExecute.mockResolvedValueOnce(
         err(new DomainError('Email duplicado', 'DUPLICATE'))
       );
-      const { result } = renderHook(() => useUserActions());
+      const { result } = renderHook(() => useUserActions(), { wrapper });
 
       await act(async () => {
         const success = await result.current.createUser({
@@ -175,7 +179,7 @@ describe('useUserActions', () => {
         ok({ items: [u1, u2], total: 2, hasMore: false })
       );
 
-      const { result } = renderHook(() => useUserActions());
+      const { result } = renderHook(() => useUserActions(), { wrapper });
       await act(async () => {
         await result.current.loadUsers();
       });
@@ -188,7 +192,7 @@ describe('useUserActions', () => {
     });
 
     it('shows success toast', async () => {
-      const { result } = renderHook(() => useUserActions());
+      const { result } = renderHook(() => useUserActions(), { wrapper });
       await act(async () => {
         await result.current.deleteUser('u-1');
       });
@@ -205,7 +209,7 @@ describe('useUserActions', () => {
         ok({ items: [inactive], total: 1, hasMore: false })
       );
 
-      const { result } = renderHook(() => useUserActions());
+      const { result } = renderHook(() => useUserActions(), { wrapper });
       await act(async () => {
         await result.current.loadUsers();
       });
@@ -217,7 +221,7 @@ describe('useUserActions', () => {
     });
 
     it('shows success toast', async () => {
-      const { result } = renderHook(() => useUserActions());
+      const { result } = renderHook(() => useUserActions(), { wrapper });
       await act(async () => {
         await result.current.activateUser('u-1');
       });
@@ -230,7 +234,7 @@ describe('useUserActions', () => {
       mockActivateExecute.mockResolvedValueOnce(
         err(new DomainError('No existe', 'NOT_FOUND'))
       );
-      const { result } = renderHook(() => useUserActions());
+      const { result } = renderHook(() => useUserActions(), { wrapper });
 
       await act(async () => {
         const success = await result.current.activateUser('u-1');
@@ -247,7 +251,7 @@ describe('useUserActions', () => {
         ok({ items: [active], total: 1, hasMore: false })
       );
 
-      const { result } = renderHook(() => useUserActions());
+      const { result } = renderHook(() => useUserActions(), { wrapper });
       await act(async () => {
         await result.current.loadUsers();
       });
@@ -259,7 +263,7 @@ describe('useUserActions', () => {
     });
 
     it('shows success toast', async () => {
-      const { result } = renderHook(() => useUserActions());
+      const { result } = renderHook(() => useUserActions(), { wrapper });
       await act(async () => {
         await result.current.deactivateUser('u-1');
       });

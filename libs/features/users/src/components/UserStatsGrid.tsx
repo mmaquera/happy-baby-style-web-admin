@@ -3,7 +3,7 @@ import UsersIcon from 'lucide-react/dist/esm/icons/users';
 import UserPlusIcon from 'lucide-react/dist/esm/icons/user-plus';
 import ShieldIcon from 'lucide-react/dist/esm/icons/shield';
 import CalendarIcon from 'lucide-react/dist/esm/icons/calendar';
-import { Card } from '@/components/ui/Card';
+import { Card } from '@happy-baby/shared-ui';
 
 interface UserStats {
   totalUsers?: number;

@@ -1,0 +1,15 @@
+{
+  "name": "feature-users",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/features/users/src",
+  "projectType": "library",
+  "tags": ["type:feature", "scope:users"],
+  "targets": {
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p libs/features/users/tsconfig.json"
+      }
+    }
+  }
+}

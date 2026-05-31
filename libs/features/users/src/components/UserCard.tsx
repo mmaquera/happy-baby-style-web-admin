@@ -1,6 +1,6 @@
 import type React from 'react';
-import { cn } from '@/lib/utils';
-import { Card } from '@/components/ui/Card';
+import { cn } from '@happy-baby/shared-utils';
+import { Card } from '@happy-baby/shared-ui';
 
 interface UserCardProps {
   children: React.ReactNode;

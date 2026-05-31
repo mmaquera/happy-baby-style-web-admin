@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import SearchIcon from 'lucide-react/dist/esm/icons/search';
 import type { UserRole } from '@happy-baby/domain-user';
-import { Input } from '@/components/ui/Input';
+import { Input } from '@happy-baby/shared-ui';
 
 interface UserFiltersProps {
   searchTerm: string;

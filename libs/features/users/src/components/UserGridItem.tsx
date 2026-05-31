@@ -1,10 +1,10 @@
 import { memo } from 'react';
 import PhoneIcon from 'lucide-react/dist/esm/icons/phone';
 import CalendarIcon from 'lucide-react/dist/esm/icons/calendar';
-import { cn } from '@/lib/utils';
+import { cn } from '@happy-baby/shared-utils';
 import type { User, UserRole } from '@happy-baby/domain-user';
-import { Card } from '@/components/ui/Card';
-import { UserActionsMenu } from '@/components/users/UserActionsMenu';
+import { Card } from '@happy-baby/shared-ui';
+import { UserActionsMenu } from './UserActionsMenu';
 
 const ROLE_LABEL: Record<UserRole, string> = {
   admin: 'Administrador',
