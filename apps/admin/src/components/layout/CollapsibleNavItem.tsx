@@ -1,6 +1,6 @@
 import type React from 'react';
 import { NavLink } from 'react-router-dom';
-import { cn } from '@/lib/utils';
+import { cn } from '@happy-baby/shared-utils';
 import { useSidebarTooltip } from '@happy-baby/shared-hooks';
 
 interface CollapsibleNavItemProps {

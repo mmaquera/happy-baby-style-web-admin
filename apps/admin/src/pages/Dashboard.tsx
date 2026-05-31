@@ -5,7 +5,7 @@ import UsersIcon from 'lucide-react/dist/esm/icons/users';
 import TrendingUpIcon from 'lucide-react/dist/esm/icons/trending-up';
 import DollarSignIcon from 'lucide-react/dist/esm/icons/dollar-sign';
 import AlertTriangleIcon from 'lucide-react/dist/esm/icons/alert-triangle';
-import { cn } from '@/lib/utils';
+import { cn } from '@happy-baby/shared-utils';
 import { Card } from '@happy-baby/shared-ui';
 import { SessionInfo } from '@happy-baby/feature-auth';
 

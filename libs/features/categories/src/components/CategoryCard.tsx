@@ -5,7 +5,7 @@ import Trash2Icon from 'lucide-react/dist/esm/icons/trash-2';
 import EyeIcon from 'lucide-react/dist/esm/icons/eye';
 import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
 import XCircleIcon from 'lucide-react/dist/esm/icons/x-circle';
-import { cn } from '@/lib/utils';
+import { cn } from '@happy-baby/shared-utils';
 import { Card } from '@happy-baby/shared-ui';
 import type { Category } from '../types/category';
 

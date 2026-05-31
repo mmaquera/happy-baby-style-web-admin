@@ -6,7 +6,7 @@ import UserIcon from 'lucide-react/dist/esm/icons/user';
 import SettingsIcon from 'lucide-react/dist/esm/icons/settings';
 import LogOutIcon from 'lucide-react/dist/esm/icons/log-out';
 import ChevronDownIcon from 'lucide-react/dist/esm/icons/chevron-down';
-import { cn } from '@/lib/utils';
+import { cn } from '@happy-baby/shared-utils';
 import { useAuth } from '@happy-baby/feature-auth';
 import { useLogout } from '@/hooks/useLogout';
 import { LogoutConfirmModal } from '@happy-baby/feature-auth';

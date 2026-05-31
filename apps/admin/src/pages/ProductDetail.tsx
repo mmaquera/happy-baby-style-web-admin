@@ -10,7 +10,7 @@ import Trash2Icon from 'lucide-react/dist/esm/icons/trash-2';
 import PackageIcon from 'lucide-react/dist/esm/icons/package';
 import SettingsIcon from 'lucide-react/dist/esm/icons/settings';
 import DownloadIcon from 'lucide-react/dist/esm/icons/download';
-import { cn } from '@/lib/utils';
+import { cn } from '@happy-baby/shared-utils';
 import { Card } from '@happy-baby/shared-ui';
 import { Button } from '@happy-baby/shared-ui';
 import { useParams, useNavigate } from 'react-router-dom';

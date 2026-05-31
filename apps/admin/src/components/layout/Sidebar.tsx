@@ -8,7 +8,7 @@ import ImageIcon from 'lucide-react/dist/esm/icons/image';
 import HomeIcon from 'lucide-react/dist/esm/icons/home';
 import BabyIcon from 'lucide-react/dist/esm/icons/baby';
 import FolderIcon from 'lucide-react/dist/esm/icons/folder';
-import { cn } from '@/lib/utils';
+import { cn } from '@happy-baby/shared-utils';
 import { useLogout } from '@/hooks/useLogout';
 import { LogoutConfirmModal } from '@happy-baby/feature-auth';
 import { useSidebarStore as useSidebar } from '@happy-baby/shared-stores';

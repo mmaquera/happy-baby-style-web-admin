@@ -10,7 +10,7 @@ import CheckCircleIcon from 'lucide-react/dist/esm/icons/check-circle';
 import XCircleIcon from 'lucide-react/dist/esm/icons/x-circle';
 import LinkIcon from 'lucide-react/dist/esm/icons/link';
 import Edit3Icon from 'lucide-react/dist/esm/icons/edit-3';
-import { cn } from '@/lib/utils';
+import { cn } from '@happy-baby/shared-utils';
 import { Card } from '@happy-baby/shared-ui';
 import { Button } from '@happy-baby/shared-ui';
 import type { Category } from '../types/category';

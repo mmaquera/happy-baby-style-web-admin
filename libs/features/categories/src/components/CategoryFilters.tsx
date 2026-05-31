@@ -10,7 +10,7 @@ import FileTextIcon from 'lucide-react/dist/esm/icons/file-text';
 import PackageIcon from 'lucide-react/dist/esm/icons/package';
 import ChevronDownIcon from 'lucide-react/dist/esm/icons/chevron-down';
 import ChevronUpIcon from 'lucide-react/dist/esm/icons/chevron-up';
-import { cn } from '@/lib/utils';
+import { cn } from '@happy-baby/shared-utils';
 import { Button } from '@happy-baby/shared-ui';
 import { Input } from '@happy-baby/shared-ui';
 import { Card } from '@happy-baby/shared-ui';
