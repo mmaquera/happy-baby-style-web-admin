@@ -6,12 +6,14 @@ import Loader2Icon from 'lucide-react/dist/esm/icons/loader-2';
 import { cn } from '@happy-baby/shared-utils';
 
 const buttonVariants = cva(
-  'group/button inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*="size-"])]:size-4',
+  'group/button inline-flex shrink-0 items-center justify-center gap-1.5 rounded-[var(--control-radius)] border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*="size-"])]:size-4',
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary-hover',
-        primary: 'bg-primary text-primary-foreground hover:bg-primary-hover',
+        default:
+          'bg-primary text-primary-foreground hover:bg-primary-hover hover:shadow-[var(--shadow-control-hover)]',
+        primary:
+          'bg-primary text-primary-foreground hover:bg-primary-hover hover:shadow-[var(--shadow-control-hover)]',
         outline:
           'border-border bg-background text-foreground hover:bg-primary-soft hover:border-primary hover:text-primary',
         secondary:
@@ -24,14 +26,14 @@ const buttonVariants = cva(
         link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {
-        default: 'h-9 px-4',
-        md: 'h-9 px-4',
-        medium: 'h-9 px-4',
-        sm: 'h-8 rounded-md px-3 text-xs',
-        small: 'h-8 rounded-md px-3 text-xs',
-        lg: 'h-10 px-6',
-        large: 'h-10 px-6',
-        icon: 'size-9',
+        sm: 'h-[var(--control-h-sm)] px-[var(--control-px-sm)] text-xs',
+        small: 'h-[var(--control-h-sm)] px-[var(--control-px-sm)] text-xs',
+        md: 'h-[var(--control-h-md)] px-[var(--control-px-md)]',
+        medium: 'h-[var(--control-h-md)] px-[var(--control-px-md)]',
+        default: 'h-[var(--control-h-md)] px-[var(--control-px-md)]',
+        lg: 'h-[var(--control-h-lg)] px-[var(--control-px-lg)]',
+        large: 'h-[var(--control-h-lg)] px-[var(--control-px-lg)]',
+        icon: 'size-[var(--control-h-md)]',
       },
     },
     defaultVariants: {

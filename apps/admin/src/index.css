@@ -54,6 +54,17 @@
   --shadow-brand-md: 0 4px 16px rgba(162, 133, 209, 0.14);
   --shadow-brand-lg: 0 12px 32px rgba(162, 133, 209, 0.18);
   --shadow-brand-xl: 0 20px 48px rgba(162, 133, 209, 0.22);
+
+  /* Control dimensions — Brand defaults (mockup design-system.html) */
+  --control-radius: 1rem; /* 16px — input/button radius */
+  --control-h-sm: 2rem; /* 32px */
+  --control-h-md: 2.5rem; /* 40px */
+  --control-h-lg: 2.75rem; /* 44px — input default + button lg */
+  --control-px-sm: 0.75rem; /* 12px */
+  --control-px-md: 1rem; /* 16px — input/button md */
+  --control-px-lg: 1.375rem; /* 22px — button lg */
+  --control-py-input: 0.75rem; /* 12px */
+  --shadow-control-hover: 0 8px 24px rgba(162, 133, 209, 0.18);
 }
 
 /* ── Semantic tokens — Brand theme (default) ────────────────── */
@@ -105,17 +116,27 @@
   --header-h: 64px;
 }
 
-/* ── :root[data-theme="erp"] — Placeholder (Fase ERP, no implementado) ─
- * TODO: cuando arranque la fase ERP, agregar overrides aquí.
- * Referencia: docs/design-mockups/design-system.html:13-43
- *   - --primary: #875A7B (eggplant)
- *   - --secondary: #00A09D (teal)
- *   - --accent: #F0AD4E (warm yellow)
- *   - --font-sans / --font-heading: Inter
- *   - --radius: 0.25rem (4px control / 6px card)
- *   - sombras neutras (no tintadas)
- *   - tamaños body 14px, h1 28px, densidad compacta
- */
+/* ── :root[data-theme="erp"] — Overrides control system (Fase ERP) ─── */
+:root[data-theme='erp'] {
+  /* TODO Fase ERP: completar paleta y tipografía cuando arranque la fase.
+   * Referencia: docs/design-mockups/design-system.html:13-43
+   *   - --primary: #875A7B (eggplant)
+   *   - --secondary: #00A09D (teal)
+   *   - --accent: #F0AD4E (warm yellow)
+   *   - --font-sans / --font-heading: Inter
+   *   - sombras neutras (no tintadas)
+   *   - tamaños body 14px, h1 28px, densidad compacta
+   * Por ahora solo overrides de control dimensions para validar el switch. */
+  --control-radius: 0.25rem; /* 4px */
+  --control-h-sm: 1.75rem;
+  --control-h-md: 2rem; /* 32px denso */
+  --control-h-lg: 2.25rem; /* 36px */
+  --control-px-sm: 0.5rem;
+  --control-px-md: 0.75rem; /* 8px-12px ERP */
+  --control-px-lg: 1rem;
+  --control-py-input: 0.5rem; /* 8px */
+  --shadow-control-hover: none;
+}
 
 /* ── Global resets & base styles ────────────────────────────── */
 @layer base {

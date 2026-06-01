@@ -50,7 +50,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           data-slot='input'
           aria-invalid={error ? true : undefined}
           className={cn(
-            'h-9 w-full min-w-0 rounded-lg border border-input bg-transparent px-3 py-1 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm',
+            'w-full min-w-0 border border-input bg-transparent text-base transition-colors outline-none h-[var(--control-h-lg)] rounded-[var(--control-radius)] px-[var(--control-px-md)] py-[var(--control-py-input)] placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary-soft disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm',
             hasLeftIcon && 'pl-10',
             rightIcon && 'pr-10',
             className
