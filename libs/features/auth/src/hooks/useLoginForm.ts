@@ -33,7 +33,8 @@ export const useLoginForm = (): UseLoginFormReturn => {
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues,
-    mode: 'onBlur',
+    mode: 'onSubmit',
+    reValidateMode: 'onBlur',
   });
 
   // Memoized redirect path

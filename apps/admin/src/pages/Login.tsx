@@ -20,7 +20,10 @@ export const Login: React.FC = () => {
 
   return (
     <div className='min-h-screen flex items-center justify-center bg-background p-4'>
-      <div className='animate-[loginFadeIn_400ms_ease-out_both] w-full max-w-5xl rounded-3xl overflow-hidden shadow-[var(--shadow-brand-xl)] grid md:grid-cols-[55fr_45fr]'>
+      <div
+        className='animate-[loginFadeIn_400ms_ease-out_both] w-full max-w-5xl rounded-3xl overflow-hidden grid md:grid-cols-[55fr_45fr]'
+        style={{ boxShadow: 'var(--shadow-brand-xl)' }}
+      >
         {/* Hero panel — oculto en mobile */}
         <aside
           aria-hidden='true'
@@ -77,7 +80,7 @@ export const Login: React.FC = () => {
             ].map(item => (
               <li
                 key={item}
-                className='flex items-center gap-2 font-sans text-[15px] text-foreground/60'
+                className='flex items-center gap-2 font-sans text-[15px] text-foreground/60 leading-tight'
               >
                 <CheckCircleIcon
                   size={16}
@@ -91,8 +94,8 @@ export const Login: React.FC = () => {
 
         {/* Form panel */}
         <main className='bg-card flex flex-col justify-center px-6 py-8 md:px-10 md:py-12'>
-          {/* Logo mark centrado — visible en todos los tamaños */}
-          <div className='flex justify-center mb-6'>
+          {/* Logo mark — solo mobile (en desktop, el hero panel ya muestra el logo) */}
+          <div className='flex justify-center mb-6 md:hidden'>
             <LoginLogo size='md' />
           </div>
 

@@ -134,7 +134,7 @@ export const LoginForm: React.FC = () => {
           size='large'
           fullWidth
           isLoading={isLoading}
-          disabled={isLoading || !form.formState.isValid}
+          disabled={isLoading}
         >
           {isLoading ? 'Verificando credenciales...' : 'Iniciar Sesión'}
         </Button>

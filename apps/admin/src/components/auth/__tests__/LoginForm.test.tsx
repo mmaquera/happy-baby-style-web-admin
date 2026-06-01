@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { render } from '@testing-library/react';
 import { MockedProvider, type MockedResponse } from '@apollo/client/testing';
@@ -141,12 +141,12 @@ describe('LoginForm', () => {
     ).toBeInTheDocument();
   });
 
-  it('botón submit está deshabilitado con campos vacíos', async () => {
+  it('botón submit está habilitado con campos vacíos (validación ocurre al submit)', async () => {
     renderLoginForm();
     await waitFor(() => {
       expect(
         screen.getByRole('button', { name: /iniciar sesión/i })
-      ).toBeDisabled();
+      ).not.toBeDisabled();
     });
   });
 
@@ -214,7 +214,7 @@ describe('LoginForm', () => {
     });
   });
 
-  it('muestra error de validación con email inválido', async () => {
+  it('muestra error de validación con email inválido al intentar submit', async () => {
     const user = userEvent.setup();
     renderLoginForm();
     await waitFor(() =>
@@ -224,7 +224,10 @@ describe('LoginForm', () => {
     const emailInput = screen.getByPlaceholderText('admin@happybabystyle.com');
     await user.click(emailInput);
     await user.type(emailInput, 'notanemail');
-    await user.tab();
+
+    // Disparar submit directamente en el form para evitar interferencia de @base-ui en jsdom
+    const form = emailInput.closest('form') as HTMLFormElement;
+    fireEvent.submit(form);
 
     await waitFor(() => {
       expect(

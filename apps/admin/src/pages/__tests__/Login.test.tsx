@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { Login } from '../Login';
 
 const mockNavigate = vi.fn();
 
@@ -25,9 +26,6 @@ vi.mock('@happy-baby/feature-auth', () => ({
   LoginForm: () => <div data-testid='login-form' />,
   useAuth: () => mockUseAuth(),
 }));
-
-// eslint-disable-next-line import/first
-import { Login } from '../Login';
 
 describe('Login', () => {
   beforeEach(() => {
