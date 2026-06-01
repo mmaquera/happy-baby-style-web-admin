@@ -21,7 +21,7 @@ export const Login: React.FC = () => {
   return (
     <div className='min-h-screen flex items-center justify-center bg-background p-4'>
       <div
-        className='animate-[loginFadeIn_400ms_ease-out_both] w-full max-w-5xl rounded-3xl overflow-hidden grid md:grid-cols-[55fr_45fr]'
+        className='animate-[loginFadeIn_400ms_ease-out_both] w-full max-w-5xl rounded-[20px] overflow-hidden grid md:grid-cols-[55fr_45fr]'
         style={{ boxShadow: 'var(--shadow-brand-xl)' }}
       >
         {/* Hero panel — oculto en mobile */}
@@ -67,7 +67,7 @@ export const Login: React.FC = () => {
           </div>
 
           {/* Tagline */}
-          <p className='relative z-10 font-heading font-light text-[20px] text-foreground/70 max-w-xs leading-relaxed mb-8'>
+          <p className='relative z-10 font-heading font-normal text-[20px] text-foreground/70 max-w-xs leading-relaxed mb-8'>
             Tu panel de gestión, diseñado para crecer con tu negocio.
           </p>
 
@@ -108,7 +108,8 @@ export const Login: React.FC = () => {
           )}
 
           <p className='text-xs text-muted-foreground/60 mt-8 text-center'>
-            © 2025 Happy Baby Style. Todos los derechos reservados.
+            © {new Date().getFullYear()} Happy Baby Style. Todos los derechos
+            reservados.
           </p>
         </main>
       </div>

@@ -20,8 +20,8 @@ export const LoginLogo: React.FC<LoginLogoProps> = ({ size = 'md' }) => {
     : 'font-heading font-bold text-[18px] text-foreground leading-tight';
 
   const subTextClass = isLg
-    ? 'font-sans font-normal text-[11px] uppercase tracking-widest text-muted-foreground'
-    : 'font-sans font-normal text-[10px] uppercase tracking-widest text-muted-foreground';
+    ? 'font-sans font-normal text-[13px] uppercase tracking-widest text-muted-foreground'
+    : 'font-sans font-normal text-[12px] uppercase tracking-widest text-muted-foreground';
 
   return (
     <div className='flex items-center gap-3'>

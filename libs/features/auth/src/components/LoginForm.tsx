@@ -47,7 +47,7 @@ export const LoginForm: React.FC = () => {
 
   return (
     <>
-      <h2 className='font-heading mb-2 font-bold text-[26px] text-foreground'>
+      <h2 className='font-heading mb-2 font-bold text-[28px] text-foreground'>
         Iniciar Sesión
       </h2>
       <p className='mb-4 font-sans text-[15px] text-muted-foreground'>
@@ -59,22 +59,24 @@ export const LoginForm: React.FC = () => {
         className='mb-6 flex flex-col gap-4'
       >
         <Input
+          id='login-email'
           label='Correo Electrónico'
           type='email'
           placeholder='admin@happybabystyle.com'
-          leftIcon={<MailIcon size={18} />}
+          leftIcon={<MailIcon size={16} />}
           fullWidth
           {...register('email')}
           error={errors.email?.message ?? ''}
         />
 
         <Input
+          id='login-password'
           label='Contraseña'
           type={showPassword ? 'text' : 'password'}
           placeholder='••••••••'
-          leftIcon={<LockIcon size={18} />}
+          leftIcon={<LockIcon size={16} />}
           rightIcon={
-            showPassword ? <EyeOffIcon size={18} /> : <EyeIcon size={18} />
+            showPassword ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />
           }
           rightIconClickable
           onRightIconClick={togglePasswordVisibility}
@@ -90,7 +92,7 @@ export const LoginForm: React.FC = () => {
           type='button'
           onClick={handleForgotPassword}
           aria-label='¿Olvidaste tu contraseña?'
-          className='-mt-2 self-end rounded px-1 py-0.5 text-sm font-medium text-brand-purple transition-colors hover:bg-muted hover:text-[#FF6B6B] hover:underline active:scale-[0.98]'
+          className='-mt-2 self-end rounded px-1 py-0.5 text-sm font-medium text-brand-purple transition-colors hover:bg-muted hover:text-brand-coral hover:underline active:scale-[0.98]'
         >
           ¿Olvidaste tu contraseña?
         </button>
