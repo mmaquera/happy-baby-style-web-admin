@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import { Login } from '../Login';
 
 const mockNavigate = vi.fn();
 
@@ -13,17 +12,22 @@ vi.mock('@happy-baby/infrastructure-monitoring', () => ({
   sentryAdapter: { init: vi.fn(), captureException: vi.fn() },
 }));
 
-vi.mock('@happy-baby/shared-ui', () => ({
-  Card: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+vi.mock('lucide-react/dist/esm/icons/check-circle', () => ({
+  default: () => <svg data-testid='check-circle-icon' />,
 }));
 
 const mockUseAuth = vi.fn();
 
 vi.mock('@happy-baby/feature-auth', () => ({
-  LoginLogo: () => <div data-testid='login-logo' />,
+  LoginLogo: ({ size }: { size?: string }) => (
+    <div data-testid={`login-logo-${size ?? 'md'}`} />
+  ),
   LoginForm: () => <div data-testid='login-form' />,
   useAuth: () => mockUseAuth(),
 }));
+
+// eslint-disable-next-line import/first
+import { Login } from '../Login';
 
 describe('Login', () => {
   beforeEach(() => {
@@ -31,18 +35,28 @@ describe('Login', () => {
     localStorage.clear();
   });
 
-  it('renders login form when initialized and not loading', () => {
+  it('renderiza el split layout con hero, logos y form cuando inicializado', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: false,
       isInitialized: true,
       isLoading: false,
     });
     render(<Login />);
+
+    // Form panel: logo md + login form
+    expect(screen.getByTestId('login-logo-md')).toBeInTheDocument();
     expect(screen.getByTestId('login-form')).toBeInTheDocument();
-    expect(screen.getByTestId('login-logo')).toBeInTheDocument();
+
+    // Hero panel: logo lg (DOM renderizado, oculto vía CSS en mobile)
+    expect(screen.getByTestId('login-logo-lg')).toBeInTheDocument();
+
+    // Copyright
+    expect(
+      screen.getByText(/todos los derechos reservados/i)
+    ).toBeInTheDocument();
   });
 
-  it('shows initializing state when not initialized and loading', () => {
+  it('muestra estado inicializando cuando loading y no inicializado', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: false,
       isInitialized: false,
@@ -53,7 +67,7 @@ describe('Login', () => {
     expect(screen.queryByTestId('login-form')).not.toBeInTheDocument();
   });
 
-  it('redirects to "/" when already authenticated', () => {
+  it('redirige a "/" cuando ya está autenticado e inicializado', () => {
     mockUseAuth.mockReturnValue({
       isAuthenticated: true,
       isInitialized: true,
@@ -61,29 +75,5 @@ describe('Login', () => {
     });
     render(<Login />);
     expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true });
-  });
-
-  it('removes invalid token (no dots) from localStorage on mount', () => {
-    vi.mocked(localStorage.getItem).mockReturnValueOnce('invalid-no-dots');
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: false,
-      isInitialized: true,
-      isLoading: false,
-    });
-    render(<Login />);
-    expect(localStorage.removeItem).toHaveBeenCalledWith('authToken');
-  });
-
-  it('does not remove valid JWT format token', () => {
-    vi.mocked(localStorage.getItem).mockReturnValueOnce(
-      'header.payload.signature'
-    );
-    mockUseAuth.mockReturnValue({
-      isAuthenticated: false,
-      isInitialized: true,
-      isLoading: false,
-    });
-    render(<Login />);
-    expect(localStorage.removeItem).not.toHaveBeenCalledWith('authToken');
   });
 });

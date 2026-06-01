@@ -10,21 +10,22 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        default: 'bg-primary text-primary-foreground hover:bg-primary-hover',
+        primary: 'bg-primary text-primary-foreground hover:bg-primary-hover',
         outline:
-          'border-border bg-background hover:bg-muted hover:text-foreground',
+          'border-border bg-background text-foreground hover:bg-primary-soft hover:border-primary hover:text-primary',
         secondary:
           'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        ghost: 'hover:bg-muted hover:text-foreground',
+        ghost: 'hover:bg-primary-soft hover:text-primary',
         destructive:
-          'bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20',
+          'bg-destructive text-white hover:brightness-90 focus-visible:border-destructive/40 focus-visible:ring-destructive/20',
         danger:
-          'bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20',
+          'bg-destructive text-white hover:brightness-90 focus-visible:border-destructive/40 focus-visible:ring-destructive/20',
         link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {
         default: 'h-9 px-4',
+        md: 'h-9 px-4',
         medium: 'h-9 px-4',
         sm: 'h-8 rounded-md px-3 text-xs',
         small: 'h-8 rounded-md px-3 text-xs',

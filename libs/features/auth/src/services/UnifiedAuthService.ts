@@ -272,6 +272,17 @@ export class UnifiedAuthService {
       }
     } finally {
       await this.tokenStorage.clearTokens();
+      // Limpiar cache Apollo para evitar data leak entre sesiones de usuarios distintos.
+      // clearStore() descarta la cache sin refetch automático (a diferencia de resetStore()).
+      // Try/catch interno: si clearStore rechaza, no enmascarar el AuthError del catch externo.
+      try {
+        await this.client.clearStore();
+      } catch (cacheError: unknown) {
+        logger.warn(
+          'Apollo cache clearStore failed during logout:',
+          cacheError
+        );
+      }
     }
   }
 

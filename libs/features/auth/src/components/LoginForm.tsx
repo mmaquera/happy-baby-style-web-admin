@@ -47,11 +47,11 @@ export const LoginForm: React.FC = () => {
 
   return (
     <>
-      <h2 className='font-heading mb-2 text-2xl font-medium text-foreground'>
+      <h2 className='font-heading mb-2 font-bold text-[26px] text-foreground'>
         Iniciar Sesión
       </h2>
-      <p className='mb-4 text-base text-muted-foreground'>
-        Ingresa tus credenciales para acceder al panel de administración
+      <p className='mb-4 font-sans text-[15px] text-muted-foreground'>
+        Ingresa tus credenciales para acceder al panel.
       </p>
 
       <form

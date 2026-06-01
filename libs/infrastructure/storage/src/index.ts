@@ -4,4 +4,5 @@ export {
   SessionTokenStorage,
   TokenStorageFactory,
   tokenStorage,
+  clearLegacyAuthKeys,
 } from './TokenStorage';

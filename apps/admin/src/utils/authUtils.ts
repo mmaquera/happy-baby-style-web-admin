@@ -1,6 +1,8 @@
 // Auth Utilities
 // Single Responsibility: Handle authentication-related storage cleanup.
 
+import { clearLegacyAuthKeys } from '@happy-baby/infrastructure-storage';
+
 const ACCESS_TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
 const TOKEN_EXPIRES_AT_KEY = 'tokenExpiresAt';
@@ -44,6 +46,9 @@ const cleanExpiredTokensOnLoad = (): void => {
 };
 
 if (typeof window !== 'undefined') {
+  // Limpia claves legacy de versiones anteriores (authToken, user)
+  clearLegacyAuthKeys();
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', cleanExpiredTokensOnLoad);
   } else {

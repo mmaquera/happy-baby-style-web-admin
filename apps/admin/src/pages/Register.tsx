@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card } from '@happy-baby/shared-ui';
 import { LoginLogo, RegisterForm, useAuth } from '@happy-baby/feature-auth';
-import { logger } from '@happy-baby/infrastructure-monitoring';
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -18,26 +17,6 @@ export const Register: React.FC = () => {
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, isInitialized, navigate, location]);
-
-  useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      try {
-        const tokenParts = token.split('.');
-        if (tokenParts.length !== 3) {
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('refreshToken');
-          localStorage.removeItem('user');
-          logger.debug('Cleared invalid tokens');
-        }
-      } catch {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
-        logger.debug('Cleared malformed tokens');
-      }
-    }
-  }, []);
 
   const handleRegistrationSuccess = () => {
     navigate('/login', {

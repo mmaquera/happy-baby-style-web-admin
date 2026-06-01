@@ -41,5 +41,6 @@
       "{workspaceRoot}/tsconfig.base.json",
       "{workspaceRoot}/apps/admin/vite.config.ts"
     ]
-  }
+  },
+  "analytics": true
 }

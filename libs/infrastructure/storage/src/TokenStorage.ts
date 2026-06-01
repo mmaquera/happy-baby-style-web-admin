@@ -169,3 +169,15 @@ export class TokenStorageFactory {
 
 // Default export for convenience
 export const tokenStorage = TokenStorageFactory.createLocalStorage();
+
+/**
+ * Limpia claves legacy escritas por versiones anteriores del cliente.
+ * Nunca son escritas por LocalTokenStorage actual — solo existen si el
+ * usuario tiene datos de una sesión previa con claves distintas.
+ * Invocar una vez en el arranque de la app (ver authUtils.ts).
+ */
+export const clearLegacyAuthKeys = (): void => {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('user');
+};

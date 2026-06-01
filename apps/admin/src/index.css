@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Quicksand:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Quicksand:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* ── Happy Baby Style brand tokens ──────────────────────────── */
 @theme inline {
@@ -13,15 +13,21 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-soft: var(--primary-soft);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
+  --color-border-soft: var(--border-soft);
   --color-input: var(--input);
   --color-ring: var(--ring);
 
@@ -36,38 +42,80 @@
   --font-heading: 'Montserrat', sans-serif;
   --font-mono: 'JetBrains Mono', 'Consolas', monospace;
 
-  /* Radius */
+  /* Radius (escala completa Brand) */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --radius-pill: 9999px;
+
+  /* Brand shadows (tintadas) — mockup design-system.html Brand */
+  --shadow-brand-sm: 0 2px 8px rgba(162, 133, 209, 0.1);
+  --shadow-brand-md: 0 4px 16px rgba(162, 133, 209, 0.14);
+  --shadow-brand-lg: 0 12px 32px rgba(162, 133, 209, 0.18);
+  --shadow-brand-xl: 0 20px 48px rgba(162, 133, 209, 0.22);
 }
 
-/* ── Semantic tokens (light mode) ───────────────────────────── */
+/* ── Semantic tokens — Brand theme (default) ────────────────── */
 :root {
   --radius: 0.75rem;
 
-  /* purple #A285D1 → hsl(263 45% 67%) */
+  /* Surfaces / text — purple #A285D1 ≈ hsl(263 45% 67%) */
   --background: hsl(0 0% 100%);
   --foreground: hsl(0 0% 17%);
   --card: hsl(0 0% 100%);
   --card-foreground: hsl(0 0% 17%);
   --popover: hsl(0 0% 100%);
   --popover-foreground: hsl(0 0% 17%);
+
+  /* Primary — Brand purple */
   --primary: hsl(263 45% 67%);
   --primary-foreground: hsl(0 0% 100%);
+  --primary-hover: hsl(263 41% 60%);
+  --primary-soft: rgba(162, 133, 209, 0.1);
+
+  /* Secondary — Brand turquoise */
   --secondary: hsl(175 36% 55%);
   --secondary-foreground: hsl(0 0% 100%);
+
+  /* Muted */
   --muted: hsl(0 0% 97%);
   --muted-foreground: hsl(25 4% 53%);
+
+  /* Accent — purple-light (shadcn-style; coral lives under brand-coral) */
   --accent: hsl(263 45% 93%);
   --accent-foreground: hsl(263 45% 40%);
+
+  /* Semantic feedback (mockup design-system.html Brand) */
+  --success: hsl(147 50% 62%); /* #6FCF97 */
+  --warning: hsl(46 84% 62%); /* #F2C94C */
+  --info: hsl(199 86% 65%); /* #56CCF2 */
   --destructive: hsl(0 76% 57%);
   --destructive-foreground: hsl(0 0% 100%);
+
+  /* Borders */
   --border: hsl(25 4% 90%);
+  --border-soft: hsl(0 13% 94%); /* #F1EFEF */
   --input: hsl(25 4% 90%);
   --ring: hsl(263 45% 67%);
+
+  /* Layout (consumido por shell en Fase 3) */
+  --sidebar-w: 256px;
+  --sidebar-w-collapsed: 72px;
+  --header-h: 64px;
 }
+
+/* ── :root[data-theme="erp"] — Placeholder (Fase ERP, no implementado) ─
+ * TODO: cuando arranque la fase ERP, agregar overrides aquí.
+ * Referencia: docs/design-mockups/design-system.html:13-43
+ *   - --primary: #875A7B (eggplant)
+ *   - --secondary: #00A09D (teal)
+ *   - --accent: #F0AD4E (warm yellow)
+ *   - --font-sans / --font-heading: Inter
+ *   - --radius: 0.25rem (4px control / 6px card)
+ *   - sombras neutras (no tintadas)
+ *   - tamaños body 14px, h1 28px, densidad compacta
+ */
 
 /* ── Global resets & base styles ────────────────────────────── */
 @layer base {
@@ -195,5 +243,28 @@
   to {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+@keyframes loginFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Respeto por preferencias de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  @layer base {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
