@@ -15,9 +15,163 @@ Trabajas en el panel administrativo **Happy Baby Style**, un e-commerce de produ
 Antes de proponer cualquier diseño, debés tener internalizado:
 
 1. **Dirección estratégica**: el producto evoluciona de e-commerce admin → ERP completo (Inventory, Invoicing, CRM, Purchase, Helpdesk, HR). Leé `ROADMAP_ERP_ODOO.md` para fases P1/P2/P3.
-2. **Sistema de temas dual**: el proyecto maneja dos identidades visuales — **Brand theme** (e-commerce, cálido, baby-friendly) y **ERP theme** (Odoo-inspired, denso, productivo). Los prompts y tokens están en `CLAUDE_DESIGN_PROMPTS.md`. **Siempre** identificá qué tema aplica a la pantalla en cuestión antes de proponer.
+2. **Sistema de temas dual**: el proyecto maneja dos identidades visuales — **Brand theme** (e-commerce, cálido, baby-friendly, default actual) y **ERP theme** (Odoo-inspired, denso, productivo, placeholder en código). **Siempre** identificá qué tema aplica a la pantalla en cuestión antes de proponer. Los tokens canónicos están en la sección **Sistema de diseño — Tokens canónicos** más abajo (no necesitás abrir otros archivos para conocerlos).
 3. **Stack visual**: Tailwind v4 + shadcn/ui + lucide-react 0.294. NO sugerir librerías de iconos alternativas ni componentes fuera del design system existente sin justificación arquitectónica fuerte.
 4. **Arquitectura**: Clean Architecture en monorepo NX. Los componentes UI viven en `libs/shared/ui` (puros, sin lógica de negocio) y se componen en `libs/features/*`. Respetá esto en tus propuestas.
+
+## Sistema de diseño — Tokens canónicos
+
+Fuente de verdad visual: `docs/design-mockups/design-system.html` + `docs/design-mockups/app-shell.html`. Lo que sigue está extraído de ahí — usá estos valores como autoridad. **Brand es el tema activo por defecto** (`<html data-theme="brand">`); ERP está como placeholder comentado en `apps/admin/src/index.css` y se materializará en una fase futura.
+
+### Brand theme (default — e-commerce, generoso, baby-friendly)
+
+**Densidad:** generosa · **Personalidad:** cálida, redondeada, contemporánea consumer
+
+```css
+/* Paleta */
+--c-primary: #a285d1; /* purple — CTAs principales */
+--c-primary-hover: #8e6fc2;
+--c-primary-soft: rgba(
+  162,
+  133,
+  209,
+  0.12
+); /* fondo soft + hover de outline/ghost */
+--c-secondary: #5cbdb4; /* turquoise — acciones complementarias, OK */
+--c-accent: #ff7b5a; /* coral — highlights / badges destacados */
+--c-success: #6fcf97;
+--c-warning: #f2c94c;
+--c-error: #eb5757;
+--c-info: #56ccf2;
+--c-bg: #f8f8f8; /* background general (el repo hoy usa #FFF; coordinar antes de cambiar) */
+--c-surface: #ffffff; /* cards, modales, inputs */
+--c-text: #2c2c2c; /* texto principal */
+--c-text-muted: #8b8680; /* texto secundario, helpers, captions */
+--c-border: #ececec;
+--c-border-soft: #f1efef;
+
+/* Tipografía */
+--f-heading: 'Montserrat', system-ui, sans-serif; /* 300–700 */
+--f-body: 'Quicksand', system-ui, sans-serif; /* 300–700 */
+--f-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+/* Sizes (Brand es ~15-20% más grande que ERP) */
+--h1: 36px;
+--h2: 28px;
+--h3: 20px;
+--body: 15px;
+--caption: 13px;
+--mono: 13px;
+
+/* Radius (orgánico, redondeado) */
+--r-control: 16px; /* inputs, botones */
+--r-card: 20px; /* cards, modales */
+--r-pill: 9999px;
+
+/* Shadows tintadas con primary (no negras planas) */
+--sh-sm: 0 2px 8px rgba(162, 133, 209, 0.1); /* hover/tooltip */
+--sh-md: 0 8px 24px rgba(162, 133, 209, 0.18); /* dropdowns/popovers */
+--sh-lg: 0 16px 40px rgba(162, 133, 209, 0.22); /* modales/drawers */
+--sh-xl: 0 20px 48px rgba(162, 133, 209, 0.22); /* hero containers */
+```
+
+**Reglas Brand:**
+
+- Padding generoso: inputs `12px 16px`, botones md `10px 18px`, lg `14px 22px`.
+- Sombras siempre tintadas con el primary (nunca `rgba(0,0,0,...)` planas).
+- Headings en Montserrat 600–700; body en Quicksand 400–500.
+- Animaciones suaves (200–400ms ease-out), microinteracciones (translateY hover, shadow growth).
+- Contrastes: `#A285D1` sobre blanco solo en componentes UI ≥3:1 (botones grandes, badges); para texto, usá `text-foreground` (#2C2C2C) o `text-muted-foreground` (#8B8680).
+
+### ERP theme (placeholder — denso, utilitario, Odoo-inspired)
+
+**Estado actual:** definido como placeholder comentado en `apps/admin/src/index.css` (`:root[data-theme="erp"]`), no implementado. Si una nueva pantalla apunta al ERP, decirlo explícitamente y validar tokens con el usuario antes de codear.
+
+```css
+--c-primary: #875a7b; /* eggplant Odoo */
+--c-primary-hover: #6f4863;
+--c-secondary: #00a09d;
+--c-accent: #f0ad4e;
+--c-success: #28a745;
+--c-warning: #ffc107;
+--c-error: #dc3545;
+--c-info: #17a2b8;
+--c-bg: #f0eeee;
+--c-surface: #ffffff;
+--c-text: #212529;
+--c-text-muted: #6c757d;
+--c-border: #dee2e6;
+
+--f-heading: 'Inter', system-ui, sans-serif;
+--f-body: 'Inter', system-ui, sans-serif;
+
+--h1: 28px;
+--h2: 22px;
+--h3: 17px;
+--body: 14px;
+--caption: 12px;
+
+--r-control: 4px;
+--r-card: 6px;
+
+--sh-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+--sh-base: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+--sh-md: 0 2px 6px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.06);
+--sh-lg: 0 4px 12px rgba(0, 0, 0, 0.1), 0 8px 24px rgba(0, 0, 0, 0.08);
+```
+
+**Reglas ERP:**
+
+- Densidad compacta: inputs `8px 12px`, botones sm `6px 10px`, md `8px 14px`, lg `11px 18px`.
+- Sombras neutras (rgba(0,0,0,...)), no tintadas.
+- Inter en todo. Radius corto (4–6px). Tablas con muchas filas, scanning rápido.
+- Pensado para usuarios power, alta densidad de información en pantalla.
+
+### Mapeo a clases Tailwind en código (puente operativo)
+
+El repo ya expone estos tokens como utilities Tailwind v4 vía `@theme inline` en `apps/admin/src/index.css`. Cuando propongas clases concretas:
+
+| Token canónico              | Clase Tailwind disponible                                                                                                                                      |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--c-primary` (#A285D1)     | `bg-primary`, `text-primary`, `border-primary` (semánticas) o `bg-brand-purple` (literal)                                                                      |
+| `--c-primary-hover`         | `hover:bg-primary-hover`                                                                                                                                       |
+| `--c-primary-soft`          | `bg-primary-soft`, `hover:bg-primary-soft`                                                                                                                     |
+| `--c-secondary` (#5CBDB4)   | `bg-secondary`, `text-secondary`, `bg-brand-turquoise`                                                                                                         |
+| `--c-accent` (#FF7B5A)      | `bg-brand-coral`, `text-brand-coral` (semantic `accent` está reservado a purple-light)                                                                         |
+| `--c-success` (#6FCF97)     | `bg-success`, `text-success`                                                                                                                                   |
+| `--c-warning` (#F2C94C)     | `bg-warning`, `text-warning`                                                                                                                                   |
+| `--c-info` (#56CCF2)        | `bg-info`, `text-info`                                                                                                                                         |
+| `--c-error` (#EB5757)       | `bg-destructive`, `text-destructive`                                                                                                                           |
+| `--c-surface` (#FFF)        | `bg-card`, `bg-popover`                                                                                                                                        |
+| `--c-text` (#2C2C2C)        | `text-foreground`                                                                                                                                              |
+| `--c-text-muted`            | `text-muted-foreground`                                                                                                                                        |
+| `--c-border` (#ECECEC)      | `border-border`                                                                                                                                                |
+| `--c-border-soft` (#F1EFEF) | `border-border-soft`                                                                                                                                           |
+| `--f-heading`               | `font-heading` (Montserrat)                                                                                                                                    |
+| `--f-body`                  | `font-sans` (Quicksand, default)                                                                                                                               |
+| `--f-mono`                  | `font-mono` (JetBrains Mono)                                                                                                                                   |
+| `--r-control` (16px)        | `rounded-lg` (depende del valor base de `--radius: 0.75rem`); para 14px usar `rounded-md`; para 20px `rounded-xl`.                                             |
+| `--r-pill`                  | `rounded-full`                                                                                                                                                 |
+| Sombras brand               | `style={{ boxShadow: 'var(--shadow-brand-xl)' }}` — Tailwind v4 NO resuelve `shadow-[var(...)]` correctamente; usar style inline o registrar `@utility` en CSS |
+
+### Componentes canónicos (mockup)
+
+- **Buttons**: 5 variantes (primary, secondary, outline, ghost, danger) × 3 tamaños (sm, md, lg). Outline en idle es **neutro** (`text-foreground`); el morado aparece solo en hover (`hover:text-primary hover:bg-primary-soft`). Esto preserva jerarquía cuando un "Cancelar" outline está al lado de un "Eliminar" sólido danger.
+- **Inputs**: fondo `surface`, border `border`. Focus: `border-primary` + `ring-3 ring-primary-soft`. Error: `border-destructive` + `ring-destructive/20`. Disabled: `bg-bg` + `text-muted` + `cursor-not-allowed`.
+- **Badges (pills)**: padding Brand `4px 12px`, fuente 12px, font-weight 600. 7 tonos: success, warning, error, info, neutral, primary, primary-with-icon (destacado).
+- **Cards**: `bg-card border border-border rounded-xl shadow-brand-md`. Composición canónica: `Header (border-bottom) → Content (padding 18px) → Footer (border-top + bg-muted)`.
+- **Logo mark**: badge gradiente `linear-gradient(135deg, #A285D1 0%, #8E6FC2 100%)` con texto "HB" en Montserrat 700 + wordmark "Happy Baby" + sub uppercase tracking-widest.
+
+### Mockups de referencia en el repo
+
+Todos en `docs/design-mockups/*.html`:
+
+- `design-system.html` — tokens + componentes canónicos con toggle Brand/ERP.
+- `app-shell.html` — shell brand (sidebar 256px, header 64px, breadcrumbs, ⌘K search, user menu).
+- `app-shell-erp.html` — shell ERP (denso, columnas múltiples).
+- `dashboard.html`, `productos-list.html`, `producto-form.html`, `pedidos-kanban.html`, `inventario.html`, `crm-pipeline.html`, `purchase-order.html`, `helpdesk.html`, `reviews.html`, `cupones.html`, `settings.html`, `chatter.html`, `search-panel-states.html`, `statusbar-pedidos.html`.
+
+Cuando dudes de cómo se vería algo, abrí el mockup correspondiente. Si el mockup no existe para la pantalla en cuestión, **derivá desde `design-system.html` + `app-shell.html`** respetando densidad/sombras/radius del tema activo.
 
 ## Tu rol y mandato
 
