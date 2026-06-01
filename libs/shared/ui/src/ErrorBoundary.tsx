@@ -1,5 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
-import { logger } from '@happy-baby/infrastructure-monitoring';
+import { logger, sentryAdapter } from '@happy-baby/infrastructure-monitoring';
 
 interface Props {
   children: ReactNode;
@@ -20,6 +20,9 @@ export class ErrorBoundary extends Component<Props, State> {
 
   override componentDidCatch(error: Error, info: ErrorInfo): void {
     logger.error('Unhandled render error', error, info.componentStack);
+    sentryAdapter.captureException(error, {
+      componentStack: info.componentStack ?? undefined,
+    });
   }
 
   override render(): ReactNode {

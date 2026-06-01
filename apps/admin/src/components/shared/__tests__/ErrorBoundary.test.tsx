@@ -3,6 +3,7 @@ import { ErrorBoundary } from '@happy-baby/shared-ui';
 
 vi.mock('@happy-baby/infrastructure-monitoring', () => ({
   logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
+  sentryAdapter: { init: vi.fn(), captureException: vi.fn() },
 }));
 
 const ThrowingComponent = ({ shouldThrow }: { shouldThrow: boolean }) => {
