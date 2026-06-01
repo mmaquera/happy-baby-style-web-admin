@@ -1,10 +1,7 @@
 # Dependencies
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
-# Lock files for other package managers (project uses pnpm)
+# Lock files from other package managers (project uses pnpm)
 package-lock.json
 yarn.lock
 
@@ -13,14 +10,30 @@ dist/
 build/
 *.tsbuildinfo
 
-# Environment files (ignore all real envs, keep only the example template)
+# Environment files — keep only the canonical template
 .env
 .env.*
 !.env.example
+env.example
+env.template
+
+# Local playground / scratch files with credentials
+authentication_query_example.graphql
+
+# Test coverage
+coverage/
+
+# NX cache
+.nx/cache
+.nx/workspace-data
 
 # Logs
 logs/
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
 # Runtime data
 pids/
@@ -28,53 +41,9 @@ pids/
 *.seed
 *.pid.lock
 
-# Coverage directory used by tools like istanbul
-coverage/
-*.lcov
-
-# nyc test coverage
-.nyc_output
-
-# Dependency directories
-jspm_packages/
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
+# Optional caches
 .eslintcache
-
-# Microbundle cache
-.rpt2_cache/
-.rts2_cache_cjs/
-.rts2_cache_es/
-.rts2_cache_umd/
-
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# dotenv environment variables file
-.env.test
-
-# parcel-bundler cache (https://parceljs.org/)
-.cache
-.parcel-cache
-
-# Next.js build output
-.next
-
-# Nuxt.js build / generate output
-.nuxt
-
-# Storybook build outputs
-.out
-.storybook-out
+.npm
 
 # Temporary folders
 tmp/
@@ -95,8 +64,3 @@ temp/
 .Trashes
 ehthumbs.db
 Thumbs.db
-
-
-
-.nx/cache
-.nx/workspace-data
