@@ -126,15 +126,64 @@ Si tocás `.graphql`, **siempre** corré `pnpm codegen` y commiteá `generated/g
 
 ---
 
-## 7. Agentes
+## 7. Agentes — orquestación
 
-| Agente                           | Cuándo usarlo                                                                                                                                                        |
-| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `frontend-architect-advisor`     | Decisiones arquitectónicas: nueva lib, cambio de capas, estructura de módulo, contratos entre capas, revisión de alineación Clean Architecture, trade-offs de diseño |
-| `frontend-implementation-expert` | Implementación de código: componentes, hooks, páginas, refactors React/TypeScript, optimización de rendimiento, migración de features a Clean Architecture           |
-| `Explore`                        | Búsquedas amplias en código (ubicar archivos, símbolos, referencias)                                                                                                 |
-| `Plan`                           | Diseñar estrategia de implementación antes de codear                                                                                                                 |
-| `claude`                         | Fallback de propósito general                                                                                                                                        |
+### 7.1 Mapa de agentes
+
+| Agente                           | Especialidad                            | Cuándo invocarlo                                                                                                                                |
+| -------------------------------- | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `frontend-security-auditor`      | Seguridad FE, auth, tokens, deps        | Cambios en `libs/features/auth`, `libs/infrastructure/storage`, `useUnifiedAuth`, cookies, CSP, `dangerouslySetInnerHTML`, bumps con riesgo CVE |
+| `frontend-architect-advisor`     | Arquitectura Clean, capas, contratos    | Nueva lib, cambio de `tags`/`depConstraints`, mover código entre capas, evaluación de trade-offs con blast radius >1 carpeta                    |
+| `ux-ui-design-critic`            | UX/UI, tema Brand vs ERP, design system | Antes de implementar nueva página, después de cerrar feature UI, dudas de tokens/densidad, revisión de flujos confusos                          |
+| `frontend-implementation-expert` | Implementación React/TS                 | Features, componentes, hooks, páginas, refactors, migración a Clean Architecture, performance                                                   |
+| `Explore`                        | Búsqueda en código (read-only)          | Localizar archivos/símbolos/referencias antes de un cambio amplio                                                                               |
+| `Plan`                           | Estrategia de implementación            | Diseñar plan antes de codear cuando hay >1 enfoque viable                                                                                       |
+| `claude` / `general-purpose`     | Fallback                                | Tareas que no encajan en los anteriores                                                                                                         |
+
+### 7.2 Precedencia (cuando una tarea cruza dominios)
+
+```
+frontend-security-auditor  >  frontend-architect-advisor  >  ux-ui-design-critic  >  frontend-implementation-expert
+```
+
+Seguridad **bloquea merge**; arquitectura define contratos; UX define experiencia; implementación ejecuta. Si dos categorías aplican y son independientes, **invocar en paralelo** (un solo mensaje con múltiples `Agent` calls).
+
+### 7.3 Pipelines por tipo de tarea
+
+| Tarea                                          | Pipeline                                                                                                                                                                                   |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Nueva feature con UI**                       | `Plan` → `frontend-architect-advisor` (validar capa) → `ux-ui-design-critic` (proponer UX) → `frontend-implementation-expert` (codear) → skill `verify` → skill `code-review`              |
+| **Migrar feature legacy a Clean Architecture** | `frontend-architect-advisor` (plan de capas + aliases) → `frontend-implementation-expert` (ejecutar) → skill `code-review`                                                                 |
+| **Cambio en auth / storage / tokens**          | `frontend-security-auditor` (gate previo) → `frontend-implementation-expert` (ejecutar) → `frontend-security-auditor` (review post) → skill `security-review` antes de merge               |
+| **Refactor de performance**                    | `Explore` (mapear callers) → `frontend-implementation-expert` (aplica `react-best-practices`) → skill `verify`                                                                             |
+| **Diseño de nueva página/dashboard**           | `ux-ui-design-critic` (layout + tema Brand/ERP) → `frontend-architect-advisor` (validar ubicación de feature) → `frontend-implementation-expert` (codear)                                  |
+| **Bump de dep con potencial CVE**              | `frontend-security-auditor` (audit + alternativas) → decisión: mantener, parchear o reemplazar                                                                                             |
+| **Cambio en `project.json` / tags / aliases**  | `frontend-architect-advisor` (obligatorio) → `frontend-implementation-expert` (aplicar) → `pnpm lint` para re-validar `@nx/enforce-module-boundaries`                                      |
+| **Surface en UI de Reviews / Cupones (P1)**    | `Explore` (schema GraphQL existente) → `ux-ui-design-critic` (UX del módulo) → `frontend-architect-advisor` (definir `libs/features/{reviews,coupons}`) → `frontend-implementation-expert` |
+
+### 7.4 Coordinación agente ↔ skill
+
+Cada agente ya consume sus skills internamente — **no los invoques vos por encima** del agente. Mapeo:
+
+| Agente                           | Skills que consume                                     |
+| -------------------------------- | ------------------------------------------------------ |
+| `frontend-architect-advisor`     | `senior-architect`                                     |
+| `frontend-implementation-expert` | `senior-frontend`, `react-best-practices`              |
+| `frontend-security-auditor`      | `senior-security`, `security-review`                   |
+| `ux-ui-design-critic`            | `ui-design-system`, `frontend-design`, `ui-ux-pro-max` |
+
+**Invocar skill directo (sin agente)** cuando: el cambio es menor (1 archivo, sin trade-offs), o cuando un agente terminó y necesitás un gate de verificación final: `verify`, `run`, `code-review`, `security-review`.
+
+### 7.5 Paralelización
+
+Cuando dos agentes son independientes (ej: `frontend-security-auditor` sobre el flujo de auth + `ux-ui-design-critic` sobre el form visual del login), **lanzarlos en el mismo mensaje** con múltiples `Agent` tool calls para que corran concurrentes. Si hay dependencia (ej: arquitectura → implementación), secuencial.
+
+### 7.6 Gates obligatorios antes de PR
+
+1. Si el diff toca `libs/features/auth`, `libs/infrastructure/storage`, cookies, tokens, CSP o `dangerouslySetInnerHTML` → `frontend-security-auditor` + skill `security-review`.
+2. Si el diff toca `project.json`, tags NX, `depConstraints` o aliases → `frontend-architect-advisor` + `pnpm lint`.
+3. Si el diff toca UI visible al usuario → `ux-ui-design-critic` + skill `verify`.
+4. Siempre antes del PR → skill `code-review`.
 
 ---
 
