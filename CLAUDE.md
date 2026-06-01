@@ -117,12 +117,13 @@ Si tocás `.graphql`, **siempre** corré `pnpm codegen` y commiteá `generated/g
 | Implementación de feature FE, componente, página, refactor React              | `senior-frontend`      | Crear/modificar código en `libs/features/*`, `libs/shared/ui`, `apps/admin/src/pages`                                                                               |
 | Diseño visual, design tokens, paleta, densidad, componente shadcn nuevo       | `ui-design-system`     | Al tocar tema (Brand vs ERP), definir un componente nuevo, o cuando hay duda de tokens. Contexto Brand/ERP en `CLAUDE_DESIGN_PROMPTS.md`                            |
 | Vulnerabilidades, manejo de tokens, auth flows, CSP, XSS, deps inseguras      | `senior-security`      | Antes de mergear cambios en `libs/features/auth`, `libs/infrastructure/storage` (TokenStorage), `apps/admin/src/hooks/useUnifiedAuth.ts`, o al revisar `pnpm audit` |
+| CI/CD, observabilidad, deployment, build, infra, secrets, NX cache            | `senior-devops`        | Antes de tocar `.github/workflows/*`, `nx.json` targets, wiring Sentry, scripts de build, env vars o estrategia de deploy                                           |
 | Performance React (re-renders, memoization, bundle)                           | `react-best-practices` | Al detectar problemas o como gate en pages pesadas antes de merge                                                                                                   |
 | Verificar cambio en navegador                                                 | `verify` o `run`       | Antes de marcar tarea como complete en features con UI                                                                                                              |
 | Code review del diff                                                          | `code-review`          | Al cerrar feature, antes del PR                                                                                                                                     |
 | Security review de la rama                                                    | `security-review`      | Antes de mergear ramas que tocan auth / storage / cookies                                                                                                           |
 
-**Regla de precedencia** (si la tarea cruza categorías): `senior-security` > `senior-architect` > `senior-frontend` > `ui-design-system`.
+**Regla de precedencia** (si la tarea cruza categorías): `senior-security` > `senior-architect` > `senior-devops` > `senior-frontend` > `ui-design-system`.
 
 ---
 
@@ -134,6 +135,7 @@ Si tocás `.graphql`, **siempre** corré `pnpm codegen` y commiteá `generated/g
 | -------------------------------- | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `frontend-security-auditor`      | Seguridad FE, auth, tokens, deps        | Cambios en `libs/features/auth`, `libs/infrastructure/storage`, `useUnifiedAuth`, cookies, CSP, `dangerouslySetInnerHTML`, bumps con riesgo CVE |
 | `frontend-architect-advisor`     | Arquitectura Clean, capas, contratos    | Nueva lib, cambio de `tags`/`depConstraints`, mover código entre capas, evaluación de trade-offs con blast radius >1 carpeta                    |
+| `devops-engineer-hbs`            | CI/CD, infra, observabilidad, deploy    | GitHub Actions, NX affected, Sentry wiring, caching pnpm/NX/Vite, env vars/secrets, build optimization, deployment, dependabot/audit            |
 | `ux-ui-design-critic`            | UX/UI, tema Brand vs ERP, design system | Antes de implementar nueva página, después de cerrar feature UI, dudas de tokens/densidad, revisión de flujos confusos                          |
 | `frontend-implementation-expert` | Implementación React/TS                 | Features, componentes, hooks, páginas, refactors, migración a Clean Architecture, performance                                                   |
 | `Explore`                        | Búsqueda en código (read-only)          | Localizar archivos/símbolos/referencias antes de un cambio amplio                                                                               |
@@ -143,10 +145,10 @@ Si tocás `.graphql`, **siempre** corré `pnpm codegen` y commiteá `generated/g
 ### 7.2 Precedencia (cuando una tarea cruza dominios)
 
 ```
-frontend-security-auditor  >  frontend-architect-advisor  >  ux-ui-design-critic  >  frontend-implementation-expert
+frontend-security-auditor  >  frontend-architect-advisor  >  devops-engineer-hbs  >  ux-ui-design-critic  >  frontend-implementation-expert
 ```
 
-Seguridad **bloquea merge**; arquitectura define contratos; UX define experiencia; implementación ejecuta. Si dos categorías aplican y son independientes, **invocar en paralelo** (un solo mensaje con múltiples `Agent` calls).
+Seguridad **bloquea merge**; arquitectura define contratos; DevOps define pipeline/infra; UX define experiencia; implementación ejecuta. Si dos categorías aplican y son independientes, **invocar en paralelo** (un solo mensaje con múltiples `Agent` calls).
 
 ### 7.3 Pipelines por tipo de tarea
 
@@ -160,6 +162,10 @@ Seguridad **bloquea merge**; arquitectura define contratos; UX define experienci
 | **Bump de dep con potencial CVE**              | `frontend-security-auditor` (audit + alternativas) → decisión: mantener, parchear o reemplazar                                                                                             |
 | **Cambio en `project.json` / tags / aliases**  | `frontend-architect-advisor` (obligatorio) → `frontend-implementation-expert` (aplicar) → `pnpm lint` para re-validar `@nx/enforce-module-boundaries`                                      |
 | **Surface en UI de Reviews / Cupones (P1)**    | `Explore` (schema GraphQL existente) → `ux-ui-design-critic` (UX del módulo) → `frontend-architect-advisor` (definir `libs/features/{reviews,coupons}`) → `frontend-implementation-expert` |
+| **CI/CD pipeline nuevo o cambio en workflows** | `devops-engineer-hbs` (diseño con NX affected + gates) → aplicar YAML → validar en PR de prueba → `frontend-security-auditor` si toca secrets/CSP                                          |
+| **Wiring Sentry / observabilidad**             | `frontend-architect-advisor` (validar capa `infrastructure/monitoring`) → `devops-engineer-hbs` (init + source maps + env) → `frontend-implementation-expert` (instrumentación en código)  |
+| **Deploy a producción / preview deploys**      | `devops-engineer-hbs` (estrategia + env vars + SPA fallback) → `frontend-security-auditor` (CSP headers + secrets) → ejecución                                                             |
+| **Optimización de build / bundle / CI cache**  | `devops-engineer-hbs` (NX cache + pnpm store + Vite chunks) → `frontend-implementation-expert` si requiere lazy-loading de rutas/componentes                                               |
 
 ### 7.4 Coordinación agente ↔ skill
 
@@ -170,6 +176,7 @@ Cada agente ya consume sus skills internamente — **no los invoques vos por enc
 | `frontend-architect-advisor`     | `senior-architect`                                     |
 | `frontend-implementation-expert` | `senior-frontend`, `react-best-practices`              |
 | `frontend-security-auditor`      | `senior-security`, `security-review`                   |
+| `devops-engineer-hbs`            | `senior-devops`                                        |
 | `ux-ui-design-critic`            | `ui-design-system`, `frontend-design`, `ui-ux-pro-max` |
 
 **Invocar skill directo (sin agente)** cuando: el cambio es menor (1 archivo, sin trade-offs), o cuando un agente terminó y necesitás un gate de verificación final: `verify`, `run`, `code-review`, `security-review`.
@@ -182,8 +189,9 @@ Cuando dos agentes son independientes (ej: `frontend-security-auditor` sobre el 
 
 1. Si el diff toca `libs/features/auth`, `libs/infrastructure/storage`, cookies, tokens, CSP o `dangerouslySetInnerHTML` → `frontend-security-auditor` + skill `security-review`.
 2. Si el diff toca `project.json`, tags NX, `depConstraints` o aliases → `frontend-architect-advisor` + `pnpm lint`.
-3. Si el diff toca UI visible al usuario → `ux-ui-design-critic` + skill `verify`.
-4. Siempre antes del PR → skill `code-review`.
+3. Si el diff toca `.github/workflows/*`, `nx.json` targets, scripts de build, env vars, secrets, wiring Sentry o manifiestos de deploy → `devops-engineer-hbs`.
+4. Si el diff toca UI visible al usuario → `ux-ui-design-critic` + skill `verify`.
+5. Siempre antes del PR → skill `code-review`.
 
 ---
 
