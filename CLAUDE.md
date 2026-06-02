@@ -101,7 +101,7 @@ pnpm test:coverage
 
 # GraphQL
 pnpm graphql:download-schema  # rover introspect → apps/admin/src/graphql/schema.graphql
-pnpm codegen                  # regenera apps/admin/src/generated/graphql.ts
+pnpm codegen                  # regenera libs/infrastructure/graphql/src/generated/graphql.ts
 pnpm codegen:check            # CI: falla si el generated está desincronizado
 ```
 
@@ -128,6 +128,25 @@ Si tocás `.graphql`, **siempre** corré `pnpm codegen` y commiteá `generated/g
 ---
 
 ## 7. Agentes — orquestación
+
+### 7.0 Contrato de ejecución (disparo automático post-plan)
+
+**Regla dura:** todo plan aprobado se ejecuta vía el orquestador de agentes, no a mano. Al salir de plan mode (o al recibir un "ejecutá / dale / proceder" sobre un plan), **antes de escribir código**:
+
+1. **Clasificá la tarea** contra §7.3 (tipo de tarea → pipeline). Si cruza dominios, aplicá precedencia §7.2.
+2. **Lanzá el pipeline correspondiente** disparando los agentes en el orden definido. Pasos independientes → en paralelo (§7.5, un solo mensaje con múltiples `Agent` calls).
+3. **No saltees agentes del pipeline.** Si decidís omitir uno, justificá explícitamente por qué no aplica.
+4. **Cerrá con los gates §7.6** antes de proponer PR.
+
+**Excepción (ejecución directa sin orquestador)** — solo si se cumplen **todas**:
+
+- Cambio en **1 archivo** sin trade-offs arquitectónicos.
+- **No** toca: `auth`, `storage`/tokens, `project.json`/tags/aliases, `.github/workflows`, `nx.json`, secrets, `.graphql`, ni UI visible al usuario.
+- Blast radius ≤ 1 carpeta.
+
+En ese caso, invocá el **skill** directo (§6) en vez del agente. Cualquier duda → orquestá.
+
+> "Plan" acá = el plan aprobado (plan mode o un plan que el usuario manda ejecutar), **no** el agente `Plan` de §7.1 (ese es quien _produce_ el plan). El plan aprobado **es** el disparador: "ejecutar el plan" = correr su pipeline de agentes, no codear de una.
 
 ### 7.1 Mapa de agentes
 
