@@ -134,7 +134,7 @@ Si tocás `.graphql`, **siempre** corré `pnpm codegen` y commiteá `generated/g
 **Regla dura:** todo plan aprobado se ejecuta vía el orquestador de agentes, no a mano. Al salir de plan mode (o al recibir un "ejecutá / dale / proceder" sobre un plan), **antes de escribir código**:
 
 1. **Clasificá la tarea** contra §7.3 (tipo de tarea → pipeline). Si cruza dominios, aplicá precedencia §7.2.
-2. **Lanzá el pipeline correspondiente** disparando los agentes en el orden definido. Pasos independientes → en paralelo (§7.5, un solo mensaje con múltiples `Agent` calls).
+2. **Lanzá el pipeline correspondiente** disparando los agentes en el orden definido. Pasos independientes → en paralelo (§7.5). Si el alcance es **múltiple** (N features/módulos/dimensiones) y el usuario lo habilitó, orquestá con `Workflow` (§7.7) en vez de fan-out manual.
 3. **No saltees agentes del pipeline.** Si decidís omitir uno, justificá explícitamente por qué no aplica.
 4. **Cerrá con los gates §7.6** antes de proponer PR.
 
@@ -171,20 +171,20 @@ Seguridad **bloquea merge**; arquitectura define contratos; DevOps define pipeli
 
 ### 7.3 Pipelines por tipo de tarea
 
-| Tarea                                          | Pipeline                                                                                                                                                                                   |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Nueva feature con UI**                       | `Plan` → `frontend-architect-advisor` (validar capa) → `ux-ui-design-critic` (proponer UX) → `frontend-implementation-expert` (codear) → skill `verify` → skill `code-review`              |
-| **Migrar feature legacy a Clean Architecture** | `frontend-architect-advisor` (plan de capas + aliases) → `frontend-implementation-expert` (ejecutar) → skill `code-review`                                                                 |
-| **Cambio en auth / storage / tokens**          | `frontend-security-auditor` (gate previo) → `frontend-implementation-expert` (ejecutar) → `frontend-security-auditor` (review post) → skill `security-review` antes de merge               |
-| **Refactor de performance**                    | `Explore` (mapear callers) → `frontend-implementation-expert` (aplica `react-best-practices`) → skill `verify`                                                                             |
-| **Diseño de nueva página/dashboard**           | `ux-ui-design-critic` (layout + tema Brand/ERP) → `frontend-architect-advisor` (validar ubicación de feature) → `frontend-implementation-expert` (codear)                                  |
-| **Bump de dep con potencial CVE**              | `frontend-security-auditor` (audit + alternativas) → decisión: mantener, parchear o reemplazar                                                                                             |
-| **Cambio en `project.json` / tags / aliases**  | `frontend-architect-advisor` (obligatorio) → `frontend-implementation-expert` (aplicar) → `pnpm lint` para re-validar `@nx/enforce-module-boundaries`                                      |
-| **Surface en UI de Reviews / Cupones (P1)**    | `Explore` (schema GraphQL existente) → `ux-ui-design-critic` (UX del módulo) → `frontend-architect-advisor` (definir `libs/features/{reviews,coupons}`) → `frontend-implementation-expert` |
-| **CI/CD pipeline nuevo o cambio en workflows** | `devops-engineer-hbs` (diseño con NX affected + gates) → aplicar YAML → validar en PR de prueba → `frontend-security-auditor` si toca secrets/CSP                                          |
-| **Wiring Sentry / observabilidad**             | `frontend-architect-advisor` (validar capa `infrastructure/monitoring`) → `devops-engineer-hbs` (init + source maps + env) → `frontend-implementation-expert` (instrumentación en código)  |
-| **Deploy a producción / preview deploys**      | `devops-engineer-hbs` (estrategia + env vars + SPA fallback) → `frontend-security-auditor` (CSP headers + secrets) → ejecución                                                             |
-| **Optimización de build / bundle / CI cache**  | `devops-engineer-hbs` (NX cache + pnpm store + Vite chunks) → `frontend-implementation-expert` si requiere lazy-loading de rutas/componentes                                               |
+| Tarea                                               | Pipeline                                                                                                                                                                                   |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Nueva feature con UI**                            | `Plan` → `frontend-architect-advisor` (validar capa) → `ux-ui-design-critic` (proponer UX) → `frontend-implementation-expert` (codear) → skill `verify` → skill `code-review`              |
+| **Migrar feature legacy a Clean Architecture**      | `frontend-architect-advisor` (plan de capas + aliases) → `frontend-implementation-expert` (ejecutar) → skill `code-review`                                                                 |
+| **Cambio en auth / storage / tokens**               | `frontend-security-auditor` (gate previo) → `frontend-implementation-expert` (ejecutar) → `frontend-security-auditor` (review post) → skill `security-review` antes de merge               |
+| **Refactor de performance**                         | `Explore` (mapear callers) → `frontend-implementation-expert` (aplica `react-best-practices`) → skill `verify`                                                                             |
+| **Diseño de nueva página/dashboard**                | `ux-ui-design-critic` (layout + tema Brand/ERP) → `frontend-architect-advisor` (validar ubicación de feature) → `frontend-implementation-expert` (codear)                                  |
+| **Bump de dep con potencial CVE**                   | `frontend-security-auditor` (audit + alternativas) → decisión: mantener, parchear o reemplazar                                                                                             |
+| **Cambio en `project.json` / tags / aliases**       | `frontend-architect-advisor` (obligatorio) → `frontend-implementation-expert` (aplicar) → `pnpm lint` para re-validar `@nx/enforce-module-boundaries`                                      |
+| **Surface en UI de Reviews / Cupones (P1)**         | `Explore` (schema GraphQL existente) → `ux-ui-design-critic` (UX del módulo) → `frontend-architect-advisor` (definir `libs/features/{reviews,coupons}`) → `frontend-implementation-expert` |
+| **CI/CD pipeline nuevo o cambio en GitHub Actions** | `devops-engineer-hbs` (diseño con NX affected + gates) → aplicar YAML → validar en PR de prueba → `frontend-security-auditor` si toca secrets/CSP                                          |
+| **Wiring Sentry / observabilidad**                  | `frontend-architect-advisor` (validar capa `infrastructure/monitoring`) → `devops-engineer-hbs` (init + source maps + env) → `frontend-implementation-expert` (instrumentación en código)  |
+| **Deploy a producción / preview deploys**           | `devops-engineer-hbs` (estrategia + env vars + SPA fallback) → `frontend-security-auditor` (CSP headers + secrets) → ejecución                                                             |
+| **Optimización de build / bundle / CI cache**       | `devops-engineer-hbs` (NX cache + pnpm store + Vite chunks) → `frontend-implementation-expert` si requiere lazy-loading de rutas/componentes                                               |
 
 ### 7.4 Coordinación agente ↔ skill
 
@@ -200,9 +200,18 @@ Cada agente ya consume sus skills internamente — **no los invoques vos por enc
 
 **Invocar skill directo (sin agente)** cuando: el cambio es menor (1 archivo, sin trade-offs), o cuando un agente terminó y necesitás un gate de verificación final: `verify`, `run`, `code-review`, `security-review`.
 
-### 7.5 Paralelización
+### 7.5 Paralelización — dos niveles
 
-Cuando dos agentes son independientes (ej: `frontend-security-auditor` sobre el flujo de auth + `ux-ui-design-critic` sobre el form visual del login), **lanzarlos en el mismo mensaje** con múltiples `Agent` tool calls para que corran concurrentes. Si hay dependencia (ej: arquitectura → implementación), secuencial.
+**Nivel 1 — fan-out manual (default):** cuando 2–3 agentes son independientes (ej: `frontend-security-auditor` sobre auth + `ux-ui-design-critic` sobre el form visual del login), **lanzarlos en el mismo mensaje** con múltiples `Agent` tool calls para que corran concurrentes. Si hay dependencia (arquitectura → implementación), secuencial.
+
+**Nivel 2 — orquestación determinística (`Workflow`):** cuando el trabajo es **fan-out sobre una lista** (N archivos/módulos/dimensiones), **multi-stage con barrera condicional**, o **loop hasta condición**, subí a la herramienta `Workflow` (§7.7). Da control flow real (loops, condicionales, `pipeline`/`parallel`), caché de resultados y verificación adversarial — cosas que el fan-out manual no puede expresar.
+
+| Señal en la tarea                                            | Mecanismo                         |
+| ------------------------------------------------------------ | --------------------------------- |
+| 2–3 agentes independientes, una pasada                       | Nivel 1 — múltiples `Agent` calls |
+| Misma operación sobre N items (N≥4)                          | Nivel 2 — `Workflow` + `pipeline` |
+| Etapas que dependen de "todos los resultados de la anterior" | Nivel 2 — `Workflow` + `parallel` |
+| "Buscá hasta no encontrar más" / "verificá cada hallazgo"    | Nivel 2 — `Workflow` (patrones)   |
 
 ### 7.6 Gates obligatorios antes de PR
 
@@ -211,6 +220,35 @@ Cuando dos agentes son independientes (ej: `frontend-security-auditor` sobre el 
 3. Si el diff toca `.github/workflows/*`, `nx.json` targets, scripts de build, env vars, secrets, wiring Sentry o manifiestos de deploy → `devops-engineer-hbs`.
 4. Si el diff toca UI visible al usuario → `ux-ui-design-critic` + skill `verify`.
 5. Siempre antes del PR → skill `code-review`.
+
+### 7.7 Workflows — orquestación determinística
+
+La herramienta `Workflow` ejecuta un script JS que orquesta subagentes con control flow real. **Requiere opt-in explícito del usuario** (que mencione "workflow" o pida orquestación multi-agente); no lo dispares por tu cuenta. Cuando aplica, reemplaza al fan-out manual para procesos repetitivos o multi-etapa.
+
+**Primitivas (default → `pipeline`):**
+
+- `pipeline(items, stage1, stage2, …)` — cada item recorre todas las etapas **sin barrera**: el item A puede estar en stage 3 mientras B sigue en stage 1. Wall-clock = la cadena más lenta, no la suma. **Usalo por defecto.**
+- `parallel(thunks)` — **barrera**: espera todos. Solo cuando la etapa N necesita _todos_ los resultados de N-1 (dedup global, early-exit si total=0, comparación cruzada).
+- `agent(prompt, {schema, phase, agentType, isolation})` — un subagente. `agentType` acepta los de §7.1 (`frontend-implementation-expert`, etc.); `schema` fuerza salida estructurada validada; `isolation:'worktree'` solo si N agentes mutan archivos en paralelo y chocarían.
+
+**Patrones de calidad (componer según la tarea):**
+
+| Patrón                      | Cuándo en este repo                                                                 |
+| --------------------------- | ----------------------------------------------------------------------------------- |
+| **Adversarial verify**      | Confirmar hallazgos de `security-review` / `code-review` con N escépticos por bug   |
+| **Pipeline de dimensiones** | Review del diff por eje (bugs, perf, arch, a11y) → verificar cada uno al cerrar     |
+| **Fan-out sobre lista**     | Migrar K features legacy a Clean Arch, o tipar K forms con zod — un item por agente |
+| **Loop-until-dry**          | Auditoría exhaustiva: seguir buscando hasta K rondas sin hallazgos nuevos           |
+| **Judge panel**             | Evaluar N enfoques de diseño/arquitectura en paralelo y sintetizar el ganador       |
+
+**Pipelines §7.3 que escalan a `Workflow`** (cuando el alcance es múltiple):
+
+- **Migrar features legacy a Clean Arch** sobre varias features → `pipeline` con etapas `architect-advisor` (plan de capas) → `implementation-expert` (ejecutar, `isolation:'worktree'`) → `code-review`.
+- **Surface UI Reviews + Cupones (P1)** → `parallel` de dos sub-pipelines (uno por módulo), cada uno `Explore` → `ux-ui-design-critic` → `implementation-expert`.
+- **Review pre-PR multi-dimensión** → `pipeline` de dimensiones → verificación adversarial → síntesis, antes de los gates §7.6.
+- **Auditoría de seguridad de la rama** → loop-until-dry de `frontend-security-auditor` + verify adversarial.
+
+**Regla:** los gates §7.6 siguen siendo obligatorios — un `Workflow` los _ejecuta dentro_ de sus etapas, no los reemplaza. Escalá a workflow solo si el ahorro de wall-clock justifica el costo de tokens (decenas de agentes); para ≤3 agentes de una pasada, quedate en Nivel 1 (§7.5).
 
 ---
 
